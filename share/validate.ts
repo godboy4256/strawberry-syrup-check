@@ -6,7 +6,7 @@
  * 3: 일용직
  * 4: 초단시간
  * 5: 자영업
- * 
+ *
  * 퇴직사유
  * 0: 권고사직
  * 1: 계약만료
@@ -24,48 +24,57 @@
  */
 
 const DefineParamInfo = {
-    severancePay: { // 퇴직금
-        type: "number",
-        minimum: 0,
-    },
-    salary: { // 월급
-        type: "number",
-        minimum: 0,
-        maximum: 9999999999,
-    },
-    workCate: { // 근로형태
-        type: "number",
-        minimum: 0,
-        maximum: 5,
-    },
-    retireReason: { // 퇴직사유
-        type: "number",
-        minimum: 0,
-        maximum: 12,
-    },
-    subYear: { // 총 고용보험 가입 기간 (년)(단기예술인 등)
-        type: "number",
-        minimum: 0,
-        maximum: 50,
-    },
-    subMonth: { // 총 고용보험 가입 기간 (월)(단기예술인 등)
-        type: "number",
-        minimum: 0,
-        maximum: 11,
-    },
-    weekWorkTime: { // 주 근무시간 (초단시간 등)
-        type: "number",
-        minimum: 1,
-        maximum: 14,
-    },
-    weekWorkDay: { // 주 근무일 (초단시간 등)
-        type: "number",
-        minimum: 1,
-        maximum: 2,
-    },
-    grade: { // 자영업자 고용보험 등급
-        type: "number",
-        minimum: 1,
-        maximum: 10
-    }
-}
+  severancePay: {
+    // 퇴직금
+    type: "number",
+    minimum: 0,
+  },
+  salary: {
+    // 월급
+    type: "number",
+    minimum: 0,
+    maximum: 9999999999,
+  },
+  workCate: {
+    // 근로형태
+    type: "number",
+    minimum: 0,
+    maximum: 5,
+  },
+  retireReason: {
+    // 퇴직사유
+    type: "number",
+    minimum: 0,
+    maximum: 12,
+  },
+  subYear: {
+    // 총 고용보험 가입 기간 (년)(단기예술인 등)
+    type: "number",
+    minimum: 0,
+    maximum: 50,
+  },
+  subMonth: {
+    // 총 고용보험 가입 기간 (월)(단기예술인 등)
+    type: "number",
+    minimum: 0,
+    maximum: 11,
+  },
+  weekWorkTime: {
+    // 주 근무시간 (초단시간 등)
+    type: "number",
+    minimum: 1,
+    maximum: 14,
+  },
+  weekWorkDay: {
+    // 주 근무일 (초단시간 등)
+    type: "number",
+    minimum: 1,
+    maximum: 2,
+  },
+  grade: {
+    // 자영업자 고용보험 등급
+    type: "number",
+    minimum: 1,
+    maximum: 10,
+  },
+};
