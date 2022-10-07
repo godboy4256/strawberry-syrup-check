@@ -1,0 +1,18 @@
+#sidemenu_container {
+  width: 100%;
+  height: 100vh;
+  position: fixed;
+  top: 0;
+  left: 0;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-evenly;
+  padding-top: 54.5px;
+  z-index: 1000;
+}
+
+#sidemenu_container button {
+  width: 100%;
+  font-size: 28px;
+}

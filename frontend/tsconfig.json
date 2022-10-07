@@ -20,5 +20,5 @@
     "webpack",
     "./node_modules/**/*"
   ],
-  "include": ["./src/**/*", "@type"]
+  "include": ["./src/**/*", "@type", "custom.d.ts"]
 }
