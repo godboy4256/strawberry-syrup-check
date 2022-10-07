@@ -1,0 +1,78 @@
+@font-face {
+  font-family: Jua;
+  src: url("../assets/fonts/Jua-Regular.ttf");
+}
+
+@font-face {
+  font-family: NanumSquareRoundOTF;
+  src: url("../assets/fonts/NanumSquareRoundOTFR.otf");
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  color: rgba(0, 0, 0, 0.8);
+  font-size: 18px;
+  font-family: Jua;
+  outline: none;
+  box-sizing: border-box;
+}
+
+body {
+  background-color: azure;
+}
+
+li {
+  list-style: none;
+}
+a {
+  text-decoration: none;
+  color: rgba(0, 0, 0, 0.8);
+}
+
+button {
+  background: none;
+  border: none;
+  cursor: pointer;
+  height: auto;
+}
+
+.strong_red {
+  color: rgba(255, 0, 0, 0.8);
+}
+.strong_blue {
+  color: rgba(0, 10, 255, 1);
+}
+
+.bg_color_main {
+  background-color: rgba(255, 101, 89, 1);
+}
+.bg_color_white {
+  background-color: white;
+}
+.font_color_main {
+  color: rgba(255, 73, 58, 1);
+}
+.font_color_white {
+  color: white;
+}
+
+.fs_12 {
+  font-size: 12px;
+}
+.fs_14 {
+  font-size: 14px;
+}
+.fs_18 {
+  font-size: 14px;
+}
+.fs_25 {
+  font-size: 25px;
+}
+
+#app_container {
+  max-width: 500px;
+  width: 100%;
+  margin: 0 auto;
+  position: relative;
+}
