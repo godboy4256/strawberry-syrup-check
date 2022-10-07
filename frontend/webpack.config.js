@@ -13,12 +13,12 @@ module.exports = {
   },
   resolve: {
     modules: [path.join(__dirname, "node_modules")],
-    extensions: [".tsx", ".ts", ".js", ".css"],
+    extensions: [".tsx", ".ts", ".js", ".css", ".svg"],
   },
   module: {
     rules: [
       {
-        test: /\.(js|jsx)$/,
+        test: /\.svg$/,
         exclude: "/node_modules/",
         loader: "babel-loader",
       },
@@ -45,6 +45,17 @@ module.exports = {
           },
         ],
         exclude: /node_modules/,
+      },
+      {
+        test: /\.(png|svg)$/,
+        use: [
+          {
+            loader: "file-loader",
+            options: {
+              name: "images/[name].[ext]?[hash]",
+            },
+          },
+        ],
       },
     ],
   },

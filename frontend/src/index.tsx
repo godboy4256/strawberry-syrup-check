@@ -1,8 +1,14 @@
 import { createRoot } from "react-dom/client";
-import * as React from "react";
-import "./public.css";
-
+import React from "react";
+import "./styles/public.css";
+import Footer from "./components/layout/footer";
+import MainPage from "./pages/mainPage";
 const App = () => {
-  return <div>딸기 시럽!!</div>;
+  return (
+    <div id="app_container">
+      <MainPage />
+      <Footer />
+    </div>
+  );
 };
 createRoot(document.getElementById("root")).render(<App />);
