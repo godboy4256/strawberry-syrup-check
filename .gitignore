@@ -105,6 +105,4 @@ dist
 
 # add
 backend/build/
-backend/share/
-frontend/share/
 frontend/build/

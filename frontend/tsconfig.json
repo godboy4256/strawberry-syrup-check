@@ -1,0 +1,24 @@
+{
+  "compilerOptions": {
+    "target": "es6",
+    "module": "esnext",
+    "moduleResolution": "node",
+    "noResolve": false,
+    "noImplicitAny": false,
+    "removeComments": false,
+    "sourceMap": true,
+    "allowJs": true,
+    "jsx": "react",
+    "allowSyntheticDefaultImports": true,
+    "keyofStringsOnly": true
+  },
+  "typeRoots": ["node_modules/@types", "src/@type"],
+  "exclude": [
+    "node_modules",
+    "build",
+    "scripts",
+    "webpack",
+    "./node_modules/**/*"
+  ],
+  "include": ["./src/**/*", "@type"]
+}

@@ -3,9 +3,7 @@
   "version": "1.0.0",
   "description": "corp Bundle made by ByuckChon",
   "main": "",
-  "scripts": {
-    "update-share": "bash ./z_build_script/UpdateShareFile.sh"
-  },
+  "scripts": {},
   "repository": {
     "type": "git",
     "url": "git+https://github.com/LawyLand/moneysylove.git"
