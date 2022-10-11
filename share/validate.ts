@@ -23,7 +23,10 @@
  * 12: 기타 불가피한 사유
  */
 
-const DefineParamInfo = {
+ export const DefineParamInfo = {
+  retired: { // 퇴사여부
+    type: 'boolean'
+  },
   severancePay: {
     // 퇴직금
     type: "number",
@@ -77,4 +80,12 @@ const DefineParamInfo = {
     minimum: 1,
     maximum: 10,
   },
+  enterDay: { // 입사일
+    type: 'string'
+  },
+  retiredDay: { // 퇴사일
+    type: 'string'
+  }
+
+
 };
