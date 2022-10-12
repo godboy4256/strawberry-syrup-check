@@ -7,11 +7,6 @@ import path from 'path'
 import { createServerAsCluster } from "./lib/cluster";
 
 const server = fastify({
-    // logger: {
-    //     transport: {
-    //         target: 'pino-pretty'
-    //     }
-    // }
     logger: false
 })
 
@@ -27,8 +22,8 @@ server.setNotFoundHandler(function (req, reply) {
     reply.code(404).sendFile('index.html')//send({ error: 'Not Found', message: 'Four Oh Four 🤷‍♂️', statusCode: 404 })
 })
 
-server.register(import('./routes/calculate'))
-
+server.register(import('./routes/standard'))
+server.register(import('./routes/detail'), {prefix: '/detail'})
 
 function serverStart() {
     server.listen({port: 8080, host: '0.0.0.0'}, (err, addr) => {
@@ -41,6 +36,3 @@ function serverStart() {
 }
 
 createServerAsCluster(serverStart)
-
-
-
