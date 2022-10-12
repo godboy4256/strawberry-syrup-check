@@ -27,25 +27,21 @@
   retired: { // 퇴사여부
     type: 'boolean'
   },
-  severancePay: {
-    // 퇴직금
+  severancePay: { // 퇴직금
     type: "number",
     minimum: 0,
   },
-  salary: {
-    // 월급
+  salary: { // 월급
     type: "number",
     minimum: 0,
     maximum: 9999999999,
   },
-  workCate: {
-    // 근로형태
+  workCate: { // 근로형태
     type: "number",
     minimum: 0,
     maximum: 5,
   },
-  retireReason: {
-    // 퇴직사유
+  retireReason: { // 퇴직사유
     type: "number",
     minimum: 0,
     maximum: 12,
@@ -89,3 +85,12 @@
 
 
 };
+
+export const DefinedParamErrorMesg: { [col_: string]: string } = {
+  birth: "생년월일을 입력해주세요",
+  disabled: "장애여부를 선택해주세요",
+  enterDay: "입사일 및 퇴사일을 입력해주세요",
+  retiredDay: "입사일 및 퇴사일을 입력해주세요",
+  ealryRetire: "퇴사일이 입사일보다 빠릅니다.",
+  salary: "월 급여를 입력해 주세요"  
+}
