@@ -6,14 +6,12 @@
   position: absolute;
   bottom: 0;
 }
-
 #footer_header {
   width: 100%;
   display: flex;
   justify-content: space-between;
   padding: 7px 0;
 }
-
 #footer_header button {
   line-height: 0;
   padding-right: 4px;
@@ -21,16 +19,10 @@
 #footer_header button.active {
   transform: rotateX(180deg);
 }
-
 #footer_contents {
   border-top: 1px solid rgba(255, 255, 255, 0.4);
   font-size: 10px;
   padding: 4px 6px;
   font-family: NanumSquareRoundOTF;
   line-height: 1.5;
-  display: none;
-}
-
-#footer_contents.active {
-  display: block;
 }

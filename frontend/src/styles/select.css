@@ -1,0 +1,20 @@
+.select_popup {
+  background-color: rgba(255, 227, 226, 1);
+  padding: 30px 25px;
+  width: 252px;
+  height: 252px;
+  overflow-y: auto;
+}
+
+.options {
+  width: 100%;
+  padding: 9px 0;
+  background-color: rgba(255, 101, 89, 1);
+  color: white;
+  margin-bottom: 20px;
+  border-radius: 5px;
+}
+
+.options:last-child {
+  margin-bottom: 0;
+}
