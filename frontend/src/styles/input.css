@@ -1,0 +1,13 @@
+.input_style {
+  display: flex;
+  border: 1px solid rgba(255, 101, 89, 1);
+  border-radius: 2px;
+  padding: 12px 16px;
+  color: rgba(255, 101, 89, 1);
+}
+
+.input_style input {
+  width: 100%;
+  margin: 0 10px;
+  border-bottom: 1px solid rgba(255, 101, 89, 1);
+}
