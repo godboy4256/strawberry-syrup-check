@@ -34,7 +34,12 @@ button {
   background: none;
   border: none;
   cursor: pointer;
-  height: auto;
+  font-size: 18px;
+}
+
+input {
+  border: none;
+  background: none;
 }
 
 .strong_red {
@@ -63,10 +68,16 @@ button {
 .fs_14 {
   font-size: 14px;
 }
-.fs_18 {
+.fs_16 {
   font-size: 14px;
 }
+.fs_18 {
+  font-size: 18px;
+}
 .fs_25 {
+  font-size: 25px;
+}
+.fs_36 {
   font-size: 25px;
 }
 
