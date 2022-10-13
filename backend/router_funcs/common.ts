@@ -1,6 +1,13 @@
 import dayjs from "dayjs"
 
-export function getDateVal(reqEnterDay: string, reqRetiredDay: string | undefined) { // dayjs 또는 JS Date로 통일
+export function getDateVal(reqEnterDay: string, reqRetiredDay: string | null = null, birth: string | null = null) { // dayjs 또는 JS Date로 통일
+    type result = {
+        enterDay: dayjs.Dayjs
+        retiredDay: dayjs.Dayjs
+        retiredDayArray: string[]
+        birthArray?:string[]
+    }
+    
     let retiredDayArray = []
     const enterDay = dayjs(reqEnterDay) // 입사일(고용보험 가입일)
     let retiredDay: dayjs.Dayjs // 퇴사일(마지막 고용보험 가입일)
@@ -11,8 +18,11 @@ export function getDateVal(reqEnterDay: string, reqRetiredDay: string | undefine
         retiredDay = dayjs(reqRetiredDay)            
         retiredDayArray = reqRetiredDay.split('-')
     }
+    const result: result = {enterDay, retiredDay, retiredDayArray}
 
-    return {enterDay, retiredDay, retiredDayArray}
+    if (birth) result.birthArray = birth.split('-')
+
+    return result
 }
 
 export function calWorkingDay(enterDay: dayjs.Dayjs, retiredDay: dayjs.Dayjs) {
@@ -25,7 +35,8 @@ export function calWorkingDay(enterDay: dayjs.Dayjs, retiredDay: dayjs.Dayjs) {
     return {workingDays, workingYears}
 }
 
-export function calLeastPayInfo(retiredDay: dayjs.Dayjs, retiredDayArray: any[], salary: number, dayWorkTime: number) { // 수정 가능?
+export function calLeastPayInfo(retiredDay: dayjs.Dayjs, retiredDayArray: any[], salary: number[], dayWorkTime: number) { // 수정 가능?
+    const sumSalary = salary.length === 3 ? salary.reduce((acc, val) => acc + val, 0) : salary[0] * 3
     const lastThreeMonth = [] // 퇴사일 전 월 부터 3개월
     for (let i = 1; i <= 3; i++) {
         lastThreeMonth.push(retiredDay.subtract(i, 'month'))
@@ -35,7 +46,7 @@ export function calLeastPayInfo(retiredDay: dayjs.Dayjs, retiredDayArray: any[],
         let month = lastThreeMonth[i].month() === 11 ? 12 : lastThreeMonth[i].month() +1
         sumLastThreeMonthDays += new Date(retiredDayArray[0],month,0).getDate()
     }
-    const dayAvgPay = Math.ceil(salary * 3 / sumLastThreeMonthDays) // 1일 평균 급여액
+    const dayAvgPay = Math.ceil(sumSalary / sumLastThreeMonthDays) // 1일 평균 급여액
     let realDayPay = Math.ceil(dayAvgPay * 0.6) * (Math.ceil((dayWorkTime/8) * 100)/100) // 실업급여 일 수급액
     if (realDayPay > 66000) {
         realDayPay = 66000
@@ -45,8 +56,8 @@ export function calLeastPayInfo(retiredDay: dayjs.Dayjs, retiredDayArray: any[],
     return {dayAvgPay, realDayPay, realMonthPay}
 }
 
-export function getFailResult(retired: boolean, retiredDay: dayjs.Dayjs, workingDays: number, realDayPay: number, realMonthPay: number, leastRequireWorkingDay: number, receiveDay: number){
-    if (retired) {
+export function getFailResult(retired: boolean, retiredDay: dayjs.Dayjs, workingDays: number, realDayPay: number, realMonthPay: number, leastRequireWorkingDay: number, receiveDay: number, isDetail: boolean = false){
+    if (retired || isDetail) {
         return {
             succ: false, // 수급 인정 여부
             retired: retired, // 퇴직자/퇴직예정자
@@ -69,17 +80,38 @@ export function getFailResult(retired: boolean, retiredDay: dayjs.Dayjs, working
     }
 }
 
-export function getReceiveDay(workingYears: number) {
+export function getReceiveDay(workingYears: number, age: number = 0, disabled: boolean = false) {
+    if (age >=50 || disabled) {
+        if (workingYears < 1) return 120
+        if (workingYears >= 1 && workingYears < 3) return 180
+        if (workingYears >= 3 && workingYears < 5) return 210
+        if (workingYears >= 5 && workingYears < 10) return 240
+        return 270
+    }
     if (workingYears < 1) return 120
     if (workingYears >= 1 && workingYears < 3) return 150
     if (workingYears >= 3 && workingYears < 5) return 180
     if (workingYears >= 5 && workingYears < 10) return 210
     return 240
 }
+export function getNextReceiveDay(workingYears: number, age:number, disabled: boolean = false ) {
+    if(age >=50 || disabled) {
+        if(workingYears < 1) return [1 ,180]
+        if (workingYears >= 1 && workingYears < 3) return [3 - workingYears, 210]
+        if (workingYears >= 3 && workingYears < 5) return [5 - workingYears, 240]
+        if (workingYears >= 5 && workingYears < 10) return [10 - workingYears, 270]
+    }
+    if (workingYears < 1) return [1, 150]
+    if (workingYears >= 1 && workingYears < 3) return [3, 180]
+    if (workingYears >= 3 && workingYears < 5) return [5, 210]
+    if (workingYears >= 5 && workingYears < 10) return [10, 240]
+    return [0, 0]
+}
 
-function calDday(retiredDay: Date | Date, days: number) {
+export function calDday(retiredDay: Date, needDay: number) {
+    console.log(">>", needDay)
     let count = 0
-    for(let i = 0; i < days; i++) {
+    for(let i = 0; i < needDay; i++) {
         if (retiredDay.getDay() === 6) {
             i--
             retiredDay.setDate(retiredDay.getDate() + 1)  

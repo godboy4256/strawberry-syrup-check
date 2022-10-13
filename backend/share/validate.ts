@@ -32,9 +32,14 @@
     minimum: 0,
   },
   salary: { // 월급
-    type: "number",
-    minimum: 0,
-    maximum: 9999999999,
+    type: "array",
+    items: {
+      type: 'number',
+      minimum: 0,
+      maximum: 9999999999,
+    },
+    minItems: 1,
+    maxItems: 3    
   },
   workCate: { // 근로형태
     type: "number",
@@ -81,16 +86,30 @@
   },
   retiredDay: { // 퇴사일
     type: 'string'
+  },
+  birth: { // 생일
+    type: 'string'
+  },
+  disabled: { // 장애여부
+    type: 'boolean'
+  },
+  weekDay: { // 근무요일
+    type: 'array'
+  },
+  dayWorkTime: {
+    type: 'number',
+    minimum: 3,
+    maximum: 8
   }
 
 
 };
 
 export const DefinedParamErrorMesg: { [col_: string]: string } = {
-  birth: "생년월일을 입력해주세요",
-  disabled: "장애여부를 선택해주세요",
-  enterDay: "입사일 및 퇴사일을 입력해주세요",
-  retiredDay: "입사일 및 퇴사일을 입력해주세요",
+  birth: "생년월일을 입력해 주세요",
+  disabled: "장애여부를 선택해 주세요",
+  enterDay: "입사일 및 퇴사일을 입력해 주세요",
+  retiredDay: "입사일 및 퇴사일을 입력해 주세요",
   ealryRetire: "퇴사일이 입사일보다 빠릅니다.",
   salary: "월 급여를 입력해 주세요"  
 }
