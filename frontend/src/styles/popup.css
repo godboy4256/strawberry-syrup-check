@@ -3,8 +3,6 @@
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  text-align: center;
-  border-radius: 5px;
 }
 
 .popup_container .popup_title {
@@ -13,10 +11,12 @@
   border-bottom: 1px solid rgba(0, 0, 0, 0.2);
   margin: 0 20px;
   background-color: white;
+  text-align: center;
 }
 
-.popup_container .popup_contents {
+.popup_container .popup_contents.string {
   width: 300px;
   padding: 15px 0;
+  text-align: center;
   background-color: white;
 }
