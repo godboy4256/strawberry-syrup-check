@@ -34,17 +34,15 @@ export default function (fastify: FastifyInstance, options: any, done: any) {
             if (workingDays < leastRequireWorkingDay) 
                 return getFailResult(req.body.retired, retiredDay, workingDays, realDayPay, realMonthPay, leastRequireWorkingDay, receiveDay)
             
-            const result = {
+            return {
                 succ: true, // 수급 인정 여부
                 retired: req.body.retired, // 퇴직자/퇴직예정자
                 availableAmountCost: realDayPay * receiveDay, // 총 수급액
-                dayPay: realDayPay, // 일 수급액
+                realDayPay, // 일 수급액
                 receiveDay, // 소정 급여일수
-                monthPay: realMonthPay,// 월 수급액
+                realMonthPay,// 월 수급액
                 severancePay: workingYears >= 1 ? Math.ceil(((dayAvgPay * 30) * workingDays) / 365) : 0
             }            
-
-            return result
         }
     ) 
 
