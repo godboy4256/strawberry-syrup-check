@@ -4,12 +4,12 @@ import PopUp from "../common/popUp";
 
 const SelectInput = ({
   options,
-  type = "popup",
-  select_focus_template,
+  type = "normal",
+  popup_focus_template,
 }: {
   options: string[] | number[];
-  type?: "popup" | string;
-  select_focus_template: ReactElement;
+  type?: "popup" | "normal";
+  popup_focus_template?: ReactElement;
 }) => {
   const [onOptionList, setOptionList] = useState(false);
   const onClickOnOptionList = () => {
@@ -18,23 +18,37 @@ const SelectInput = ({
   return (
     <>
       {type === "popup" ? (
-        <div onClick={onClickOnOptionList}>{select_focus_template}</div>
-      ) : null}
-      {onOptionList && (
-        <PopUp
-          contents={
-            <div className="select_popup">
-              {options.map((el: string | number, idx: number) => {
-                return (
-                  <div className="options" key={el + String(idx)}>
-                    {el}
-                  </div>
-                );
-              })}
-            </div>
-          }
-          buttons="none"
-        />
+        <>
+          <div onClick={onClickOnOptionList}>{popup_focus_template}</div>
+          {onOptionList && (
+            <PopUp
+              contents={
+                <div className="select_popup">
+                  {options.map((el: string | number, idx: number) => {
+                    return (
+                      <div className="options" key={el + String(idx)}>
+                        {el}
+                      </div>
+                    );
+                  })}
+                </div>
+              }
+              buttons="none"
+            />
+          )}
+        </>
+      ) : (
+        type === "normal" && (
+          <select>
+            {options.map((el: string | number, idx: number) => {
+              return (
+                <option key={idx + Date.now()} value={el}>
+                  {el}
+                </option>
+              );
+            })}
+          </select>
+        )
       )}
     </>
   );
