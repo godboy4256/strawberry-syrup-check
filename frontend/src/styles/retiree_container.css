@@ -1,0 +1,22 @@
+#retiree_container {
+  width: 100%;
+  height: 100vh;
+}
+#retiree_main {
+  margin-top: 93px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+#retiree_main button {
+  font-size: 32px;
+  border-radius: 10px;
+  width: 224px;
+  height: 62px;
+}
+#retiree_main > p {
+  margin: 5px 0 48px;
+}
+#retiree_help_routes {
+  color: rgba(0, 137, 237, 1);
+}

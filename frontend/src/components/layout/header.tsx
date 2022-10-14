@@ -1,5 +1,4 @@
 import React, { useState } from "react";
-import { useLocation } from "react-router-dom";
 import IMGBack from "../../assets/img/back_arrow.svg";
 import IMGLogo from "../../assets/img/logo.png";
 import "../../styles/header.css";

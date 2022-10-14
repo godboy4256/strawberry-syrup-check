@@ -1,11 +1,16 @@
-import React, { MouseEvent, useState } from "react";
+import React, { useState } from "react";
+import ValuesHandler from "../../service/valueHandle";
 import "../../styles/checkbox.css";
 
+const value = new ValuesHandler();
+
 const CheckBoxInput = ({
+  key,
   options,
   type,
   label,
 }: {
+  key?: string;
   options: string[];
   type: "box_type" | "square_type" | "circle_type";
   label?: string;
@@ -22,13 +27,14 @@ const CheckBoxInput = ({
                   className={`${type} ${el === boxSelect ? "active" : ""}`}
                   onClick={() => {
                     setBoxSelect(el);
+                    value.GetInputValue(key, el);
                   }}
                 >
                   {el}
                 </div>
               );
             })
-          : options.map((el: string | number, idx: number) => {
+          : options.map((el: string, idx: number) => {
               return (
                 <div className="checkbox_wrapper">
                   <label className="fs_16" htmlFor={`${String(el)}_for${idx}`}>
@@ -43,6 +49,9 @@ const CheckBoxInput = ({
                       type="radio"
                       name={label ? label : "any_radios"}
                       className="checkbox_list"
+                      onChange={() => {
+                        value.GetInputValue(key, el);
+                      }}
                     />
                     <span className="check_mark"></span>
                   </div>
