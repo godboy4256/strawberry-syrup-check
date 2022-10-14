@@ -1,9 +1,10 @@
-import React from "react";
+import React, { MouseEventHandler } from "react";
 import "../../styles/button.css";
 
 const Button = ({
   text,
   type = "normal_main",
+  click_func,
 }: {
   text: string;
   type?:
@@ -13,8 +14,13 @@ const Button = ({
     | "popup_cancel"
     | "popup_ok"
     | "bottom";
+  click_func: MouseEventHandler;
 }) => {
-  return <button className={`${type}`}>{text}</button>;
+  return (
+    <button onClick={click_func} className={`${type}`}>
+      {text}
+    </button>
+  );
 };
 
 export default Button;

@@ -1,13 +1,18 @@
-import React, { ReactElement, useState } from "react";
+import React, { ChangeEvent, MouseEvent, ReactElement, useState } from "react";
+import ValuesHandler from "../../service/valueHandle";
 import "../../styles/select.css";
 import PopUp from "../common/popUp";
 
+const value = new ValuesHandler();
+
 const SelectInput = ({
+  key,
   options,
   type = "normal",
   popup_focus_template,
 }: {
-  options: string[] | number[];
+  key?: string;
+  options: string[];
   type?: "popup" | "normal";
   popup_focus_template?: ReactElement;
 }) => {
@@ -24,9 +29,13 @@ const SelectInput = ({
             <PopUp
               contents={
                 <div className="select_popup">
-                  {options.map((el: string | number, idx: number) => {
+                  {options.map((el: string, idx: number) => {
                     return (
-                      <div className="options" key={el + String(idx)}>
+                      <div
+                        onClick={() => value.GetInputValue(key, el)}
+                        className="options"
+                        key={el + String(idx)}
+                      >
                         {el}
                       </div>
                     );
@@ -39,7 +48,11 @@ const SelectInput = ({
         </>
       ) : (
         type === "normal" && (
-          <select>
+          <select
+            onChange={(e: ChangeEvent<HTMLSelectElement>) =>
+              value.GetInputValue(key, e.target.value)
+            }
+          >
             {options.map((el: string | number, idx: number) => {
               return (
                 <option key={idx + Date.now()} value={el}>

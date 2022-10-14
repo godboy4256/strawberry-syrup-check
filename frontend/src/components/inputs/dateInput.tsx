@@ -1,4 +1,4 @@
-import React, { Dispatch, SetStateAction, useState } from "react";
+import React, { useState } from "react";
 import IMGDate from "../../assets/img/date_icon.svg";
 import IMGRedDirection from "../../assets/img/red_direction.svg";
 import PopUp from "../common/popUp";
@@ -34,7 +34,20 @@ const _DatePopUp = ({ currentDate }: { currentDate: number[] }) => {
           <SelectInput type="normal" options={year_arr} />
           <SelectInput
             type="normal"
-            options={[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]}
+            options={[
+              "1",
+              "2",
+              "3",
+              "4",
+              "5",
+              "6",
+              "7",
+              "8",
+              "9",
+              "10",
+              "11",
+              "12",
+            ]}
           />
         </div>
         <button id="date_next_btn">
