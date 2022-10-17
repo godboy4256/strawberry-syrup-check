@@ -100,7 +100,20 @@
     type: 'number',
     minimum: 3,
     maximum: 8
-  }
+  },
+  isShort: {
+    type: 'boolean'
+  },
+  lastWorkDay: {
+    type: 'string'
+  },
+  // eachWorkData: { // 상세형 개별입력 데이터 검증용
+  //   type: "array",
+  //   items: {
+  //     type: 'object'
+  //   },
+  //   items
+  // }
 
 
 };
