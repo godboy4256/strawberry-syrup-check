@@ -100,7 +100,20 @@
     type: 'number',
     minimum: 3,
     maximum: 8
-  }
+  },
+  isShort: {
+    type: 'boolean'
+  },
+  lastWorkDay: {
+    type: 'string'
+  },
+  // eachWorkData: { // 상세형 개별입력 데이터 검증용
+  //   type: "array",
+  //   items: {
+  //     type: 'object'
+  //   },
+  //   items
+  // }
 
 
 };
@@ -110,6 +123,6 @@ export const DefinedParamErrorMesg: { [col_: string]: string } = {
   disabled: "장애여부를 선택해 주세요",
   enterDay: "입사일 및 퇴사일을 입력해 주세요",
   retiredDay: "입사일 및 퇴사일을 입력해 주세요",
-  ealryRetire: "퇴사일이 입사일보다 빠릅니다.",
+  ealryRetire: "퇴사일이 입사일보다 빠릅니다.",  
   salary: "월 급여를 입력해 주세요"  
 }
