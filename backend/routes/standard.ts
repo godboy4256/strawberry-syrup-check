@@ -3,13 +3,14 @@ import dayjs from 'dayjs';
 
 import { getDateVal, calWorkingDay, calLeastPayInfo, getFailResult, getReceiveDay } from "../router_funcs/common";
 import { DefinedParamErrorMesg, DefineParamInfo } from "../share/validate";
+import { standardPath } from "share/pathList";
 
 export default function (fastify: FastifyInstance, options: any, done: any) {
     fastify.post(
-        '/standard',
+        standardPath.standard,
         {
             schema: {                
-                body: {
+                body: { 
                     type: 'object',
                     required: ['retired', 'enterDay', 'salary'],
                     properties: {
