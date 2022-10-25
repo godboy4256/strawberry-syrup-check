@@ -4,12 +4,13 @@ import isSameOrAfter from "dayjs/plugin/isSameOrAfter";
 
 import { calDday, calLeastPayInfo, calWorkingDay, getDateVal, getFailResult, getNextReceiveDay, getReceiveDay } from "../router_funcs/common";
 import { DefinedParamErrorMesg, DefineParamInfo } from "../share/validate";
+import { detailPath } from "share/pathList";
 
 dayjs.extend(isSameOrAfter);
 
 export default function (fastify: FastifyInstance, options: any, done: any) {
 	fastify.post(
-		"/standard",
+		detailPath.standard,
 		{
 			schema: {
 				body: {
@@ -35,8 +36,8 @@ export default function (fastify: FastifyInstance, options: any, done: any) {
 
 			if (Math.floor(retiredDay.diff(enterDay, "day", true)) < 0) return { succ: false, mesg: DefinedParamErrorMesg.ealryRetire };
 
-			const age = Number(new Date().getFullYear) - Number(new Date(req.body.birth).getFullYear);
-			if (new Date(`${new Date().getFullYear}-${birthArray[1]}-${birthArray[2]}`).getTime() >= new Date().getTime()) age - 1;
+			const age = new Date().getFullYear() - new Date(req.body.birth).getFullYear();
+			if (new Date(`${new Date().getFullYear()}-${birthArray[1]}-${birthArray[2]}`).getTime() >= new Date().getTime()) age - 1;
 
 			const { dayAvgPay, realDayPay, realMonthPay } = calLeastPayInfo(retiredDay, retiredDayArray, req.body.salary, req.body.dayWorkTime);
 			const { workingDays, workingYears } = calWorkingDay(enterDay, retiredDay); // 상세형에 맞게 수정 필요
@@ -77,7 +78,7 @@ export default function (fastify: FastifyInstance, options: any, done: any) {
 	);
 
 	fastify.post(
-		"/art",
+		detailPath.art,
 		{
 			schema: {
 				body: {
@@ -104,8 +105,8 @@ export default function (fastify: FastifyInstance, options: any, done: any) {
 
 			if (Math.floor(retiredDay.diff(enterDay, "day", true)) < 0) return { succ: false, mesg: DefinedParamErrorMesg.ealryRetire };
 
-			const age = Number(new Date().getFullYear) - Number(new Date(req.body.birth).getFullYear);
-			if (new Date(`${new Date().getFullYear}-${birthArray[1]}-${birthArray[2]}`).getTime() >= new Date().getTime()) age - 1;
+			const age = new Date().getFullYear() - new Date(req.body.birth).getFullYear();
+			if (new Date(`${new Date().getFullYear()}-${birthArray[1]}-${birthArray[2]}`).getTime() >= new Date().getTime()) age - 1;
 
 			////////////////////////////////////////////////////////////////////////////////////////////////// 예술인
 			if (!req.body.isShort) {
@@ -149,12 +150,12 @@ export default function (fastify: FastifyInstance, options: any, done: any) {
 	);
 
 	fastify.post(
-		"/art/short",
+		detailPath.shortArt,
 		{
 			schema: {
 				body: {
 					type: "object",
-					required: [],
+					required: ["birth", "disable", "lastWorkDay"],
 					properties: {
 						retired: DefineParamInfo.retired, // 퇴직여부
 						workCate: DefineParamInfo.workCate, // 근로형태
@@ -162,6 +163,9 @@ export default function (fastify: FastifyInstance, options: any, done: any) {
 						birth: DefineParamInfo.birth, //생일
 						disable: DefineParamInfo.disabled, // 장애여부
 						lastWorkDay: DefineParamInfo.lastWorkDay, // 마지막 근무일
+						workRecord: DefineParamInfo.workRecord,
+						sumOneYearPay: { type: "number", minimum: 0 },
+						sumOneYearWorkDay: { type: "array", minlength: 2, items: { type: "number" } },
 					},
 				},
 			},
@@ -169,102 +173,88 @@ export default function (fastify: FastifyInstance, options: any, done: any) {
 		(req: any, res) => {
 			const lastWorkDay = dayjs(req.body.lastWorkDay);
 			const beforeTwoYearArr = lastWorkDay.subtract(24, "month").format("YYYY-MM-DD").split("-").map(Number);
+			const beforeOneYearArr = lastWorkDay.subtract(12, "month").format("YYYY-MM-DD").split("-").map(Number);
 
-			const overDatePool = dayjs(new Date(data[0].year, data[0].months[0].month, 0)).subtract(1, "month").isSameOrAfter(lastWorkDay);
-			if (overDatePool) return { succ: false, mesg: "입력한 근무일이 마지막 근무일 이 후 입니다." };
+			if (req.body.hasOwnProperty("workRecord")) {
+				const overDatePool = dayjs(new Date(req.body.workRecord[0].year, req.body.workRecord[0].months[0].month, 0)).subtract(1, "month").isSameOrAfter(lastWorkDay);
+				if (overDatePool) return { succ: false, mesg: "입력한 근무일이 마지막 근무일 이 후 입니다." };
+			}
 
-			return true;
+			let isPermit: (number | boolean)[] = [false, 0];
+			let sortedData: any[];
+			if (!req.body.hasOwnProperty("workRecord")) {
+				isPermit = artShortCheckPermit(beforeTwoYearArr, req.body.sumOneYearWorkDay, true);
+			} else {
+				sortedData = req.body.workRecord.sort((a: any, b: any) => {
+					if (a.year < b.year) return 1;
+					if (a.year > b.year) return -1;
+					return 0;
+				});
+
+				isPermit = artShortCheckPermit(beforeTwoYearArr, sortedData);
+			}
+			if (!isPermit[0])
+				return {
+					succ: false,
+					workingMonths: isPermit[1],
+					requireMonths: isPermit[2],
+				};
+
+			const birthArray = req.body.birth.split("-");
+			const age = new Date().getFullYear() - new Date(req.body.birth).getFullYear(); // 만 나이 처리 필요
+			if (new Date(`${new Date().getFullYear()}-${birthArray[1]}-${birthArray[2]}`).getTime() >= new Date().getTime()) age - 1;
+
+			let workingMonth: number;
+			let sumOneYearPay: number;
+			let sumOneYearWorkDay: number;
+			if (!req.body.hasOwnProperty("workRecord")) {
+				workingMonth = calArtShortWorkingMonth(req.body.sumOneYearWorkDay, true);
+				sumOneYearPay = req.body.sumOneYearPay;
+				sumOneYearWorkDay = req.body.sumOneYearWorkDay[0] * 12 + req.body.sumOneYearWorkDay[1];
+			} else {
+				workingMonth = calArtShortWorkingMonth(sortedData);
+				[sumOneYearPay, sumOneYearWorkDay] = sumArtShortPay(beforeOneYearArr, sortedData); // 12개월 총액
+			}
+
+			const workingYear = Math.floor(workingMonth / 12);
+			const receiveDay = getReceiveDay(workingYear, age, req.body.disable);
+
+			const { artRealDayPay, artRealMonthPay } = calArtPay(sumOneYearPay, sumOneYearWorkDay);
+			const [requireWorkingYear, nextReceiveDay] = getNextReceiveDay(workingYear, age, req.body.disable);
+
+			if (nextReceiveDay === 0) {
+				return {
+					succ: true,
+					retired: req.body.retired,
+					availableAmountCost: artRealDayPay * receiveDay,
+					artRealDayPay,
+					receiveDay,
+					artRealMonthPay,
+				};
+			}
+			return {
+				succ: true,
+				retired: req.body.retired,
+				availableAmountCost: artRealDayPay * receiveDay,
+				artRealDayPay,
+				receiveDay,
+				artRealMonthPay,
+				needMonth: requireWorkingYear * 12 - workingMonth,
+				nextAvailableAmountCost: nextReceiveDay * artRealDayPay,
+				morePay: nextReceiveDay * artRealDayPay - artRealDayPay * receiveDay,
+			};
 		}
 	);
-	// fastify.post(
-	//     '/art/short',
-	//     {
-	//         schema: {
-	//             body: {
-	//                 type: 'object',
-	//                 required: ['retired', 'workCate', 'retireReason', 'birth', 'disabled'],
-	//                 properties: {
-	//                     retired: DefineParamInfo.retired,
-	//                     workCate: DefineParamInfo.workCate,
-	//                     retireReason: DefineParamInfo.retireReason,
-	//                     birth: DefineParamInfo.birth,
-	//                     disabled: DefineParamInfo.disabled,
-	//                     lastWorkDay: DefineParamInfo.lastWorkDay // 마지막 근무일
-	//                 }
-	//             }
-	//         }
-	//     },
-	//     (req:any, res) => {
-	//         const birthArray = req.body.birth.split('-')
-	//         const age = Number(new Date().getFullYear) - Number(new Date(req.body.birth).getFullYear)
-	//         if (new Date(`${new Date().getFullYear}-${birthArray[1]}-${birthArray[2]}`).getTime() >= new Date().getTime()) age - 1
-	//         const lastWorkDay = dayjs(req.body.lastWorkDay)
-
-	//         const when24Arr = lastWorkDay.subtract(24, 'month').format('YYYY-MM-DD').split('-').map(Number) // 마지막 근무일에서 24개월 이전 날
-	//         const when12Arr = lastWorkDay.subtract(12, 'month').format('YYYY-MM-DD').split('-').map(Number)
-
-	//         const sortedData = data.sort((a: any,b: any) => { // 입력받은 데이터를 정렬하는 것으로 변경 필요
-	//             if(a.year < b.year) return 1;
-	//             if(a.year > b.year) return -1;
-	//             return 0;
-	//         });
-
-	//         // 정상작동 시 마지막 근무일을 기준으로 10년을 역산한 후보에서 입력되므로 문제가 없음
-	//         // 하지만 후보에 없는 날짜가 들어온다면? => 처리 필요
-	//         const isPermit = artShortCheckPermit(when24Arr, sortedData)
-	//         if (!isPermit[0])
-	//             return {
-	//                 succ: false,
-	//                 retired: req.body.retired,
-	//                 workingMonths: isPermit[1],
-	//                 requireMonths: isPermit[2]
-	//             }
-
-	//         const sumPay = sumArtShortPay(when12Arr, sortedData)
-	//         const artWorkingDays = sumArtShortWorkingDay(sortedData)
-	//         const artWorkingYears = Math.floor(artWorkingDays / 365)
-	//         const {artDayAvgPay, artRealDayPay, artRealMonthPay } = calArtPay(sumPay, artWorkingDays)
-	//         const receiveDay = getReceiveDay(artWorkingYears, age, req.body.disabled)
-
-	//         const [requireWorkingYear, nextReceiveDay] = getNextReceiveDay(artWorkingYears, age, req.body.disabled)
-	//         if (nextReceiveDay === 0) {
-	//             return {
-	//                 succ: true,
-	//                 retired: req.body.retired,
-	//                 availableAmountCost: artRealDayPay * receiveDay,
-	//                 artRealDayPay,
-	//                 receiveDay,
-	//                 artRealMonthPay,
-	//                 severancePay: artWorkingYears >= 1 ? Math.ceil(((artDayAvgPay * 30) * artWorkingDays) / 365) : 0, // 예술인은 퇴직금이 없는 듯 하다
-	//                 artWorkingDays
-	//             }
-	//         } else {
-	//             return {
-	//                 succ: true,
-	//                 retired: req.body.retired,
-	//                 availableAmountCost: artRealDayPay * receiveDay,
-	//                 artRealDayPay,
-	//                 receiveDay,
-	//                 artRealMonthPay,
-	//                 severancePay: artWorkingYears >= 1 ? Math.ceil(((artDayAvgPay * 30) * artWorkingDays) / 365) : 0,
-	//                 artWorkingDays,
-	//                 needDay: requireWorkingYear * 365 - artWorkingDays,
-	//                 nextAvailableAmountCost: nextReceiveDay * artRealDayPay,
-	//                 morePay: (nextReceiveDay * artRealDayPay) - (receiveDay * artRealDayPay)
-	//             }
-	//         }
-	//     }
-	// )
 
 	done();
 }
 
-function calArtPay(sumTwelveMonthSalary: number[] | number, artWorkingDays: number) {
+function calArtPay(sumOneYearPay: number[] | number, artWorkingDays: number) {
 	let artDayAvgPay = 0;
-	if (Array.isArray(sumTwelveMonthSalary)) {
-		artDayAvgPay = Math.ceil(sumTwelveMonthSalary[0] / artWorkingDays);
+	if (Array.isArray(sumOneYearPay)) {
+		artDayAvgPay = Math.ceil(sumOneYearPay[0] / artWorkingDays);
 	} else {
-		artDayAvgPay = Math.ceil(sumTwelveMonthSalary / artWorkingDays);
+		artDayAvgPay = Math.ceil(sumOneYearPay / artWorkingDays);
 	}
 	let artRealDayPay = Math.ceil(artDayAvgPay * 0.6);
 	if (artRealDayPay > 66000) artRealDayPay = 66000;
@@ -274,92 +264,111 @@ function calArtPay(sumTwelveMonthSalary: number[] | number, artWorkingDays: numb
 	return { artDayAvgPay, artRealDayPay, artRealMonthPay };
 }
 
-function artShortCheckPermit(when24Arr: number[], sortedData: any) {
-	let sumJoinMonth = 0;
+function artShortCheckPermit(when24Arr: number[], workRecord: any, isSimple: boolean = false) {
+	let sumJoinMonth = 0; // 월 단위의 피보험 단위기간
 
-	sortedData.map((v: { year: number; months: any[] }) => {
-		// 예술인 => 24개월 내에 피보험 단위기간이 9개월 이상인가?
-		let sumLeftWorkDay = 0; // 11일 미만 근무일을 더하는 공간
-		if (v.year >= when24Arr[0]) {
-			if (v.year === when24Arr[0]) {
-				v.months.map((v: { month: number; workDay: number }) => {
-					if (v.month <= when24Arr[1]) {
-						console.log(v.month, v.workDay);
+	if (isSimple) {
+		sumJoinMonth = workRecord[0] * 12 + workRecord[1];
+	} else {
+		workRecord.map((v: { year: number; months: any[] }) => {
+			// 예술인 => 24개월 내에 피보험 단위기간이 9개월 이상인가?
+			let sumLeftWorkDay = 0; // 11일 미만 근무일을 더하는 공간
+			if (v.year >= when24Arr[0]) {
+				if (v.year === when24Arr[0]) {
+					v.months.map((v: { month: number; workDay: number }) => {
+						if (v.month <= when24Arr[1]) {
+							v.workDay >= 11 ? (sumJoinMonth += 1) : (sumLeftWorkDay += v.workDay);
+						}
+					});
+				} else {
+					v.months.map((v: { month: number; workDay: number }) => {
 						v.workDay >= 11 ? (sumJoinMonth += 1) : (sumLeftWorkDay += v.workDay);
-					}
-				});
-			} else {
-				v.months.map((v: { month: number; workDay: number }) => {
-					v.workDay >= 11 ? (sumJoinMonth += 1) : (sumLeftWorkDay += v.workDay);
-				});
+					});
+				}
+				sumJoinMonth += sumLeftWorkDay / 22; // 근무일(피보험단위)가 11일 이상이되지 않는 달은 근무일을 전부 더해서 22로 나누어 개월에 더한다
 			}
-			sumJoinMonth += sumLeftWorkDay / 22; // 근무일(피보험단위)가 11일 이상이되지 않는 달은 근무일을 전부 더해서 22로 나누어 개월에 더한다
-		}
-	});
+		});
+		sumJoinMonth = Math.floor(sumJoinMonth * 10) / 10;
+	}
 
-	if (Math.ceil(sumJoinMonth) >= 9) return [true];
-	return [false, Math.ceil(sumJoinMonth * 100) / 100, 9 - Math.ceil(sumJoinMonth * 100) / 100]; // 인정 여부, 현재 피보험단위 기간, 부족 기간
+	if (sumJoinMonth >= 9) return [true];
+	return [false, sumJoinMonth, 9 - sumJoinMonth]; // 인정 여부, 24개월 내 현재 피보험단위 기간, 부족 기간
 }
 
 function sumArtShortPay(when12Arr: number[], sortedData: any[]) {
-	let sum12MonthPay = 0;
+	// artShortCheckPermit 과 다르게 12개월 임
+	let sumOneYearPay = 0;
+	let sumOneYearWorkDay = 0;
 	sortedData.map((v: { year: number; months: any[] }) => {
 		if (v.year >= when12Arr[0]) {
 			if (v.year == when12Arr[0]) {
 				v.months.map((v: { month: number; workDay: number; pay: number }) => {
-					if (v.month >= when12Arr[1]) sum12MonthPay += v.pay;
+					if (v.month >= when12Arr[1]) {
+						sumOneYearPay += v.pay;
+						sumOneYearWorkDay += v.workDay;
+					}
 				});
 			} else {
 				v.months.map((v: { month: number; workDay: number; pay: number }) => {
-					sum12MonthPay += v.pay;
+					sumOneYearPay += v.pay;
+					sumOneYearWorkDay += v.workDay;
 				});
 			}
 		}
 	});
-	return Math.ceil(sum12MonthPay);
+	return [Math.floor(sumOneYearPay), Math.floor(sumOneYearWorkDay)];
 }
 
-function sumArtShortWorkingDay(sortedData: any[]) {
-	let sumWorkingDay = 0;
-	sortedData.map((v) => {
+function calArtShortWorkingMonth(workRecord: any[], isSimple: boolean = false) {
+	let workingMonth = 0;
+	let leftWorkingDay = 0;
+	if (isSimple) {
+		workingMonth = workRecord[0] * 12 + workRecord[1];
+		return workingMonth;
+	}
+
+	workRecord.map((v) => {
 		v.months.map((v: { month: number; workDay: number; pay: number }) => {
-			sumWorkingDay += v.workDay;
+			if (v.workDay >= 11) {
+				workingMonth++;
+			} else {
+				leftWorkingDay += v.workDay;
+			}
 		});
 	});
-
-	return sumWorkingDay;
+	return workingMonth + Math.floor((leftWorkingDay / 22) * 10) / 10;
 }
 
-const data = [
-	{
-		year: 2022,
-		months: [
-			{ month: 8, workDay: 10, pay: 200000 },
-			{ month: 5, workDay: 15, pay: 200000 },
-			{ month: 3, workDay: 11, pay: 1000000 },
-			{ month: 2, workDay: 30, pay: 2000000 },
-			{ month: 1, workDay: 11, pay: 500000 },
-		],
-	},
-	{
-		year: 2021,
-		months: [
-			{ month: 12, workDay: 11, pay: 200000 },
-			{ month: 10, workDay: 11, pay: 1800000 },
-			{ month: 7, workDay: 11, pay: 320000 },
-			{ month: 6, workDay: 11, pay: 2000000 },
-			{ month: 2, workDay: 11, pay: 1000000 },
-		],
-	},
-	{
-		year: 2018,
-		months: [
-			{ month: 12, workDay: 10, pay: 200000 },
-			{ month: 10, workDay: 26, pay: 1800000 },
-			{ month: 8, workDay: 12, pay: 320000 },
-			{ month: 7, workDay: 12, pay: 320000 },
-			{ month: 6, workDay: 10, pay: 200000 },
-			{ month: 2, workDay: 10, pay: 100000 },
-		],
-	},
-];
+// const data = [
+// 	{
+// 		year: 2022,
+// 		months: [
+// 			{ month: 8, workDay: 10, pay: 200000 },
+// 			{ month: 5, workDay: 15, pay: 200000 },
+// 			{ month: 3, workDay: 11, pay: 1000000 },
+// 			{ month: 2, workDay: 30, pay: 2000000 },
+// 			{ month: 1, workDay: 11, pay: 500000 },
+// 		],
+// 	},
+// 	{
+// 		year: 2021,
+// 		months: [
+// 			{ month: 12, workDay: 11, pay: 200000 },
+// 			{ month: 10, workDay: 11, pay: 1800000 },
+// 			{ month: 7, workDay: 11, pay: 320000 },
+// 			{ month: 6, workDay: 11, pay: 2000000 },
+// 			{ month: 2, workDay: 11, pay: 1000000 },
+// 		],
+// 	},
+// 	{
+// 		year: 2018,
+// 		months: [
+// 			{ month: 12, workDay: 10, pay: 200000 },
+// 			{ month: 10, workDay: 26, pay: 1800000 },
+// 			{ month: 8, workDay: 12, pay: 320000 },
+// 			{ month: 7, workDay: 12, pay: 320000 },
+// 			{ month: 6, workDay: 10, pay: 200000 },
+// 			{ month: 2, workDay: 10, pay: 100000 },
+// 		],
+// 	},
+// ];
