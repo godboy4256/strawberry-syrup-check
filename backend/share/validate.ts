@@ -23,106 +23,113 @@
  * 12: 기타 불가피한 사유
  */
 
- export const DefineParamInfo = {
-  retired: { // 퇴사여부
-    type: 'boolean'
-  },
-  severancePay: { // 퇴직금
-    type: "number",
-    minimum: 0,
-  },
-  salary: { // 월급
-    type: "array",
-    items: {
-      type: 'number',
-      minimum: 0,
-      maximum: 9999999999,
-    },
-    minItems: 1,
-    maxItems: 3    
-  },
-  workCate: { // 근로형태
-    type: "number",
-    minimum: 0,
-    maximum: 5,
-  },
-  retireReason: { // 퇴직사유
-    type: "number",
-    minimum: 0,
-    maximum: 12,
-  },
-  subYear: {
-    // 총 고용보험 가입 기간 (년)(단기예술인 등)
-    type: "number",
-    minimum: 0,
-    maximum: 50,
-  },
-  subMonth: {
-    // 총 고용보험 가입 기간 (월)(단기예술인 등)
-    type: "number",
-    minimum: 0,
-    maximum: 11,
-  },
-  weekWorkTime: {
-    // 주 근무시간 (초단시간 등)
-    type: "number",
-    minimum: 1,
-    maximum: 14,
-  },
-  weekWorkDay: {
-    // 주 근무일 (초단시간 등)
-    type: "number",
-    minimum: 1,
-    maximum: 2,
-  },
-  grade: {
-    // 자영업자 고용보험 등급
-    type: "number",
-    minimum: 1,
-    maximum: 10,
-  },
-  enterDay: { // 입사일
-    type: 'string'
-  },
-  retiredDay: { // 퇴사일
-    type: 'string'
-  },
-  birth: { // 생일
-    type: 'string'
-  },
-  disabled: { // 장애여부
-    type: 'boolean'
-  },
-  weekDay: { // 근무요일
-    type: 'array'
-  },
-  dayWorkTime: {
-    type: 'number',
-    minimum: 3,
-    maximum: 8
-  },
-  isShort: {
-    type: 'boolean'
-  },
-  lastWorkDay: {
-    type: 'string'
-  },
-  // eachWorkData: { // 상세형 개별입력 데이터 검증용
-  //   type: "array",
-  //   items: {
-  //     type: 'object'
-  //   },
-  //   items
-  // }
-
-
+export const DefineParamInfo = {
+	retired: {
+		// 퇴사여부
+		type: "boolean",
+	},
+	severancePay: {
+		// 퇴직금
+		type: "number",
+		minimum: 0,
+	},
+	salary: {
+		// 월급
+		type: "array",
+		items: {
+			type: "number",
+			minimum: 0,
+			maximum: 9999999999,
+		},
+		minItems: 1,
+		maxItems: 3,
+	},
+	workCate: {
+		// 근로형태
+		type: "number",
+		minimum: 0,
+		maximum: 5,
+	},
+	retireReason: {
+		// 퇴직사유
+		type: "number",
+		minimum: 0,
+		maximum: 12,
+	},
+	subYear: {
+		// 총 고용보험 가입 기간 (년)(단기예술인 등)
+		type: "number",
+		minimum: 0,
+		maximum: 50,
+	},
+	subMonth: {
+		// 총 고용보험 가입 기간 (월)(단기예술인 등)
+		type: "number",
+		minimum: 0,
+		maximum: 11,
+	},
+	weekWorkTime: {
+		// 주 근무시간 (초단시간 등)
+		type: "number",
+		minimum: 1,
+		maximum: 14,
+	},
+	weekWorkDay: {
+		// 주 근무일 (초단시간 등)
+		type: "number",
+		minimum: 1,
+		maximum: 2,
+	},
+	grade: {
+		// 자영업자 고용보험 등급
+		type: "number",
+		minimum: 1,
+		maximum: 10,
+	},
+	enterDay: {
+		// 입사일
+		type: "string",
+	},
+	retiredDay: {
+		// 퇴사일
+		type: "string",
+	},
+	birth: {
+		// 생일
+		type: "string",
+	},
+	disabled: {
+		// 장애여부
+		type: "boolean",
+	},
+	weekDay: {
+		// 근무요일
+		type: "array",
+	},
+	dayWorkTime: {
+		type: "number",
+		minimum: 3,
+		maximum: 8,
+	},
+	isShort: {
+		type: "boolean",
+	},
+	lastWorkDay: {
+		type: "string",
+	},
+	workRecord: {
+		type: "array",
+		items: {
+			type: "object",
+		},
+	},
 };
 
 export const DefinedParamErrorMesg: { [col_: string]: string } = {
-  birth: "생년월일을 입력해 주세요",
-  disabled: "장애여부를 선택해 주세요",
-  enterDay: "입사일 및 퇴사일을 입력해 주세요",
-  retiredDay: "입사일 및 퇴사일을 입력해 주세요",
-  ealryRetire: "퇴사일이 입사일보다 빠릅니다.",  
-  salary: "월 급여를 입력해 주세요"  
-}
+	birth: "생년월일을 입력해 주세요",
+	disabled: "장애여부를 선택해 주세요",
+	enterDay: "입사일 및 퇴사일을 입력해 주세요",
+	retiredDay: "입사일 및 퇴사일을 입력해 주세요",
+	ealryRetire: "퇴사일이 입사일보다 빠릅니다.",
+	salary: "월 급여를 입력해 주세요",
+};
