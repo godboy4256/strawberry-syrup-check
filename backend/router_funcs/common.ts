@@ -51,9 +51,8 @@ export function calLeastPayInfo(retiredDay: dayjs.Dayjs, retiredDayArray: any[],
 	}
 	const dayAvgPay = Math.ceil(sumSalary / sumLastThreeMonthDays); // 1일 평균 급여액
 	let realDayPay = Math.ceil(dayAvgPay * 0.6) * (Math.ceil((dayWorkTime / 8) * 100) / 100); // 실업급여 일 수급액
-	if (realDayPay > 66000) {
-		realDayPay = 66000;
-	} else if (realDayPay < 60120) realDayPay = 60120;
+	if (realDayPay > 66000) realDayPay = 66000;
+	else if (realDayPay < 60120) realDayPay = 60120;
 	const realMonthPay = realDayPay * 30; // 실업급여 월 수급액
 
 	return { dayAvgPay, realDayPay, realMonthPay };

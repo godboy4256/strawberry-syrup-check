@@ -4,7 +4,7 @@ import isSameOrAfter from "dayjs/plugin/isSameOrAfter";
 
 import { calDday, calLeastPayInfo, calWorkingDay, getDateVal, getFailResult, getNextReceiveDay, getReceiveDay } from "../router_funcs/common";
 import { DefinedParamErrorMesg, DefineParamInfo } from "../share/validate";
-import { detailPath } from "share/pathList";
+import { detailPath } from "../share/pathList";
 
 dayjs.extend(isSameOrAfter);
 
@@ -165,7 +165,7 @@ export default function (fastify: FastifyInstance, options: any, done: any) {
 						lastWorkDay: DefineParamInfo.lastWorkDay, // 마지막 근무일
 						workRecord: DefineParamInfo.workRecord,
 						sumOneYearPay: { type: "number", minimum: 0 },
-						sumOneYearWorkDay: { type: "array", minlength: 2, items: { type: "number" } },
+						sumOneYearWorkDay: { type: "array", minItems: 2, items: { type: "number" } },
 					},
 				},
 			},
@@ -201,7 +201,7 @@ export default function (fastify: FastifyInstance, options: any, done: any) {
 				};
 
 			const birthArray = req.body.birth.split("-");
-			const age = new Date().getFullYear() - new Date(req.body.birth).getFullYear(); // 만 나이 처리 필요
+			const age = new Date().getFullYear() - new Date(req.body.birth).getFullYear();
 			if (new Date(`${new Date().getFullYear()}-${birthArray[1]}-${birthArray[2]}`).getTime() >= new Date().getTime()) age - 1;
 
 			let workingMonth: number;
@@ -246,6 +246,105 @@ export default function (fastify: FastifyInstance, options: any, done: any) {
 		}
 	);
 
+	fastify.post(
+		"/dayjob",
+		{
+			schema: {
+				body: {
+					type: "object",
+					required: ["birth", "disable", "lastWorkDay"],
+					properties: {
+						retired: DefineParamInfo.retired, // 퇴직여부
+						workCate: DefineParamInfo.workCate, // 근로형태
+						retireReason: DefineParamInfo.retireReason, // 퇴직사유
+						birth: DefineParamInfo.birth, //생일
+						disable: DefineParamInfo.disabled, // 장애여부
+						isSpecial: { type: "boolean" }, // 건설직 여부
+						lastWorkDay: DefineParamInfo.lastWorkDay, // 마지막 근무일
+						workRecord: DefineParamInfo.workRecord,
+						dayAvgPay: { type: "number", minimum: 0 },
+						sumWorkDay: { type: "number", minimum: 0 },
+					},
+				},
+			},
+		},
+		(req: any, res) => {
+			/**
+			 * 1. 이직일 이전 18개월 동안 피보험 단위기간이 180일 이상?
+			 * 2. 마지막 근무일이 신청일(조회일을 신청일로 가정)과 비교하여 1개월을 초과하면 PASS
+			 * 	2-1. PASS하면 계속 진행
+			 * 	2-2. PASS하지 못하면 신청일 이전 1개월 동안 근로일 수 10일 미만 인지 확인
+			 * 3. 근로일 정보에서 근로일수와 임금 총액을 합산
+			 */
+			// 	let jobPay = { dayAvgPay: 0, realDayPay: 0, realMonthPay: 0 };
+			// 	const lastWorkDay = dayjs(req.body.lastWorkDay);
+			// 	const limitPermitDay = lastWorkDay.subtract(19, "month").format("YYYY-MM-DD").split("-").map(Number);
+			// 	const limitPayDay = lastWorkDay.subtract(4, "month").format("YYYY-MM-DD").split("-").map(Number);
+			// 	if (req.body.hasOwnProperty("workRecord")) {
+			// 		const overDatePool = dayjs(new Date(req.body.workRecord[0].year, req.body.workRecord[0].months[0].month, 0)).subtract(1, "month").isSameOrAfter(lastWorkDay);
+			// 		if (overDatePool) return { succ: false, mesg: "입력한 근무일이 마지막 근무일 이 후 입니다." };
+			// 	}
+			// 	let isPermit: (number | boolean)[];
+			// 	let sortedData: any[];
+			// 	if (!req.body.hasOwnProperty("workRecord")) {
+			// 		isPermit = dayJobCheckPermit(limitPermitDay, req.body.sumWorkDay, true);
+			// 	} else {
+			// 		sortedData = req.body.workRecord.sort((a: any, b: any) => {
+			// 			if (a.year < b.year) return 1;
+			// 			if (a.year > b.year) return -1;
+			// 			return 0;
+			// 		});
+			// 		isPermit = dayJobCheckPermit(limitPermitDay, sortedData);
+			// 	}
+			// 	if (!isPermit[0])
+			// 		return {
+			// 			succ: false,
+			// 			workingDay: isPermit[1],
+			// 			requireWorkingDay: isPermit[2],
+			// 		};
+			// 	const birthArray = req.body.birth.split("-");
+			// 	const age = new Date().getFullYear() - new Date(req.body.birth).getFullYear();
+			// 	if (new Date(`${new Date().getFullYear()}-${birthArray[1]}-${birthArray[2]}`).getTime() >= new Date().getTime()) age - 1;
+			// 	let workingDay: number;
+			// 	let sumPay: number;
+			// 	let sumWorkDay: number;
+			// 	if (req.body.hasOwnProperty("workRecord")) {
+			// 		workingDay = sumDayJobWorkingDay(sortedData);
+			// 		[sumPay, sumWorkDay] = sumArtShortPay(limitPayDay, sortedData);
+			// 		jobPay = calDayjobPay(sumPay, sumWorkDay);
+			// 	} else {
+			// 		workingDay = req.body.sumWorkDay;
+			// 		jobPay.dayAvgPay = req.body.dayAvgPay;
+			// 		jobPay.realDayPay = Math.ceil(jobPay.dayAvgPay * 0.6);
+			// 		jobPay.realMonthPay = jobPay.realDayPay * 30;
+			// 	}
+			// 	const workingYear = Math.floor(workingDay / 365);
+			// 	const receiveDay = getReceiveDay(workingYear, age, req.body.disable);
+			// 	const [requireWorkingYear, nextReceiveDay] = getNextReceiveDay(workingYear, age, req.body.disable);
+			// 	if (nextReceiveDay === 0) {
+			// 		return {
+			// 			succ: true,
+			// 			retired: req.body.retired,
+			// 			availableAmountCost: jobPay.realDayPay * receiveDay,
+			// 			realDayPay: jobPay.realDayPay,
+			// 			receiveDay,
+			// 			realMonthPay: jobPay.realMonthPay,
+			// 		};
+			// 	}
+			// 	return {
+			// 		succ: true,
+			// 		retired: req.body.retired,
+			// 		availableAmountCost: jobPay.realDayPay * receiveDay,
+			// 		realDayPay: jobPay.realDayPay,
+			// 		receiveDay,
+			// 		realMonthPay: jobPay.realMonthPay,
+			// 		needDay: requireWorkingYear * 365 - workingDay,
+			// 		nextAvailableAmountCost: nextReceiveDay * jobPay.realDayPay,
+			// 		morePay: nextReceiveDay * jobPay.realDayPay - receiveDay * jobPay.realDayPay,
+			// 	};
+		}
+	);
+
 	done();
 }
 
@@ -276,7 +375,7 @@ function artShortCheckPermit(when24Arr: number[], workRecord: any, isSimple: boo
 			if (v.year >= when24Arr[0]) {
 				if (v.year === when24Arr[0]) {
 					v.months.map((v: { month: number; workDay: number }) => {
-						if (v.month <= when24Arr[1]) {
+						if (v.month >= when24Arr[1]) {
 							v.workDay >= 11 ? (sumJoinMonth += 1) : (sumLeftWorkDay += v.workDay);
 						}
 					});
@@ -295,15 +394,15 @@ function artShortCheckPermit(when24Arr: number[], workRecord: any, isSimple: boo
 	return [false, sumJoinMonth, 9 - sumJoinMonth]; // 인정 여부, 24개월 내 현재 피보험단위 기간, 부족 기간
 }
 
-function sumArtShortPay(when12Arr: number[], sortedData: any[]) {
+function sumArtShortPay(limitDay: number[], sortedData: any[]) {
 	// artShortCheckPermit 과 다르게 12개월 임
 	let sumOneYearPay = 0;
 	let sumOneYearWorkDay = 0;
 	sortedData.map((v: { year: number; months: any[] }) => {
-		if (v.year >= when12Arr[0]) {
-			if (v.year == when12Arr[0]) {
+		if (v.year >= limitDay[0]) {
+			if (v.year == limitDay[0]) {
 				v.months.map((v: { month: number; workDay: number; pay: number }) => {
-					if (v.month >= when12Arr[1]) {
+					if (v.month >= limitDay[1]) {
 						sumOneYearPay += v.pay;
 						sumOneYearWorkDay += v.workDay;
 					}
@@ -337,6 +436,64 @@ function calArtShortWorkingMonth(workRecord: any[], isSimple: boolean = false) {
 		});
 	});
 	return workingMonth + Math.floor((leftWorkingDay / 22) * 10) / 10;
+}
+
+function dayJobCheckPermit(limitDay: number[], workRecord: any, isSimple: boolean = false) {
+	let sumWorkDay = 0; //피보험 단위기간
+
+	if (isSimple) {
+		return workRecord >= 180 ? [true] : [false, workRecord, 180 - workRecord];
+	} else {
+		workRecord.map((v: { year: number; months: any[] }) => {
+			if (v.year >= limitDay[0]) {
+				if (v.year === limitDay[0]) {
+					v.months.map((v: { month: number; workDay: number }) => {
+						if (v.month >= limitDay[1]) {
+							sumWorkDay += v.workDay;
+						}
+					});
+				} else {
+					v.months.map((v: { month: number; workDay: number }) => {
+						sumWorkDay += v.workDay;
+					});
+				}
+			}
+		});
+	}
+
+	if (sumWorkDay >= 180) return [true];
+	return [false, sumWorkDay, 180 - sumWorkDay]; // 인정 여부, 24개월 내 현재 피보험단위 기간, 부족 기간
+}
+
+function sumDayJobWorkingDay(workRecord: any[], isSimple: boolean = false) {
+	let sumWorkDay = 0; //피보험 단위기간
+
+	if (isSimple) {
+		return 1;
+		// sumJoinMonth = workRecord[0] * 12 + workRecord[1];
+	} else {
+		workRecord.map((v: { year: number; months: any[] }) => {
+			v.months.map((v: { month: number; workDay: number }) => {
+				sumWorkDay += v.workDay;
+			});
+		});
+	}
+
+	return sumWorkDay;
+}
+function calDayjobPay(sumPay: number[] | number, sumWorkDay: number) {
+	let dayAvgPay = 0;
+	if (Array.isArray(sumPay)) {
+		dayAvgPay = Math.ceil(sumPay[0] / sumWorkDay);
+	} else {
+		dayAvgPay = Math.ceil(sumPay / sumWorkDay);
+	}
+	let realDayPay = Math.ceil(dayAvgPay * 0.6);
+	if (realDayPay > 66000) realDayPay = 66000;
+	else if (realDayPay < 60120) realDayPay = 60120;
+	const realMonthPay = realDayPay * 30;
+
+	return { dayAvgPay, realDayPay, realMonthPay };
 }
 
 // const data = [
