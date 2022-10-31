@@ -7,13 +7,14 @@ import BasicCalHandler from "../service/basicCal";
 const basicCal = new BasicCalHandler();
 
 const BasicCalPage = () => {
-  return (
-    <div>
-      <CalIsRetiree type="basic" />
-      {/* <CalWrite write_list={[]} start_cal={() => {}} />
+	return (
+		<>
+			기본형 페이지
+			<CalIsRetiree type="기본형" />
+			{/* <CalWrite write_list={[]} start_cal={() => {}} />
       <CalResult /> */}
-    </div>
-  );
+		</>
+	);
 };
 
 export default BasicCalPage;

@@ -1,22 +1,32 @@
 #retiree_container {
-  width: 100%;
-  height: 100vh;
+	width: 100%;
+	height: 100%;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: space-between;
+	padding: 0 10px;
+}
+#retiree_type {
+	margin-right: auto;
+	padding-top: 63px;
+}
+#retiree_character {
+	margin-bottom: 93px;
+	text-align: center;
 }
 #retiree_main {
-  margin-top: 93px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
 }
 #retiree_main button {
-  font-size: 32px;
-  border-radius: 10px;
-  width: 224px;
-  height: 62px;
+	font-size: 32px;
+	border-radius: 10px;
+	width: 224px;
+	height: 62px;
 }
-#retiree_main > p {
-  margin: 5px 0 48px;
-}
-#retiree_help_routes {
-  color: rgba(0, 137, 237, 1);
+#retiree_help {
+	color: rgba(0, 137, 237, 1);
+	padding-bottom: 42px;
 }

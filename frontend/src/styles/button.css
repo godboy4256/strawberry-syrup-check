@@ -1,43 +1,48 @@
 .normal_main {
-  border-radius: 5px;
-  padding: 12px 41px;
-  background-color: rgba(255, 101, 89, 1);
-  color: white;
+	border-radius: 5px;
+	padding: 12px 41px;
+	background-color: rgba(255, 101, 89, 1);
+	color: white;
 }
 
 .normal_sub {
-  border-radius: 5px;
-  padding: 12px 41px;
-  border: 1px solid rgba(255, 101, 89, 1);
-  background-color: white;
+	border-radius: 5px;
+	padding: 12px 41px;
+	border: 1px solid rgba(255, 101, 89, 1);
+	background-color: white;
 }
 
 .popup_ok {
-  padding: 9px 0;
-  width: 100%;
-  background-color: rgba(255, 73, 58, 1);
-  border-radius: 0px 0px 5px 5px;
-  color: white;
+	padding: 9px 0;
+	width: 100%;
+	background-color: rgba(255, 73, 58, 1);
+	border-radius: 0px 0px 5px 5px;
+	color: white;
 }
 
 .popup_confirm {
-  padding: 9px 0;
-  width: 100%;
-  background-color: rgba(255, 73, 58, 1);
-  border-bottom-right-radius: 5px;
-  color: white;
+	padding: 9px 0;
+	width: 100%;
+	background-color: rgba(255, 73, 58, 1);
+	border-bottom-right-radius: 5px;
+	color: white;
 }
 
 .popup_cancel {
-  padding: 9px 0;
-  width: 100%;
-  background-color: white;
-  border-bottom-left-radius: 5px;
-  color: rgba(255, 73, 58, 1);
+	padding: 9px 0;
+	width: 100%;
+	background-color: white;
+	border-bottom-left-radius: 5px;
+	color: rgba(255, 73, 58, 1);
 }
 
 .bottom {
-  width: 100%;
-  background-color: rgba(255, 101, 89, 1);
-  color: white;
+	width: 100%;
+	background-color: rgba(255, 101, 89, 1);
+	color: white;
+}
+
+.description {
+	margin-top: 5px;
+	margin-bottom: 45px;
 }
