@@ -1,0 +1,57 @@
+.strong_red {
+	color: rgba(255, 0, 0, 0.8);
+}
+.strong_blue {
+	color: rgba(0, 10, 255, 1);
+}
+
+.box_shadow_style01 {
+	box-shadow: -2px 2px 10px rgba(0, 0, 0, 0.25), inset -2px 2px 4px rgba(255, 255, 255, 0.25), inset 2px -2px 1px rgba(0, 0, 0, 0.25);
+}
+
+.bg_color_main {
+	background-color: rgba(255, 101, 89, 1);
+}
+.bg_color_white {
+	background-color: white;
+}
+.font_color_main {
+	color: rgba(255, 73, 58, 1);
+}
+.font_color_white {
+	color: white;
+}
+
+.fs_12 {
+	font-size: 12px;
+}
+.fs_14 {
+	font-size: 14px;
+}
+.fs_16 {
+	font-size: 16px;
+}
+.fs_18 {
+	font-size: 18px;
+}
+.fs_25 {
+	font-size: 25px;
+}
+.fs_36 {
+	font-size: 25px;
+}
+
+.flex_left {
+	margin-left: auto;
+}
+
+.flex_right {
+	margin-right: auto;
+}
+
+#root {
+	max-width: 500px;
+	width: 100%;
+	margin: 0 auto;
+	position: relative;
+}
