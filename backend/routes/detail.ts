@@ -5,6 +5,7 @@ import isSameOrAfter from "dayjs/plugin/isSameOrAfter";
 import { calDday, calLeastPayInfo, calWorkingDay, getDateVal, getFailResult, getNextReceiveDay, getReceiveDay } from "../router_funcs/common";
 import { DefinedParamErrorMesg, DefineParamInfo } from "../share/validate";
 import { detailPath } from "../share/pathList";
+import { HTTPRequestPart } from "fastify/types/request";
 
 dayjs.extend(isSameOrAfter);
 
@@ -247,7 +248,7 @@ export default function (fastify: FastifyInstance, options: any, done: any) {
 	);
 
 	fastify.post(
-		"/dayjob",
+		detailPath.dayJob,
 		{
 			schema: {
 				body: {
@@ -411,6 +412,43 @@ export default function (fastify: FastifyInstance, options: any, done: any) {
 			// 		nextAvailableAmountCost: nextReceiveDay * jobPay.realDayPay,
 			// 		morePay: nextReceiveDay * jobPay.realDayPay - receiveDay * jobPay.realDayPay,
 			// 	};
+		}
+	);
+
+	fastify.post(
+		detailPath.veryShort,
+		{
+			schema: {
+				body: {
+					type: "object",
+					required: ["age", "disable", "enterDay", "weekDay", "dayWorkTime", "salary"],
+					properties: {
+						age: { type: "number", minimum: 0 },
+						disable: DefineParamInfo.disabled,
+						enterDay: DefineParamInfo.enterDay,
+						retiredDay: DefineParamInfo.retiredDay,
+						weekDay: DefineParamInfo.weekDay, // 주의
+						dayWorkTime: DefineParamInfo.dayWorkTime,
+						salary: DefineParamInfo.salary,
+					},
+				},
+			},
+		},
+		(res, req: any) => {
+			/**
+			 * 이직일 이전 24개월 동안 180일의 피보험 단위기간
+			 * 이직일 이전 24개월 동안 90일 이상을 아래 두 조건을 만족하여 근무한 경우
+			 * 주 근로시간 15시간 미만
+			 * 주 근로일 2일 이하
+			 * 입사일, 퇴사일, 근무요일을 이용해서 피보험 단위기간 계산
+			 * 기초일액 계산
+			 * 기초일액으로 일수령금액, 월수령금액 게산
+			 * 피보험 단위기간을 이용해서 소정급여일수 계산
+			 */
+
+			const lastWorkDay = dayjs(req.body.lastWorkDay);
+			const limitPermitDay = lastWorkDay.subtract(18, "month").format("YYYY-MM-DD").split("-").map(Number);
+			return true;
 		}
 	);
 
