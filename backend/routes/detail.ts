@@ -257,13 +257,25 @@ export default function (fastify: FastifyInstance, options: any, done: any) {
 						retired: DefineParamInfo.retired, // 퇴직여부
 						workCate: DefineParamInfo.workCate, // 근로형태
 						retireReason: DefineParamInfo.retireReason, // 퇴직사유
-						birth: DefineParamInfo.birth, //생일
+						age: { type: "number", minimum: 0 },
 						disable: DefineParamInfo.disabled, // 장애여부
 						isSpecial: { type: "boolean" }, // 건설직 여부
 						lastWorkDay: DefineParamInfo.lastWorkDay, // 마지막 근무일
 						workRecord: DefineParamInfo.workRecord,
 						dayAvgPay: { type: "number", minimum: 0 },
 						sumWorkDay: { type: "number", minimum: 0 },
+						isOverTen: { type: "boolean" },
+						hasWork: { type: "boolean" },
+						// retired: DefineParamInfo.retired, // 퇴직여부
+						// workCate: DefineParamInfo.workCate, // 근로형태
+						// retireReason: DefineParamInfo.retireReason, // 퇴직사유
+						// birth: DefineParamInfo.birth, //생일
+						// disable: DefineParamInfo.disabled, // 장애여부
+						// isSpecial: { type: "boolean" }, // 건설직 여부
+						// lastWorkDay: DefineParamInfo.lastWorkDay, // 마지막 근무일
+						// workRecord: DefineParamInfo.workRecord,
+						// dayAvgPay: { type: "number", minimum: 0 },
+						// sumWorkDay: { type: "number", minimum: 0 },
 					},
 				},
 			},
@@ -279,7 +291,60 @@ export default function (fastify: FastifyInstance, options: any, done: any) {
 			 * 		2-2-1. 위의 단계를 통과하지 못하고 건설직인 경우 최근 14일 내에 근로 내역이 없는 지 확인
 			 * 			2-2-1-1. 없다면 수급 인정 있다면 수급 불인정
 			 * 3. 근로일 정보에서 근로일수와 임금 총액을 합산
+			 * 	3-1. 기초일액, 일 수급액, 소정급여일수, 월 수급액
+			 * 4. 더 많은 수급액을 받을 수 있는 지를 기준으로 결과 값 리턴(수급인정 메세지를 리턴하면서 퇴직금)
 			 */
+			const lastWorkDay = dayjs(req.body.lastWorkDay);
+			const now = dayjs(new Date());
+			const limitPermitDay = lastWorkDay.subtract(18, "month").format("YYYY-MM-DD").split("-").map(Number);
+
+			let isPermit: (number | boolean)[];
+			let sortedData: any[];
+			if (req.body.hasOwnProperty("workRecord")) {
+				const overDatePool = dayjs(new Date(req.body.workRecord[0].year, req.body.workRecord[0].months[0].month, 0)).subtract(1, "month").isSameOrAfter(lastWorkDay);
+				if (overDatePool) return { succ: false, mesg: "입력한 근무일이 마지막 근무일 이 후 입니다." };
+
+				sortedData = req.body.workRecord.sort((a: any, b: any) => {
+					if (a.year < b.year) return 1;
+					if (a.year > b.year) return -1;
+					return 0;
+				});
+				isPermit = dayJobCheckPermit(limitPermitDay, sortedData);
+			} else {
+				isPermit = dayJobCheckPermit(limitPermitDay, req.body.sumWorkDay, true);
+			}
+			if (!isPermit[0]) return { succ: false, workingDay: isPermit[1], requireWorkingDay: isPermit[2] };
+			if (Math.floor(now.diff(req.body.lastWorkDay, "day", true)) <= 30) {
+				if (req.body.isSpecial) {
+					if (!req.body.isOverTen && !req.body.hasWork) return { succ: false, mesg: "수급 조건에 맞지 않습니다." };
+				} else {
+					if (req.body.isOverTen) return { succ: false, mesg: "수급 조건에 맞지 않습니다." };
+				}
+			}
+			// req.body.sumWorkDay, dayAvgPay
+			const { realDayPay, realMonthPay } = calDayjobPay(req.body.dayAvgPay);
+			const workingYear = Math.floor(req.body.sumWorkDay / 365);
+			const receiveDay = getReceiveDay(workingYear, req.body.age, req.body.disable);
+			const [requireWorkingYear, nextReceiveDay] = getNextReceiveDay(workingYear, req.body.age, req.body.disable);
+
+			if (!nextReceiveDay)
+				return {
+					succ: true,
+					amountCost: realDayPay * receiveDay,
+					realDayPay,
+					realMonthPay,
+				};
+
+			return {
+				succ: true,
+				amountCost: realDayPay * receiveDay,
+				realDayPay,
+				receiveDay,
+				realMonthPay,
+				needDay: requireWorkingYear * 365 - req.body.sumWorkDay,
+				nextAmountCost: nextReceiveDay * realDayPay,
+			};
+
 			// 	let jobPay = { dayAvgPay: 0, realDayPay: 0, realMonthPay: 0 };
 			// 	const lastWorkDay = dayjs(req.body.lastWorkDay);
 			// 	const limitPermitDay = lastWorkDay.subtract(19, "month").format("YYYY-MM-DD").split("-").map(Number);
@@ -485,13 +550,7 @@ function sumDayJobWorkingDay(workRecord: any[], isSimple: boolean = false) {
 
 	return sumWorkDay;
 }
-function calDayjobPay(sumPay: number[] | number, sumWorkDay: number) {
-	let dayAvgPay = 0;
-	if (Array.isArray(sumPay)) {
-		dayAvgPay = Math.ceil(sumPay[0] / sumWorkDay);
-	} else {
-		dayAvgPay = Math.ceil(sumPay / sumWorkDay);
-	}
+function calDayjobPay(dayAvgPay: number) {
 	let realDayPay = Math.ceil(dayAvgPay * 0.6);
 	if (realDayPay > 66000) realDayPay = 66000;
 	else if (realDayPay < 60120) realDayPay = 60120;
@@ -499,6 +558,20 @@ function calDayjobPay(sumPay: number[] | number, sumWorkDay: number) {
 
 	return { dayAvgPay, realDayPay, realMonthPay };
 }
+// function calDayjobPay(sumPay: number[] | number, sumWorkDay: number) {
+// 	let dayAvgPay = 0;
+// 	if (Array.isArray(sumPay)) {
+// 		dayAvgPay = Math.ceil(sumPay[0] / sumWorkDay);
+// 	} else {
+// 		dayAvgPay = Math.ceil(sumPay / sumWorkDay);
+// 	}
+// 	let realDayPay = Math.ceil(dayAvgPay * 0.6);
+// 	if (realDayPay > 66000) realDayPay = 66000;
+// 	else if (realDayPay < 60120) realDayPay = 60120;
+// 	const realMonthPay = realDayPay * 30;
+
+// 	return { dayAvgPay, realDayPay, realMonthPay };
+// }
 
 // const data = [
 // 	{
