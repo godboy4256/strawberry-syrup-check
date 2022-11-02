@@ -40,6 +40,10 @@
 	width: 100%;
 	background-color: rgba(255, 101, 89, 1);
 	color: white;
+	position: fixed;
+	bottom: 0;
+	left: 0;
+	padding: 9px 0;
 }
 
 .description {
