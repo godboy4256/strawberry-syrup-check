@@ -42,6 +42,10 @@ button {
 	font-size: 18px;
 }
 
+label {
+	display: block;
+}
+
 input {
 	border: none;
 	background: none;

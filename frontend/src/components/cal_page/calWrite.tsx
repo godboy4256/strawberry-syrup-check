@@ -1,18 +1,10 @@
 import React from "react";
+import { JsxChild } from "typescript";
 import Button from "../inputs/button";
+import "./../../styles/write.css";
 
-const CalWrite = ({
-  write_list,
-  start_cal,
-}: {
-  write_list: string[];
-  start_cal: () => void;
-}) => {
-  return (
-    <div>
-      <Button text="계산하기" type="bottom" click_func={() => {}} />
-    </div>
-  );
+const CalWrite = ({ children, text, callback }: { children: []; text: string; callback: CallableFunction }) => {
+	return <div className="write_container"></div>;
 };
 
 export default CalWrite;

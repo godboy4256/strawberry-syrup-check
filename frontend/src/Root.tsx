@@ -7,9 +7,9 @@ import "./styles/root.css";
 function Root() {
 	return (
 		<>
-			<Header title="딸기시럽" leftType="logo" />
+			<Header leftType="logo" />
 			<Outlet />
-			<Footer />
+			{/* <Footer /> */}
 		</>
 	);
 }

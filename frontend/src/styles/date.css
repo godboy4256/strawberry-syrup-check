@@ -1,113 +1,112 @@
 .date_container {
-  border: 1px solid rgba(255, 101, 89, 1);
-  border-radius: 5px;
-  width: 100%;
-  display: flex;
+	border: 1px solid rgba(255, 101, 89, 1);
+	border-radius: 5px;
+	width: 100%;
+	display: flex;
 }
 .date_container .date_value {
-  width: 100%;
-  color: rgba(255, 191, 186, 1);
-  padding: 9px 0;
-  text-align: center;
+	width: 100%;
+	color: rgba(255, 191, 186, 1);
+	padding: 9px 0;
+	text-align: center;
 }
 .date_container .date_icon {
-  background-color: rgba(255, 101, 89, 1);
-  width: 40px;
-  border-radius: 0px 5px 5px 0;
-  display: flex;
-  justify-content: center;
-  align-items: center;
+	background-color: rgba(255, 101, 89, 1);
+	width: 40px;
+	display: flex;
+	justify-content: center;
+	align-items: center;
 }
 .date_input_container {
-  width: 340px;
-  background-color: white;
-  border-radius: 10px;
+	width: 340px;
+	background-color: white;
+	border-radius: 10px;
 }
 .date_input_header {
-  border-top-left-radius: 10px;
-  border-top-right-radius: 10px;
-  background-color: rgba(234, 91, 80, 1);
-  padding: 16px 0;
-  color: white;
-  font-size: 21px;
-  text-align: center;
-  font-weight: 400;
+	border-top-left-radius: 10px;
+	border-top-right-radius: 10px;
+	background-color: rgba(234, 91, 80, 1);
+	padding: 16px 0;
+	color: white;
+	font-size: 21px;
+	text-align: center;
+	font-weight: 400;
 }
 .date_input_container .date_input_dates .select {
-  position: relative;
+	position: relative;
 }
 .date_input_container .date_input_dates .select_box {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  color: white;
+	position: absolute;
+	top: 50%;
+	left: 50%;
+	transform: translate(-50%, -50%);
+	color: white;
 }
 .date_input_container .date_input_dates .select::before {
-  content: "";
-  width: 31px;
-  height: 31px;
-  display: block;
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  background-color: rgba(255, 73, 58, 1);
-  border-radius: 50%;
+	content: "";
+	width: 31px;
+	height: 31px;
+	display: block;
+	position: absolute;
+	top: 50%;
+	left: 50%;
+	transform: translate(-50%, -50%);
+	background-color: rgba(255, 73, 58, 1);
+	border-radius: 50%;
 }
 .date_input_container .date_input_days,
 .date_input_container .date_input_dates {
-  width: 100%;
-  display: flex;
-  flex-wrap: wrap;
-  padding: 0 23px;
+	width: 100%;
+	display: flex;
+	flex-wrap: wrap;
+	padding: 0 23px;
 }
 .date_input_container .date_input_days > div,
 .date_input_container .date_input_dates > div {
-  width: 14.28%;
-  height: 40px;
-  line-height: 40px;
-  text-align: center;
+	width: 14.28%;
+	height: 40px;
+	line-height: 40px;
+	text-align: center;
 }
 .date_input_container .date_input_dates > div:nth-child(7n) {
-  color: rgba(45, 91, 255, 1);
+	color: rgba(45, 91, 255, 1);
 }
 .date_input_container .date_input_dates > div:nth-child(7n + 1) {
-  color: rgba(255, 68, 68, 1);
+	color: rgba(255, 68, 68, 1);
 }
 #date_input_controllbar {
-  width: 100%;
-  display: flex;
-  justify-content: space-between;
-  padding: 22px 23px 6px;
+	width: 100%;
+	display: flex;
+	justify-content: space-between;
+	padding: 22px 23px 6px;
 }
 #date_input_controllbar button {
-  line-height: 0;
+	line-height: 0;
 }
 #date_next_btn {
-  transform: rotate(180deg);
+	transform: rotate(180deg);
 }
 #date_select_box select {
-  margin: 0 5px;
-  border: 1px solid #000;
-  border-radius: 5px;
-  padding: 6px 12px;
+	margin: 0 5px;
+	border: 1px solid #000;
+	border-radius: 5px;
+	padding: 6px 12px;
 }
 #date_buttons {
-  padding: 10px 23px 20px;
-  display: flex;
-  justify-content: flex-end;
+	padding: 10px 23px 20px;
+	display: flex;
+	justify-content: flex-end;
 }
 #date_buttons button {
-  border-radius: 37px;
-  padding: 6px 9px;
+	border-radius: 37px;
+	padding: 6px 9px;
 }
 #date_select_cancel {
-  border: 1px solid rgba(255, 73, 58, 1);
-  color: rgba(255, 73, 58, 1);
-  margin-right: 10px;
+	border: 1px solid rgba(255, 73, 58, 1);
+	color: rgba(255, 73, 58, 1);
+	margin-right: 10px;
 }
 #date_select_ok {
-  background-color: rgba(255, 73, 58, 1);
-  color: white;
+	background-color: rgba(255, 73, 58, 1);
+	color: white;
 }
