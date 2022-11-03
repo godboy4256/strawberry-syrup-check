@@ -105,6 +105,9 @@ export const DefineParamInfo = {
 	weekDay: {
 		// 근무요일
 		type: "array",
+		items: {
+			type: "number",
+		},
 	},
 	dayWorkTime: {
 		type: "number",

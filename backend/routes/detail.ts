@@ -1,6 +1,7 @@
 import dayjs from "dayjs";
 import { FastifyInstance } from "fastify";
 import isSameOrAfter from "dayjs/plugin/isSameOrAfter";
+import weekOfYear from "dayjs/plugin/weekOfYear";
 
 import { calDday, calLeastPayInfo, calWorkingDay, getDateVal, getFailResult, getNextReceiveDay, getReceiveDay } from "../router_funcs/common";
 import { DefinedParamErrorMesg, DefineParamInfo } from "../share/validate";
@@ -8,6 +9,7 @@ import { detailPath } from "../share/pathList";
 import { HTTPRequestPart } from "fastify/types/request";
 
 dayjs.extend(isSameOrAfter);
+dayjs.extend(weekOfYear);
 
 export default function (fastify: FastifyInstance, options: any, done: any) {
 	fastify.post(
@@ -437,7 +439,7 @@ export default function (fastify: FastifyInstance, options: any, done: any) {
 		(res, req: any) => {
 			/**
 			 * 이직일 이전 24개월 동안 180일의 피보험 단위기간
-			 * 이직일 이전 24개월 동안 90일 이상을 아래 두 조건을 만족하여 근무한 경우
+			 * 이직일 이전 24개월 동안 90일 이상을 아래 두 조건을 만족하여 근무한 경우(실제로)
 			 * 주 근로시간 15시간 미만
 			 * 주 근로일 2일 이하
 			 * 입사일, 퇴사일, 근무요일을 이용해서 피보험 단위기간 계산
@@ -447,7 +449,18 @@ export default function (fastify: FastifyInstance, options: any, done: any) {
 			 */
 
 			const lastWorkDay = dayjs(req.body.lastWorkDay);
-			const limitPermitDay = lastWorkDay.subtract(18, "month").format("YYYY-MM-DD").split("-").map(Number);
+			const retiredDay = dayjs(req.body.retiredDay);
+			const enterDay = dayjs(req.body.enterDay);
+			const limitPermitDay = lastWorkDay.subtract(24, "month").format("YYYY-MM-DD").split("-").map(Number);
+
+			const difftoEnter = Math.floor(Math.floor(enterDay.diff("1951-01-01", "day", true)) / 7); // 입사일 - 1951.1.1.
+			const diffToretired = Math.floor(Math.floor(retiredDay.diff("1951-01-01", "day", true)) / 7); // 퇴사일 - 1951.1.1.
+			const middleWeeks = (diffToretired - difftoEnter) * req.body.weekDay.length;
+
+			const allDays = Math.floor(retiredDay.diff(enterDay, "day", true) + 1);
+
+			let isPermit: (number | boolean)[];
+
 			return true;
 		}
 	);
