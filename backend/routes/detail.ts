@@ -491,17 +491,54 @@ export default function (fastify: FastifyInstance, options: any, done: any) {
 			for (let i = 1; i <= 3; i++) {
 				lastThreeMonth.push(retiredDay.subtract(i, "month").month() + 1); // 이게 정상 작동한다면 calLeastPayInfo의 수정이 필요함
 			}
-			let sumLastThreeMonthDays: number;
+			let sumLastThreeMonthDays = 0;
 			for (let count = 0; count < 3; count++) {
 				sumLastThreeMonthDays += new Date(retiredDayArr[0], lastThreeMonth[count], 0).getDate();
 			}
+
 			const sumSalary = req.body.salary.length === 3 ? req.bodysalary.reduce((acc: number, val: number) => acc + val, 0) : req.body.salary[0] * 3;
 			const dayAvgPay = Math.ceil(sumSalary / sumLastThreeMonthDays);
-			const realDayPay = Math.ceil(dayAvgPay * 0.6); // 급여 계산식 확인, 상/하한액 확인
+			const realDayPay = Math.ceil(dayAvgPay * 0.6) * Math.ceil(req.body.dayWorkTime / 8); // 급여 계산식 확인, 상/하한액 확인
 			const realMonthPay = realDayPay * 30;
+			const workingYears = Math.floor(allWorkDay / 365);
 
-			return true;
+			const receiveDay = getReceiveDay(workingYears, req.body.age, req.body.disable);
+			const [requireWorkingYear, nextReceiveDay] = getNextReceiveDay(workingYears, req.body.age, req.body.disable);
+
+			if (nextReceiveDay === 0) {
+				return {
+					succ: true,
+					amountCost: realDayPay * receiveDay,
+					realDayPay,
+					receiveDay,
+					realMonthPay,
+				};
+			}
+
+			return {
+				succ: true,
+				amountCost: realDayPay * receiveDay,
+				realDayPay,
+				receiveDay,
+				realMonthPay,
+				needDay: requireWorkingYear * 365 - allWorkDay,
+				nextAmountCost: nextReceiveDay * realDayPay,
+			};
 		}
+	);
+
+	fastify.post(
+		"/employer",
+		{
+			schema: {
+				body: {
+					type: "object",
+					required: [],
+					properties: {},
+				},
+			},
+		},
+		(req, res) => {}
 	);
 
 	done();
