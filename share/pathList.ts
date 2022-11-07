@@ -1,10 +1,12 @@
 export const standardPath = {
-    standard: "/standard"
-}
+	standard: "/standard",
+};
 
 export const detailPath = {
-    PRIFX: "/detail",
-    standard: "/standard",
-    art: "/art",
-    shortArt: "/art/short"
-}
+	PRIFX: "/detail",
+	standard: "/standard",
+	art: "/art",
+	shortArt: "/art/short",
+	dayJob: "/dayjob",
+	veryShort: "/veryShort",
+};
