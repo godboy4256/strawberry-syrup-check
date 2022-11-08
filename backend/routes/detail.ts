@@ -6,7 +6,7 @@ import weekOfYear from "dayjs/plugin/weekOfYear";
 import { calDday, calLeastPayInfo, calWorkingDay, getDateVal, getFailResult, getNextReceiveDay, getReceiveDay } from "../router_funcs/common";
 import { DefinedParamErrorMesg, DefineParamInfo } from "../share/validate";
 import { detailPath } from "../share/pathList";
-import { HTTPRequestPart } from "fastify/types/request";
+import { employerPayTable } from "../data/employerPayTable";
 
 dayjs.extend(isSameOrAfter);
 dayjs.extend(weekOfYear);
@@ -533,12 +533,59 @@ export default function (fastify: FastifyInstance, options: any, done: any) {
 			schema: {
 				body: {
 					type: "object",
-					required: [],
-					properties: {},
+					required: ["enterDay", "retiredDay", "insuranceGrade"],
+					properties: {
+						enterDay: DefineParamInfo.enterDay,
+						retiredDay: DefineParamInfo.retiredDay,
+						insuranceGrade: { type: "array", minItems: 1, maxItems: 10, items: { type: "array", minItems: 2, maxItems: 2 } },
+					},
 				},
 			},
 		},
-		(req, res) => {}
+		(req: any, res) => {
+			const enterDay: dayjs.Dayjs = dayjs(req.body.enterDay);
+			const retiredDay: dayjs.Dayjs = dayjs(req.body.retiredDay);
+			const insuranceGradeArr: any[] = req.body.insuranceGrade;
+
+			const workingDay = Math.floor(retiredDay.diff(enterDay, "day", true));
+			if (workingDay < 365) return { succ: false, workingDay, requireDay: 365 - workingDay };
+
+			let sumPay = 0;
+			let sumWorkDay = 0;
+			let dayAvgPay = 0;
+			let realDayPay = 0;
+			let realMonthPay = 0;
+			let receiveDay = 0;
+
+			if (insuranceGradeArr.length >= 3) {
+				for (let count = 0; count < 3; count++) {
+					const grade: 1 | 2 | 3 | 4 | 5 | 6 | 7 = insuranceGradeArr[count][1];
+					insuranceGradeArr[count][0] >= 2019 ? (sumPay += employerPayTable["2019"][grade]) : (sumPay += employerPayTable["2018"][grade]);
+					sumWorkDay += 365;
+				}
+			} else {
+				insuranceGradeArr.map((insuranceGrade) => {
+					const grade: 1 | 2 | 3 | 4 | 5 | 6 | 7 = insuranceGrade[1];
+					insuranceGrade[0] >= 2019 ? (sumPay += employerPayTable["2019"][grade]) : (sumPay += employerPayTable["2018"][grade]);
+					sumWorkDay += 365;
+				});
+			}
+
+			dayAvgPay = Math.floor(sumPay / sumWorkDay); // 기초일액
+			if (dayAvgPay < 73280) dayAvgPay = 73280;
+			if (dayAvgPay > 110000) dayAvgPay = 110000;
+
+			realDayPay = Math.floor(dayAvgPay * 0.6);
+			realMonthPay = realDayPay * 30;
+			receiveDay = getEmployerReceiveDay(insuranceGradeArr);
+
+			return {
+				succ: true,
+				amountCost: realDayPay * receiveDay,
+				realDayPay,
+				realMonthPay,
+			};
+		}
 	);
 
 	done();
@@ -685,6 +732,14 @@ function calDayjobPay(dayAvgPay: number) {
 
 	return { dayAvgPay, realDayPay, realMonthPay };
 }
+
+function getEmployerReceiveDay(insuranceGradeArr: any[]) {
+	if (insuranceGradeArr.length >= 1 && insuranceGradeArr.length < 3) return 120;
+	if (insuranceGradeArr.length >= 3 && insuranceGradeArr.length < 5) return 150;
+	if (insuranceGradeArr.length >= 5 && insuranceGradeArr.length < 10) return 180;
+	return 210;
+}
+
 // function calDayjobPay(sumPay: number[] | number, sumWorkDay: number) {
 // 	let dayAvgPay = 0;
 // 	if (Array.isArray(sumPay)) {
