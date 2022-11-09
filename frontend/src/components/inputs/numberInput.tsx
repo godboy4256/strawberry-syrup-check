@@ -9,10 +9,17 @@ const NumberInput = ({ params, label, by_date, num_unit, callBack }: { params?: 
 				{by_date && by_date}{" "}
 				<input
 					onChange={(e) => {
-						callBack(params, e.currentTarget.value);
+						if (e.currentTarget.value.length > 0) {
+							e.currentTarget.classList.add("select");
+							e.currentTarget.parentElement.classList.add("select");
+						} else {
+							e.currentTarget.classList.remove("select");
+							e.currentTarget.parentElement.classList.remove("select");
+						}
+						callBack(params, Number(e.currentTarget.value));
 					}}
-					type="text"
-				/>{" "}
+					type="number"
+				/>
 				{num_unit}
 			</div>
 		</div>

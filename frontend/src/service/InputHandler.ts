@@ -1,7 +1,6 @@
 export default class InputHandler {
-	protected _Data: { [key: string]: any } = {};
-	constructor(keyList_) {
-		console.log(this._Data);
+	protected _Data: { [key: string]: {} } = {};
+	constructor(keyList_: {}) {
 		this._Data = keyList_;
 	}
 	GetPageVal = (key: string) => {
