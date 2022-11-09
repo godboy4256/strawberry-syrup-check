@@ -12,46 +12,48 @@
 	font-family: NanumBarunGothicLight;
 	src: url("../assets/fonts/NanumBarunGothicLight.otf");
 }
-
 * {
 	margin: 0;
 	padding: 0;
 	color: rgba(0, 0, 0, 0.8);
 	font-size: 18px;
-	font-family: Jua;
+	font-family: NanumSquareRoundOTF;
 	outline: none;
 	box-sizing: border-box;
 }
-
 body {
 	background-color: white;
 }
-
 li {
 	list-style: none;
 }
 a {
 	text-decoration: none;
-	color: rgba(0, 0, 0, 0.8);
+	color: rgba(251, 167, 167, 0.8);
 }
-
 button {
 	background: none;
 	border: none;
 	cursor: pointer;
 	font-size: 18px;
 }
-
 label {
 	display: block;
 }
-
 input {
 	border: none;
 	background: none;
 }
-
 select {
 	border: none;
 	background: none;
+}
+.font_style_main {
+	font-family: Jua;
+}
+.font_style_sub01 {
+	font-family: NanumSquareRoundOTF;
+}
+.font_style_sub02 {
+	font-family: NanumBarunGothicLight;
 }

@@ -4,11 +4,17 @@
 	width: 100%;
 	display: flex;
 }
+.date_container.unselect {
+	border-color: rgba(0, 0, 0, 0.2);
+}
 .date_container .date_value {
 	width: 100%;
 	color: rgba(255, 191, 186, 1);
 	padding: 9px 0;
 	text-align: center;
+}
+.date_container .date_value.unselect {
+	color: rgba(0, 0, 0, 0.2);
 }
 .date_container .date_icon {
 	background-color: rgba(255, 101, 89, 1);
@@ -17,9 +23,11 @@
 	justify-content: center;
 	align-items: center;
 }
+.date_container .date_icon.unselect {
+	background-color: rgba(0, 0, 0, 0.2);
+}
 .date_input_container {
 	width: 340px;
-	background-color: white;
 	border-radius: 10px;
 }
 .date_input_header {

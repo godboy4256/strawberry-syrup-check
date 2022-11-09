@@ -8,7 +8,7 @@ const Button = ({
 	description,
 }: {
 	text: string;
-	type?: "normal_main" | "normal_sub" | "popup_confirm" | "popup_cancel" | "popup_ok" | "bottom";
+	type?: "normal_main" | "normal_sub" | "popup_confirm" | "popup_cancel" | "popup_ok" | "bottom" | "date_select" | "date_cancel";
 	click_func: MouseEventHandler;
 	description?: string;
 }) => {
