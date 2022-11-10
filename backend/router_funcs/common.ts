@@ -41,7 +41,7 @@ export function calLeastPayInfo(retiredDay: dayjs.Dayjs, retiredDayArray: any[],
 	// 수정 가능?
 	const sumSalary = salary.length === 3 ? salary.reduce((acc, val) => acc + val, 0) : salary[0] * 3;
 	const lastThreeMonth = []; // 퇴사일 전 월 부터 3개월
-	for (let i = 1; i <= 3; i++) {
+	for (let i = 0; i < 3; i++) {
 		lastThreeMonth.push(retiredDay.subtract(i, "month"));
 	}
 	let sumLastThreeMonthDays = 0; // 퇴사일 전 월 부터 3개월 일수
@@ -51,9 +51,11 @@ export function calLeastPayInfo(retiredDay: dayjs.Dayjs, retiredDayArray: any[],
 		sumLastThreeMonthDays += new Date(retiredDayArray[0], month, 0).getDate();
 	}
 	const dayAvgPay = Math.ceil(sumSalary / sumLastThreeMonthDays); // 1일 평균 급여액
+	const highLimit = Math.floor(66000 * (dayWorkTime / 8));
+	const lowLimit = Math.floor(60120 * (dayWorkTime / 8));
 	let realDayPay = Math.floor(Math.ceil(dayAvgPay * 0.6) * (Math.ceil((dayWorkTime / 8) * 100) / 100)); // 실업급여 일 수급액
-	if (realDayPay > 66000) realDayPay = 66000;
-	else if (realDayPay < 60120) realDayPay = 60120;
+	if (realDayPay > highLimit) realDayPay = highLimit;
+	if (realDayPay < lowLimit) realDayPay = lowLimit;
 	const realMonthPay = realDayPay * 30; // 실업급여 월 수급액
 
 	return { dayAvgPay, realDayPay, realMonthPay };

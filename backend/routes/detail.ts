@@ -18,7 +18,7 @@ export default function (fastify: FastifyInstance, options: any, done: any) {
 			schema: {
 				body: {
 					type: "object",
-					required: ["retired", "workCate", "retireReason", "birth", "disabled", "enterDay", "weekDay", "dayWorkTime", "salary"],
+					required: ["retired", "workCate", "retireReason", "age", "disabled", "enterDay", "retiredDay", "weekDay", "dayWorkTime", "salary"],
 					properties: {
 						retired: DefineParamInfo.retired,
 						workCate: DefineParamInfo.workCate,
@@ -37,7 +37,7 @@ export default function (fastify: FastifyInstance, options: any, done: any) {
 		},
 		async (req: any, res) => {
 			// const { enterDay, retiredDay, retiredDayArray, birthArray } = getDateVal(req.body.enterDay, req.body.retiredDay, req.body.birth);
-			const { enterDay, retiredDay, retiredDayArray } = getDateVal(req.body.enterDay, req.body.retiredDay, req.body.birth);
+			const { enterDay, retiredDay, retiredDayArray } = getDateVal(req.body.enterDay, req.body.retiredDay);
 
 			if (Math.floor(retiredDay.diff(enterDay, "day", true)) < 0) return { succ: false, mesg: DefinedParamErrorMesg.ealryRetire };
 
@@ -90,7 +90,7 @@ export default function (fastify: FastifyInstance, options: any, done: any) {
 			schema: {
 				body: {
 					type: "object",
-					required: ["retired", "workCate", "retireReason", "birth", "disabled"],
+					required: ["retired", "workCate", "retireReason", "age", "disabled", "enterDay", "retiredDay", "sumTwelveMonthSalary"],
 					properties: {
 						retired: DefineParamInfo.retired,
 						workCate: DefineParamInfo.workCate,
@@ -109,7 +109,8 @@ export default function (fastify: FastifyInstance, options: any, done: any) {
 		},
 		(req: any, res) => {
 			// 일반 예술인은 12개월 급여를 입력한 순간 이직일 이전 24개월 동안 9개월 이상의 피보험단위기간을 만족한다.
-			const { enterDay, retiredDay, retiredDayArray } = getDateVal(req.body.enterDay, req.body.retiredDay, req.body.birth);
+			const { enterDay, retiredDay } = getDateVal(req.body.enterDay, req.body.retiredDay);
+			// const { enterDay, retiredDay, retiredDayArray } = getDateVal(req.body.enterDay, req.body.retiredDay, req.body.birth);
 
 			if (Math.floor(retiredDay.diff(enterDay, "day", true)) < 0) return { succ: false, mesg: DefinedParamErrorMesg.ealryRetire };
 
@@ -161,7 +162,7 @@ export default function (fastify: FastifyInstance, options: any, done: any) {
 			schema: {
 				body: {
 					type: "object",
-					required: ["birth", "disable", "lastWorkDay"],
+					required: ["age", "disable", "lastWorkDay"],
 					properties: {
 						retired: DefineParamInfo.retired, // 퇴직여부
 						workCate: DefineParamInfo.workCate, // 근로형태
@@ -261,7 +262,7 @@ export default function (fastify: FastifyInstance, options: any, done: any) {
 			schema: {
 				body: {
 					type: "object",
-					required: ["birth", "disable", "lastWorkDay"],
+					required: ["age", "disable", "isSpecial", "lastWorkDay", "workRecord", "dayAvg{ay", "sumWorkDay", "isOverTen", "hasWork"],
 					properties: {
 						retired: DefineParamInfo.retired, // 퇴직여부
 						workCate: DefineParamInfo.workCate, // 근로형태
@@ -325,7 +326,7 @@ export default function (fastify: FastifyInstance, options: any, done: any) {
 			if (!isPermit[0]) return { succ: false, workingDay: isPermit[1], requireWorkingDay: isPermit[2] };
 			if (Math.floor(now.diff(req.body.lastWorkDay, "day", true)) <= 30) {
 				if (req.body.isSpecial) {
-					if (!req.body.isOverTen && !req.body.hasWork) return { succ: false, mesg: "수급 조건에 맞지 않습니다." };
+					if (req.body.isOverTen && req.body.hasWork) return { succ: false, mesg: "수급 조건에 맞지 않습니다." };
 				} else {
 					if (req.body.isOverTen) return { succ: false, mesg: "수급 조건에 맞지 않습니다." };
 				}
@@ -429,7 +430,7 @@ export default function (fastify: FastifyInstance, options: any, done: any) {
 			schema: {
 				body: {
 					type: "object",
-					required: ["age", "disable", "enterDay", "weekDay", "dayWorkTime", "salary"],
+					required: ["age", "disable", "enterDay", "reitredDay", "weekDay", "dayWorkTime", "salary"],
 					properties: {
 						age: { type: "number", minimum: 0 },
 						disable: DefineParamInfo.disabled,
@@ -504,7 +505,11 @@ export default function (fastify: FastifyInstance, options: any, done: any) {
 
 			const sumSalary = req.body.salary.length === 3 ? req.bodysalary.reduce((acc: number, val: number) => acc + val, 0) : req.body.salary[0] * 3;
 			const dayAvgPay = Math.ceil(sumSalary / sumLastThreeMonthDays);
-			const realDayPay = Math.ceil(dayAvgPay * 0.6) * Math.ceil(req.body.dayWorkTime / 8); // 급여 계산식 확인, 하한액  60120원, 상한액 6000
+			const highLimit = Math.floor(66000 * (req.body.dayWorkTime / 8));
+			const lowLimit = Math.floor(60120 * (req.body.dayWorkTime / 8));
+			let realDayPay = Math.ceil(dayAvgPay * 0.6) * Math.ceil(req.body.dayWorkTime / 8); // 급여 계산식 확인, 하한액  60120원, 상한액 66000
+			if (realDayPay > highLimit) realDayPay = highLimit;
+			if (realDayPay < lowLimit) realDayPay = lowLimit;
 			const realMonthPay = realDayPay * 30;
 			const workingYears = Math.floor(allWorkDay / 365);
 
@@ -534,7 +539,7 @@ export default function (fastify: FastifyInstance, options: any, done: any) {
 	);
 
 	fastify.post(
-		"/employer",
+		detailPath.employer,
 		{
 			schema: {
 				body: {
@@ -734,6 +739,9 @@ function sumDayJobWorkingDay(workRecord: any[], isSimple: boolean = false) {
 }
 function calDayjobPay(dayAvgPay: number) {
 	let realDayPay = Math.ceil(dayAvgPay * 0.6);
+	// const highLimit = Math.floor(66000 * (dayWorkTime / 8));
+	// const lowLimit = Math.floor(60120 * (dayWorkTime / 8));
+
 	if (realDayPay > 66000) realDayPay = 66000;
 	else if (realDayPay < 60120) realDayPay = 60120;
 	const realMonthPay = realDayPay * 30;
