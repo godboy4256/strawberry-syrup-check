@@ -31,7 +31,7 @@ export default function (fastify: FastifyInstance, options: any, done: any) {
 			const receiveDay = getReceiveDay(workingYears);
 
 			const leastRequireWorkingDay = 180; // 실업급여를 받기위한 최소 피보험기간
-			if (workingDays < leastRequireWorkingDay) return getFailResult(req.body.retired, retiredDay, workingDays, realDayPay, realMonthPay, leastRequireWorkingDay, receiveDay);
+			if (workingDays <= leastRequireWorkingDay) return getFailResult(req.body.retired, retiredDay, workingDays, realDayPay, realMonthPay, leastRequireWorkingDay, receiveDay);
 
 			return {
 				succ: true, // 수급 인정 여부
