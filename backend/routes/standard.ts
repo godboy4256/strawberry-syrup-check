@@ -24,7 +24,12 @@ export default function (fastify: FastifyInstance, options: any, done: any) {
 		},
 		async (req: any, res) => {
 			const { enterDay, retiredDay, retiredDayArray } = getDateVal(req.body.enterDay, req.body.retiredDay);
-			if (Math.floor(retiredDay.diff(enterDay, "day", true)) < 0) return { succ: false, mesg: DefinedParamErrorMesg.ealryRetire };
+
+			const employmentDate = Math.floor(retiredDay.diff(enterDay, "day", true));
+			if (employmentDate < 0) return { succ: false, mesg: DefinedParamErrorMesg.ealryRetire };
+
+			const now = dayjs(new Date());
+			if (Math.floor(now.diff(retiredDay, "day", true)) > 365) return { succ: false, mesg: DefinedParamErrorMesg.expire };
 
 			const { dayAvgPay, realDayPay, realMonthPay } = calLeastPayInfo(retiredDay, retiredDayArray, req.body.salary, 8);
 			const { workingDays, workingYears } = calWorkingDay(enterDay, retiredDay);
@@ -40,7 +45,7 @@ export default function (fastify: FastifyInstance, options: any, done: any) {
 				realDayPay, // 일 수급액
 				receiveDay, // 소정 급여일수
 				realMonthPay, // 월 수급액
-				severancePay: workingYears >= 1 ? Math.ceil((dayAvgPay * 30 * workingDays) / 365) : 0,
+				severancePay: employmentDate >= 365 ? Math.ceil((dayAvgPay * 30 * workingDays) / 365) : 0,
 			};
 		}
 	);
