@@ -1,5 +1,6 @@
-import React, { ChangeEvent, MouseEvent, ReactElement, useState } from "react";
+import React, { ChangeEvent, ReactElement, useState } from "react";
 import "../../styles/select.css";
+import IMGSelect from "../../assets/img/select_icon.svg";
 // import PopUp from "../common/PopUp";
 
 const SelectInput = ({
@@ -10,9 +11,9 @@ const SelectInput = ({
 	params,
 	callBack,
 }: {
-	selected: string;
-	options: string[];
-	type?: "popup" | "normal";
+	selected: number | string;
+	options: string[] | number[];
+	type?: "popup" | "normal" | "date_normal";
 	popup_focus_template?: ReactElement;
 	params: string;
 	callBack: CallableFunction;
@@ -45,22 +46,26 @@ const SelectInput = ({
 					)}
 				</>
 			) : (
-				type === "normal" && (
-					<select
-						onChange={(e: ChangeEvent<HTMLSelectElement>) => {
-							callBack(params, e.currentTarget.value);
-						}}
-						defaultValue={selected}
-					>
-						{options.map((el: string | number, idx: number) => {
-							return (
-								<option key={idx + Date.now()} value={el}>
-									{el}
-								</option>
-							);
-						})}
-					</select>
-				)
+				type === "normal" ||
+				(type === "date_normal" && (
+					<div id={type} className="select_custom">
+						<select
+							onChange={(e: ChangeEvent<HTMLSelectElement>) => {
+								callBack(params, e.currentTarget.value);
+							}}
+							defaultValue={selected}
+						>
+							{options.map((el: string | number, idx: number) => {
+								return (
+									<option key={idx + Date.now()} value={el}>
+										{el}
+									</option>
+								);
+							})}
+						</select>
+						<img src={IMGSelect} alt="Select Icon" />
+					</div>
+				))
 			)}
 		</>
 	);

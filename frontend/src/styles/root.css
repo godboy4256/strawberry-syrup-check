@@ -34,9 +34,6 @@
 .fs_25 {
 	font-size: 25px;
 }
-.fs_36 {
-	font-size: 25px;
-}
 .flex_left {
 	margin-left: auto;
 }
@@ -55,6 +52,7 @@
 	padding: 0 30px;
 }
 .full_height_layout {
+	margin-top: 50px;
 	height: calc(100vh - 80px);
 	overflow: hidden;
 }

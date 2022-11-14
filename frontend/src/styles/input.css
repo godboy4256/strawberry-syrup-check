@@ -18,3 +18,7 @@
 	border: 1px solid rgba(255, 101, 89, 1);
 	color: rgba(255, 101, 89, 1);
 }
+.kr_value {
+	text-align: right;
+	padding: 5px 0;
+}

@@ -47,6 +47,7 @@ input {
 select {
 	border: none;
 	background: none;
+	appearance: none;
 }
 .font_style_main {
 	font-family: Jua;

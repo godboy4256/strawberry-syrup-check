@@ -1,4 +1,4 @@
-import React from "react";
+import React, { Dispatch, SetStateAction, useEffect } from "react";
 import { useState } from "react";
 import CalIsRetiree from "../components/cal_page/calIsRetiree";
 import Button from "../components/inputs/button";
@@ -6,15 +6,24 @@ import DateInput from "../components/inputs/dateInput";
 import NumberInput from "../components/inputs/numberInput";
 import InputHandler from "../service/InputHandler";
 import IMGRetireeCharacter from "../assets/img/strawberry_character_01.png";
+import { sendToServer } from "../assets/utils/sendToserver";
+import CalResult from "../components/cal_page/calResult";
+import { GetCurrentDate } from "../assets/utils/date";
 import "./../styles/basic.css";
 
+const currentDate = GetCurrentDate();
+
 class BasicCalHandler extends InputHandler {
-	Action_Get_Data = () => {
-		// const from_server = fetch("http://localhost:8080/standard", {});
-		console.log(this._Data);
+	public result: {};
+	public setCompState: Dispatch<SetStateAction<number>>;
+	public Action_Cal_Result = async () => {
+		if (!this._Data.retiredDay) {
+			this._Data.retiredDay = currentDate.join("-");
+		}
+		this.result = await sendToServer("/standard", this._Data);
+		this.setCompState(3);
 	};
 }
-
 const handler = new BasicCalHandler({});
 
 const _BasicCalComp = () => {
@@ -28,17 +37,22 @@ const _BasicCalComp = () => {
 				<DateInput params="enterDay" label="입사일" callBack={handler.SetPageVal} />
 				{handler.GetPageVal("retired") && <DateInput params="retiredDay" label="퇴사일" callBack={handler.SetPageVal} />}
 				<NumberInput params="salary" label="월 급여(세전)" num_unit="원" callBack={handler.SetPageVal} />
-				<Button text="계산하기" type="bottom" click_func={handler.Action_Get_Data} />
+				<Button text="계산하기" type="bottom" click_func={handler.Action_Cal_Result} />
 			</div>
 		</>
 	);
 };
+
 const BasicCalPage = () => {
 	const [compState, setCompState] = useState(1);
+	useEffect(() => {
+		handler.setCompState = setCompState;
+	}, []);
 	return (
 		<div id="basic_container" className="full_height_layout">
-			{compState === 1 && <CalIsRetiree handler={handler} moveComp={setCompState} type="기본형" />}
+			{compState === 1 && <CalIsRetiree handler={handler} type="기본형" />}
 			{compState === 2 && <_BasicCalComp />}
+			{compState === 3 && <CalResult result={handler.result} />}
 		</div>
 	);
 };
