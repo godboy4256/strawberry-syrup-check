@@ -10,6 +10,7 @@ import { sendToServer } from "../assets/utils/sendToserver";
 import CalResult from "../components/cal_page/calResult";
 import { GetCurrentDate } from "../assets/utils/date";
 import "./../styles/basic.css";
+import Header from "../components/layout/header";
 
 const currentDate = GetCurrentDate();
 
@@ -47,13 +48,17 @@ const BasicCalPage = () => {
 	const [compState, setCompState] = useState(1);
 	useEffect(() => {
 		handler.setCompState = setCompState;
+		handler.SetPageVal("retired", undefined);
 	}, []);
 	return (
-		<div id="basic_container" className="full_height_layout">
-			{compState === 1 && <CalIsRetiree handler={handler} type="기본형" />}
-			{compState === 2 && <_BasicCalComp />}
-			{compState === 3 && <CalResult result={handler.result} />}
-		</div>
+		<>
+			<Header title={handler.GetPageVal("retired") === undefined ? "퇴직자 vs 퇴직예정자" : handler.GetPageVal("retired") ? "퇴직자" : "퇴직예정자"} leftLink="/" leftType="BACK" />
+			<div id="basic_container" className="full_height_layout">
+				{compState === 1 && <CalIsRetiree handler={handler} type="기본형" />}
+				{compState === 2 && <_BasicCalComp />}
+				{compState === 3 && <CalResult result={handler.result} />}
+			</div>
+		</>
 	);
 };
 

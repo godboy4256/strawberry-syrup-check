@@ -15,6 +15,7 @@ module.exports = {
 		path: path.resolve(__dirname, "build/"),
 		filename: "bundle.js",
 		publicPath: "/",
+		sourceMapFilename: "[name].js.map",
 	},
 	module: {
 		rules: [
@@ -57,6 +58,12 @@ module.exports = {
 						},
 					},
 				],
+			},
+			{
+				test: [/\.js$/, /\.ts?$/, /\.jsx?$/, /\.tsx?$/],
+				enforce: "pre",
+				exclude: /node_modules/,
+				use: ["source-map-loader"],
 			},
 		],
 	},

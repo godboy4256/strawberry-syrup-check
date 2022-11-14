@@ -1,0 +1,61 @@
+#result_container {
+	text-align: center;
+}
+
+#result_comment01 {
+	padding-bottom: 15px;
+	line-height: 27px;
+}
+#result_comment02 {
+	padding: 25px 0 15px;
+}
+#result_main {
+}
+#result_main h3 {
+	padding: 3px 0;
+}
+#result_main h3 div {
+	width: 168px;
+	line-height: 38px;
+	text-align: center;
+}
+#result_main_content {
+	padding: 10px 0;
+	text-align: center;
+	border: 1px solid rgba(255, 101, 89, 1);
+}
+#result_day {
+	margin-bottom: 5px;
+	line-height: 18px;
+}
+#result_month {
+	margin-bottom: 5px;
+	line-height: 24px;
+}
+#result_severance_pay {
+	padding: 3px 0;
+}
+#result_severance_pay div {
+	line-height: 38px;
+	width: 152px;
+}
+#result_disapproval {
+	margin-bottom: 96px;
+}
+#result_disapproval > div {
+	line-height: 40px;
+	justify-content: center;
+}
+#result_disapproval div div {
+	width: 135px;
+}
+.result_disapproval_tip.help_link {
+	margin-bottom: 15px;
+}
+#result_remaining_days {
+	line-height: 1.5;
+	margin-bottom: 3px;
+}
+#result_remaining_days > div {
+	margin-bottom: 5px;
+}
