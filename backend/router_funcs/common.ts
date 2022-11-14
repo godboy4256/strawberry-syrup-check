@@ -9,17 +9,11 @@ export function getDateVal(reqEnterDay: string, reqRetiredDay: string | null = n
 		birthArray?: string[];
 	};
 
-	let retiredDayArray = [];
 	const enterDay = dayjs(reqEnterDay); // 입사일(고용보험 가입일)
-	let retiredDay: dayjs.Dayjs; // 퇴사일(마지막 고용보험 가입일)
-	if (!reqRetiredDay) {
-		// 퇴직예정자
-		retiredDay = dayjs(new Date());
-		retiredDayArray = dayjs(new Date()).format("YYYY-MM-DD").split("-");
-	} else {
-		retiredDay = dayjs(reqRetiredDay);
-		retiredDayArray = reqRetiredDay.split("-");
-	}
+
+	const retiredDay = dayjs(reqRetiredDay); // 퇴사일(마지막 고용보험 가입일)
+	const retiredDayArray = reqRetiredDay.split("-");
+
 	const result: result = { enterDay, retiredDay, retiredDayArray };
 
 	if (birth) result.birthArray = birth.split("-");

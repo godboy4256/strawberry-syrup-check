@@ -12,7 +12,7 @@ export default function (fastify: FastifyInstance, options: any, done: any) {
 			schema: {
 				body: {
 					type: "object",
-					required: ["retired", "enterDay", "salary"],
+					required: ["retired", "enterDay", "retiredDay", "salary"],
 					properties: {
 						retired: DefineParamInfo.retired,
 						enterDay: DefineParamInfo.enterDay,
