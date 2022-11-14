@@ -1,6 +1,6 @@
 import React, { Dispatch, ReactElement, SetStateAction, useState } from "react";
-import "../../styles/popup.css";
 import Button from "../inputs/button";
+import "../../styles/popup.css";
 
 interface IPopUpHandler {
 	create_func: Dispatch<SetStateAction<ReactElement | string>>;
@@ -39,8 +39,8 @@ const PopUpGlobal = () => {
 						<div id={`${PopUpHandler.popup_type}_button_container`}>
 							{PopUpHandler.popup_type === "date" ? (
 								<>
-									<Button text="취소" type="date_cancel" click_func={onClickConfirm} />
-									<Button text="선택" type="date_select" click_func={onClickCancel} />
+									<Button text="취소" type="date_cancel" click_func={onClickCancel} />
+									<Button text="선택" type="date_select" click_func={onClickConfirm} />
 								</>
 							) : PopUpHandler.popup_type === "only_check" ? (
 								<Button text="예" type="popup_ok" click_func={() => {}} />
@@ -60,12 +60,12 @@ const PopUpGlobal = () => {
 	);
 };
 
-const CreatePopup = (title: string = undefined, content: ReactElement | string, popup_type: "confirm" | "only_check" | "date", confirm_func: () => void, cancel_func: () => void) => {
+const CreatePopup = (title?: string, content: ReactElement | string = "팝업", popup_type: "confirm" | "only_check" | "date" = "confirm", confirm_func?: () => void, cancel_func?: () => void) => {
 	PopUpHandler.create_func(content);
-	PopUpHandler.title = title;
-	PopUpHandler.confirm_func = confirm_func;
-	PopUpHandler.cancel_func = cancel_func;
 	PopUpHandler.popup_type = popup_type;
+	if (title) PopUpHandler.title = title;
+	if (confirm_func) PopUpHandler.confirm_func = confirm_func;
+	if (cancel_func) PopUpHandler.cancel_func = cancel_func;
 };
 
 export { CreatePopup, PopUpGlobal };

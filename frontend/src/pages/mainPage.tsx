@@ -41,10 +41,6 @@ const MainPage = () => {
 						</Link>
 					</Slider>
 				</div>
-				<div id="main_tooltip">
-					본 계산기는 법적 효력이 없습니다. <br />
-					정확한 결과를 확인하시기 위해서는 관할 고용센터로 문의하시기 바랍니다.
-				</div>
 			</div>
 		</>
 	);

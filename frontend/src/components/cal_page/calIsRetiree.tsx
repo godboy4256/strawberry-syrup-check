@@ -3,10 +3,10 @@ import Button from "../inputs/button";
 import "../../styles/retiree.css";
 import IMGRetireeCharacter from "../../assets/img/strawberry_character_01.png";
 
-const CalIsRetiree = ({ handler, moveComp, type }: { handler: any; moveComp: Dispatch<SetStateAction<number>>; type: "기본형" | "상세형" | "복수형" }) => {
+const CalIsRetiree = ({ handler, type }: { handler: any; type: "기본형" | "상세형" | "복수형" }) => {
 	const onClickIsRetiree = (isRetiree: boolean) => {
 		handler.SetPageVal("retired", isRetiree);
-		moveComp(2);
+		handler.setCompState(2);
 	};
 	return (
 		<div id="retiree_container">

@@ -5,16 +5,16 @@ import { CreatePopup } from "../common/PopUp";
 import SelectInput from "./selectInput";
 import "../../styles/date.css";
 import InputHandler from "../../service/InputHandler";
-
-// 함수 위치 리팩토링 요망
-const GetCurrentDate = () => {
-	const date = new Date();
-	return [date.getFullYear(), date.getMonth() + 1, date.getDate()];
-};
+import { GetCurrentDate } from "../../assets/utils/date";
 
 const currentDate = GetCurrentDate();
 
 class DateHandler extends InputHandler {
+	public setYear: Dispatch<SetStateAction<number>>;
+	public setMonth: Dispatch<SetStateAction<number>>;
+	public setDay: Dispatch<SetStateAction<number>>;
+	public setDays: Dispatch<SetStateAction<number[]>>;
+
 	Year_Option_Generater = () => {
 		const year_arr = [];
 		for (let j = 0; j < 10; j++) {
@@ -23,9 +23,58 @@ class DateHandler extends InputHandler {
 		return year_arr;
 	};
 
-	Days_Option_Generater = () => {
-		const days_arr = new Array(new Date(currentDate[0], currentDate[1] - 1, 1).getDay()).fill("");
-		const days_count = new Date(currentDate[0], currentDate[1], 0).getDate();
+	public current_year_list = this.Year_Option_Generater();
+
+	SelectCallback = (params: string, value: string) => {
+		this.SetPageVal(params, value);
+		if (params === "year") {
+			this.setDays(this.Days_Option_Generater(Number(value), currentDate[1]));
+			this.setYear(Number(value));
+		} else if (params === "month") {
+			this.setDays(this.Days_Option_Generater(currentDate[0], Number(value)));
+			this.setMonth(Number(value));
+		}
+	};
+
+	SelectDateNextClick = () => {
+		const minYear = Number(this.current_year_list[this.current_year_list.length - 1]);
+		this.setMonth((prev) => {
+			if (prev === 12) {
+				this.setYear((prev) => {
+					if (prev === Number(this.current_year_list[0])) {
+						return minYear;
+					} else {
+						return prev + 1;
+					}
+				});
+				return 1;
+			} else {
+				return prev + 1;
+			}
+		});
+	};
+
+	SelectDatePrevClick = () => {
+		const minYear = Number(this.current_year_list[this.current_year_list.length - 1]);
+		this.setMonth((prev) => {
+			if (prev === 1) {
+				this.setYear((prev) => {
+					if (prev === minYear) {
+						return Number(this.current_year_list[0]);
+					} else {
+						return prev - 1;
+					}
+				});
+				return 12;
+			} else {
+				return prev - 1;
+			}
+		});
+	};
+
+	Days_Option_Generater = (year: number, month: number) => {
+		const days_arr = new Array(new Date(year, month, 1).getDay()).fill("");
+		const days_count = new Date(year, month, 0).getDate();
 		for (let i = 0; i < days_count; i++) {
 			days_arr.push(String(i + 1));
 		}
@@ -33,9 +82,8 @@ class DateHandler extends InputHandler {
 	};
 
 	Action_Get_Date = (callback: CallableFunction, setValueState: Dispatch<SetStateAction<string>>, params: string) => {
-		const viewDate = `${this._Data.year ? this._Data.year : currentDate[0]}년 ${this._Data.month ? this._Data.month : currentDate[1]}월 ${this._Data.day ? this._Data.day : currentDate[2]}일`;
-		const sendDate = `${this._Data.year ? this._Data.year : currentDate[0]}-${this._Data.month ? this._Data.month : currentDate[1]}-${this._Data.day ? this._Data.day : currentDate[2]}`;
-		callback(params, sendDate);
+		const viewDate = `${this._Data.year ? this._Data.year : currentDate[0]}-${this._Data.month ? this._Data.month : currentDate[1]}-${this._Data.day ? this._Data.day : currentDate[2]}`;
+		callback(params, viewDate);
 		setValueState(viewDate);
 	};
 }
@@ -43,15 +91,20 @@ class DateHandler extends InputHandler {
 // 추후 리렌더링 관련 리팩토링 요망
 const _DaysComp = ({ handler }) => {
 	const [selectedDate, setSelectedDate] = useState<number>(currentDate[2]);
+	const [days, setDays] = useState(handler.Days_Option_Generater(currentDate[0], currentDate[1]));
+	useEffect(() => {
+		handler.setDays = setDays;
+	}, []);
 	return (
 		<div className="date_input_dates">
-			{handler.Days_Option_Generater()?.map((el: string, idx: number) => {
+			{days?.map((el: string, idx: number) => {
 				return (
 					<div
 						key={String(el + Date.now()) + idx}
 						onClick={() => {
 							if (!el) return;
 							setSelectedDate(Number(el));
+							handler.setDay(Number(el));
 							handler.SetPageVal("day", el);
 						}}
 						className={`fs_16 ${Number(el) === selectedDate ? "select" : ""}`}
@@ -64,21 +117,31 @@ const _DaysComp = ({ handler }) => {
 	);
 };
 
-const _DatePopUp = ({ handler }: { handler: any }) => {
+const _DateHeader = ({ handler }) => {
+	const [year, setYear] = useState(currentDate[0]);
+	const [month, setMonth] = useState(currentDate[1]);
+	const [day, setDay] = useState(currentDate[2]);
+	useEffect(() => {
+		handler.setYear = setYear;
+		handler.setMonth = setMonth;
+		handler.setDay = setDay;
+	}, []);
+	return <div className="date_input_header">{`${year}년 ${month}월 ${day}일`}</div>;
+};
+
+const _DatePopUp = ({ handler }) => {
 	return (
 		<div className="date_input_container">
-			<div className="date_input_header">
-				{currentDate[0]}년 {currentDate[1]}월 {currentDate[2]}일
-			</div>
+			<_DateHeader handler={handler} />
 			<div id="date_input_controllbar">
-				<button id="date_prev_btn">
+				<button id="date_prev_btn" onClick={handler.SelectDatePrevClick}>
 					<img src={IMGRedDirection} alt="Date Prev Button" />
 				</button>
 				<div id="date_select_box">
-					<SelectInput selected={String(currentDate[0])} type="normal" options={handler.Year_Option_Generater()} params="year" callBack={handler.SetPageVal} />
-					<SelectInput selected={String(currentDate[1])} type="normal" options={["1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12"]} params="month" callBack={handler.SetPageVal} />
+					<SelectInput selected={currentDate[0]} type="date_normal" options={handler.current_year_list} params="year" callBack={handler.SelectCallback} />
+					<SelectInput selected={currentDate[1]} type="date_normal" options={[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]} params="month" callBack={handler.SelectCallback} />
 				</div>
-				<button id="date_next_btn">
+				<button id="date_next_btn" onClick={handler.SelectDateNextClick}>
 					<img src={IMGRedDirection} alt="Date Next Button" />
 				</button>
 			</div>
@@ -100,13 +163,7 @@ const DateInput = ({ params, label, callBack }: { params: string; label?: string
 	const handler = new DateHandler({});
 	const [dateValue, setDateValue] = useState("");
 	const onClickDateOn = () => {
-		CreatePopup(
-			undefined,
-			<_DatePopUp handler={handler} />,
-			"date",
-			() => handler.Action_Get_Date(callBack, setDateValue, params),
-			() => handler.Action_Get_Date(callBack, setDateValue, params)
-		);
+		CreatePopup(undefined, <_DatePopUp handler={handler} />, "date", () => handler.Action_Get_Date(callBack, setDateValue, params));
 	};
 
 	return (
