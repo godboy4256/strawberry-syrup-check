@@ -3,6 +3,7 @@ import "../styles/mainpage.css";
 import Slider from "react-slick";
 import IMGStroberry from "./../assets/img/temp_st.svg";
 import { Link } from "react-router-dom";
+import Header from "../components/layout/header";
 
 const MainPage = () => {
 	const settings = {
@@ -14,6 +15,7 @@ const MainPage = () => {
 	};
 	return (
 		<>
+			<Header title="딸기시럽" leftType="LOGO" leftLink="/" />
 			<div id="main_page_container" className="full_height_layout">
 				<div>
 					<h3 className="fs_25">실업급여 계산기</h3>

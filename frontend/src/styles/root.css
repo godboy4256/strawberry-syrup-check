@@ -34,14 +34,21 @@
 .fs_25 {
 	font-size: 25px;
 }
+.flex_box {
+	display: flex;
+}
 .flex_left {
 	margin-left: auto;
 }
-
 .flex_right {
 	margin-right: auto;
 }
-
+.flex_box_row_center {
+	align-items: center;
+}
+.flex_box_column_center {
+	justify-content: center;
+}
 .w_100 {
 	width: 100%;
 }
@@ -51,17 +58,32 @@
 .basic_side_padding {
 	padding: 0 30px;
 }
-.full_height_layout {
-	margin-top: 50px;
-	height: calc(100vh - 80px);
-	overflow: hidden;
-}
 .pd_810 {
 	padding: 8px 10px;
+}
+.last_child_margin_init {
+	margin-bottom: 0;
+}
+.mini_tip {
+	font-size: 10px;
+	line-height: 15px;
+	color: rgba(0, 0, 0, 0.4);
+	margin-top: 25px;
 }
 #root {
 	max-width: 500px;
 	width: 100%;
 	margin: 0 auto;
 	position: relative;
+}
+.full_height_layout {
+	margin-top: 50px;
+	height: calc(100vh - 80px);
+	overflow: hidden;
+}
+.help_link {
+	color: #0089ed;
+	font-size: 12px;
+	line-height: 18px;
+	text-align: right;
 }

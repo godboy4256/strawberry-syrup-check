@@ -1,5 +1,7 @@
 #main_page_container {
-	padding-top: 77px;
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
 }
 
 #main_page_container h3 {
@@ -33,11 +35,6 @@
 .main_slide_card p {
 	border-radius: 10px;
 	padding: 11px 19px;
-}
-#main_page_container {
-	display: flex;
-	flex-direction: column;
-	justify-content: space-between;
 }
 
 #main_slide_wrapper {

@@ -29,7 +29,8 @@ li {
 }
 a {
 	text-decoration: none;
-	color: rgba(251, 167, 167, 0.8);
+	display: block;
+	color: black;
 }
 button {
 	background: none;
