@@ -16,6 +16,7 @@ export default function (fastify: FastifyInstance, options: any, done: any) {
 		detailPath.standard,
 		{
 			schema: {
+				tags: ["detail"],
 				body: {
 					type: "object",
 					required: ["retired", "workCate", "retireReason", "age", "disabled", "enterDay", "retiredDay", "weekDay", "dayWorkTime", "salary"],
@@ -67,6 +68,7 @@ export default function (fastify: FastifyInstance, options: any, done: any) {
 			// const receiveDay = getReceiveDay(workingYears, age, req.body.disabled);
 			const receiveDay = getReceiveDay(workingYears, req.body.age, req.body.disabled);
 
+			// isPermit
 			const leastRequireWorkingDay = 180;
 			if (workingDays < leastRequireWorkingDay) return getFailResult(req.body.retired, retiredDay, workingDays, realDayPay, realMonthPay, leastRequireWorkingDay, receiveDay, true);
 
@@ -106,6 +108,7 @@ export default function (fastify: FastifyInstance, options: any, done: any) {
 		detailPath.art,
 		{
 			schema: {
+				tags: ["detail"],
 				body: {
 					type: "object",
 					required: ["retired", "workCate", "retireReason", "age", "disabled", "enterDay", "retiredDay", "sumTwelveMonthSalary"],
@@ -133,6 +136,9 @@ export default function (fastify: FastifyInstance, options: any, done: any) {
 
 			const employmentDate = Math.floor(retiredDay.diff(enterDay, "day", true));
 			if (employmentDate < 0) return { succ: false, mesg: DefinedParamErrorMesg.ealryRetire };
+
+			const now = dayjs(new Date());
+			if (Math.floor(now.diff(retiredDay, "day", true)) > 365) return { succ: false, mesg: DefinedParamErrorMesg.expire };
 
 			// const age = new Date().getFullYear() - new Date(req.body.birth).getFullYear();
 			// if (new Date(`${new Date().getFullYear()}-${birthArray[1]}-${birthArray[2]}`).getTime() >= new Date().getTime()) age - 1;
@@ -180,6 +186,7 @@ export default function (fastify: FastifyInstance, options: any, done: any) {
 		detailPath.shortArt,
 		{
 			schema: {
+				tags: ["detail"],
 				body: {
 					type: "object",
 					required: ["age", "disable", "lastWorkDay"],
@@ -196,7 +203,7 @@ export default function (fastify: FastifyInstance, options: any, done: any) {
 						sumOneYearWorkDay: { type: "array", minItems: 2, items: { type: "number" } },
 						isSpecial: { type: "boolean" },
 						isOverTen: { type: "boolean" },
-						hasWork: { type: "array" },
+						// hasWork: { type: "array", items: [{ type: "boolean" }, { type: "Date" }] },
 					},
 				},
 			},
@@ -287,6 +294,7 @@ export default function (fastify: FastifyInstance, options: any, done: any) {
 		detailPath.dayJob,
 		{
 			schema: {
+				tags: ["detail"],
 				body: {
 					type: "object",
 					required: ["age", "disable", "isSpecial", "lastWorkDay", "workRecord", "dayAvg{ay", "sumWorkDay", "isOverTen", "hasWork"],
@@ -458,6 +466,7 @@ export default function (fastify: FastifyInstance, options: any, done: any) {
 		detailPath.veryShort,
 		{
 			schema: {
+				tags: ["detail"],
 				body: {
 					type: "object",
 					required: ["age", "disable", "enterDay", "reitredDay", "weekDay", "dayWorkTime", "salary"],
@@ -572,6 +581,7 @@ export default function (fastify: FastifyInstance, options: any, done: any) {
 		detailPath.employer,
 		{
 			schema: {
+				tags: ["detail"],
 				body: {
 					type: "object",
 					required: ["enterDay", "retiredDay", "insuranceGrade"],
