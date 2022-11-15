@@ -14,9 +14,10 @@
 	"dependencies": {
 		"@fastify/cors": "^8.1.0",
 		"@fastify/static": "^6.5.0",
-		"@fastify/swagger": "^8.1.0",
+		"@fastify/swagger": "^7.4.1",
 		"dayjs": "^1.11.5",
-		"fastify": "^4.8.1"
+		"fastify": "^4.8.1",
+		"fastify-favicon": "^4.2.0"
 	},
 	"devDependencies": {
 		"@types/node": "^18.8.2",

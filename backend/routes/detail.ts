@@ -16,6 +16,7 @@ export default function (fastify: FastifyInstance, options: any, done: any) {
 		detailPath.standard,
 		{
 			schema: {
+				tags: ["detail"],
 				body: {
 					type: "object",
 					required: ["retired", "workCate", "retireReason", "age", "disabled", "enterDay", "retiredDay", "weekDay", "dayWorkTime", "salary"],
@@ -107,6 +108,7 @@ export default function (fastify: FastifyInstance, options: any, done: any) {
 		detailPath.art,
 		{
 			schema: {
+				tags: ["detail"],
 				body: {
 					type: "object",
 					required: ["retired", "workCate", "retireReason", "age", "disabled", "enterDay", "retiredDay", "sumTwelveMonthSalary"],
@@ -184,6 +186,7 @@ export default function (fastify: FastifyInstance, options: any, done: any) {
 		detailPath.shortArt,
 		{
 			schema: {
+				tags: ["detail"],
 				body: {
 					type: "object",
 					required: ["age", "disable", "lastWorkDay"],
@@ -200,7 +203,7 @@ export default function (fastify: FastifyInstance, options: any, done: any) {
 						sumOneYearWorkDay: { type: "array", minItems: 2, items: { type: "number" } },
 						isSpecial: { type: "boolean" },
 						isOverTen: { type: "boolean" },
-						hasWork: { type: "array", items: [{ type: "boolean" }, { type: "Date" }] },
+						// hasWork: { type: "array", items: [{ type: "boolean" }, { type: "Date" }] },
 					},
 				},
 			},
@@ -291,6 +294,7 @@ export default function (fastify: FastifyInstance, options: any, done: any) {
 		detailPath.dayJob,
 		{
 			schema: {
+				tags: ["detail"],
 				body: {
 					type: "object",
 					required: ["age", "disable", "isSpecial", "lastWorkDay", "workRecord", "dayAvg{ay", "sumWorkDay", "isOverTen", "hasWork"],
@@ -462,6 +466,7 @@ export default function (fastify: FastifyInstance, options: any, done: any) {
 		detailPath.veryShort,
 		{
 			schema: {
+				tags: ["detail"],
 				body: {
 					type: "object",
 					required: ["age", "disable", "enterDay", "reitredDay", "weekDay", "dayWorkTime", "salary"],
@@ -576,6 +581,7 @@ export default function (fastify: FastifyInstance, options: any, done: any) {
 		detailPath.employer,
 		{
 			schema: {
+				tags: ["detail"],
 				body: {
 					type: "object",
 					required: ["enterDay", "retiredDay", "insuranceGrade"],

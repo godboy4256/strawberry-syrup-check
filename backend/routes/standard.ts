@@ -10,6 +10,7 @@ export default function (fastify: FastifyInstance, options: any, done: any) {
 		standardPath.standard,
 		{
 			schema: {
+				tags: ["standard"],
 				body: {
 					type: "object",
 					required: ["retired", "enterDay", "retiredDay", "salary"],
