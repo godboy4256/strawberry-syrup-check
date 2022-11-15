@@ -1,7 +1,7 @@
 import React, { MouseEvent, useState } from "react";
 import "../../styles/footer.css";
-import IMGLawyLandLogo from "../../assets/img/lawyland_logo.svg";
-import IMGOnOffArrow from "../../assets/img/footer_on_arrow.svg";
+import IMGLawyLandLogo from "../../assets/image/lawyland_logo.svg";
+import IMGOnOffArrow from "../../assets/image/footer_on_arrow.svg";
 
 const Footer = () => {
 	const [onContents, setOnContents] = useState<boolean>(false);

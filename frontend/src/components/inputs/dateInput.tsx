@@ -1,6 +1,6 @@
 import React, { Dispatch, SetStateAction, useEffect, useState } from "react";
-import IMGDate from "../../assets/img/date_icon.svg";
-import IMGRedDirection from "../../assets/img/red_direction.svg";
+import IMGDate from "../../assets/image/date_icon.svg";
+import IMGRedDirection from "../../assets/image/red_direction.svg";
 import { CreatePopup } from "../common/PopUp";
 import SelectInput from "./selectInput";
 import "../../styles/date.css";

@@ -17,7 +17,7 @@ const Button = ({
 			<button onClick={click_func} className={type}>
 				{text}
 			</button>
-			{description && <div className="fs_14 flex_right description">{description}</div>}
+			{description && <div className="fs_14 description">{description}</div>}
 		</>
 	);
 };

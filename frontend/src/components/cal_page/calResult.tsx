@@ -1,9 +1,8 @@
 import React from "react";
 import { Link } from "react-router-dom";
-import IMGRetireeCharacter from "../../assets/img/strawberry_character_01.png";
+import IMGRetireeCharacter from "../../assets/image/strawberry_character_01.png";
 import Button from "../inputs/button";
 import "../../styles/result.css";
-import Header from "../layout/header";
 
 const comments_arr = ["당신은 실업급여 수급대상자입니다.", "실업급여를 받으실 수 없습니다.", "지금도 가능해요!", "조금만 더 힘내요!"];
 
@@ -24,14 +23,14 @@ const CalResult = ({ result }) => {
 					{result.succ ? (
 						<div id="result_main">
 							<h3 className="bg_color_main font_color_white flex_box flex_box_row_center flex_box_column_center">
-								총 수령액 :<div className="font_color_white fs_25">{result.availableAmountCost}</div> 원
+								총 수령액 :<div className="font_color_white fs_25">{result.availableAmountCost.toLocaleString()}</div> 원
 							</h3>
 							<div id="result_main_content">
 								<div id="result_day" className="fs_12">
-									하루 <span className="font_color_main fs_12">{result.realDayPay}</span> 원을 <span className="font_color_main fs_12">{result.receiveDay}</span>일 동안
+									하루 <span className="font_color_main fs_12">{result.realDayPay.toLocaleString()}</span> 원을 <span className="font_color_main fs_12">{result.receiveDay}</span>일 동안
 								</div>
 								<div id="result_month">
-									월 <span className="strong_red">{result.realMonthPay}</span> 원 받아요!
+									월 <span className="strong_red">{result.realMonthPay.toLocaleString()}</span> 원 받아요!
 								</div>
 							</div>
 						</div>
@@ -64,10 +63,10 @@ const CalResult = ({ result }) => {
 								</h3>
 								<div id="result_main_content">
 									<div id="result_day" className="fs_12">
-										하루 <span className="font_color_main fs_12">{result.dayPay}</span> 원을 <span className="font_color_main fs_12">{result.receiveDays}</span>일 동안
+										하루 <span className="font_color_main fs_12">{result.dayPay.toLocaleString()}</span> 원을 <span className="font_color_main fs_12">{result.receiveDays}</span>일 동안
 									</div>
 									<div id="result_month">
-										월 <span className="strong_red">{result.monthPay}</span> 원 받아요!
+										월 <span className="strong_red">{result.monthPay.toLocaleString()}</span> 원 받아요!
 									</div>
 								</div>
 							</div>
@@ -79,7 +78,7 @@ const CalResult = ({ result }) => {
 					{result.succ && <div id="result_comment02">고생 많으셨습니다!</div>}
 					{result.succ && (
 						<div id="result_severance_pay" className="flex_box bg_color_main font_color_white flex_box_row_center flex_box_column_center">
-							예상 퇴직금 : <div className="font_color_white fs_25">{result.availableAmountCost}</div> 원
+							예상 퇴직금 : <div className="font_color_white fs_25">{result.availableAmountCost.toLocaleString()}</div> 원
 						</div>
 					)}
 				</div>

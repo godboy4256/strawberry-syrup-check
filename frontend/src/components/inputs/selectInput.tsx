@@ -1,6 +1,6 @@
 import React, { ChangeEvent, ReactElement, useState } from "react";
 import "../../styles/select.css";
-import IMGSelect from "../../assets/img/select_icon.svg";
+import IMGSelect from "../../assets/image/select_icon.svg";
 // import PopUp from "../common/PopUp";
 
 const SelectInput = ({
