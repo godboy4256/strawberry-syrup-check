@@ -1,9 +1,8 @@
 import React from "react";
 import Button from "../inputs/button";
 import "../../styles/retiree.css";
-import IMGRetireeCharacter from "../../assets/img/strawberry_character_01.png";
+import IMGRetireeCharacter from "../../assets/image/strawberry_character_01.png";
 import { Link } from "react-router-dom";
-import Header from "../layout/header";
 
 const CalIsRetiree = ({ handler, type }: { handler: any; type: "기본형" | "상세형" | "복수형" }) => {
 	const onClickIsRetiree = (isRetiree: boolean) => {

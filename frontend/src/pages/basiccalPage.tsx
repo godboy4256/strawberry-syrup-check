@@ -5,7 +5,7 @@ import Button from "../components/inputs/button";
 import DateInput from "../components/inputs/dateInput";
 import NumberInput from "../components/inputs/numberInput";
 import InputHandler from "../service/InputHandler";
-import IMGRetireeCharacter from "../assets/img/strawberry_character_01.png";
+import IMGRetireeCharacter from "../assets/image/strawberry_character_01.png";
 import { sendToServer } from "../assets/utils/sendToserver";
 import CalResult from "../components/cal_page/calResult";
 import { GetCurrentDate } from "../assets/utils/date";

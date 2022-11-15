@@ -1,23 +1,19 @@
 @font-face {
-	font-family: Jua;
-	src: url("../assets/fonts/Jua-Regular.ttf");
+	font-family: NanumSrRegular;
+	src: url("../assets/fonts/NanumSquareRoundR.ttf");
 }
 
 @font-face {
-	font-family: NanumSquareRoundOTF;
-	src: url("../assets/fonts/NanumSquareRoundOTFR.otf");
+	font-family: NanumSrBold;
+	src: url("../assets/fonts/NanumSquareRoundEB.ttf");
 }
 
-@font-face {
-	font-family: NanumBarunGothicLight;
-	src: url("../assets/fonts/NanumBarunGothicLight.otf");
-}
 * {
 	margin: 0;
 	padding: 0;
 	color: rgba(0, 0, 0, 0.8);
 	font-size: 18px;
-	font-family: NanumSquareRoundOTF;
+	font-family: NanumSrRegular;
 	outline: none;
 	box-sizing: border-box;
 }
@@ -37,6 +33,7 @@ button {
 	border: none;
 	cursor: pointer;
 	font-size: 18px;
+	font-family: NanumSrBold;
 }
 label {
 	display: block;
@@ -50,12 +47,12 @@ select {
 	background: none;
 	appearance: none;
 }
-.font_style_main {
-	font-family: Jua;
+.font_family_bold {
+	font-family: NanumSrBold;
 }
-.font_style_sub01 {
-	font-family: NanumSquareRoundOTF;
+.lh_27 {
+	line-height: 27px;
 }
-.font_style_sub02 {
-	font-family: NanumBarunGothicLight;
+.lh_37 {
+	line-height: 37px;
 }
