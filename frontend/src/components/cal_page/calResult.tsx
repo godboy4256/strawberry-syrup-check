@@ -1,23 +1,30 @@
 import React from "react";
 import { Link } from "react-router-dom";
-import IMGRetireeCharacter from "../../assets/image/strawberry_character_01.png";
+// import IMGRetireeCharacter from "../../assets/image/strawberry_character_01.png";
+import IMGHelpIcon from "../../assets/image/new/help_icon.svg";
 import Button from "../inputs/button";
 import "../../styles/result.css";
+import Header from "../layout/header";
+import IMGBasicHappyEmoticon from "../../assets/image/emoticon/basic_happy.svg";
+import IMGBasicCheerEmoticon from "../../assets/image/emoticon/basic_cheer.svg";
+import IMGBasicSadEmoticon from "../../assets/image/emoticon/basic_sad.svg";
 
 const comments_arr = ["당신은 실업급여 수급대상자입니다.", "실업급여를 받으실 수 없습니다.", "지금도 가능해요!", "조금만 더 힘내요!"];
 
 const CalResult = ({ result }) => {
 	const commnet = result.succ && result.retired ? comments_arr[0] : !result.succ && result.retired ? comments_arr[1] : result.succ && !result.retired ? comments_arr[2] : !result.succ && !result.retired && comments_arr[3];
+	const emoticon = result.succ ? IMGBasicHappyEmoticon : result.retired ? IMGBasicSadEmoticon : !result.retired && IMGBasicCheerEmoticon;
 	const availableDay = result.availableDay && result.availableDay.split("-");
 	return (
 		<>
-			<div className="pd_810">기본형 / {result.retired ? "퇴직자" : "퇴직예정자 "}</div>
-			<div className="basic_side_padding">
+			<Header title={result.retired ? "퇴직자" : "퇴직예정자"} leftLink="/" leftType="BACK" />
+			<div className="pd_810 fs_14">기본형 / {result.retired ? "퇴직자" : "퇴직예정자 "}</div>
+			<div className="public_side_padding">
 				<div id="strobarry_character">
-					<img src={IMGRetireeCharacter} alt="Basic Strawberry Character" />
+					<img className="emoticon_w" src={emoticon} alt="Basic Strawberry Emoticon" />
 				</div>
 				<div id="result_container">
-					<div id="result_comment01" className="fs_18">
+					<div id="result_comment01" className="fs_18 font_family_bold">
 						{commnet}
 					</div>
 					{result.succ ? (
@@ -44,12 +51,16 @@ const CalResult = ({ result }) => {
 									부족한 근무 일수: <div className="fs_25 font_color_white">{result.requireDays}</div> 일
 								</div>
 							</div>
-							<Link className="help_link result_disapproval_tip" to="/">
-								피보험단위기간이란 무엇인가요?
-							</Link>
-							<Link className="help_link" to="/">
-								근무일수가 부족하다면?
-							</Link>
+							<div className="help_link_container">
+								<Link className="help_link" to="/">
+									<img src={IMGHelpIcon} alt="help icon" />
+									피보험단위기간이란 무엇인가요?
+								</Link>
+								<Link className="help_link" to="/">
+									<img src={IMGHelpIcon} alt="help icon" />
+									근무일수가 부족하다면?
+								</Link>
+							</div>
 						</>
 					) : (
 						<>
@@ -59,7 +70,7 @@ const CalResult = ({ result }) => {
 							</div>
 							<div id="result_main">
 								<h3 className="bg_color_main font_color_white flex_box flex_box_row_center flex_box_column_center">
-									총 수령액 :<div className="font_color_white fs_25">{result.availableAmountCost}</div> 원
+									총 수령액 :<div className="font_color_white fs_25">{result.availableAmountCost.toLocaleString()}</div> 원
 								</h3>
 								<div id="result_main_content">
 									<div id="result_day" className="fs_12">
@@ -71,11 +82,16 @@ const CalResult = ({ result }) => {
 								</div>
 							</div>
 							<Link className="help_link" to="/">
+								<img src={IMGHelpIcon} alt="help icon" />
 								피보험단위기간이란 무엇인가요?
 							</Link>
 						</>
 					)}
-					{result.succ && <div id="result_comment02">고생 많으셨습니다!</div>}
+					{result.succ && (
+						<div id="result_comment02" className="font_family_bold">
+							고생 많으셨습니다!
+						</div>
+					)}
 					{result.succ && (
 						<div id="result_severance_pay" className="flex_box bg_color_main font_color_white flex_box_row_center flex_box_column_center">
 							예상 퇴직금 : <div className="font_color_white fs_25">{result.availableAmountCost.toLocaleString()}</div> 원

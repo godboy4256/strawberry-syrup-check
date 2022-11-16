@@ -60,7 +60,7 @@ module.exports = {
 				],
 			},
 			{
-				test: [/\.js$/, /\.ts?$/, /\.jsx?$/, /\.tsx?$/],
+				test: [/\.ts?$/, /\.tsx?$/],
 				enforce: "pre",
 				exclude: /node_modules/,
 				use: ["source-map-loader"],

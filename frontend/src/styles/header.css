@@ -52,7 +52,6 @@
 #header_menu_btn span:last-child {
 	top: 100%;
 }
-
 #header_menu_btn.active span:first-child {
 	top: 50%;
 	transform: rotate(45deg);

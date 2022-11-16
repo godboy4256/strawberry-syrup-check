@@ -1,5 +1,4 @@
 import React from "react";
-import { JsxChild } from "typescript";
 import Button from "../inputs/button";
 import "./../../styles/write.css";
 
