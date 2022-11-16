@@ -4,12 +4,12 @@
 	"description": "corp Bundle made by ByuckChon",
 	"main": "server.js",
 	"scripts": {
-		"test": "echo \"Error: no test specified\" && exit 1",
-		"start:dev": "tsc -p tsconfig.json && node ./build/server.js",
+		"start": "TZ=Asia/Seoul node build/server.js",
+		"start:dev": "node ./build/server.js",
 		"build": "tsc -p tsconfig.json",
 		"update-share": "cd ../ && npm run update-share"
 	},
-	"author": "",
+	"author": "ByuchChon <info@byuckchon.com>",
 	"license": "ISC",
 	"dependencies": {
 		"@fastify/cors": "^8.1.0",
