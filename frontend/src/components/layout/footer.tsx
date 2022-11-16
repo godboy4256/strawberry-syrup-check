@@ -8,13 +8,16 @@ const Footer = () => {
 	const onClickFooterContentsOn = (e: MouseEvent<HTMLButtonElement>) => {
 		e.currentTarget.classList.toggle("active");
 		setOnContents((prev: boolean) => !prev);
+		window.scrollTo(0, 701);
 	};
 	return (
 		<footer id="footer_container">
 			<div id="footer_header">
 				<img src={IMGLawyLandLogo} alt="LawyLand Logo" />
 				<button onClick={onClickFooterContentsOn}>
-					<img src={IMGOnOffArrow} alt="Footer Contents On Off Button" />
+					<a href="#footer_contents">
+						<img src={IMGOnOffArrow} alt="Footer Contents On Off Button" />
+					</a>
 				</button>
 			</div>
 			{onContents && (

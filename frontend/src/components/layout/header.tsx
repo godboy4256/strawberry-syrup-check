@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
-import IMGBack from "../../assets/image/header_back.svg";
+import IMGBack from "../../assets/image/new/header_back.svg";
 import IMGLogo from "../../assets/image/logo.svg";
 import "../../styles/header.css";
 import SideMenu from "./sideMenu";
