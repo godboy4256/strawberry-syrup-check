@@ -3,9 +3,9 @@ import IMGDate from "../../assets/image/date_icon.svg";
 import IMGRedDirection from "../../assets/image/red_direction.svg";
 import { CreatePopup } from "../common/PopUp";
 import SelectInput from "./selectInput";
-import "../../styles/date.css";
 import InputHandler from "../../service/InputHandler";
 import { GetCurrentDate } from "../../assets/utils/date";
+import "../../styles/date.css";
 
 const currentDate = GetCurrentDate();
 
@@ -159,7 +159,7 @@ const _DatePopUp = ({ handler }) => {
 	);
 };
 
-const DateInput = ({ params, label, callBack }: { params: string; label?: string; callBack: CallableFunction }) => {
+const DateInput = ({ params, label, callBack, description }: { params: string; label?: string; callBack: CallableFunction; description?: string | "enter_day" }) => {
 	const handler = new DateHandler({});
 	const [dateValue, setDateValue] = useState("");
 	const onClickDateOn = () => {
@@ -167,15 +167,26 @@ const DateInput = ({ params, label, callBack }: { params: string; label?: string
 	};
 
 	return (
-		<div className="w_100">
-			{label && <label className="write_label">{label}</label>}
-			<div onClick={onClickDateOn} className={`date_container ${!dateValue ? "unselect" : ""}`}>
-				<div className={`date_value ${!dateValue ? "unselect" : ""}`}>{!dateValue ? "날짜를 입력해주세요." : dateValue}</div>
-				<div className={`date_icon ${!dateValue ? "unselect" : ""}`}>
-					<img src={IMGDate} alt="Date Icon" />
+		<>
+			<div className="w_100">
+				{label && <label className="write_label fs_16">{label}</label>}
+				<div onClick={onClickDateOn} className={`date_container ${!dateValue ? "unselect" : ""}`}>
+					<div className={`date_value ${!dateValue ? "unselect" : ""}`}>{!dateValue ? "날짜를 입력해주세요." : dateValue}</div>
+					<div className={`date_icon ${!dateValue ? "unselect" : ""}`}>
+						<img src={IMGDate} alt="Date Icon" />
+					</div>
 				</div>
 			</div>
-		</div>
+			{description === "anter_day" && (
+				<div className="date_description">
+					<span className="fs_14">※</span>
+					<span className="fs_14">
+						고용보험 가입일이 입·퇴사일과 다르다면,
+						<br /> <span className="font_color_main fs_14">고용보험 가입일</span>을 기재해주세요.
+					</span>
+				</div>
+			)}
+		</>
 	);
 };
 
