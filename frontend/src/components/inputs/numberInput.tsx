@@ -26,7 +26,7 @@ class NumberInputHandler {
 }
 
 const handler = new NumberInputHandler();
-const NumberInput = ({ params, label, by_date, num_unit, callBack, guide }: { params?: string; label?: string; by_date?: string; num_unit?: string; callBack: CallableFunction; guide?: string | ReactElement }) => {
+const NumberInput = ({ params, label, by_date, num_unit, callBack }: { params?: string; label?: string; by_date?: string; num_unit?: string; callBack: CallableFunction }) => {
 	const [value, setValue] = useState<string>("");
 	let protoNum: number, toStringNum: string;
 	const onChangeSetValue = (e: ChangeEvent<HTMLInputElement>) => {
@@ -35,16 +35,13 @@ const NumberInput = ({ params, label, by_date, num_unit, callBack, guide }: { pa
 		if (isNaN(protoNum) || toStringNum.length > 11) {
 			return;
 		} else {
-			callBack(params, protoNum);
+			callBack(params, [protoNum]);
 			setValue(toStringNum);
 		}
 	};
 	return (
 		<div className="w_100">
-			<div>
-				{label && <label className="write_label">{label}</label>}
-				{guide && <>{guide}</>}
-			</div>
+			<div>{label && <label className="write_label fs_16">{label}</label>}</div>
 			<div className={`input_style ${value ? "select" : ""}`}>
 				{by_date && by_date}
 				<input value={value} className={value ? "select" : ""} onChange={onChangeSetValue} type="text" />

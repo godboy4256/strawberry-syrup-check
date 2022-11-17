@@ -1,0 +1,51 @@
+#salary_tab_container {
+	border-radius: 2px;
+}
+#salary_tab_header button.all,
+#salary_tab_header button.three_month {
+	border: 1px solid #ff493a;
+	border-bottom: none;
+	padding: 10px 0;
+	border-top-right-radius: 4px;
+	border-top-left-radius: 4px;
+	color: #ff493a;
+}
+
+#salary_tab_header button.un_all {
+	border-left: none;
+	border-top-right-radius: 4px;
+}
+
+#salary_tab_header button.un_three_month {
+	border-right: none;
+	border-top-left-radius: 4px;
+}
+
+#salary_tab_header {
+	display: flex;
+	align-items: flex-end;
+}
+#salary_tab_header button {
+	width: 50%;
+	line-height: 24px;
+	border: 1px solid rgba(0, 0, 0, 0.2);
+	border-bottom: none;
+	font-family: NanumSrRegular;
+	color: rgba(0, 0, 0, 0.2);
+	border-bottom: 1px solid #ff493a;
+}
+#salary_tab_content {
+	padding: 11px 9px 0;
+	border: 1px solid #ff493a;
+	border-top: none;
+}
+#salary_tab_content.all {
+	border-top-right-radius: 4px;
+	border-bottom-left-radius: 4px;
+	border-bottom-right-radius: 4px;
+}
+#salary_tab_content.three_month {
+	border-top-left-radius: 4px;
+	border-bottom-left-radius: 4px;
+	border-bottom-right-radius: 4px;
+}

@@ -1,5 +1,4 @@
-import React, { Dispatch, SetStateAction, useEffect } from "react";
-import { useState } from "react";
+import React, { useState, Dispatch, SetStateAction, useEffect } from "react";
 import CalIsRetiree from "../components/cal_page/calIsRetiree";
 import Button from "../components/inputs/button";
 import DateInput from "../components/inputs/dateInput";
