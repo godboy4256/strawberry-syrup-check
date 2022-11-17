@@ -148,10 +148,8 @@ export default function (fastify: FastifyInstance, options: any, done: any) {
 			const artWorkingYears = Math.floor(artWorkingDays / 365);
 			const { artDayAvgPay, artRealDayPay, artRealMonthPay } = calArtPay(req.body.sumTwelveMonthSalary, artWorkingDays, req.body.isSpecial);
 			const receiveDay = getReceiveDay(artWorkingYears, req.body.age, req.body.disabled);
-			// const receiveDay = getReceiveDay(artWorkingYears, age, req.body.disabled);
 
 			const [requireWorkingYear, nextReceiveDay] = getNextReceiveDay(artWorkingYears, req.body.age, req.body.disabled);
-			// const [requireWorkingYear, nextReceiveDay] = getNextReceiveDay(artWorkingYears, age, req.body.disabled);
 			if (nextReceiveDay === 0) {
 				return {
 					succ: true,
@@ -588,15 +586,24 @@ export default function (fastify: FastifyInstance, options: any, done: any) {
 					properties: {
 						enterDay: DefineParamInfo.enterDay,
 						retiredDay: DefineParamInfo.retiredDay,
-						insuranceGrade: { type: "array", minItems: 1, maxItems: 10, items: { type: "array", minItems: 2, maxItems: 2 } },
+						insuranceGrade: {
+							type: "object",
+						},
 					},
+					examples: [
+						{
+							enterDay: "2020-01-01",
+							retiredDay: "2022-10-01",
+							insuranceGrade: { 2022: 1, 2021: 2, 2020: 1 },
+						},
+					],
 				},
 			},
 		},
 		(req: any, res) => {
 			const enterDay: dayjs.Dayjs = dayjs(req.body.enterDay);
 			const retiredDay: dayjs.Dayjs = dayjs(req.body.retiredDay);
-			const insuranceGradeArr: any[] = req.body.insuranceGrade;
+			const insuranceGradeObj = req.body.insuranceGrade;
 
 			const workingDay = Math.floor(retiredDay.diff(enterDay, "day", true));
 			if (workingDay < 365) return { succ: false, workingDay, requireDay: 365 - workingDay };
@@ -608,28 +615,71 @@ export default function (fastify: FastifyInstance, options: any, done: any) {
 			let realMonthPay = 0;
 			let receiveDay = 0;
 
-			// 피보험 기간이 3년 이상이면 최대 3년 까지만 계산에 사용한다.
-			if (insuranceGradeArr.length >= 3) {
-				for (let count = 0; count < 3; count++) {
-					const grade: 1 | 2 | 3 | 4 | 5 | 6 | 7 = insuranceGradeArr[count][1];
-					insuranceGradeArr[count][0] >= 2019 ? (sumPay += employerPayTable["2019"][grade]) : (sumPay += employerPayTable["2018"][grade]);
-					sumWorkDay += 365;
-				}
-			} else {
-				insuranceGradeArr.map((insuranceGrade) => {
-					const grade: 1 | 2 | 3 | 4 | 5 | 6 | 7 = insuranceGrade[1];
-					insuranceGrade[0] >= 2019 ? (sumPay += employerPayTable["2019"][grade]) : (sumPay += employerPayTable["2018"][grade]);
-					sumWorkDay += 365;
-				});
-			}
+			const workList = [];
+			const yearCount = retiredDay.year() - enterDay.year();
 
+			for (let i = yearCount; i >= 0; i--) {
+				let workElement = [enterDay.year() + i];
+				if (i === 0) {
+					for (let month = 12; month >= enterDay.month() + 1; month--) {
+						workElement.push(month);
+						workList.push(workElement);
+						workElement = [enterDay.year() + i];
+					}
+				} else if (i === yearCount) {
+					for (let month = retiredDay.month() + 1; month >= 1; month--) {
+						workElement.push(month);
+						workList.push(workElement);
+						workElement = [enterDay.year() + i];
+					}
+				} else {
+					for (let month = 12; month >= 1; month--) {
+						workElement.push(month);
+						workList.push(workElement);
+						workElement = [enterDay.year() + i];
+					}
+				}
+			}
+			const workYear = Math.floor(workingDay / 365);
+			const limitYear = retiredDay.subtract(36, "month").year();
+			const limitMonth = retiredDay.subtract(36, "month").month() + 1;
+
+			workList.map((workElement) => {
+				const grade: 1 | 2 | 3 | 4 | 5 | 6 | 7 = insuranceGradeObj[workElement[0]];
+				if (workElement[0] > limitYear) {
+					workElement[0] >= 2019 ? (sumPay += employerPayTable["2019"][grade]) : (sumPay += employerPayTable["2018"][grade]);
+					sumWorkDay += dayjs(new Date(`${workElement[0]}-${workElement[1]}-01`)).daysInMonth();
+				}
+				if (workElement[0] === limitYear) {
+					if (workElement[1] >= limitMonth) {
+						workElement[0] >= 2019 ? (sumPay += employerPayTable["2019"][grade]) : (sumPay += employerPayTable["2018"][grade]);
+						sumWorkDay += dayjs(new Date(`${workElement[0]}-${workElement[1]}-01`)).daysInMonth();
+					}
+				}
+			});
+			// 피보험 기간이 3년 이상이면 최대 3년 까지만 계산에 사용한다.
+			// if (insuranceGradeArr.length >= 3) {
+			// 	for (let count = 0; count < 3; count++) {
+			// 		const grade: 1 | 2 | 3 | 4 | 5 | 6 | 7 = insuranceGradeArr[count][1];
+			// 		insuranceGradeArr[count][0] >= 2019 ? (sumPay += employerPayTable["2019"][grade]) : (sumPay += employerPayTable["2018"][grade]);
+			// 		sumWorkDay += 365;
+			// 	}
+			// } else {
+			// 	insuranceGradeArr.map((insuranceGrade) => {
+			// 		const grade: 1 | 2 | 3 | 4 | 5 | 6 | 7 = insuranceGrade[1];
+			// 		insuranceGrade[0] >= 2019 ? (sumPay += employerPayTable["2019"][grade]) : (sumPay += employerPayTable["2018"][grade]);
+			// 		sumWorkDay += 365;
+			// 	});
+			// }
+
+			console.log(sumPay, sumWorkDay);
 			dayAvgPay = Math.floor(sumPay / sumWorkDay); // 기초일액
 			if (dayAvgPay < 73280) dayAvgPay = 73280;
 			if (dayAvgPay > 110000) dayAvgPay = 110000;
 
 			realDayPay = Math.floor(dayAvgPay * 0.6);
 			realMonthPay = realDayPay * 30;
-			receiveDay = getEmployerReceiveDay(insuranceGradeArr); // 소정 급여일수 테이블이 다르다
+			receiveDay = getEmployerReceiveDay(workYear); // 소정 급여일수 테이블이 다르다
 
 			// 퇴지금, 다음 단계 없음
 			return {
@@ -797,10 +847,10 @@ function calDayjobPay(dayAvgPay: number) {
 	return { dayAvgPay, realDayPay, realMonthPay };
 }
 
-function getEmployerReceiveDay(insuranceGradeArr: any[]) {
-	if (insuranceGradeArr.length >= 1 && insuranceGradeArr.length < 3) return 120;
-	if (insuranceGradeArr.length >= 3 && insuranceGradeArr.length < 5) return 150;
-	if (insuranceGradeArr.length >= 5 && insuranceGradeArr.length < 10) return 180;
+function getEmployerReceiveDay(workYear: number) {
+	if (workYear >= 1 && workYear < 3) return 120;
+	if (workYear >= 3 && workYear < 5) return 150;
+	if (workYear >= 5 && workYear < 10) return 180;
 	return 210;
 }
 
