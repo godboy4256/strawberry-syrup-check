@@ -1,11 +1,12 @@
-import { SwaggerOptions } from "@fastify/swagger";
+import { FastifyDynamicSwaggerOptions } from "@fastify/swagger";
 
-export const swaggerConfig: SwaggerOptions = {
+export const swaggerConfig: FastifyDynamicSwaggerOptions = {
 	routePrefix: "/documentation",
 	openapi: {
+		// servers: [{ url: "http://localhost" }, { url: "https://moneysylove.com" }],
 		info: {
 			title: "딸기시럽",
-			description: "딸기시럽 API documentation",
+			description: "딸기시럽 API 문서",
 			version: "0.1.0",
 		},
 		tags: [
