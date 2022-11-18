@@ -1,8 +1,27 @@
-import React, { ChangeEvent, ReactElement, useState } from "react";
+import React, { ChangeEvent, ReactElement } from "react";
 import IMGSelect from "../../assets/image/select_icon.svg";
 import IMGNormalSelect from "../../assets/image/new/select_icon_normal.svg";
+import { ClosePopup, CreatePopup } from "../common/PopUp";
 import "../../styles/select.css";
-// import PopUp from "../common/PopUp";
+
+const PopupSelect = ({ options, callBack, params }: { options: string[] | number[]; callBack: CallableFunction; params: string }) => {
+	return (
+		<div className="popup_select_container">
+			{options?.map((el: string | number, idx: number) => (
+				<div
+					className="popup_select_option font_color_main pd_810 fs_16 "
+					key={String(Date.now()) + el}
+					onClick={() => {
+						callBack(params, idx);
+						ClosePopup();
+					}}
+				>
+					{el}
+				</div>
+			))}
+		</div>
+	);
+};
 
 const SelectInput = ({
 	selected,
@@ -21,33 +40,15 @@ const SelectInput = ({
 	params: string;
 	callBack: CallableFunction;
 }) => {
-	const [onOptionList, setOptionList] = useState(false);
 	const onClickOnOptionList = () => {
-		setOptionList((prev) => !prev);
+		CreatePopup(undefined, <PopupSelect options={options} callBack={callBack} params={params} />, "none");
 	};
 	return (
 		<>
 			{type === "popup" ? (
-				<>
-					<div onClick={onClickOnOptionList}>{popup_focus_template}</div>
-					{onOptionList && (
-						<></>
-						// <PopUp
-						// 	contents={
-						// 		<div className="select_popup">
-						// 			{options.map((el: string, idx: number) => {
-						// 				return (
-						// 					<div onClick={() => {}} className="options" key={el + String(idx)}>
-						// 						{el}
-						// 					</div>
-						// 				);
-						// 			})}
-						// 		</div>
-						// 	}
-						// 	buttons="none"
-						// />
-					)}
-				</>
+				<div className="w_100" onClick={onClickOnOptionList}>
+					{popup_focus_template}
+				</div>
 			) : type === "date_normal" ? (
 				<div id={type} className="select_custom">
 					<select

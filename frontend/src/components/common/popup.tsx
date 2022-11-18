@@ -3,11 +3,11 @@ import Button from "../inputs/button";
 import "../../styles/popup.css";
 
 interface IPopUpHandler {
-	create_func: Dispatch<SetStateAction<ReactElement | string>>;
+	create_func: Dispatch<SetStateAction<ReactElement | string | boolean>>;
 	confirm_func: () => void;
 	cancel_func: () => void;
 	title: string;
-	popup_type: "confirm" | "only_check" | "date";
+	popup_type: "confirm" | "only_check" | "date" | "none";
 }
 
 const PopUpHandler: IPopUpHandler = {
@@ -44,14 +44,12 @@ const PopUpGlobal = () => {
 								</>
 							) : PopUpHandler.popup_type === "only_check" ? (
 								<Button text="예" type="popup_ok" click_func={() => {}} />
-							) : (
-								PopUpHandler.popup_type === "confirm" && (
-									<>
-										<Button text="예" type="popup_confirm" click_func={() => {}} />
-										<Button text="아니오" type="popup_cancel" click_func={() => {}} />
-									</>
-								)
-							)}
+							) : PopUpHandler.popup_type === "confirm" ? (
+								<>
+									<Button text="예" type="popup_confirm" click_func={() => {}} />
+									<Button text="아니오" type="popup_cancel" click_func={() => {}} />
+								</>
+							) : null}
 						</div>
 					</div>
 				</div>
@@ -60,7 +58,7 @@ const PopUpGlobal = () => {
 	);
 };
 
-const CreatePopup = (title?: string, content: ReactElement | string = "팝업", popup_type: "confirm" | "only_check" | "date" = "confirm", confirm_func?: () => void, cancel_func?: () => void) => {
+const CreatePopup = (title?: string, content: ReactElement | string = "팝업", popup_type: "confirm" | "only_check" | "date" | "none" = "confirm", confirm_func?: () => void, cancel_func?: () => void) => {
 	PopUpHandler.create_func(content);
 	PopUpHandler.popup_type = popup_type;
 	if (title) PopUpHandler.title = title;
@@ -68,4 +66,8 @@ const CreatePopup = (title?: string, content: ReactElement | string = "팝업", 
 	if (cancel_func) PopUpHandler.cancel_func = cancel_func;
 };
 
-export { CreatePopup, PopUpGlobal };
+const ClosePopup = () => {
+	PopUpHandler.create_func(false);
+};
+
+export { CreatePopup, PopUpGlobal, ClosePopup };
