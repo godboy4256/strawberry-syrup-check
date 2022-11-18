@@ -1,6 +1,5 @@
 import React from "react";
 import { Link } from "react-router-dom";
-// import IMGRetireeCharacter from "../../assets/image/strawberry_character_01.png";
 import IMGHelpIcon from "../../assets/image/new/help_icon.svg";
 import Button from "../inputs/button";
 import "../../styles/result.css";
@@ -16,7 +15,7 @@ const CalResult = ({ result }) => {
 	const emoticon = result.succ ? IMGBasicHappyEmoticon : result.retired ? IMGBasicSadEmoticon : !result.retired && IMGBasicCheerEmoticon;
 	const availableDay = result.availableDay && result.availableDay.split("-");
 	return (
-		<>
+		<div className="full_height_layout">
 			<Header title={result.retired ? "퇴직자" : "퇴직예정자"} leftLink="/" leftType="BACK" />
 			<div className="pd_810 fs_14">기본형 / {result.retired ? "퇴직자" : "퇴직예정자 "}</div>
 			<div className="public_side_padding">
@@ -105,7 +104,7 @@ const CalResult = ({ result }) => {
 					<Button text="홈으로" type="bottom" click_func={() => {}} />
 				</Link>
 			</div>
-		</>
+		</div>
 	);
 };
 
