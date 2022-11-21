@@ -674,14 +674,13 @@ export default function (fastify: FastifyInstance, options: any, done: any) {
 
 			console.log(sumPay, sumWorkDay);
 			dayAvgPay = Math.floor(sumPay / sumWorkDay); // 기초일액
-			if (dayAvgPay < 73280) dayAvgPay = 73280;
-			if (dayAvgPay > 110000) dayAvgPay = 110000;
-
 			realDayPay = Math.floor(dayAvgPay * 0.6);
+			if (realDayPay < 60240) realDayPay = 60240;
+			if (realDayPay > 66000) realDayPay = 66000;
 			realMonthPay = realDayPay * 30;
 			receiveDay = getEmployerReceiveDay(workYear); // 소정 급여일수 테이블이 다르다
 
-			// 퇴지금, 다음 단계 없음
+			// 퇴직금, 다음 단계 없음
 			return {
 				succ: true,
 				amountCost: realDayPay * receiveDay,
