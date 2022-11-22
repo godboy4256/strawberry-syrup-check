@@ -18,3 +18,12 @@ export const employerPayTable = {
 		7: 3380000,
 	},
 };
+
+export const permitRangeData = {
+	0: 18,
+	1: 24,
+	2: 24,
+	3: 18,
+	4: 24,
+	5: 24,
+};
