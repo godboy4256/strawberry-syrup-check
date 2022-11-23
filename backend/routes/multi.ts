@@ -4,7 +4,8 @@ import isSameOrAfter from "dayjs/plugin/isSameOrAfter";
 
 import { getReceiveDay } from "../router_funcs/common";
 import { DefinedParamErrorMesg, DefineParamInfo } from "../share/validate";
-import { permitRangeData } from "../data/data";
+import { permitRangeData, requiredWorkingDay } from "../data/data";
+import { getEmployerReceiveDay } from "./detail";
 
 dayjs.extend(isSameOrAfter);
 
@@ -20,6 +21,7 @@ type TmainData = {
 };
 type TaddData = {
 	workCate: 0 | 1 | 2 | 3 | 4 | 5;
+	isIrregular: boolean;
 	enterDay: string;
 	retiredDay: string;
 	workingDays: number;
@@ -84,6 +86,7 @@ export default function (fastify: FastifyInstance, options: any, done: any) {
 
 			const mainData: TmainData = req.body.mainData;
 			const addData: TaddData[] = req.body.addData;
+			const leastRequireWorkingDay = requiredWorkingDay[mainData.workCate]; // 근로 형태에 맞는 기한 가져오기
 
 			// 1. 신청일이 이직일로 부터 1년 초과 확인
 			const mainRetiredDay = dayjs(mainData.retiredDay);
@@ -98,11 +101,11 @@ export default function (fastify: FastifyInstance, options: any, done: any) {
 			// 1095일은 365일 * 3 즉 3년
 			// 다음 근로 정보가 3년을 초과하는 경우 가장 최근 근로 정보만 이용해서 계산
 			if (diffMainToSecond > 1095) {
-				const leastRequireWorkingDay = 180;
-				const workingDays = mainData.workingDays;
-				if (workingDays < leastRequireWorkingDay) return { succ: false, workingDays, requireDays: leastRequireWorkingDay - workingDays };
-				if (mainData.isIrregular) return { succ: false }; //최초 근무가 불규칙인 경우 처리 필요
+				// const permitWorkingDays = mainData.workingDays; // 상세형에서permit을 이미 받았슴
+				// if (permitWorkingDays < leastRequireWorkingDay) return { succ: false, permitWorkingDays, requireDays: leastRequireWorkingDay - permitWorkingDays };
 
+				// 최소조건 (기한내 필요 피보험단위(예시 180일) 만족, 이직 후 1년 이내) 만족 후
+				const workingDays = mainData.workingDays;
 				const workingYears = Math.floor(workingDays / 365);
 				const receiveDay = getReceiveDay(workingYears, mainData.age, mainData.disable);
 
@@ -112,9 +115,9 @@ export default function (fastify: FastifyInstance, options: any, done: any) {
 					realDayPay: mainData.realDayPay,
 					receiveDay,
 					realMonthPay: mainData.realDayPay * 30,
+					// 퇴직금 추가
 				};
 			}
-
 			// 여기서 부터는 3년 내에 다른 직장 정보가 유효한 경우
 
 			// 3. 마지막 직장의 이직일로 부터 18개월 또는 24개월 이전 날짜 확인
@@ -123,17 +126,27 @@ export default function (fastify: FastifyInstance, options: any, done: any) {
 
 			// 4.  18개월 또는 24개월 시점을 고려해서 기간내의 피보험 단위기간 합산
 			const addCandidate: TaddData[] = addData.filter((work) => dayjs(work.retiredDay).isSameOrAfter(limitDay, "date"));
-			const workingDays = addCandidate.reduce((acc, obj) => acc + obj.workingDays, mainData.workingDays);
-			console.log(workingDays);
+			const permitWorkingDays = addCandidate.reduce((acc, obj) => acc + obj.workingDays, mainData.workingDays);
+			const workingDays = addData.reduce((acc, obj) => acc + obj.workingDays, mainData.workingDays);
 
-			const leastRequireWorkingDay = 180; // 최종 근무형태에 따라서 필요한 최소 피보험 단위는 달라질 수 있음
-			if (workingDays < 180) return { succ: false, workingDays, requireDays: leastRequireWorkingDay - workingDays };
+			// 😎 이 부분에서 피보험단위기간을 계산하기위해서 상세형과 같은 형태의 데이터를 입력받아야하나?
 
-			const workingYears = Math.floor(workingDays / 365);
-			const receiveDay = getReceiveDay(workingYears, mainData.age, mainData.disable);
+			// console.log(permitWorkingDays);
 
-			console.log(workingDays, workingYears, receiveDay);
+			//5.
+			if (permitWorkingDays < leastRequireWorkingDay) return { succ: false, permitWorkingDays, requireDays: leastRequireWorkingDay - permitWorkingDays };
+			if (addCandidate[addCandidate.length - 1].isIrregular) return { succ: false, mesg: "isIrregular" };
 
+			// 최소조건 (기한내 필요 피보험단위(예시 180일) 만족, 이직 후 1년 이내) 만족 후
+
+			// 6.
+			const workingYears = Math.floor(workingDays / mainData.workCate === 2 ? 12 : 365); // 월 단위의 경우 12로 나눈다. 자영업자는 이거
+			const tempReceiveDay = mainData.workCate === 5 ? getEmployerReceiveDay(workingYears) : getReceiveDay(workingYears, mainData.age, mainData.disable);
+			const receiveDay = tempReceiveDay === 120 ? 120 : tempReceiveDay - 30;
+
+			// console.log(workingDays, workingYears, receiveDay);
+
+			// 7.
 			return {
 				succ: true,
 				amountCost: mainData.realDayPay * receiveDay,

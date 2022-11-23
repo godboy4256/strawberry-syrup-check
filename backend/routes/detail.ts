@@ -32,6 +32,8 @@ export default function (fastify: FastifyInstance, options: any, done: any) {
 						weekDay: DefineParamInfo.weekDay, // 주의
 						dayWorkTime: DefineParamInfo.dayWorkTime,
 						salary: DefineParamInfo.salary,
+						//////////////////////////////////////////////////////////////////////
+						isEnd: { type: "boolean" },
 					},
 				},
 			},
@@ -672,7 +674,6 @@ export default function (fastify: FastifyInstance, options: any, done: any) {
 			// 	});
 			// }
 
-			console.log(sumPay, sumWorkDay);
 			dayAvgPay = Math.floor(sumPay / sumWorkDay); // 기초일액
 			realDayPay = Math.floor(dayAvgPay * 0.6);
 			if (realDayPay < 60240) realDayPay = 60240;
@@ -846,7 +847,7 @@ function calDayjobPay(dayAvgPay: number) {
 	return { dayAvgPay, realDayPay, realMonthPay };
 }
 
-function getEmployerReceiveDay(workYear: number) {
+export function getEmployerReceiveDay(workYear: number) {
 	if (workYear >= 1 && workYear < 3) return 120;
 	if (workYear >= 3 && workYear < 5) return 150;
 	if (workYear >= 5 && workYear < 10) return 180;
