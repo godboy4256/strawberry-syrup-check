@@ -1,5 +1,5 @@
 import React, { Dispatch, ReactElement, SetStateAction, useState } from "react";
-import Button from "../inputs/button";
+import Button from "../inputs/Button";
 import "../../styles/popup.css";
 
 interface IPopUpHandler {

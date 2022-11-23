@@ -51,18 +51,26 @@
 .checkbox_container.square_type .radio_input_box input:checked ~ .check_mark {
 	border-radius: 2px;
 }
-.checkbox_container .box_type {
+.checkbox_container .box_type,
+.checkbox_container.radio_box_type label {
 	flex: 1;
 	border: 1px solid rgba(0, 0, 0, 0.2);
 	border-left: none;
 	color: rgba(0, 0, 0, 0.2);
 	padding: 11px 0;
 	text-align: center;
+	margin-left: 0;
 }
-.checkbox_container .box_type:first-child {
+.checkbox_container .box_type:first-child,
+.checkbox_container.radio_box_type label:first-of-type {
 	border-left: 1px solid rgba(0, 0, 0, 0.2);
 }
-.checkbox_container .box_type.active {
+
+.checkbox_container .box_type.active,
+.checkbox_container.radio_box_type input[type="radio"]:checked + label {
 	border: 1px solid rgba(255, 101, 89, 1);
 	color: rgba(255, 101, 89, 1);
+}
+.checkbox_container.radio_box_type input {
+	display: none;
 }

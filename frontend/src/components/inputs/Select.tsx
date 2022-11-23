@@ -1,7 +1,7 @@
 import React, { ChangeEvent, ReactElement } from "react";
 import IMGSelect from "../../assets/image/select_icon.svg";
 import IMGNormalSelect from "../../assets/image/new/select_icon_normal.svg";
-import { ClosePopup, CreatePopup } from "../common/PopUp";
+import { ClosePopup, CreatePopup } from "../common/Popup";
 import "../../styles/select.css";
 
 const PopupSelect = ({ options, callBack, params }: { options: string[] | number[]; callBack: CallableFunction; params: string }) => {

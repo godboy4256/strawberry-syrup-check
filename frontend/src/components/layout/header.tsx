@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 import IMGBack from "../../assets/image/new/header_back.svg";
 import IMGLogo from "../../assets/image/logo.svg";
 import "../../styles/header.css";
-import SideMenu from "./sideMenu";
+import SideMenu from "./FadeMenu";
 
 const Header = ({ title, leftType, leftLink }: { title?: string; leftType?: string; leftLink?: string }) => {
 	const [onMenu, setOnMenu] = useState(false);
