@@ -12,6 +12,7 @@ export const swaggerConfig: FastifyDynamicSwaggerOptions = {
 		tags: [
 			{ name: "standard", description: "기본형 계산기" },
 			{ name: "detail", description: "상세형 계산기" },
+			{ name: "multi", description: "복수형 계산기" },
 		],
 	},
 	uiConfig: {

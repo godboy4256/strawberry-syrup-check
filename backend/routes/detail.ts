@@ -6,7 +6,7 @@ import weekOfYear from "dayjs/plugin/weekOfYear";
 import { calDday, calLeastPayInfo, calWorkingDay, getDateVal, getFailResult, getNextReceiveDay, getReceiveDay } from "../router_funcs/common";
 import { DefinedParamErrorMesg, DefineParamInfo } from "../share/validate";
 import { detailPath } from "../share/pathList";
-import { employerPayTable } from "../data/employerPayTable";
+import { employerPayTable } from "../data/data";
 
 dayjs.extend(isSameOrAfter);
 dayjs.extend(weekOfYear);
