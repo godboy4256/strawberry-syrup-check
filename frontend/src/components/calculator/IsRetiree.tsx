@@ -1,10 +1,10 @@
 import React from "react";
-import Button from "../inputs/button";
+import Button from "../inputs/Button";
 import { Link } from "react-router-dom";
 import IMGBasicEmoticon from "../../assets/image/new/basic.svg";
 import IMGHelpIcon from "../../assets/image/new/help_icon.svg";
 import "../../styles/retiree.css";
-import Header from "../layout/header";
+import Header from "../layout/Header";
 
 const CalIsRetiree = ({ handler, type }: { handler: any; type: "기본형" | "상세형" | "복수형" }) => {
 	const onClickIsRetiree = (isRetiree: boolean) => {
@@ -12,7 +12,7 @@ const CalIsRetiree = ({ handler, type }: { handler: any; type: "기본형" | "�
 		handler.setCompState(2);
 	};
 	return (
-		<>
+		<div className="full_height_layout">
 			<Header title="퇴직자 vs 퇴직예정자" leftLink="/" leftType="BACK" />
 			<div id="retiree_container">
 				<div className="pd_810 fs_14">{type}</div>
@@ -28,7 +28,7 @@ const CalIsRetiree = ({ handler, type }: { handler: any; type: "기본형" | "�
 					퇴직사유 알아보기
 				</Link>
 			</div>
-		</>
+		</div>
 	);
 };
 

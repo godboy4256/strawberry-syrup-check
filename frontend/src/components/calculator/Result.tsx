@@ -1,16 +1,16 @@
 import React from "react";
 import { Link } from "react-router-dom";
 import IMGHelpIcon from "../../assets/image/new/help_icon.svg";
-import Button from "../inputs/button";
+import Button from "../inputs/Button";
 import "../../styles/result.css";
-import Header from "../layout/header";
+import Header from "../layout/Header";
 import IMGBasicHappyEmoticon from "../../assets/image/emoticon/basic_happy.svg";
 import IMGBasicCheerEmoticon from "../../assets/image/emoticon/basic_cheer.svg";
 import IMGBasicSadEmoticon from "../../assets/image/emoticon/basic_sad.svg";
 
 const comments_arr = ["당신은 실업급여 수급대상자입니다.", "실업급여를 받으실 수 없습니다.", "지금도 가능해요!", "조금만 더 힘내요!"];
 
-const CalResult = ({ result }) => {
+const Result = ({ result }) => {
 	const commnet = result.succ && result.retired ? comments_arr[0] : !result.succ && result.retired ? comments_arr[1] : result.succ && !result.retired ? comments_arr[2] : !result.succ && !result.retired && comments_arr[3];
 	const emoticon = result.succ ? IMGBasicHappyEmoticon : result.retired ? IMGBasicSadEmoticon : !result.retired && IMGBasicCheerEmoticon;
 	const availableDay = result.availableDay && result.availableDay.split("-");
@@ -108,4 +108,4 @@ const CalResult = ({ result }) => {
 	);
 };
 
-export default CalResult;
+export default Result;

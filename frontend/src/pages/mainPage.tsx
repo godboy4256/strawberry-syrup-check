@@ -9,7 +9,7 @@ import IMGSlideNext from "./../assets/image/new/slide_next.svg";
 import IMGIconDetail from "./../assets/image/new/main_detail_icon.svg";
 import IMGIconMulti from "./../assets/image/new/main_multi_icon02.svg";
 import { Link } from "react-router-dom";
-import Header from "../components/layout/header";
+import Header from "../components/layout/Header";
 import { useState, useEffect } from "react";
 import "../styles/mainpage.css";
 

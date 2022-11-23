@@ -1,9 +1,9 @@
 import React from "react";
 import { createBrowserRouter } from "react-router-dom";
-import BasicCalPage from "./pages/basiccalPage";
-import DetailCalPage from "./pages/detailcalPage";
-import MainPage from "./pages/mainPage";
-import MultiCalPage from "./pages/multicalPage";
+import BasicCalPage from "./pages/Standad";
+import DetailCalPage from "./pages/Detailed";
+import MainPage from "./pages/MainPage";
+import MultiCalPage from "./pages/Multi";
 import Root from "./Root";
 
 const router = createBrowserRouter([

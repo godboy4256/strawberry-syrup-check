@@ -1,10 +1,10 @@
 import React, { Dispatch, SetStateAction, useEffect, useState } from "react";
 import IMGDate from "../../assets/image/date_icon.svg";
 import IMGRedDirection from "../../assets/image/red_direction.svg";
-import { CreatePopup } from "../common/PopUp";
-import SelectInput from "./selectInput";
-import InputHandler from "../../service/InputHandler";
-import { GetCurrentDate } from "../../assets/utils/date";
+import { CreatePopup } from "../common/Popup";
+import SelectInput from "./Select";
+import InputHandler from "../../object/Inputs";
+import { GetCurrentDate } from "../../utils/date";
 import "../../styles/date.css";
 
 const currentDate = GetCurrentDate();
@@ -177,13 +177,23 @@ const DateInput = ({ params, label, callBack, description }: { params: string; l
 					</div>
 				</div>
 			</div>
-			{description === "anter_day" && (
+			{description && (
 				<div className="date_description">
 					<span className="fs_14">※</span>
-					<span className="fs_14">
-						고용보험 가입일이 입·퇴사일과 다르다면,
-						<br /> <span className="font_color_main fs_14">고용보험 가입일</span>을 기재해주세요.
-					</span>
+					{description === "anter_day" ? (
+						<span className="fs_14">
+							고용보험 가입일이 입·퇴사일과 다르다면,
+							<br />
+							<span className="font_color_main fs_14">고용보험 가입일</span>을 기재해주세요.
+						</span>
+					) : (
+						description === "insurance_end_day" && (
+							<span className="fs_14">
+								업무시작일이 아닌
+								<span className="font_color_main fs_14"> 고용보험 가입일</span>을 기재해주세요.
+							</span>
+						)
+					)}
 				</div>
 			)}
 		</>
