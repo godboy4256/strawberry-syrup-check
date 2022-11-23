@@ -17,5 +17,6 @@ export const money_korean = (targetValue: string) => {
 		}
 		han_value += strTextWord;
 	}
+
 	return han_value;
 };
