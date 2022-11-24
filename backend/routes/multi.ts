@@ -25,6 +25,7 @@ type TaddData = {
 	enterDay: string;
 	retiredDay: string;
 	workingDays: number;
+	permitDays: number;
 };
 
 export default function (fastify: FastifyInstance, options: any, done: any) {
@@ -55,13 +56,14 @@ export default function (fastify: FastifyInstance, options: any, done: any) {
 							type: "array",
 							items: {
 								type: "object",
-								required: ["workCate", "enterDay", "retiredDay", "workingDays"],
+								required: ["workCate", "enterDay", "retiredDay", "workingDays", "permitDays"],
 								properties: {
 									workCate: DefineParamInfo.workCate,
 									isIrregular: { type: "boolean" },
 									enterDay: DefineParamInfo.enterDay,
 									retiredDay: DefineParamInfo.retiredDay,
 									workingDays: { type: "number", minimum: 0 },
+									permitDays: { type: "number", minimum: 0 },
 								},
 							},
 							minItems: 1,
@@ -126,7 +128,7 @@ export default function (fastify: FastifyInstance, options: any, done: any) {
 
 			// 4.  18개월 또는 24개월 시점을 고려해서 기간내의 피보험 단위기간 합산
 			const addCandidate: TaddData[] = addData.filter((work) => dayjs(work.retiredDay).isSameOrAfter(limitDay, "date"));
-			const permitWorkingDays = addCandidate.reduce((acc, obj) => acc + obj.workingDays, mainData.workingDays);
+			const permitWorkingDays = addCandidate.reduce((acc, obj) => acc + obj.permitDays, mainData.workingDays);
 			const workingDays = addData.reduce((acc, obj) => acc + obj.workingDays, mainData.workingDays);
 
 			// 😎 이 부분에서 피보험단위기간을 계산하기위해서 상세형과 같은 형태의 데이터를 입력받아야하나?
