@@ -8,5 +8,6 @@ export default class InputHandler {
 	};
 	SetPageVal = (key: string, value: string) => {
 		this._Data[key] = value;
+		console.log(this._Data);
 	};
 }

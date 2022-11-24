@@ -18,7 +18,19 @@ const _BoxTypeCheckBox = ({ el, type, callBack, params }: { el: string | number;
 	);
 };
 
-const CheckBoxInput = ({ options, type, label, params, callBack }: { options: string[] | number[]; type: "box_type" | "radio_box_type" | "circle_type"; label?: string; params: string; callBack: CallableFunction }) => {
+const CheckBoxInput = ({
+	options,
+	type,
+	label,
+	params,
+	callBack,
+}: {
+	options: string[] | number[];
+	type: "box_type" | "radio_box_type" | "circle_type" | "is_true_type";
+	label?: string;
+	params: string;
+	callBack: CallableFunction;
+}) => {
 	return (
 		<>
 			{label && <div className="fs_16 write_label">{label}</div>}
@@ -41,8 +53,8 @@ const CheckBoxInput = ({ options, type, label, params, callBack }: { options: st
 								</div>
 							);
 					  })
-					: type === "radio_box_type" &&
-					  options.map((el: string | number, idx: number) => {
+					: type === "radio_box_type"
+					? options.map((el: string | number, idx: number) => {
 							return (
 								<Fragment key={`${String(Date.now())}_for${el}`}>
 									<input id={`${String(el)}_for${idx}`} type="radio" name={label ? label : "any_radios"} className="checkbox_list" onChange={() => callBack(params, el)} />
@@ -51,7 +63,25 @@ const CheckBoxInput = ({ options, type, label, params, callBack }: { options: st
 									</label>
 								</Fragment>
 							);
-					  })}
+					  })
+					: type === "is_true_type" && (
+							<div className="checkbox_wrapper">
+								<label htmlFor={`${type}_box`} className="fs_16">
+									{options[0]}
+								</label>
+								<div className="radio_input_box">
+									<input
+										id={`${type}_box`}
+										type="checkbox"
+										className="checkbox_list"
+										onChange={(e) => {
+											callBack(params, e.target.checked);
+										}}
+									/>
+									<span className="check_mark"></span>
+								</div>
+							</div>
+					  )}
 			</div>
 		</>
 	);

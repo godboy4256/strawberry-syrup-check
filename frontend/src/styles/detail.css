@@ -54,3 +54,37 @@
 	display: block;
 	margin: 20px auto;
 }
+.belong_form_tab {
+	display: flex;
+}
+.belong_form_tab > div {
+	width: 50%;
+	border: 1px solid rgba(0, 0, 0, 0.2);
+	color: rgba(0, 0, 0, 0.2);
+	padding: 8px 10px;
+	text-align: center;
+}
+.belong_form_tab > div:first-child {
+	border-right: none;
+}
+.belong_form_tab > div.active {
+	border: 1px solid #ff493a;
+	color: #ff493a;
+}
+.lndividual_input_container {
+	flex-wrap: wrap;
+	margin-bottom: 5px;
+	border-bottom: 1px solid rgba(0, 0, 0, 0.2);
+	border-right: 1px solid rgba(0, 0, 0, 0.2);
+}
+.lndividual_input_container > div {
+	width: 20%;
+	border: 1px solid rgba(0, 0, 0, 0.2);
+	text-align: center;
+	color: rgba(0, 0, 0, 0.2);
+	border-bottom: none;
+	border-right: none;
+}
+#detail_comp_container {
+	padding-bottom: 75px;
+}
