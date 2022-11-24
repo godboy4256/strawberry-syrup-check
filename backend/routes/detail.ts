@@ -24,7 +24,6 @@ export default function (fastify: FastifyInstance, options: any, done: any) {
 						retired: DefineParamInfo.retired,
 						workCate: DefineParamInfo.workCate,
 						retireReason: DefineParamInfo.retireReason,
-						// birth: DefineParamInfo.birth,
 						age: { type: "number" },
 						disabled: DefineParamInfo.disabled,
 						enterDay: DefineParamInfo.enterDay,
@@ -32,6 +31,9 @@ export default function (fastify: FastifyInstance, options: any, done: any) {
 						weekDay: DefineParamInfo.weekDay, // 주의
 						dayWorkTime: DefineParamInfo.dayWorkTime,
 						salary: DefineParamInfo.salary,
+						//////////////////////////////////////////////////////////////////////
+						isEnd: { type: "boolean" }, // 복수형 여부
+						limitDay: { type: "string" },
 					},
 				},
 			},
@@ -65,6 +67,22 @@ export default function (fastify: FastifyInstance, options: any, done: any) {
 			const workingDays = (diffToRetired - diffToEnter) * req.body.weekDay.length + firstWeekWorkDay + lastWeekWorkDay;
 			const workingYears = Math.floor(workingDays / 365);
 			/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+			let workDayForMulti = 0;
+			// 복수형 여부
+			if (req.body.isEnd) {
+				const limitDay = dayjs(req.body.limitDay); // 마지막 직장 퇴사일로 부터 필요한 개월 수(18 또는 24) 전
+				// 이 직장의 입사일이 기준일 이후 인가?
+				if (enterDay.isSameOrAfter(limitDay, "day")) {
+					workDayForMulti = workingDays;
+				} else {
+					const diffToEnter = Math.floor(Math.floor(limitDay.diff("1951-01-01", "day", true)) / 7); // diffTOEnter를 limitDay에 맞춰서 변경
+					const firstWeekWorkDay = req.body.weekDay.length - req.body.weekDay.findIndex(findEnterDayIndex) + 1; // 유급 휴일 추가
+					const lastWeekWorkDay = req.body.weekDay.findIndex(findRetiredDayIndex) + 2; // index는 0부터 시작해서 보정, 유급 휴일 추가
+
+					workDayForMulti = (diffToRetired - diffToEnter) * req.body.weekDay.length + firstWeekWorkDay + lastWeekWorkDay;
+				}
+			}
+			/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 			// const receiveDay = getReceiveDay(workingYears, age, req.body.disabled);
 			const receiveDay = getReceiveDay(workingYears, req.body.age, req.body.disabled);
 
@@ -85,6 +103,7 @@ export default function (fastify: FastifyInstance, options: any, done: any) {
 					realMonthPay,
 					severancePay: employmentDate >= 1 ? Math.ceil((dayAvgPay * 30 * workingDays) / 365) : 0,
 					workingDays,
+					workDayForMulti, // 복수형에서만 사용
 				};
 			} else {
 				return {
@@ -99,6 +118,7 @@ export default function (fastify: FastifyInstance, options: any, done: any) {
 					needDay: calDday(new Date(retiredDay.format("YYYY-MM-DD")), requireWorkingYear * 365 - workingDays)[1],
 					nextAvailableAmountCost: nextReceiveDay * realDayPay,
 					morePay: nextReceiveDay * realDayPay - receiveDay * realDayPay,
+					workDayForMulti, // 복수형에서만 사용
 				};
 			}
 		}
@@ -672,7 +692,6 @@ export default function (fastify: FastifyInstance, options: any, done: any) {
 			// 	});
 			// }
 
-			console.log(sumPay, sumWorkDay);
 			dayAvgPay = Math.floor(sumPay / sumWorkDay); // 기초일액
 			realDayPay = Math.floor(dayAvgPay * 0.6);
 			if (realDayPay < 60240) realDayPay = 60240;
@@ -846,7 +865,7 @@ function calDayjobPay(dayAvgPay: number) {
 	return { dayAvgPay, realDayPay, realMonthPay };
 }
 
-function getEmployerReceiveDay(workYear: number) {
+export function getEmployerReceiveDay(workYear: number) {
 	if (workYear >= 1 && workYear < 3) return 120;
 	if (workYear >= 3 && workYear < 5) return 150;
 	if (workYear >= 5 && workYear < 10) return 180;
