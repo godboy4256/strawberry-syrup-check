@@ -22,3 +22,16 @@
 	text-align: right;
 	padding: 5px 0;
 }
+.double_numberinput_content {
+	display: flex;
+}
+.double_numberinput_content > div {
+	white-space: nowrap;
+	width: 50%;
+}
+.double_numberinput_content > div:first-child {
+	margin-right: 10px;
+}
+.double_numberinput_content > div:last-child {
+	margin-left: 10px;
+}

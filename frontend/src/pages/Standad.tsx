@@ -1,18 +1,18 @@
 import React, { useState, Dispatch, SetStateAction, useEffect } from "react";
 import IsRetiree from "../components/calculator/IsRetiree";
 import Button from "../components/inputs/Button";
-import DateInput from "../components/inputs/Date";
+import { DateInputNormal } from "../components/inputs/Date";
 import NumberInput from "../components/inputs/Pay";
 import InputHandler from "../object/Inputs";
 import { sendToServer } from "../utils/sendToserver";
 import Result from "../components/calculator/Result";
-import { GetCurrentDate } from "../utils/date";
+import { GetDateArr } from "../utils/date";
 import Header from "../components/layout/Header";
 import IMGBasicCuriousEmoticon from "../assets/image/emoticon/basic_curious.svg";
 import IMGBasicEngryEmoticon from "../assets/image/emoticon/basic_angry.svg";
 import "./../styles/basic.css";
 
-const currentDate = GetCurrentDate();
+const currentDate = GetDateArr(undefined);
 
 class BasicCalHandler extends InputHandler {
 	public result: {};
@@ -36,8 +36,8 @@ const _BasicCalComp = () => {
 				<div id="strobarry_character">
 					<img src={handler.GetPageVal("retired") ? IMGBasicCuriousEmoticon : IMGBasicEngryEmoticon} alt="Basic Strawberry Emoticon" />
 				</div>
-				<DateInput params="enterDay" label="입사일" callBack={handler.SetPageVal} />
-				{handler.GetPageVal("retired") && <DateInput params="retiredDay" label="퇴사일" callBack={handler.SetPageVal} />}
+				<DateInputNormal params="enterDay" label="입사일" callBack={handler.SetPageVal} />
+				{handler.GetPageVal("retired") && <DateInputNormal params="retiredDay" label="퇴사일" callBack={handler.SetPageVal} />}
 				<NumberInput params="salary" label="월 급여(세전)" num_unit="원" callBack={handler.SetPageVal} />
 				<Button text="계산하기" type="bottom" click_func={handler.Action_Cal_Result} />
 			</div>

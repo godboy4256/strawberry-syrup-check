@@ -23,10 +23,12 @@ const PopUpGlobal = () => {
 	PopUpHandler.create_func = setContent;
 	const onClickConfirm = () => {
 		if (PopUpHandler.confirm_func) PopUpHandler.confirm_func();
+		PopUpHandler.title = undefined;
 		setContent(false);
 	};
 	const onClickCancel = () => {
 		if (PopUpHandler.cancel_func) PopUpHandler.cancel_func();
+		PopUpHandler.title = undefined;
 		setContent(false);
 	};
 	return (
@@ -34,7 +36,11 @@ const PopUpGlobal = () => {
 			{content && (
 				<div id="popup_background">
 					<div id="popup_content" className={PopUpHandler.popup_type}>
-						{PopUpHandler.title && <div id="popup_title">{PopUpHandler.title}</div>}
+						{PopUpHandler.title && (
+							<div id="popup_title" className="font_family_bold">
+								{PopUpHandler.title}
+							</div>
+						)}
 						{content && content}
 						<div id={`${PopUpHandler.popup_type}_button_container`}>
 							{PopUpHandler.popup_type === "date" ? (
@@ -45,10 +51,10 @@ const PopUpGlobal = () => {
 							) : PopUpHandler.popup_type === "only_check" ? (
 								<Button text="예" type="popup_ok" click_func={() => {}} />
 							) : PopUpHandler.popup_type === "confirm" ? (
-								<>
-									<Button text="예" type="popup_confirm" click_func={() => {}} />
-									<Button text="아니오" type="popup_cancel" click_func={() => {}} />
-								</>
+								<div id="popup_confirm_container">
+									<Button text="아니오" type="popup_cancel" click_func={onClickCancel} />
+									<Button text="예" type="popup_confirm" click_func={onClickConfirm} />
+								</div>
 							) : null}
 						</div>
 					</div>
@@ -64,6 +70,7 @@ const CreatePopup = (title?: string, content: ReactElement | string = "팝업", 
 	if (title) PopUpHandler.title = title;
 	if (confirm_func) PopUpHandler.confirm_func = confirm_func;
 	if (cancel_func) PopUpHandler.cancel_func = cancel_func;
+	// resetPopUpHandler();
 };
 
 const ClosePopup = () => {

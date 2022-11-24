@@ -1,13 +1,15 @@
 import React, { Dispatch, SetStateAction, useEffect, useState } from "react";
 import IMGDate from "../../assets/image/date_icon.svg";
 import IMGRedDirection from "../../assets/image/red_direction.svg";
+import IMGPrev from "../../assets/image/new/i_date_prev.svg";
+import IMGNext from "../../assets/image/new/i_date_next.svg";
 import { CreatePopup } from "../common/Popup";
 import SelectInput from "./Select";
 import InputHandler from "../../object/Inputs";
-import { GetCurrentDate } from "../../utils/date";
+import { GetDateArr, Month_Calculator, Year_Option_Generater } from "../../utils/date";
 import "../../styles/date.css";
 
-const currentDate = GetCurrentDate();
+const currentDate = GetDateArr(null);
 
 class DateHandler extends InputHandler {
 	public setYear: Dispatch<SetStateAction<number>>;
@@ -15,15 +17,7 @@ class DateHandler extends InputHandler {
 	public setDay: Dispatch<SetStateAction<number>>;
 	public setDays: Dispatch<SetStateAction<number[]>>;
 
-	Year_Option_Generater = () => {
-		const year_arr = [];
-		for (let j = 0; j < 10; j++) {
-			year_arr.push(String(new Date().getFullYear() - j));
-		}
-		return year_arr;
-	};
-
-	public current_year_list = this.Year_Option_Generater();
+	public current_year_list = Year_Option_Generater();
 
 	SelectCallback = (params: string, value: string) => {
 		this.SetPageVal(params, value);
@@ -88,7 +82,6 @@ class DateHandler extends InputHandler {
 	};
 }
 
-// 추후 리렌더링 관련 리팩토링 요망
 const _DaysComp = ({ handler }) => {
 	const [selectedDate, setSelectedDate] = useState<number>(currentDate[2]);
 	const [days, setDays] = useState(handler.Days_Option_Generater(currentDate[0], currentDate[1]));
@@ -159,7 +152,7 @@ const _DatePopUp = ({ handler }) => {
 	);
 };
 
-const DateInput = ({ params, label, callBack, description }: { params: string; label?: string; callBack: CallableFunction; description?: string | "enter_day" }) => {
+export const DateInputNormal = ({ params, label, callBack, description }: { params: string; label?: string; callBack: CallableFunction; description?: string | "enter_day" | "insurance_end_day" | "self-employment" }) => {
 	const handler = new DateHandler({});
 	const [dateValue, setDateValue] = useState("");
 	const onClickDateOn = () => {
@@ -179,20 +172,25 @@ const DateInput = ({ params, label, callBack, description }: { params: string; l
 			</div>
 			{description && (
 				<div className="date_description">
-					<span className="fs_14">※</span>
-					{description === "anter_day" ? (
-						<span className="fs_14">
+					<span className="fs_10">※</span>
+					{description === "enter_day" ? (
+						<span className="fs_10">
 							고용보험 가입일이 입·퇴사일과 다르다면,
 							<br />
-							<span className="font_color_main fs_14">고용보험 가입일</span>을 기재해주세요.
+							<span className="font_color_main fs_10">고용보험 가입일</span>을 기재해주세요.
+						</span>
+					) : description === "insurance_end_day" ? (
+						<span className="fs_10">
+							업무시작일이 아닌
+							<span className="font_color_main fs_10"> 고용보험 가입일</span>을 기재해주세요.
+						</span>
+					) : description === "self-employment" ? (
+						<span className="fs_10">
+							개업, 폐업일이 아닌
+							<span className="font_color_main fs_10"> 고용보험 가입일</span>을 기재해주세요.
 						</span>
 					) : (
-						description === "insurance_end_day" && (
-							<span className="fs_14">
-								업무시작일이 아닌
-								<span className="font_color_main fs_14"> 고용보험 가입일</span>을 기재해주세요.
-							</span>
-						)
+						<span className="fs_14">{description}</span>
 					)}
 				</div>
 			)}
@@ -200,4 +198,105 @@ const DateInput = ({ params, label, callBack, description }: { params: string; l
 	);
 };
 
-export default DateInput;
+const _IndiviualInput = ({ average_work = false }: { average_work?: boolean }) => {
+	return (
+		<div className="indiviual_input_container fs_14">
+			<div className="flex_box">
+				<input placeholder="근로 일수" />
+				{average_work && <input placeholder="월 평균 근로시간" />}
+			</div>
+			<input placeholder="월 임금총액" />
+		</div>
+	);
+};
+
+export const DateInputIndividual = ({ handler }) => {
+	const [direction, setDirection] = useState(1);
+	const lastMonth = GetDateArr(handler.GetPageVal("lastWorkDay"))[1];
+	const month_arr = Month_Calculator(lastMonth, "before", 12);
+	const processing = month_arr.splice(-2).concat(month_arr);
+	return (
+		<div className="date_indiviual_container">
+			{direction === 1 ? (
+				<>
+					<button className="date_indiviual_prev" onClick={() => setDirection(2)}>
+						<img src={IMGPrev} alt="prev button" />
+					</button>
+					<div className="date_indiviual_page">
+						<div>
+							<div className="indiviual_input_header">{processing[3]}</div>
+							<_IndiviualInput average_work={true} />
+						</div>
+						<div>
+							<div className="indiviual_input_header">{processing[2]}</div>
+							<_IndiviualInput average_work={true} />
+						</div>
+						<div className="unset_indiviual_input">
+							<div className="indiviual_input_header">{processing[1]}</div>
+							<div className="unset_box">UnSet</div>
+							<div className="unset_box">UnSet</div>
+						</div>
+						<div className="unset_indiviual_input">
+							<div className="indiviual_input_header">{processing[0]}</div>
+							<div className="unset_box">UnSet</div>
+							<div className="unset_box">UnSet</div>
+						</div>
+					</div>
+				</>
+			) : direction === 2 ? (
+				<>
+					<button className="date_indiviual_next" onClick={() => setDirection(1)}>
+						<img src={IMGNext} alt="next button" />
+					</button>
+					<div className="date_indiviual_page">
+						<div>
+							<div className="indiviual_input_header">{processing[7]}</div>
+							<_IndiviualInput />
+						</div>
+						<div>
+							<div className="indiviual_input_header">{processing[6]}</div>
+							<_IndiviualInput />
+						</div>
+						<div>
+							<div className="indiviual_input_header">{processing[5]}</div>
+							<_IndiviualInput />
+						</div>
+						<div>
+							<div className="indiviual_input_header">{processing[4]}</div>
+							<_IndiviualInput average_work={true} />
+						</div>
+					</div>
+					<button className="date_indiviual_prev" onClick={() => setDirection(3)}>
+						<img src={IMGPrev} alt="prev button" />
+					</button>
+				</>
+			) : (
+				direction === 3 && (
+					<>
+						<div className="date_indiviual_page">
+							<div>
+								<div className="indiviual_input_header">{processing[11]}</div>
+								<_IndiviualInput />
+							</div>
+							<div>
+								<div className="indiviual_input_header">{processing[10]}</div>
+								<_IndiviualInput />
+							</div>
+							<div>
+								<div className="indiviual_input_header">{processing[9]}</div>
+								<_IndiviualInput />
+							</div>
+							<div>
+								<div className="indiviual_input_header">{processing[8]}</div>
+								<_IndiviualInput />
+							</div>
+						</div>
+						<button className="date_indiviual_next" onClick={() => setDirection(2)}>
+							<img src={IMGNext} alt="next button" />
+						</button>
+					</>
+				)
+			)}
+		</div>
+	);
+};
