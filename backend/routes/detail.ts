@@ -67,7 +67,7 @@ export default function (fastify: FastifyInstance, options: any, done: any) {
 			const workingDays = (diffToRetired - diffToEnter) * req.body.weekDay.length + firstWeekWorkDay + lastWeekWorkDay;
 			const workingYears = Math.floor(workingDays / 365);
 			/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-			let workDayForMulti = 0;
+			let workDayForMulti = 0; // 이 과정은 중복 가입된 상황을 고려하지 않는다.
 			// 복수형 여부
 			if (req.body.isEnd) {
 				const limitDay = dayjs(req.body.limitDay); // 마지막 직장 퇴사일로 부터 필요한 개월 수(18 또는 24) 전
@@ -145,6 +145,8 @@ export default function (fastify: FastifyInstance, options: any, done: any) {
 						sumTwelveMonthSalary: DefineParamInfo.salary,
 						isSpecial: { type: "boolean" },
 						// lastWorkDay: { type: "string" },
+						isEnd: { type: "boolean" },
+						limitDay: { type: "string" },
 					},
 				},
 			},
