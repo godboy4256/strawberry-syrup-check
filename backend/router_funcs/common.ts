@@ -31,7 +31,13 @@ export function calWorkingDay(enterDay: dayjs.Dayjs, retiredDay: dayjs.Dayjs) {
 	return { workingDays, workingYears };
 }
 
-export function calLeastPayInfo(retiredDay: dayjs.Dayjs, retiredDayArray: any[], salary: number[], dayWorkTime: number) {
+export function calLeastPayInfo(
+	retiredDay: dayjs.Dayjs,
+	retiredDayArray: any[],
+	salary: number[],
+	dayWorkTime: number,
+	is2023: boolean = false
+) {
 	// 수정 가능?
 	const sumSalary = salary.length === 3 ? salary.reduce((acc, val) => acc + val, 0) : salary[0] * 3;
 	const lastThreeMonth = []; // 퇴사일 전 월 부터 3개월
@@ -44,8 +50,8 @@ export function calLeastPayInfo(retiredDay: dayjs.Dayjs, retiredDayArray: any[],
 		sumLastThreeMonthDays += new Date(retiredDayArray[0], lastThreeMonth[i], 0).getDate();
 	}
 	const dayAvgPay = Math.ceil(sumSalary / sumLastThreeMonthDays); // 1일 평균 급여액
-	const highLimit = Math.floor(66000 * (dayWorkTime / 8));
-	const lowLimit = Math.floor(60120 * (dayWorkTime / 8));
+	const highLimit = is2023 ? Math.floor(66000 * (dayWorkTime / 8)) : Math.floor(66000 * (dayWorkTime / 8));
+	const lowLimit = is2023 ? Math.floor(61568 * (dayWorkTime / 8)) : Math.floor(60120 * (dayWorkTime / 8));
 	let realDayPay = Math.floor(Math.ceil(dayAvgPay * 0.6) * (Math.ceil((dayWorkTime / 8) * 100) / 100)); // 실업급여 일 수급액
 	if (realDayPay > highLimit) realDayPay = highLimit;
 	if (realDayPay < lowLimit) realDayPay = lowLimit;
@@ -54,7 +60,16 @@ export function calLeastPayInfo(retiredDay: dayjs.Dayjs, retiredDayArray: any[],
 	return { dayAvgPay, realDayPay, realMonthPay };
 }
 
-export function getFailResult(retired: boolean, retiredDay: dayjs.Dayjs, workingDays: number, realDayPay: number, realMonthPay: number, leastRequireWorkingDay: number, receiveDay: number, isDetail: boolean = false) {
+export function getFailResult(
+	retired: boolean,
+	retiredDay: dayjs.Dayjs,
+	workingDays: number,
+	realDayPay: number,
+	realMonthPay: number,
+	leastRequireWorkingDay: number,
+	receiveDay: number,
+	isDetail: boolean = false
+) {
 	if (retired || isDetail) {
 		return {
 			succ: false, // 수급 인정 여부
@@ -63,7 +78,10 @@ export function getFailResult(retired: boolean, retiredDay: dayjs.Dayjs, working
 			requireDays: leastRequireWorkingDay - workingDays, // 부족 근무일수
 		};
 	}
-	const [availableDay, dDay] = calDday(new Date(retiredDay.format("YYYY-MM-DD")), leastRequireWorkingDay - workingDays);
+	const [availableDay, dDay] = calDday(
+		new Date(retiredDay.format("YYYY-MM-DD")),
+		leastRequireWorkingDay - workingDays
+	);
 	return {
 		succ: false,
 		retired: retired,

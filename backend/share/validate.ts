@@ -1,12 +1,16 @@
+/** 근료형태
+ * 0: 정규직
+ * 1: 기간제
+ * 2: 예술인
+ * 3: 특고
+ * 4: 단기 예술인
+ * 5: 단기 특고
+ * 6: 일용직
+ * 7: 초단시간
+ * 8: 자영업
+ */
+
 /**
- * 근로형태
- * 0: 정규직, 기간제
- * 1: 예술인, 특고
- * 2: 단기 예술인, 단기 특고
- * 3: 일용직
- * 4: 초단시간
- * 5: 자영업
- *
  * 퇴직사유
  * 0: 권고사직
  * 1: 계약만료
@@ -44,11 +48,17 @@ export const DefineParamInfo = {
 		minItems: 1,
 		maxItems: 3,
 	},
+	// workCate: {
+	// 	// 근로형태
+	// 	type: "number",
+	// 	minimum: 0,
+	// 	maximum: 5,
+	// },
 	workCate: {
 		// 근로형태
 		type: "number",
 		minimum: 0,
-		maximum: 5,
+		maximum: 8,
 	},
 	retireReason: {
 		// 퇴직사유
