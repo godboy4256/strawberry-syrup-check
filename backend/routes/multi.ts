@@ -10,7 +10,7 @@ import { getEmployerReceiveDay } from "./detail";
 dayjs.extend(isSameOrAfter);
 
 type TmainData = {
-	workCate: 0 | 1 | 2 | 3 | 4 | 5;
+	workCate: 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8;
 	isIrregular: boolean;
 	enterDay: string | dayjs.Dayjs;
 	retiredDay: string | dayjs.Dayjs;
@@ -20,7 +20,7 @@ type TmainData = {
 	realDayPay: number;
 };
 type TaddData = {
-	workCate: 0 | 1 | 2 | 3 | 4 | 5;
+	workCate: 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8;
 	isIrregular: boolean;
 	enterDay: string | dayjs.Dayjs;
 	retiredDay: string | dayjs.Dayjs;
@@ -40,7 +40,15 @@ export default function (fastify: FastifyInstance, options: any, done: any) {
 					properties: {
 						mainData: {
 							type: "object",
-							required: ["workCate", "enterDay", "retiredDay", "workingDays", "age", "disable", "realDayPay"],
+							required: [
+								"workCate",
+								"enterDay",
+								"retiredDay",
+								"workingDays",
+								"age",
+								"disable",
+								"realDayPay",
+							],
 							properties: {
 								workCate: DefineParamInfo.workCate,
 								isIrregular: { type: "boolean" },
@@ -95,7 +103,8 @@ export default function (fastify: FastifyInstance, options: any, done: any) {
 			// 1. 신청일이 이직일로 부터 1년 초과 확인
 			const mainRetiredDay = dayjs(mainData.retiredDay);
 			const now = dayjs(new Date());
-			if (Math.floor(now.diff(mainRetiredDay, "day", true)) > 365) return { succ: false, mesg: DefinedParamErrorMesg.expire };
+			if (Math.floor(now.diff(mainRetiredDay, "day", true)) > 365)
+				return { succ: false, mesg: DefinedParamErrorMesg.expire };
 
 			// 2. 마지막 직장의 입사일과 전직장의 이직일 사이 기간이 3년을 초과하는 지 확인
 			const mainEnterDay = dayjs(mainData.enterDay);
@@ -129,7 +138,9 @@ export default function (fastify: FastifyInstance, options: any, done: any) {
 			const limitDay = mainRetiredDay.subtract(permitRange, "month");
 
 			// 4.  18개월 또는 24개월 시점을 고려해서 기간내의 피보험 단위기간 합산
-			const addCandidate: TaddData[] = addData.filter((work) => dayjs(work.retiredDay).isSameOrAfter(limitDay, "date"));
+			const addCandidate: TaddData[] = addData.filter((work) =>
+				dayjs(work.retiredDay).isSameOrAfter(limitDay, "date")
+			);
 			const permitWorkingDays = addCandidate.reduce((acc, obj) => acc + obj.permitDays, mainData.workingDays);
 
 			// 😎 이 부분에서 피보험단위기간을 계산하기위해서 상세형과 같은 형태의 데이터를 입력받아야하나?
@@ -137,7 +148,8 @@ export default function (fastify: FastifyInstance, options: any, done: any) {
 			// console.log(permitWorkingDays);
 
 			//5.
-			if (permitWorkingDays < leastRequireWorkingDay) return { succ: false, permitWorkingDays, requireDays: leastRequireWorkingDay - permitWorkingDays };
+			if (permitWorkingDays < leastRequireWorkingDay)
+				return { succ: false, permitWorkingDays, requireDays: leastRequireWorkingDay - permitWorkingDays };
 			if (addCandidate[addCandidate.length - 1].isIrregular) return { succ: false, mesg: "isIrregular" };
 
 			// 최소조건 (기한내 필요 피보험단위(예시 180일) 만족, 이직 후 1년 이내) 만족 후
@@ -147,7 +159,8 @@ export default function (fastify: FastifyInstance, options: any, done: any) {
 			for (let i = 0; i < addData.length; i++) {
 				workingDays += addData[i].workingDays;
 				if (i !== addData.length - 1) {
-					if (Math.floor(dayjs(addData[i].enterDay).diff(dayjs(addData[i + 1].retiredDay), "day")) > 1095) break;
+					if (Math.floor(dayjs(addData[i].enterDay).diff(dayjs(addData[i + 1].retiredDay), "day")) > 1095)
+						break;
 				}
 			}
 			// const workingDays = addData.reduce((acc, obj) => {
@@ -159,7 +172,10 @@ export default function (fastify: FastifyInstance, options: any, done: any) {
 			// addData.map((work) => (workingDays += mergeWorkingDays(mainData, work)));
 			console.log(workingDays);
 			const workingYears = Math.floor(workingDays / mainData.workCate === 2 ? 12 : 365); // 월 단위의 경우 12로 나눈다. 자영업자는 이거
-			const tempReceiveDay = mainData.workCate === 5 ? getEmployerReceiveDay(workingYears) : getReceiveDay(workingYears, mainData.age, mainData.disable);
+			const tempReceiveDay =
+				mainData.workCate === 5
+					? getEmployerReceiveDay(workingYears)
+					: getReceiveDay(workingYears, mainData.age, mainData.disable);
 			const receiveDay = tempReceiveDay === 120 ? 120 : tempReceiveDay - 30;
 
 			// console.log(workingDays, workingYears, receiveDay);
@@ -189,7 +205,8 @@ function mergeWorkingDays(mainData: TmainData, addData: TaddData) {
 
 	if (addData.enterDay > mainData.enterDay) {
 		if (addData.enterDay < mainData.retiredDay) {
-			if (addData.retiredDay > mainData.retiredDay) workingDays += mainData.retiredDay.diff(addData.enterDay, "day");
+			if (addData.retiredDay > mainData.retiredDay)
+				workingDays += mainData.retiredDay.diff(addData.enterDay, "day");
 		}
 	}
 	if (addData.enterDay < mainData.enterDay) {
