@@ -12,8 +12,8 @@ dayjs.extend(isSameOrAfter);
 type TmainData = {
 	workCate: 0 | 1 | 2 | 3 | 4 | 5;
 	isIrregular: boolean;
-	enterDay: string;
-	retiredDay: string;
+	enterDay: string | dayjs.Dayjs;
+	retiredDay: string | dayjs.Dayjs;
 	workingDays: number;
 	age: number;
 	disable: boolean;
@@ -22,8 +22,8 @@ type TmainData = {
 type TaddData = {
 	workCate: 0 | 1 | 2 | 3 | 4 | 5;
 	isIrregular: boolean;
-	enterDay: string;
-	retiredDay: string;
+	enterDay: string | dayjs.Dayjs;
+	retiredDay: string | dayjs.Dayjs;
 	workingDays: number;
 	permitDays: number;
 };
@@ -84,6 +84,8 @@ export default function (fastify: FastifyInstance, options: any, done: any) {
 			 * 😒 추가!
 			 * 1. 신청일이 이직일로 부터 1년이내인지 와 같은 기본형, 상세형 계산기 에서 한번 확인한 조건은 복수형에서 확인하지 않는다.
 			 * 2. 3년 이내 조건을 만족하여 추가로 더해질 수 있는 직장이 있는가  확인 필요
+			 *
+			 * 1. 중복 제거
 			 */
 
 			const mainData: TmainData = req.body.mainData;
@@ -129,7 +131,6 @@ export default function (fastify: FastifyInstance, options: any, done: any) {
 			// 4.  18개월 또는 24개월 시점을 고려해서 기간내의 피보험 단위기간 합산
 			const addCandidate: TaddData[] = addData.filter((work) => dayjs(work.retiredDay).isSameOrAfter(limitDay, "date"));
 			const permitWorkingDays = addCandidate.reduce((acc, obj) => acc + obj.permitDays, mainData.workingDays);
-			const workingDays = addData.reduce((acc, obj) => acc + obj.workingDays, mainData.workingDays);
 
 			// 😎 이 부분에서 피보험단위기간을 계산하기위해서 상세형과 같은 형태의 데이터를 입력받아야하나?
 
@@ -142,6 +143,21 @@ export default function (fastify: FastifyInstance, options: any, done: any) {
 			// 최소조건 (기한내 필요 피보험단위(예시 180일) 만족, 이직 후 1년 이내) 만족 후
 
 			// 6.
+			let workingDays = 0;
+			for (let i = 0; i < addData.length; i++) {
+				workingDays += addData[i].workingDays;
+				if (i !== addData.length - 1) {
+					if (Math.floor(dayjs(addData[i].enterDay).diff(dayjs(addData[i + 1].retiredDay), "day")) > 1095) break;
+				}
+			}
+			// const workingDays = addData.reduce((acc, obj) => {
+			// 	if
+			// 	return acc + obj.workingDays;
+			// }, mainData.workingDays);
+			// const workingDays = addData.reduce((acc, obj) => acc + obj.workingDays, mainData.workingDays);
+			// let workingDays = mainData.workingDays;
+			// addData.map((work) => (workingDays += mergeWorkingDays(mainData, work)));
+			console.log(workingDays);
 			const workingYears = Math.floor(workingDays / mainData.workCate === 2 ? 12 : 365); // 월 단위의 경우 12로 나눈다. 자영업자는 이거
 			const tempReceiveDay = mainData.workCate === 5 ? getEmployerReceiveDay(workingYears) : getReceiveDay(workingYears, mainData.age, mainData.disable);
 			const receiveDay = tempReceiveDay === 120 ? 120 : tempReceiveDay - 30;
@@ -160,4 +176,26 @@ export default function (fastify: FastifyInstance, options: any, done: any) {
 	);
 
 	done();
+}
+
+// 중복 제거는 했는데 피보험단위기간 산정 규칙에 맞지 않음
+function mergeWorkingDays(mainData: TmainData, addData: TaddData) {
+	console.log("hi!!!");
+	let workingDays = 0;
+	mainData.enterDay = dayjs(mainData.enterDay);
+	mainData.retiredDay = dayjs(mainData.retiredDay);
+	addData.enterDay = dayjs(addData.enterDay);
+	addData.retiredDay = dayjs(addData.retiredDay);
+
+	if (addData.enterDay > mainData.enterDay) {
+		if (addData.enterDay < mainData.retiredDay) {
+			if (addData.retiredDay > mainData.retiredDay) workingDays += mainData.retiredDay.diff(addData.enterDay, "day");
+		}
+	}
+	if (addData.enterDay < mainData.enterDay) {
+		if (addData.retiredDay < mainData.retiredDay) workingDays += addData.retiredDay.diff(addData.enterDay, "day");
+		if (addData.retiredDay > mainData.enterDay) workingDays += mainData.enterDay.diff(addData.enterDay, "day");
+	}
+
+	return workingDays;
 }
