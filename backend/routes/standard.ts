@@ -30,14 +30,27 @@ export default function (fastify: FastifyInstance, options: any, done: any) {
 			if (employmentDate < 0) return { succ: false, mesg: DefinedParamErrorMesg.ealryRetire };
 
 			const now = dayjs(new Date());
-			if (Math.floor(now.diff(retiredDay, "day", true)) > 365) return { succ: false, mesg: DefinedParamErrorMesg.expire };
+			if (Math.floor(now.diff(retiredDay, "day", true)) > 365)
+				return { succ: false, mesg: DefinedParamErrorMesg.expire };
 
-			const { dayAvgPay, realDayPay, realMonthPay } = calLeastPayInfo(retiredDay, retiredDayArray, req.body.salary, 8);
+			const { dayAvgPay, realDayPay, realMonthPay } =
+				retiredDayArray[0] === "2023"
+					? calLeastPayInfo(retiredDay, retiredDayArray, req.body.salary, 8, true)
+					: calLeastPayInfo(retiredDay, retiredDayArray, req.body.salary, 8);
 			const { workingDays, workingYears } = calWorkingDay(enterDay, retiredDay);
 			const receiveDay = getReceiveDay(workingYears);
 
 			const leastRequireWorkingDay = 180; // 실업급여를 받기위한 최소 피보험기간
-			if (workingDays <= leastRequireWorkingDay) return getFailResult(req.body.retired, retiredDay, workingDays, realDayPay, realMonthPay, leastRequireWorkingDay, receiveDay);
+			if (workingDays <= leastRequireWorkingDay)
+				return getFailResult(
+					req.body.retired,
+					retiredDay,
+					workingDays,
+					realDayPay,
+					realMonthPay,
+					leastRequireWorkingDay,
+					receiveDay
+				);
 
 			return {
 				succ: true, // 수급 인정 여부

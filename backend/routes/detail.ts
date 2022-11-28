@@ -3,7 +3,15 @@ import { FastifyInstance } from "fastify";
 import isSameOrAfter from "dayjs/plugin/isSameOrAfter";
 import weekOfYear from "dayjs/plugin/weekOfYear";
 
-import { calDday, calLeastPayInfo, calWorkingDay, getDateVal, getFailResult, getNextReceiveDay, getReceiveDay } from "../router_funcs/common";
+import {
+	calDday,
+	calLeastPayInfo,
+	calWorkingDay,
+	getDateVal,
+	getFailResult,
+	getNextReceiveDay,
+	getReceiveDay,
+} from "../router_funcs/common";
 import { DefinedParamErrorMesg, DefineParamInfo } from "../share/validate";
 import { detailPath } from "../share/pathList";
 import { employerPayTable } from "../data/data";
@@ -19,7 +27,18 @@ export default function (fastify: FastifyInstance, options: any, done: any) {
 				tags: ["detail"],
 				body: {
 					type: "object",
-					required: ["retired", "workCate", "retireReason", "age", "disabled", "enterDay", "retiredDay", "weekDay", "dayWorkTime", "salary"],
+					required: [
+						"retired",
+						"workCate",
+						"retireReason",
+						"age",
+						"disabled",
+						"enterDay",
+						"retiredDay",
+						"weekDay",
+						"dayWorkTime",
+						"salary",
+					],
 					properties: {
 						retired: DefineParamInfo.retired,
 						workCate: DefineParamInfo.workCate,
@@ -48,7 +67,12 @@ export default function (fastify: FastifyInstance, options: any, done: any) {
 			// const age = new Date().getFullYear() - new Date(req.body.birth).getFullYear();
 			// if (new Date(`${new Date().getFullYear()}-${birthArray[1]}-${birthArray[2]}`).getTime() >= new Date().getTime()) age - 1;
 
-			const { dayAvgPay, realDayPay, realMonthPay } = calLeastPayInfo(retiredDay, retiredDayArray, req.body.salary, req.body.dayWorkTime);
+			const { dayAvgPay, realDayPay, realMonthPay } = calLeastPayInfo(
+				retiredDay,
+				retiredDayArray,
+				req.body.salary,
+				req.body.dayWorkTime
+			);
 			// const { workingDays, workingYears } = calWorkingDay(enterDay, retiredDay); // 상세형에 맞게 수정 필요
 
 			/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -64,7 +88,8 @@ export default function (fastify: FastifyInstance, options: any, done: any) {
 			const firstWeekWorkDay = req.body.weekDay.length - req.body.weekDay.findIndex(findEnterDayIndex) + 1; // 유급 휴일 추가
 			const lastWeekWorkDay = req.body.weekDay.findIndex(findRetiredDayIndex) + 2; // index는 0부터 시작해서 보정, 유급 휴일 추가
 
-			const workingDays = (diffToRetired - diffToEnter) * req.body.weekDay.length + firstWeekWorkDay + lastWeekWorkDay;
+			const workingDays =
+				(diffToRetired - diffToEnter) * req.body.weekDay.length + firstWeekWorkDay + lastWeekWorkDay;
 			const workingYears = Math.floor(workingDays / 365);
 			/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 			let workDayForMulti = 0; // 이 과정은 중복 가입된 상황을 고려하지 않는다.
@@ -76,10 +101,12 @@ export default function (fastify: FastifyInstance, options: any, done: any) {
 					workDayForMulti = workingDays;
 				} else {
 					const diffToEnter = Math.floor(Math.floor(limitDay.diff("1951-01-01", "day", true)) / 7); // diffTOEnter를 limitDay에 맞춰서 변경
-					const firstWeekWorkDay = req.body.weekDay.length - req.body.weekDay.findIndex(findEnterDayIndex) + 1; // 유급 휴일 추가
+					const firstWeekWorkDay =
+						req.body.weekDay.length - req.body.weekDay.findIndex(findEnterDayIndex) + 1; // 유급 휴일 추가
 					const lastWeekWorkDay = req.body.weekDay.findIndex(findRetiredDayIndex) + 2; // index는 0부터 시작해서 보정, 유급 휴일 추가
 
-					workDayForMulti = (diffToRetired - diffToEnter) * req.body.weekDay.length + firstWeekWorkDay + lastWeekWorkDay;
+					workDayForMulti =
+						(diffToRetired - diffToEnter) * req.body.weekDay.length + firstWeekWorkDay + lastWeekWorkDay;
 				}
 			}
 			/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -88,10 +115,24 @@ export default function (fastify: FastifyInstance, options: any, done: any) {
 
 			// isPermit
 			const leastRequireWorkingDay = 180;
-			if (workingDays < leastRequireWorkingDay) return getFailResult(req.body.retired, retiredDay, workingDays, realDayPay, realMonthPay, leastRequireWorkingDay, receiveDay, true);
+			if (workingDays < leastRequireWorkingDay)
+				return getFailResult(
+					req.body.retired,
+					retiredDay,
+					workingDays,
+					realDayPay,
+					realMonthPay,
+					leastRequireWorkingDay,
+					receiveDay,
+					true
+				);
 
 			// const [requireWorkingYear, nextReceiveDay] = getNextReceiveDay(workingYears, age, req.body.disabled);
-			const [requireWorkingYear, nextReceiveDay] = getNextReceiveDay(workingYears, req.body.age, req.body.disabled);
+			const [requireWorkingYear, nextReceiveDay] = getNextReceiveDay(
+				workingYears,
+				req.body.age,
+				req.body.disabled
+			);
 			if (nextReceiveDay === 0) {
 				return {
 					// 공통 => 분리 예정
@@ -115,7 +156,10 @@ export default function (fastify: FastifyInstance, options: any, done: any) {
 					realMonthPay,
 					severancePay: employmentDate >= 1 ? Math.ceil((dayAvgPay * 30 * workingDays) / 365) : 0,
 					workingDays,
-					needDay: calDday(new Date(retiredDay.format("YYYY-MM-DD")), requireWorkingYear * 365 - workingDays)[1],
+					needDay: calDday(
+						new Date(retiredDay.format("YYYY-MM-DD")),
+						requireWorkingYear * 365 - workingDays
+					)[1],
 					nextAvailableAmountCost: nextReceiveDay * realDayPay,
 					morePay: nextReceiveDay * realDayPay - receiveDay * realDayPay,
 					workDayForMulti, // 복수형에서만 사용
@@ -131,7 +175,16 @@ export default function (fastify: FastifyInstance, options: any, done: any) {
 				tags: ["detail"],
 				body: {
 					type: "object",
-					required: ["retired", "workCate", "retireReason", "age", "disabled", "enterDay", "retiredDay", "sumTwelveMonthSalary"],
+					required: [
+						"retired",
+						"workCate",
+						"retireReason",
+						"age",
+						"disabled",
+						"enterDay",
+						"retiredDay",
+						"sumTwelveMonthSalary",
+					],
 					properties: {
 						retired: DefineParamInfo.retired,
 						workCate: DefineParamInfo.workCate,
@@ -160,7 +213,8 @@ export default function (fastify: FastifyInstance, options: any, done: any) {
 			if (employmentDate < 0) return { succ: false, mesg: DefinedParamErrorMesg.ealryRetire };
 
 			const now = dayjs(new Date());
-			if (Math.floor(now.diff(retiredDay, "day", true)) > 365) return { succ: false, mesg: DefinedParamErrorMesg.expire };
+			if (Math.floor(now.diff(retiredDay, "day", true)) > 365)
+				return { succ: false, mesg: DefinedParamErrorMesg.expire };
 
 			// const age = new Date().getFullYear() - new Date(req.body.birth).getFullYear();
 			// if (new Date(`${new Date().getFullYear()}-${birthArray[1]}-${birthArray[2]}`).getTime() >= new Date().getTime()) age - 1;
@@ -168,10 +222,18 @@ export default function (fastify: FastifyInstance, options: any, done: any) {
 			////////////////////////////////////////////////////////////////////////////////////////////////// 예술인
 			const artWorkingDays = Math.floor(retiredDay.diff(enterDay, "date", true) + 1); // 예술인은 유/무급 휴일 개념이 없으며 가입기간 전체를 피보험 단위기간으로 취급한다.
 			const artWorkingYears = Math.floor(artWorkingDays / 365);
-			const { artDayAvgPay, artRealDayPay, artRealMonthPay } = calArtPay(req.body.sumTwelveMonthSalary, artWorkingDays, req.body.isSpecial);
+			const { artDayAvgPay, artRealDayPay, artRealMonthPay } = calArtPay(
+				req.body.sumTwelveMonthSalary,
+				artWorkingDays,
+				req.body.isSpecial
+			);
 			const receiveDay = getReceiveDay(artWorkingYears, req.body.age, req.body.disabled);
 
-			const [requireWorkingYear, nextReceiveDay] = getNextReceiveDay(artWorkingYears, req.body.age, req.body.disabled);
+			const [requireWorkingYear, nextReceiveDay] = getNextReceiveDay(
+				artWorkingYears,
+				req.body.age,
+				req.body.disabled
+			);
 			if (nextReceiveDay === 0) {
 				return {
 					succ: true,
@@ -238,7 +300,11 @@ export default function (fastify: FastifyInstance, options: any, done: any) {
 			const beforeOneYearArr = lastWorkDay.subtract(12, "month").format("YYYY-MM-DD").split("-").map(Number);
 
 			if (req.body.hasOwnProperty("workRecord")) {
-				const overDatePool = dayjs(new Date(req.body.workRecord[0].year, req.body.workRecord[0].months[0].month, 0)).subtract(1, "month").isSameOrAfter(lastWorkDay);
+				const overDatePool = dayjs(
+					new Date(req.body.workRecord[0].year, req.body.workRecord[0].months[0].month, 0)
+				)
+					.subtract(1, "month")
+					.isSameOrAfter(lastWorkDay);
 				if (overDatePool) return { succ: false, mesg: "입력한 근무일이 마지막 근무일 이 후 입니다." };
 			}
 
@@ -317,7 +383,17 @@ export default function (fastify: FastifyInstance, options: any, done: any) {
 				tags: ["detail"],
 				body: {
 					type: "object",
-					required: ["age", "disable", "isSpecial", "lastWorkDay", "workRecord", "dayAvg{ay", "sumWorkDay", "isOverTen", "hasWork"],
+					required: [
+						"age",
+						"disable",
+						"isSpecial",
+						"lastWorkDay",
+						"workRecord",
+						"dayAvg{ay",
+						"sumWorkDay",
+						"isOverTen",
+						"hasWork",
+					],
 					properties: {
 						retired: DefineParamInfo.retired, // 퇴직여부
 						workCate: DefineParamInfo.workCate, // 근로형태
@@ -331,16 +407,6 @@ export default function (fastify: FastifyInstance, options: any, done: any) {
 						sumWorkDay: { type: "number", minimum: 0 },
 						isOverTen: { type: "boolean" },
 						hasWork: { type: "array" },
-						// retired: DefineParamInfo.retired, // 퇴직여부
-						// workCate: DefineParamInfo.workCate, // 근로형태
-						// retireReason: DefineParamInfo.retireReason, // 퇴직사유
-						// birth: DefineParamInfo.birth, //생일
-						// disable: DefineParamInfo.disabled, // 장애여부
-						// isSpecial: { type: "boolean" }, // 건설직 여부
-						// lastWorkDay: DefineParamInfo.lastWorkDay, // 마지막 근무일
-						// workRecord: DefineParamInfo.workRecord,
-						// dayAvgPay: { type: "number", minimum: 0 },
-						// sumWorkDay: { type: "number", minimum: 0 },
 					},
 				},
 			},
@@ -365,15 +431,21 @@ export default function (fastify: FastifyInstance, options: any, done: any) {
 			const limitPermitDay = lastWorkDay.subtract(18, "month").format("YYYY-MM-DD").split("-").map(Number);
 
 			if (req.body.isSpecial) {
-				if (req.body.isOverTen && req.body.hasWork[0]) return { succ: false, mesg: dayjs(req.body.hasWork[1]).add(14, "day").format("YYYY-MM-DD") };
+				if (req.body.isOverTen && req.body.hasWork[0])
+					return { succ: false, mesg: dayjs(req.body.hasWork[1]).add(14, "day").format("YYYY-MM-DD") };
 			} else {
-				if (req.body.isOverTen) return { succ: false, mesg: "신청일 이전 1달 간 근로일수가 10일 미만이어야 합니다." };
+				if (req.body.isOverTen)
+					return { succ: false, mesg: "신청일 이전 1달 간 근로일수가 10일 미만이어야 합니다." };
 			}
 
 			let isPermit: (number | boolean)[];
 			let sortedData: any[];
 			if (req.body.hasOwnProperty("workRecord")) {
-				const overDatePool = dayjs(new Date(req.body.workRecord[0].year, req.body.workRecord[0].months[0].month, 0)).subtract(1, "month").isSameOrAfter(lastWorkDay);
+				const overDatePool = dayjs(
+					new Date(req.body.workRecord[0].year, req.body.workRecord[0].months[0].month, 0)
+				)
+					.subtract(1, "month")
+					.isSameOrAfter(lastWorkDay);
 				if (overDatePool) return { succ: false, mesg: "입력한 근무일이 마지막 근무일 이 후 입니다." };
 
 				sortedData = req.body.workRecord.sort((a: any, b: any) => {
@@ -388,7 +460,11 @@ export default function (fastify: FastifyInstance, options: any, done: any) {
 			if (!isPermit[0]) return { succ: false, workingDay: isPermit[1], requireWorkingDay: isPermit[2] };
 
 			// req.body.sumWorkDay, dayAvgPay
-			const { realDayPay, realMonthPay } = calDayjobPay(req.body.dayAvgPay);
+
+			const { realDayPay, realMonthPay } =
+				lastWorkDay.get("year") === 2023
+					? calDayjobPay(req.body.dayAvgPay, true)
+					: calDayjobPay(req.body.dayAvgPay);
 			const workingYear = Math.floor(req.body.sumWorkDay / 365);
 			const receiveDay = getReceiveDay(workingYear, req.body.age, req.body.disable);
 			const [requireWorkingYear, nextReceiveDay] = getNextReceiveDay(workingYear, req.body.age, req.body.disable);
@@ -399,7 +475,10 @@ export default function (fastify: FastifyInstance, options: any, done: any) {
 					amountCost: realDayPay * receiveDay,
 					realDayPay,
 					realMonthPay,
-					severancePay: req.body.sumWorkDay >= 365 ? Math.ceil((req.body.dayAvgPay * 30 * req.body.sumWorkDay) / 365) : 0,
+					severancePay:
+						req.body.sumWorkDay >= 365
+							? Math.ceil((req.body.dayAvgPay * 30 * req.body.sumWorkDay) / 365)
+							: 0,
 				};
 
 			return {
@@ -408,77 +487,11 @@ export default function (fastify: FastifyInstance, options: any, done: any) {
 				realDayPay,
 				receiveDay,
 				realMonthPay,
-				severancePay: req.body.sumWorkDay >= 365 ? Math.ceil((req.body.dayAvgPay * 30 * req.body.sumWorkDay) / 365) : 0,
+				severancePay:
+					req.body.sumWorkDay >= 365 ? Math.ceil((req.body.dayAvgPay * 30 * req.body.sumWorkDay) / 365) : 0,
 				needDay: requireWorkingYear * 365 - req.body.sumWorkDay,
 				nextAmountCost: nextReceiveDay * realDayPay,
 			};
-
-			// 	let jobPay = { dayAvgPay: 0, realDayPay: 0, realMonthPay: 0 };
-			// 	const lastWorkDay = dayjs(req.body.lastWorkDay);
-			// 	const limitPermitDay = lastWorkDay.subtract(19, "month").format("YYYY-MM-DD").split("-").map(Number);
-			// 	const limitPayDay = lastWorkDay.subtract(4, "month").format("YYYY-MM-DD").split("-").map(Number);
-			// 	if (req.body.hasOwnProperty("workRecord")) {
-			// 		const overDatePool = dayjs(new Date(req.body.workRecord[0].year, req.body.workRecord[0].months[0].month, 0)).subtract(1, "month").isSameOrAfter(lastWorkDay);
-			// 		if (overDatePool) return { succ: false, mesg: "입력한 근무일이 마지막 근무일 이 후 입니다." };
-			// 	}
-			// 	let isPermit: (number | boolean)[];
-			// 	let sortedData: any[];
-			// 	if (!req.body.hasOwnProperty("workRecord")) {
-			// 		isPermit = dayJobCheckPermit(limitPermitDay, req.body.sumWorkDay, true);
-			// 	} else {
-			// 		sortedData = req.body.workRecord.sort((a: any, b: any) => {
-			// 			if (a.year < b.year) return 1;
-			// 			if (a.year > b.year) return -1;
-			// 			return 0;
-			// 		});
-			// 		isPermit = dayJobCheckPermit(limitPermitDay, sortedData);
-			// 	}
-			// 	if (!isPermit[0])
-			// 		return {
-			// 			succ: false,
-			// 			workingDay: isPermit[1],
-			// 			requireWorkingDay: isPermit[2],
-			// 		};
-			// 	const birthArray = req.body.birth.split("-");
-			// 	const age = new Date().getFullYear() - new Date(req.body.birth).getFullYear();
-			// 	if (new Date(`${new Date().getFullYear()}-${birthArray[1]}-${birthArray[2]}`).getTime() >= new Date().getTime()) age - 1;
-			// 	let workingDay: number;
-			// 	let sumPay: number;
-			// 	let sumWorkDay: number;
-			// 	if (req.body.hasOwnProperty("workRecord")) {
-			// 		workingDay = sumDayJobWorkingDay(sortedData);
-			// 		[sumPay, sumWorkDay] = sumArtShortPay(limitPayDay, sortedData);
-			// 		jobPay = calDayjobPay(sumPay, sumWorkDay);
-			// 	} else {
-			// 		workingDay = req.body.sumWorkDay;
-			// 		jobPay.dayAvgPay = req.body.dayAvgPay;
-			// 		jobPay.realDayPay = Math.ceil(jobPay.dayAvgPay * 0.6);
-			// 		jobPay.realMonthPay = jobPay.realDayPay * 30;
-			// 	}
-			// 	const workingYear = Math.floor(workingDay / 365);
-			// 	const receiveDay = getReceiveDay(workingYear, age, req.body.disable);
-			// 	const [requireWorkingYear, nextReceiveDay] = getNextReceiveDay(workingYear, age, req.body.disable);
-			// 	if (nextReceiveDay === 0) {
-			// 		return {
-			// 			succ: true,
-			// 			retired: req.body.retired,
-			// 			availableAmountCost: jobPay.realDayPay * receiveDay,
-			// 			realDayPay: jobPay.realDayPay,
-			// 			receiveDay,
-			// 			realMonthPay: jobPay.realMonthPay,
-			// 		};
-			// 	}
-			// 	return {
-			// 		succ: true,
-			// 		retired: req.body.retired,
-			// 		availableAmountCost: jobPay.realDayPay * receiveDay,
-			// 		realDayPay: jobPay.realDayPay,
-			// 		receiveDay,
-			// 		realMonthPay: jobPay.realMonthPay,
-			// 		needDay: requireWorkingYear * 365 - workingDay,
-			// 		nextAvailableAmountCost: nextReceiveDay * jobPay.realDayPay,
-			// 		morePay: nextReceiveDay * jobPay.realDayPay - receiveDay * jobPay.realDayPay,
-			// 	};
 		}
 	);
 
@@ -562,7 +575,10 @@ export default function (fastify: FastifyInstance, options: any, done: any) {
 				sumLastThreeMonthDays += new Date(retiredDayArr[0], lastThreeMonth[count], 0).getDate();
 			}
 
-			const sumSalary = req.body.salary.length === 3 ? req.bodysalary.reduce((acc: number, val: number) => acc + val, 0) : req.body.salary[0] * 3;
+			const sumSalary =
+				req.body.salary.length === 3
+					? req.bodysalary.reduce((acc: number, val: number) => acc + val, 0)
+					: req.body.salary[0] * 3;
 			const dayAvgPay = Math.ceil(sumSalary / sumLastThreeMonthDays);
 			const highLimit = Math.floor(66000 * (req.body.dayWorkTime / 8));
 			const lowLimit = Math.floor(60120 * (req.body.dayWorkTime / 8));
@@ -573,7 +589,11 @@ export default function (fastify: FastifyInstance, options: any, done: any) {
 			const workingYears = Math.floor(allWorkDay / 365);
 
 			const receiveDay = getReceiveDay(workingYears, req.body.age, req.body.disable);
-			const [requireWorkingYear, nextReceiveDay] = getNextReceiveDay(workingYears, req.body.age, req.body.disable);
+			const [requireWorkingYear, nextReceiveDay] = getNextReceiveDay(
+				workingYears,
+				req.body.age,
+				req.body.disable
+			);
 
 			if (nextReceiveDay === 0) {
 				return {
@@ -669,12 +689,16 @@ export default function (fastify: FastifyInstance, options: any, done: any) {
 			workList.map((workElement) => {
 				const grade: 1 | 2 | 3 | 4 | 5 | 6 | 7 = insuranceGradeObj[workElement[0]];
 				if (workElement[0] > limitYear) {
-					workElement[0] >= 2019 ? (sumPay += employerPayTable["2019"][grade]) : (sumPay += employerPayTable["2018"][grade]);
+					workElement[0] >= 2019
+						? (sumPay += employerPayTable["2019"][grade])
+						: (sumPay += employerPayTable["2018"][grade]);
 					sumWorkDay += dayjs(new Date(`${workElement[0]}-${workElement[1]}-01`)).daysInMonth();
 				}
 				if (workElement[0] === limitYear) {
 					if (workElement[1] >= limitMonth) {
-						workElement[0] >= 2019 ? (sumPay += employerPayTable["2019"][grade]) : (sumPay += employerPayTable["2018"][grade]);
+						workElement[0] >= 2019
+							? (sumPay += employerPayTable["2019"][grade])
+							: (sumPay += employerPayTable["2018"][grade]);
 						sumWorkDay += dayjs(new Date(`${workElement[0]}-${workElement[1]}-01`)).daysInMonth();
 					}
 				}
@@ -733,7 +757,12 @@ function calArtPay(sumOneYearPay: number[] | number, artWorkingDays: number, isS
 	return { artDayAvgPay, artRealDayPay, artRealMonthPay };
 }
 
-function artShortCheckPermit(when24Arr: number[], workRecord: any, isSimple: boolean = false, isSpecial: boolean = false) {
+function artShortCheckPermit(
+	when24Arr: number[],
+	workRecord: any,
+	isSimple: boolean = false,
+	isSpecial: boolean = false
+) {
 	let sumJoinMonth = 0; // 월 단위의 피보험 단위기간
 
 	if (isSimple) {
@@ -855,13 +884,14 @@ function sumDayJobWorkingDay(workRecord: any[], isSimple: boolean = false) {
 
 	return sumWorkDay;
 }
-function calDayjobPay(dayAvgPay: number) {
+function calDayjobPay(dayAvgPay: number, is2023: boolean = false) {
 	let realDayPay = Math.ceil(dayAvgPay * 0.6);
-	// const highLimit = Math.floor(66000 * (dayWorkTime / 8));
-	// const lowLimit = Math.floor(60120 * (dayWorkTime / 8));
+	const dayWorkTime = 8; //  임시 값
+	const highLimit = is2023 ? Math.floor(66000 * (dayWorkTime / 8)) : Math.floor(66000 * (dayWorkTime / 8));
+	const lowLimit = is2023 ? Math.floor(61568 * (dayWorkTime / 8)) : Math.floor(60120 * (dayWorkTime / 8));
 
-	if (realDayPay > 66000) realDayPay = 66000;
-	else if (realDayPay < 60120) realDayPay = 60120;
+	if (realDayPay > highLimit) realDayPay = highLimit;
+	else if (realDayPay < lowLimit) realDayPay = lowLimit;
 	const realMonthPay = realDayPay * 30;
 
 	return { dayAvgPay, realDayPay, realMonthPay };
@@ -888,37 +918,3 @@ export function getEmployerReceiveDay(workYear: number) {
 
 // 	return { dayAvgPay, realDayPay, realMonthPay };
 // }
-
-// const data = [
-// 	{
-// 		year: 2022,
-// 		months: [
-// 			{ month: 8, workDay: 10, pay: 200000 },
-// 			{ month: 5, workDay: 15, pay: 200000 },
-// 			{ month: 3, workDay: 11, pay: 1000000 },
-// 			{ month: 2, workDay: 30, pay: 2000000 },
-// 			{ month: 1, workDay: 11, pay: 500000 },
-// 		],
-// 	},
-// 	{
-// 		year: 2021,
-// 		months: [
-// 			{ month: 12, workDay: 11, pay: 200000 },
-// 			{ month: 10, workDay: 11, pay: 1800000 },
-// 			{ month: 7, workDay: 11, pay: 320000 },
-// 			{ month: 6, workDay: 11, pay: 2000000 },
-// 			{ month: 2, workDay: 11, pay: 1000000 },
-// 		],
-// 	},
-// 	{
-// 		year: 2018,
-// 		months: [
-// 			{ month: 12, workDay: 10, pay: 200000 },
-// 			{ month: 10, workDay: 26, pay: 1800000 },
-// 			{ month: 8, workDay: 12, pay: 320000 },
-// 			{ month: 7, workDay: 12, pay: 320000 },
-// 			{ month: 6, workDay: 10, pay: 200000 },
-// 			{ month: 2, workDay: 10, pay: 100000 },
-// 		],
-// 	},
-// ];
