@@ -1,18 +1,22 @@
+/** 근료형태
+ * 0: 정규직
+ * 1: 기간제
+ * 2: 예술인
+ * 3: 특고
+ * 4: 단기 예술인
+ * 5: 단기 특고
+ * 6: 일용직
+ * 7: 초단시간
+ * 8: 자영업
+ */
+
 /**
- * 근로형태
- * 0: 정규직, 기간제
- * 1: 예술인, 특고
- * 2: 단기 예술인, 단기 특고
- * 3: 일용직
- * 4: 초단시간
- * 5: 자영업
- *
  * 퇴직사유
  * 0: 권고사직
  * 1: 계약만료
  * 2: 질병
  * 3: 임신/출산/육아
- * 4: 회사 잘못
+ * 4:회사 잘못
  * 5: 원거리 통근
  * 6: 정년퇴직
  * 7: 소득감소
@@ -44,11 +48,17 @@ export const DefineParamInfo = {
 		minItems: 1,
 		maxItems: 3,
 	},
+	// workCate: {
+	// 	// 근로형태
+	// 	type: "number",
+	// 	minimum: 0,
+	// 	maximum: 5,
+	// },
 	workCate: {
 		// 근로형태
 		type: "number",
 		minimum: 0,
-		maximum: 5,
+		maximum: 8,
 	},
 	retireReason: {
 		// 퇴직사유
@@ -105,6 +115,9 @@ export const DefineParamInfo = {
 	weekDay: {
 		// 근무요일
 		type: "array",
+		items: {
+			type: "number",
+		},
 	},
 	dayWorkTime: {
 		type: "number",
@@ -117,13 +130,12 @@ export const DefineParamInfo = {
 	lastWorkDay: {
 		type: "string",
 	},
-	// eachWorkData: { // 상세형 개별입력 데이터 검증용
-	//   type: "array",
-	//   items: {
-	//     type: 'object'
-	//   },
-	//   items
-	// }
+	workRecord: {
+		type: "array",
+		items: {
+			type: "object",
+		},
+	},
 };
 
 export const DefinedParamErrorMesg: { [col_: string]: string } = {
