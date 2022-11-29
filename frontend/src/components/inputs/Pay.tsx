@@ -29,7 +29,7 @@ const NumberInput = ({
 		if (isNaN(protoNum) || toStringNum.length > 11) {
 			return;
 		} else {
-			callBack(params, [protoNum]);
+			callBack(params, protoNum);
 			setValue(toStringNum);
 		}
 	};
