@@ -18,10 +18,10 @@ export const getAge = (birthdate?: Date) => {
 	};
 };
 
-export const Year_Option_Generater = () => {
+export const Year_Option_Generater = (count: number, max?: number) => {
 	const year_arr = [];
-	for (let j = 0; j < 10; j++) {
-		year_arr.push(String(new Date().getFullYear() - j));
+	for (let i = 0; i < count; i++) {
+		year_arr.push(String(max ? max : new Date().getFullYear() - i));
 	}
 	return year_arr;
 };

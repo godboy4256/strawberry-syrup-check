@@ -1,4 +1,4 @@
-import React, { Dispatch, SetStateAction, useEffect, useState } from "react";
+import React, { ChangeEvent, Dispatch, SetStateAction, useEffect, useState } from "react";
 import IMGDate from "../../assets/image/date_icon.svg";
 import IMGRedDirection from "../../assets/image/red_direction.svg";
 import IMGPrev from "../../assets/image/new/i_date_prev.svg";
@@ -17,7 +17,7 @@ class DateHandler extends InputHandler {
 	public setDay: Dispatch<SetStateAction<number>>;
 	public setDays: Dispatch<SetStateAction<number[]>>;
 
-	public current_year_list = Year_Option_Generater();
+	public current_year_list = Year_Option_Generater(10);
 
 	SelectCallback = (params: string, value: string) => {
 		this.SetPageVal(params, value);
@@ -122,7 +122,7 @@ const _DateHeader = ({ handler }) => {
 	return <div className="date_input_header">{`${year}년 ${month}월 ${day}일`}</div>;
 };
 
-const _DatePopUp = ({ handler }) => {
+const _DatePopUp = ({ handler, year }: { handler: any; year: any[] }) => {
 	return (
 		<div className="date_input_container">
 			<_DateHeader handler={handler} />
@@ -131,7 +131,7 @@ const _DatePopUp = ({ handler }) => {
 					<img src={IMGRedDirection} alt="Date Prev Button" />
 				</button>
 				<div id="date_select_box">
-					<SelectInput selected={currentDate[0]} type="date_normal" options={handler.current_year_list} params="year" callBack={handler.SelectCallback} />
+					<SelectInput selected={currentDate[0]} type="date_normal" options={year} params="year" callBack={handler.SelectCallback} />
 					<SelectInput selected={currentDate[1]} type="date_normal" options={[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]} params="month" callBack={handler.SelectCallback} />
 				</div>
 				<button id="date_next_btn" onClick={handler.SelectDateNextClick}>
@@ -152,19 +152,32 @@ const _DatePopUp = ({ handler }) => {
 	);
 };
 
-export const DateInputNormal = ({ params, label, callBack, description }: { params: string; label?: string; callBack: CallableFunction; description?: string | "enter_day" | "insurance_end_day" | "self-employment" }) => {
+export const DateInputNormal = ({
+	params,
+	label,
+	callBack,
+	description,
+	year,
+	placeholder,
+}: {
+	params: string;
+	label?: string;
+	callBack: CallableFunction;
+	description?: string | "enter_day" | "insurance_end_day" | "self-employment";
+	year?: number[];
+	placeholder?: string;
+}) => {
 	const handler = new DateHandler({});
 	const [dateValue, setDateValue] = useState("");
 	const onClickDateOn = () => {
-		CreatePopup(undefined, <_DatePopUp handler={handler} />, "date", () => handler.Action_Get_Date(callBack, setDateValue, params));
+		CreatePopup(undefined, <_DatePopUp handler={handler} year={year ? year : handler.current_year_list} />, "date", () => handler.Action_Get_Date(callBack, setDateValue, params));
 	};
-
 	return (
 		<>
 			<div className="w_100">
 				{label && <label className="write_label fs_16">{label}</label>}
 				<div onClick={onClickDateOn} className={`date_container ${!dateValue ? "unselect" : ""}`}>
-					<div className={`date_value ${!dateValue ? "unselect" : ""}`}>{!dateValue ? "날짜를 입력해주세요." : dateValue}</div>
+					<div className={`date_value ${!dateValue ? "unselect" : ""}`}>{!dateValue ? (placeholder ? placeholder : "날짜를 선택해주세요.") : dateValue}</div>
 					<div className={`date_icon ${!dateValue ? "unselect" : ""}`}>
 						<img src={IMGDate} alt="Date Icon" />
 					</div>
@@ -198,14 +211,17 @@ export const DateInputNormal = ({ params, label, callBack, description }: { para
 	);
 };
 
-const _IndiviualInput = ({ average_work = false }: { average_work?: boolean }) => {
+const _IndiviualInput = ({ average_work = false, callBack, params }: { average_work?: boolean; callBack: CallableFunction; params: string }) => {
+	const onChangeInput = (params_num: number, value: any) => {
+		callBack(`${params}_${params_num}`, value);
+	};
 	return (
 		<div className="indiviual_input_container fs_14">
 			<div className="flex_box">
-				<input placeholder="근로 일수" />
-				{average_work && <input placeholder="월 평균 근로시간" />}
+				<input placeholder="근로 일수" onChange={(e: ChangeEvent<HTMLInputElement>) => onChangeInput(1, e.currentTarget.value)} />
+				{average_work && <input placeholder="월 평균 근로시간" onChange={(e: ChangeEvent<HTMLInputElement>) => onChangeInput(2, e.currentTarget.value)} />}
 			</div>
-			<input placeholder="월 임금총액" />
+			<input placeholder="월 임금총액" onChange={(e: ChangeEvent<HTMLInputElement>) => onChangeInput(3, e.currentTarget.value)} />
 		</div>
 	);
 };
@@ -225,11 +241,11 @@ export const DateInputIndividual = ({ handler }) => {
 					<div className="date_indiviual_page">
 						<div>
 							<div className="indiviual_input_header">{processing[3]}</div>
-							<_IndiviualInput average_work={true} />
+							<_IndiviualInput average_work={true} callBack={handler.SetPageVal} params={`${processing[3]}`} />
 						</div>
 						<div>
 							<div className="indiviual_input_header">{processing[2]}</div>
-							<_IndiviualInput average_work={true} />
+							<_IndiviualInput average_work={true} callBack={handler.SetPageVal} params={`${processing[2]}`} />
 						</div>
 						<div className="unset_indiviual_input">
 							<div className="indiviual_input_header">{processing[1]}</div>
@@ -251,19 +267,19 @@ export const DateInputIndividual = ({ handler }) => {
 					<div className="date_indiviual_page">
 						<div>
 							<div className="indiviual_input_header">{processing[7]}</div>
-							<_IndiviualInput />
+							<_IndiviualInput callBack={handler.SetPageVal} params={`${processing[7]}`} />
 						</div>
 						<div>
 							<div className="indiviual_input_header">{processing[6]}</div>
-							<_IndiviualInput />
+							<_IndiviualInput callBack={handler.SetPageVal} params={`${processing[6]}`} />
 						</div>
 						<div>
 							<div className="indiviual_input_header">{processing[5]}</div>
-							<_IndiviualInput />
+							<_IndiviualInput callBack={handler.SetPageVal} params={`${processing[5]}`} />
 						</div>
 						<div>
 							<div className="indiviual_input_header">{processing[4]}</div>
-							<_IndiviualInput average_work={true} />
+							<_IndiviualInput callBack={handler.SetPageVal} params={`${processing[4]}`} />
 						</div>
 					</div>
 					<button className="date_indiviual_prev" onClick={() => setDirection(3)}>
@@ -276,19 +292,19 @@ export const DateInputIndividual = ({ handler }) => {
 						<div className="date_indiviual_page">
 							<div>
 								<div className="indiviual_input_header">{processing[11]}</div>
-								<_IndiviualInput />
+								<_IndiviualInput callBack={handler.SetPageVal} params={`${processing[11]}`} />
 							</div>
 							<div>
 								<div className="indiviual_input_header">{processing[10]}</div>
-								<_IndiviualInput />
+								<_IndiviualInput callBack={handler.SetPageVal} params={`${processing[10]}`} />
 							</div>
 							<div>
 								<div className="indiviual_input_header">{processing[9]}</div>
-								<_IndiviualInput />
+								<_IndiviualInput callBack={handler.SetPageVal} params={`${processing[9]}`} />
 							</div>
 							<div>
 								<div className="indiviual_input_header">{processing[8]}</div>
-								<_IndiviualInput />
+								<_IndiviualInput callBack={handler.SetPageVal} params={`${processing[8]}`} />
 							</div>
 						</div>
 						<button className="date_indiviual_next" onClick={() => setDirection(2)}>
