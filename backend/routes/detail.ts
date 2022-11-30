@@ -667,16 +667,11 @@ export default function (fastify: FastifyInstance, options: any, done: any) {
 			const retiredDay: dayjs.Dayjs = dayjs(req.body.retiredDay);
 			const insuranceGradeObj = req.body.insuranceGrade;
 
+			// 1. 자영업자로서 최소 1년간 고용보험에 보험료를 납부해야함
 			const workingDay = Math.floor(retiredDay.diff(enterDay, "day", true));
 			if (workingDay < 365) return { succ: false, workingDay, requireDay: 365 - workingDay };
 
-			let sumPay = 0;
-			let sumWorkDay = 0;
-			let dayAvgPay = 0;
-			let realDayPay = 0;
-			let realMonthPay = 0;
-			let receiveDay = 0;
-
+			// 2.  몇 년 몇 월에 가입했는 지 배열로 작성(시작월과 종료월은 제외)
 			const workList = [];
 			const yearCount = retiredDay.year() - enterDay.year();
 
@@ -702,19 +697,36 @@ export default function (fastify: FastifyInstance, options: any, done: any) {
 					}
 				}
 			}
+			// console.log(workList);
 			const workYear = Math.floor(workingDay / 365);
+			// 3. 피보험긴간이 3년 이상인 경우, 미만인 경우를 확인하기 위해서 3년전 년/월 계산
 			const limitYear = retiredDay.subtract(36, "month").year();
 			const limitMonth = retiredDay.subtract(36, "month").month() + 1;
 
-			workList.map((workElement) => {
+			// 4. 폐업일 이전 3년치의 급여와, 피보험단위 산정
+			let sumPay = 0;
+			let sumWorkDay = 0;
+			workList.map((workElement, idx) => {
 				const grade: 1 | 2 | 3 | 4 | 5 | 6 | 7 = insuranceGradeObj[workElement[0]];
-				if (workElement[0] > limitYear) {
+
+				if (idx === 0) {
+					const lastMonthPay =
+						workElement[0] >= 2019 ? employerPayTable["2019"][grade] : employerPayTable["2018"][grade];
+					sumPay += Math.floor(lastMonthPay / retiredDay.daysInMonth()) * retiredDay.date();
+					sumWorkDay += retiredDay.date();
+				} else if (idx === workList.length - 1) {
+					const firstMonthPay =
+						workElement[0] >= 2019 ? employerPayTable["2019"][grade] : employerPayTable["2018"][grade];
+					sumPay +=
+						Math.floor(firstMonthPay / enterDay.daysInMonth()) *
+						(enterDay.daysInMonth() - enterDay.date() + 1);
+					sumWorkDay += enterDay.daysInMonth() - enterDay.date() + 1;
+				} else if (workElement[0] > limitYear) {
 					workElement[0] >= 2019
 						? (sumPay += employerPayTable["2019"][grade])
 						: (sumPay += employerPayTable["2018"][grade]);
 					sumWorkDay += dayjs(new Date(`${workElement[0]}-${workElement[1]}-01`)).daysInMonth();
-				}
-				if (workElement[0] === limitYear) {
+				} else if (workElement[0] === limitYear) {
 					if (workElement[1] >= limitMonth) {
 						workElement[0] >= 2019
 							? (sumPay += employerPayTable["2019"][grade])
@@ -723,27 +735,13 @@ export default function (fastify: FastifyInstance, options: any, done: any) {
 					}
 				}
 			});
-			// 피보험 기간이 3년 이상이면 최대 3년 까지만 계산에 사용한다.
-			// if (insuranceGradeArr.length >= 3) {
-			// 	for (let count = 0; count < 3; count++) {
-			// 		const grade: 1 | 2 | 3 | 4 | 5 | 6 | 7 = insuranceGradeArr[count][1];
-			// 		insuranceGradeArr[count][0] >= 2019 ? (sumPay += employerPayTable["2019"][grade]) : (sumPay += employerPayTable["2018"][grade]);
-			// 		sumWorkDay += 365;
-			// 	}
-			// } else {
-			// 	insuranceGradeArr.map((insuranceGrade) => {
-			// 		const grade: 1 | 2 | 3 | 4 | 5 | 6 | 7 = insuranceGrade[1];
-			// 		insuranceGrade[0] >= 2019 ? (sumPay += employerPayTable["2019"][grade]) : (sumPay += employerPayTable["2018"][grade]);
-			// 		sumWorkDay += 365;
-			// 	});
-			// }
 
-			dayAvgPay = Math.floor(sumPay / sumWorkDay); // 기초일액
-			realDayPay = Math.floor(dayAvgPay * 0.6);
+			const dayAvgPay = Math.floor(sumPay / sumWorkDay); // 기초일액
+			let realDayPay = Math.floor(dayAvgPay * 0.6);
 			if (realDayPay < 60240) realDayPay = 60240;
 			if (realDayPay > 66000) realDayPay = 66000;
-			realMonthPay = realDayPay * 30;
-			receiveDay = getEmployerReceiveDay(workYear); // 소정 급여일수 테이블이 다르다
+			const realMonthPay = realDayPay * 30;
+			const receiveDay = getEmployerReceiveDay(workYear); // 소정 급여일수 테이블이 다르다
 
 			// 퇴직금, 다음 단계 없음
 			return {
