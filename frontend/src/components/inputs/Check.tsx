@@ -1,15 +1,21 @@
 import React, { Fragment, useState } from "react";
 import "../../styles/checkbox.css";
 
-const _BoxTypeCheckBox = ({ el, type, callBack, params }: { el: string | number; type: string; callBack: CallableFunction; params: string }) => {
-	const checkList = [];
+let checkList: string[] = [];
+
+const _BoxTypeCheckBox = ({ el, type, callBack, params }: { el: string; type: string; callBack: CallableFunction; params: string }) => {
 	const [onSelect, setOnSelect] = useState(false);
 	return (
 		<div
 			className={`${type} ${onSelect ? "active" : ""}`}
 			onClick={() => {
 				setOnSelect((prev) => !prev);
-				checkList.push(el);
+				if (!onSelect) {
+					checkList.push(el);
+				} else {
+					const delete_num = checkList.indexOf(el);
+					checkList.splice(delete_num, 1);
+				}
 				callBack(params, checkList);
 			}}
 		>
@@ -18,25 +24,14 @@ const _BoxTypeCheckBox = ({ el, type, callBack, params }: { el: string | number;
 	);
 };
 
-const CheckBoxInput = ({
-	options,
-	type,
-	label,
-	params,
-	callBack,
-}: {
-	options: string[] | number[];
-	type: "box_type" | "radio_box_type" | "circle_type" | "is_true_type";
-	label?: string;
-	params: string;
-	callBack: CallableFunction;
-}) => {
+const CheckBoxInput = ({ options, type, label, params, callBack }: { options: string[]; type: "box_type" | "radio_box_type" | "circle_type" | "is_true_type"; label?: string; params: string; callBack: CallableFunction }) => {
+	checkList = [];
 	return (
 		<>
 			{label && <div className="fs_16 write_label">{label}</div>}
 			<div className={`checkbox_container ${type}`}>
 				{type === "box_type"
-					? options.map((el: string | number) => {
+					? options.map((el: string) => {
 							return <_BoxTypeCheckBox key={`${String(Date.now())}_for${el}`} el={el} type={type} params={params} callBack={callBack} />;
 					  })
 					: type === "circle_type"

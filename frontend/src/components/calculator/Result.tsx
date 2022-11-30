@@ -29,14 +29,14 @@ const Result = ({ result }) => {
 					{result.succ ? (
 						<div id="result_main">
 							<h3 className="bg_color_main font_color_white flex_box flex_box_row_center flex_box_column_center">
-								총 수령액 :<div className="font_color_white fs_25">{result.availableAmountCost.toLocaleString()}</div> 원
+								총 수령액 :<div className="font_color_white fs_25">{result?.availableAmountCost?.toLocaleString()}</div> 원
 							</h3>
 							<div id="result_main_content">
 								<div id="result_day" className="fs_12">
-									하루 <span className="font_color_main fs_12">{result.realDayPay.toLocaleString()}</span> 원을 <span className="font_color_main fs_12">{result.receiveDay}</span>일 동안
+									하루 <span className="font_color_main fs_12">{result?.realDayPay?.toLocaleString()}</span> 원을 <span className="font_color_main fs_12">{result?.receiveDay}</span>일 동안
 								</div>
 								<div id="result_month">
-									월 <span className="strong_red">{result.realMonthPay.toLocaleString()}</span> 원 받아요!
+									월 <span className="strong_red">{result?.realMonthPay?.toLocaleString()}</span> 원 받아요!
 								</div>
 							</div>
 						</div>
@@ -44,10 +44,10 @@ const Result = ({ result }) => {
 						<>
 							<div id="result_disapproval" className="bg_color_main">
 								<div className="flex_box font_color_white fs_14">
-									현재 근무 일수: <div className="fs_25 font_color_white">{result.workingDays}</div> 일
+									현재 근무 일수: <div className="fs_25 font_color_white">{result?.workingDays}</div> 일
 								</div>
 								<div className="flex_box font_color_white fs_14">
-									부족한 근무 일수: <div className="fs_25 font_color_white">{result.requireDays}</div> 일
+									부족한 근무 일수: <div className="fs_25 font_color_white">{result?.requireDays}</div> 일
 								</div>
 							</div>
 							<div className="help_link_container">
@@ -64,19 +64,19 @@ const Result = ({ result }) => {
 					) : (
 						<>
 							<div id="result_remaining_days">
-								<div className="fs_12">{`${availableDay[0]}년 ${availableDay[1]}월 ${availableDay[2]}일`} 이후 퇴직시</div>
-								<div className="fs_12">현 근무일수 {result.workingDays} 일</div>
+								<div className="fs_12">{`${availableDay?.[0]}년 ${availableDay?.[1]}월 ${availableDay?.[2]}일`} 이후 퇴직시</div>
+								<div className="fs_12">현 근무일수 {result?.workingDays} 일</div>
 							</div>
 							<div id="result_main">
 								<h3 className="bg_color_main font_color_white flex_box flex_box_row_center flex_box_column_center">
-									총 수령액 :<div className="font_color_white fs_25">{result.availableAmountCost.toLocaleString()}</div> 원
+									총 수령액 :<div className="font_color_white fs_25">{result?.availableAmountCost?.toLocaleString()}</div> 원
 								</h3>
 								<div id="result_main_content">
 									<div id="result_day" className="fs_12">
-										하루 <span className="font_color_main fs_12">{result.dayPay.toLocaleString()}</span> 원을 <span className="font_color_main fs_12">{result.receiveDays}</span>일 동안
+										하루 <span className="font_color_main fs_12">{result?.dayPay?.toLocaleString()}</span> 원을 <span className="font_color_main fs_12">{result?.receiveDays}</span>일 동안
 									</div>
 									<div id="result_month">
-										월 <span className="strong_red">{result.monthPay.toLocaleString()}</span> 원 받아요!
+										월 <span className="strong_red">{result?.monthPay?.toLocaleString()}</span> 원 받아요!
 									</div>
 								</div>
 							</div>
@@ -86,14 +86,14 @@ const Result = ({ result }) => {
 							</Link>
 						</>
 					)}
-					{result.succ && (
+					{result?.succ && (
 						<div id="result_comment02" className="font_family_bold">
 							고생 많으셨습니다!
 						</div>
 					)}
 					{result.succ && (
 						<div id="result_severance_pay" className="flex_box bg_color_main font_color_white flex_box_row_center flex_box_column_center">
-							예상 퇴직금 : <div className="font_color_white fs_25">{result.availableAmountCost.toLocaleString()}</div> 원
+							예상 퇴직금 : <div className="font_color_white fs_25">{result?.availableAmountCost?.toLocaleString()}</div> 원
 						</div>
 					)}
 				</div>

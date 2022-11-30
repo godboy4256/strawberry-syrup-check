@@ -1,7 +1,8 @@
-import React, { useState } from "react";
+import React, { ChangeEvent, Fragment, useState } from "react";
 import NumberInput from "./Pay";
 import "../../styles/salarytab.css";
 import SelectInput from "./Select";
+import { GetDateArr } from "../../utils/date";
 
 const before_month_cal = (retiredDay: string) => {
 	const targetDate = retiredDay.split("-"),
@@ -15,7 +16,6 @@ const before_month_cal = (retiredDay: string) => {
 		day1 = targetDate[2],
 		day2 = new Date(2022, month2, 0).getDate(),
 		day3 = new Date(2022, month3, 0).getDate();
-
 	return [
 		`${year1}.${String(month1).padStart(2, "0")}.01. ~ ${year1}.${String(month1).padStart(2, "0")}.${day1}.`,
 		`${year2}.${String(month2).padStart(2, "0")}.01. ~ ${year2}.${String(month2).padStart(2, "0")}.${day2}.`,
@@ -23,9 +23,14 @@ const before_month_cal = (retiredDay: string) => {
 	];
 };
 
-const TabInputs = ({ label, callBack, params, retiredDay = () => {}, type = "normal" }: { label?: string; callBack?: CallableFunction; params?: string; retiredDay?: CallableFunction; type?: "normal" | "salary" | "select" }) => {
+const TabInputs = ({ label, callBack, params, valueDay = () => {}, type = "normal" }: { label?: string; callBack?: CallableFunction; params?: string; valueDay?: CallableFunction; type?: "normal" | "salary" | "select" }) => {
+	const multi_salary_data = {};
 	const [salarytab, setSalaryTab] = useState("all");
-	const beforeMonthCal = retiredDay && retiredDay("retiredDay") ? before_month_cal(retiredDay && retiredDay("retiredDay")) : null;
+	const beforeMonthCal_input = valueDay && valueDay("retiredDay") ? before_month_cal(valueDay && valueDay("retiredDay")) : null;
+	const onChangeTabInput = (in_params: string, value: string) => {
+		multi_salary_data[in_params] = value;
+		callBack(params, Object.values(multi_salary_data));
+	};
 	return (
 		<>
 			<div className="fs_16 write_label">{label}</div>
@@ -44,14 +49,14 @@ const TabInputs = ({ label, callBack, params, retiredDay = () => {}, type = "nor
 							<NumberInput params={params} num_unit="원" callBack={callBack} />
 						) : (
 							salarytab === "three_month" &&
-							retiredDay("retiredDay") && (
+							valueDay("retiredDay") && (
 								<>
-									<div className="fs_14">{beforeMonthCal[0]}</div>
-									<NumberInput params={params} num_unit="원" callBack={callBack} />
-									<div className="fs_14">{beforeMonthCal[1]}</div>
-									<NumberInput params={params} num_unit="원" callBack={callBack} />
-									<div className="fs_14">{beforeMonthCal[2]}</div>
-									<NumberInput params={params} num_unit="원" callBack={callBack} />
+									<div className="fs_14">{beforeMonthCal_input[0]}</div>
+									<NumberInput params="salary_01" num_unit="원" callBack={onChangeTabInput} />
+									<div className="fs_14">{beforeMonthCal_input[1]}</div>
+									<NumberInput params="salary_02" num_unit="원" callBack={onChangeTabInput} />
+									<div className="fs_14">{beforeMonthCal_input[2]}</div>
+									<NumberInput params="salary_03" num_unit="원" callBack={onChangeTabInput} />
 								</>
 							)
 						))}
@@ -60,14 +65,23 @@ const TabInputs = ({ label, callBack, params, retiredDay = () => {}, type = "nor
 							<SelectInput selected={"1등급"} type="normal" options={["1등급", "2등급", "3등급", "4등급", "5등급"]} params="year" callBack={callBack} />
 						) : (
 							salarytab === "three_month" &&
-							retiredDay("retiredDay") && (
+							valueDay("retiredDay") &&
+							valueDay("enterDay") && (
 								<>
-									<div className="fs_14">{beforeMonthCal[0]}</div>
-									<SelectInput selected={"1등급"} type="normal" options={["1등급", "2등급", "3등급", "4등급", "5등급"]} params="year" callBack={callBack} />
-									<div className="fs_14">{beforeMonthCal[1]}</div>
-									<SelectInput selected={"1등급"} type="normal" options={["1등급", "2등급", "3등급", "4등급", "5등급"]} params="year" callBack={callBack} />
-									<div className="fs_14">{beforeMonthCal[2]}</div>
-									<SelectInput selected={"1등급"} type="normal" options={["1등급", "2등급", "3등급", "4등급", "5등급"]} params="year" callBack={callBack} />
+									{new Array(Number(GetDateArr(valueDay("retiredDay"))[0] - GetDateArr(valueDay("enterDay"))[0]) + 1).fill(1).map((_, idx: number) => {
+										return (
+											<Fragment key={String(Date.now())}>
+												<div>{GetDateArr(valueDay("enterDay"))[0] + idx} 년</div>
+												<SelectInput
+													selected={"1등급"}
+													type="normal"
+													options={["1등급", "2등급", "3등급", "4등급", "5등급"]}
+													params={String(GetDateArr(valueDay("enterDay"))[0] + idx)}
+													callBack={callBack}
+												/>
+											</Fragment>
+										);
+									})}
 								</>
 							)
 						))}
