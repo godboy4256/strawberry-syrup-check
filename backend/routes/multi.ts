@@ -17,6 +17,7 @@ type TmainData = {
 	workingDays: number;
 	age: number;
 	disable: boolean;
+	dayAvgPay: number;
 	realDayPay: number;
 };
 type TaddData = {
@@ -47,6 +48,7 @@ export default function (fastify: FastifyInstance, options: any, done: any) {
 								"workingDays",
 								"age",
 								"disable",
+								"dayAvgPay",
 								"realDayPay",
 							],
 							properties: {
@@ -57,6 +59,7 @@ export default function (fastify: FastifyInstance, options: any, done: any) {
 								workingDays: { type: "number", minimum: 0 },
 								age: { type: "number", minimum: 0 },
 								disable: DefineParamInfo.disabled,
+								dayAvgPay: { type: "number", minimum: 0 },
 								realDayPay: { type: "number", minimum: 0 },
 							},
 						},
@@ -97,18 +100,20 @@ export default function (fastify: FastifyInstance, options: any, done: any) {
 			 */
 
 			const mainData: TmainData = req.body.mainData;
-			const addData: TaddData[] = req.body.addData;
+			const addDatas: TaddData[] = req.body.addData;
 			const leastRequireWorkingDay = requiredWorkingDay[mainData.workCate]; // 근로 형태에 맞는 기한 가져오기
+			const mainEnterDay = dayjs(mainData.enterDay);
+			const mainRetiredDay = dayjs(mainData.retiredDay);
+			const joinDays = mainRetiredDay.diff(mainEnterDay, "day"); // 재직일수 퇴지금 계산용
 
 			// 1. 신청일이 이직일로 부터 1년 초과 확인
-			const mainRetiredDay = dayjs(mainData.retiredDay);
+
 			const now = dayjs(new Date());
 			if (Math.floor(now.diff(mainRetiredDay, "day", true)) > 365)
 				return { succ: false, mesg: DefinedParamErrorMesg.expire };
 
 			// 2. 마지막 직장의 입사일과 전직장의 이직일 사이 기간이 3년을 초과하는 지 확인
-			const mainEnterDay = dayjs(mainData.enterDay);
-			const secondRetiredDay = dayjs(addData[0].retiredDay);
+			const secondRetiredDay = dayjs(addDatas[0].retiredDay);
 			const diffMainToSecond = Math.floor(mainEnterDay.diff(secondRetiredDay, "day", true));
 
 			// 1095일은 365일 * 3 즉 3년
@@ -128,7 +133,7 @@ export default function (fastify: FastifyInstance, options: any, done: any) {
 					realDayPay: mainData.realDayPay,
 					receiveDay,
 					realMonthPay: mainData.realDayPay * 30,
-					// 퇴직금 추가
+					severancePay: joinDays >= 365 ? mainData.dayAvgPay * 30 * Math.floor(joinDays / 365) : 0,
 				};
 			}
 			// 여기서 부터는 3년 내에 다른 직장 정보가 유효한 경우
@@ -138,39 +143,32 @@ export default function (fastify: FastifyInstance, options: any, done: any) {
 			const limitDay = mainRetiredDay.subtract(permitRange, "month");
 
 			// 4.  18개월 또는 24개월 시점을 고려해서 기간내의 피보험 단위기간 합산
-			const addCandidate: TaddData[] = addData.filter((work) =>
-				dayjs(work.retiredDay).isSameOrAfter(limitDay, "date")
+			const permitAddCandidates: TaddData[] = addDatas.filter((addData) =>
+				dayjs(addData.retiredDay).isSameOrAfter(limitDay, "date")
 			);
-			const permitWorkingDays = addCandidate.reduce((acc, obj) => acc + obj.permitDays, mainData.workingDays);
+			const permitWorkingDays = permitAddCandidates.reduce(
+				(acc, obj) => acc + obj.permitDays,
+				mainData.workingDays
+			);
 
 			// 😎 이 부분에서 피보험단위기간을 계산하기위해서 상세형과 같은 형태의 데이터를 입력받아야하나?
 
-			// console.log(permitWorkingDays);
-
-			//5.
+			//5. 수급 불인정 조건에 맞는 경우 불인정 메세지 리턴
 			if (permitWorkingDays < leastRequireWorkingDay)
 				return { succ: false, permitWorkingDays, requireDays: leastRequireWorkingDay - permitWorkingDays };
-			if (addCandidate[addCandidate.length - 1].isIrregular) return { succ: false, mesg: "isIrregular" };
+			if (permitAddCandidates.length !== 0 && permitAddCandidates[permitAddCandidates.length - 1].isIrregular)
+				return { succ: false, mesg: "isIrregular" };
 
 			// 최소조건 (기한내 필요 피보험단위(예시 180일) 만족, 이직 후 1년 이내) 만족 후
 
-			// 6.
-			let workingDays = 0;
-			for (let i = 0; i < addData.length; i++) {
-				workingDays += addData[i].workingDays;
-				if (i !== addData.length - 1) {
-					if (Math.floor(dayjs(addData[i].enterDay).diff(dayjs(addData[i + 1].retiredDay), "day")) > 1095)
-						break;
-				}
-			}
-			// const workingDays = addData.reduce((acc, obj) => {
-			// 	if
-			// 	return acc + obj.workingDays;
-			// }, mainData.workingDays);
-			// const workingDays = addData.reduce((acc, obj) => acc + obj.workingDays, mainData.workingDays);
-			// let workingDays = mainData.workingDays;
-			// addData.map((work) => (workingDays += mergeWorkingDays(mainData, work)));
-			console.log(workingDays);
+			// 6. 전체 피보험단위를 산정하기위한 합산 가능 유형 필터링
+			const addCadiates: TaddData[] = addDatas.filter((addData, idx, addDatas) => {
+				if (idx === 0) return mainEnterDay.diff(addData.retiredDay, "day") > 1095;
+				return dayjs(addDatas[idx - 1].enterDay).diff(addData.retiredDay, "day") > 1095;
+			});
+
+			// 7. 피보험 단위기간 산정
+			const workingDays = mergeWorkingDays(mainData, addCadiates);
 			const workingYears = Math.floor(workingDays / mainData.workCate === 2 ? 12 : 365); // 월 단위의 경우 12로 나눈다. 자영업자는 이거
 			const tempReceiveDay =
 				mainData.workCate === 5
@@ -178,15 +176,14 @@ export default function (fastify: FastifyInstance, options: any, done: any) {
 					: getReceiveDay(workingYears, mainData.age, mainData.disable);
 			const receiveDay = tempReceiveDay === 120 ? 120 : tempReceiveDay - 30;
 
-			// console.log(workingDays, workingYears, receiveDay);
-
-			// 7.
+			// 8.
 			return {
 				succ: true,
 				amountCost: mainData.realDayPay * receiveDay,
 				realDayPay: mainData.realDayPay,
 				receiveDay,
 				realMonthPay: mainData.realDayPay * 30,
+				severancePay: joinDays >= 365 ? mainData.dayAvgPay * 30 * Math.floor(joinDays / 365) : 0,
 			};
 		}
 	);
@@ -195,24 +192,51 @@ export default function (fastify: FastifyInstance, options: any, done: any) {
 }
 
 // 중복 제거는 했는데 피보험단위기간 산정 규칙에 맞지 않음
-function mergeWorkingDays(mainData: TmainData, addData: TaddData) {
-	console.log("hi!!!");
-	let workingDays = 0;
-	mainData.enterDay = dayjs(mainData.enterDay);
-	mainData.retiredDay = dayjs(mainData.retiredDay);
-	addData.enterDay = dayjs(addData.enterDay);
-	addData.retiredDay = dayjs(addData.retiredDay);
+// compareData = 하나씩 늘어남 가장 처음은 mainData 이후는 addData가 0개부터 1개씩 늘어나서 최대 9개 또는 10개
+function mergeWorkingDays(mainData: TmainData, addDatas: (TmainData | TaddData)[]) {
+	let workingDays = mainData.workingDays;
 
-	if (addData.enterDay > mainData.enterDay) {
-		if (addData.enterDay < mainData.retiredDay) {
-			if (addData.retiredDay > mainData.retiredDay)
-				workingDays += mainData.retiredDay.diff(addData.enterDay, "day");
+	addDatas.map((addData, idx, addDatas) => {
+		addData.enterDay = dayjs(addData.enterDay);
+		addData.retiredDay = dayjs(addData.retiredDay);
+
+		if (idx === 0) {
+			mainData.enterDay = dayjs(mainData.enterDay);
+			mainData.retiredDay = dayjs(mainData.retiredDay);
+
+			if (addData.enterDay > mainData.enterDay) {
+				if (addData.enterDay < mainData.retiredDay) {
+					if (addData.retiredDay > mainData.retiredDay)
+						workingDays += mainData.retiredDay.diff(addData.enterDay, "day");
+				}
+			}
+			if (addData.enterDay < mainData.enterDay) {
+				if (addData.retiredDay < mainData.retiredDay)
+					workingDays += addData.retiredDay.diff(addData.enterDay, "day");
+				if (addData.retiredDay > mainData.enterDay)
+					workingDays += mainData.enterDay.diff(addData.enterDay, "day");
+			}
+		} else {
+			for (let i = 1; i <= idx; i++) {
+				const compareData = { ...addDatas[idx - i] };
+				compareData.enterDay = dayjs(compareData.enterDay);
+				compareData.retiredDay = dayjs(compareData.retiredDay);
+
+				if (addData.enterDay > compareData.enterDay) {
+					if (addData.enterDay < compareData.retiredDay) {
+						if (addData.retiredDay > compareData.retiredDay)
+							workingDays += compareData.retiredDay.diff(addData.enterDay, "day");
+					}
+				}
+				if (addData.enterDay < compareData.enterDay) {
+					if (addData.retiredDay < compareData.retiredDay)
+						workingDays += addData.retiredDay.diff(addData.enterDay, "day");
+					if (addData.retiredDay > compareData.enterDay)
+						workingDays += compareData.enterDay.diff(addData.enterDay, "day");
+				}
+			}
 		}
-	}
-	if (addData.enterDay < mainData.enterDay) {
-		if (addData.retiredDay < mainData.retiredDay) workingDays += addData.retiredDay.diff(addData.enterDay, "day");
-		if (addData.retiredDay > mainData.enterDay) workingDays += mainData.enterDay.diff(addData.enterDay, "day");
-	}
+	});
 
 	return workingDays;
 }

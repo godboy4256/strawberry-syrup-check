@@ -220,7 +220,7 @@ export default function (fastify: FastifyInstance, options: any, done: any) {
 			// if (new Date(`${new Date().getFullYear()}-${birthArray[1]}-${birthArray[2]}`).getTime() >= new Date().getTime()) age - 1;
 
 			////////////////////////////////////////////////////////////////////////////////////////////////// 예술인
-			const artWorkingDays = Math.floor(retiredDay.diff(enterDay, "date", true) + 1); // 예술인은 유/무급 휴일 개념이 없으며 가입기간 전체를 피보험 단위기간으로 취급한다.
+			const artWorkingDays = Math.floor(retiredDay.diff(enterDay, "day", true) + 1); // 예술인은 유/무급 휴일 개념이 없으며 가입기간 전체를 피보험 단위기간으로 취급한다.
 			const artWorkingYears = Math.floor(artWorkingDays / 365);
 			const { artDayAvgPay, artRealDayPay, artRealMonthPay } = calArtPay(
 				req.body.sumTwelveMonthSalary,
@@ -228,6 +228,20 @@ export default function (fastify: FastifyInstance, options: any, done: any) {
 				req.body.isSpecial
 			);
 			const receiveDay = getReceiveDay(artWorkingYears, req.body.age, req.body.disabled);
+
+			/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+			let workDayForMulti = 0; // 이 과정은 중복 가입된 상황을 고려하지 않는다.
+			// 복수형 여부
+			if (req.body.isEnd) {
+				const limitDay = dayjs(req.body.limitDay); // 마지막 직장 퇴사일로 부터 필요한 개월 수(18 또는 24) 전
+				// 이 직장의 입사일이 기준일 이후 인가?
+				if (enterDay.isSameOrAfter(limitDay, "day")) {
+					workDayForMulti = artWorkingDays;
+				} else {
+					workDayForMulti = Math.floor(retiredDay.diff(limitDay, "day", true) + 1);
+				}
+			}
+			/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 			const [requireWorkingYear, nextReceiveDay] = getNextReceiveDay(
 				artWorkingYears,
@@ -244,6 +258,7 @@ export default function (fastify: FastifyInstance, options: any, done: any) {
 					artRealMonthPay,
 					severancePay: employmentDate >= 365 ? Math.ceil((artDayAvgPay * 30 * artWorkingDays) / 365) : 0,
 					artWorkingDays,
+					workDayForMulti,
 				};
 			} else {
 				return {
@@ -258,6 +273,7 @@ export default function (fastify: FastifyInstance, options: any, done: any) {
 					needDay: requireWorkingYear * 365 - artWorkingDays, // 예술인에 맞게 변경필요 피보험 단위기간 관련
 					nextAvailableAmountCost: nextReceiveDay * artRealDayPay,
 					morePay: nextReceiveDay * artRealDayPay - receiveDay * artRealDayPay,
+					workDayForMulti,
 				};
 			}
 			//////////////////////////////////////////////////////////////////////////////////////////////////
@@ -389,7 +405,7 @@ export default function (fastify: FastifyInstance, options: any, done: any) {
 						"isSpecial",
 						"lastWorkDay",
 						"workRecord",
-						"dayAvg{ay",
+						"dayAvgPay",
 						"sumWorkDay",
 						"isOverTen",
 						"hasWork",

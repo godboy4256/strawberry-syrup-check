@@ -12,6 +12,7 @@ import { swaggerConfig } from "./config/swagger";
 // const server = fastify();
 const server = fastify({
 	logger: {
+		level: "error",
 		transport: {
 			target: "pino-pretty",
 		},
