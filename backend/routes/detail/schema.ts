@@ -90,87 +90,99 @@ const employerBodyExamples = [
 ];
 
 export const standardSchema = {
-	tags: ["detail"],
-	body: {
-		type: "object",
-		required: [
-			"retired",
-			"workCate",
-			"retireReason",
-			"age",
-			"disabled",
-			"enterDay",
-			"retiredDay",
-			"weekDay",
-			"dayWorkTime",
-			"salary",
-		],
-		properties: standardBodyProp,
+	schema: {
+		tags: ["detail"],
+		body: {
+			type: "object",
+			required: [
+				"retired",
+				"workCate",
+				"retireReason",
+				"age",
+				"disabled",
+				"enterDay",
+				"retiredDay",
+				"weekDay",
+				"dayWorkTime",
+				"salary",
+			],
+			properties: standardBodyProp,
+		},
 	},
 };
 
 export const artSchema = {
-	tags: ["detail"],
-	body: {
-		type: "object",
-		required: [
-			"retired",
-			"workCate",
-			"retireReason",
-			"age",
-			"disabled",
-			"enterDay",
-			"retiredDay",
-			"sumTwelveMonthSalary",
-			// "workRecord",
-		],
-		properties: artBodyProp,
+	schema: {
+		tags: ["detail"],
+		body: {
+			type: "object",
+			required: [
+				"retired",
+				"workCate",
+				"retireReason",
+				"age",
+				"disabled",
+				"enterDay",
+				"retiredDay",
+				"sumTwelveMonthSalary",
+				// "workRecord",
+			],
+			properties: artBodyProp,
+		},
 	},
 };
 
 export const shortArtSchema = {
-	tags: ["detail"],
-	body: {
-		type: "object",
-		required: ["age", "disable", "lastWorkDay"],
-		properties: shortArtBodyProp,
+	schema: {
+		tags: ["detail"],
+		body: {
+			type: "object",
+			required: ["age", "disable", "lastWorkDay"],
+			properties: shortArtBodyProp,
+		},
 	},
 };
 
 export const dayJobSchema = {
-	tags: ["detail"],
-	body: {
-		type: "object",
-		required: [
-			"age",
-			"disable",
-			"isSpecial",
-			"lastWorkDay",
-			"workRecord",
-			"dayAvgPay",
-			"sumWorkDay",
-			"isOverTen",
-			"hasWork",
-		],
-		properties: dayJobBodyProp,
+	schema: {
+		tags: ["detail"],
+		body: {
+			type: "object",
+			required: [
+				"age",
+				"disable",
+				"isSpecial",
+				"lastWorkDay",
+				"workRecord",
+				"dayAvgPay",
+				"sumWorkDay",
+				"isOverTen",
+				"hasWork",
+			],
+			properties: dayJobBodyProp,
+		},
 	},
 };
 
 export const veryShortSchema = {
-	tags: ["detail"],
-	body: {
-		type: "object",
-		required: ["age", "disable", "enterDay", "reitredDay", "weekDay", "dayWorkTime", "salary"],
-		properties: veryShortBodyProp,
+	schema: {
+		tags: ["detail"],
+		body: {
+			type: "object",
+			required: ["age", "disable", "enterDay", "reitredDay", "weekDay", "dayWorkTime", "salary"],
+			properties: veryShortBodyProp,
+		},
 	},
 };
 
 export const employerSchema = {
-	tags: ["detail"],
-	body: {
-		type: "object",
-		required: ["enterDay", "retiredDay", "insuranceGrade"],
-		properties: employerBodyProp,
-		examples: employerBodyExamples,
+	schema: {
+		tags: ["detail"],
+		body: {
+			type: "object",
+			required: ["enterDay", "retiredDay", "insuranceGrade"],
+			properties: employerBodyProp,
+			examples: employerBodyExamples,
+		},
 	},
 };
