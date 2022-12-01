@@ -13,9 +13,9 @@ import { swaggerConfig } from "./config/swagger";
 const server = fastify({
 	logger: {
 		timestamp: () => `,"time":"${new Date(Date.now()).toISOString()}"`,
-		// transport: {
-		// 	target: "pino-pretty",
-		// },
+		transport: {
+			target: "pino-pretty",
+		},
 	},
 });
 
