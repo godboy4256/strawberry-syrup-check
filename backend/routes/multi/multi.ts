@@ -2,10 +2,11 @@ import { FastifyInstance, FastifyReply, FastifyRequest } from "fastify";
 import dayjs from "dayjs";
 import isSameOrAfter from "dayjs/plugin/isSameOrAfter";
 
-import { getReceiveDay } from "../router_funcs/common";
-import { DefinedParamErrorMesg, DefineParamInfo } from "../share/validate";
-import { permitRangeData, requiredWorkingDay } from "../data/data";
-import { getEmployerReceiveDay } from "./detail";
+import { getReceiveDay } from "../../router_funcs/common";
+import { DefinedParamErrorMesg, DefineParamInfo } from "../../share/validate";
+import { permitRangeData, requiredWorkingDay } from "../../data/data";
+import { getEmployerReceiveDay } from "../detail/detail";
+import { multiSchema } from "./schema";
 
 dayjs.extend(isSameOrAfter);
 
@@ -29,60 +30,11 @@ type TaddData = {
 	permitDays: number;
 };
 
-export default function (fastify: FastifyInstance, options: any, done: any) {
+export default function multiRoute(fastify: FastifyInstance, options: any, done: any) {
 	fastify.post(
 		"/",
 		{
-			schema: {
-				tags: ["multi"],
-				description: `mainData는 가장 최근 근무한 직장과 관련된 정보\n\naddData는 나머지 직장과 관련된 정보\n\nisIrregular는 정보의 입력을 개별입력으로 받았는지 여부`,
-				body: {
-					type: "object",
-					properties: {
-						mainData: {
-							type: "object",
-							required: [
-								"workCate",
-								"enterDay",
-								"retiredDay",
-								"workingDays",
-								"age",
-								"disable",
-								"dayAvgPay",
-								"realDayPay",
-							],
-							properties: {
-								workCate: DefineParamInfo.workCate,
-								isIrregular: { type: "boolean" },
-								enterDay: DefineParamInfo.enterDay,
-								retiredDay: DefineParamInfo.retiredDay,
-								workingDays: { type: "number", minimum: 0 },
-								age: { type: "number", minimum: 0 },
-								disable: DefineParamInfo.disabled,
-								dayAvgPay: { type: "number", minimum: 0 },
-								realDayPay: { type: "number", minimum: 0 },
-							},
-						},
-						addData: {
-							type: "array",
-							items: {
-								type: "object",
-								required: ["workCate", "enterDay", "retiredDay", "workingDays", "permitDays"],
-								properties: {
-									workCate: DefineParamInfo.workCate,
-									isIrregular: { type: "boolean" },
-									enterDay: DefineParamInfo.enterDay,
-									retiredDay: DefineParamInfo.retiredDay,
-									workingDays: { type: "number", minimum: 0 },
-									permitDays: { type: "number", minimum: 0 },
-								},
-							},
-							minItems: 1,
-							maxItems: 10,
-						},
-					},
-				},
-			},
+			schema: multiSchema,
 		},
 		(req: any, res: FastifyReply) => {
 			/**
