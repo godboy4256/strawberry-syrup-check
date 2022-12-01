@@ -12,10 +12,10 @@ import { swaggerConfig } from "./config/swagger";
 // const server = fastify();
 const server = fastify({
 	logger: {
-		level: "error",
-		transport: {
-			target: "pino-pretty",
-		},
+		timestamp: () => `,"time":"${new Date(Date.now()).toISOString()}"`,
+		// transport: {
+		// 	target: "pino-pretty",
+		// },
 	},
 });
 
@@ -49,7 +49,7 @@ function serverStart() {
 			console.error('ERROR AT "Listen"', err);
 			process.exit(1);
 		}
-		console.log(`Server is Listening on ${addr}`);
+		// console.log(`Server is Listening on ${addr}`);
 	});
 }
 

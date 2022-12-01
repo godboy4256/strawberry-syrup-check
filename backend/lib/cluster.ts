@@ -36,7 +36,7 @@ export function createServerAsCluster(startFuncPointer: any) {
 	} else {
 		startFuncPointer();
 
-		console.log(`Worker ${process.pid} started`);
+		// console.log(`Worker ${process.pid} started`);
 	}
 }
 
