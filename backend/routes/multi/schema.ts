@@ -77,11 +77,13 @@ const multiBodyExamples = [
 ];
 
 export const multiSchema = {
-	tags: ["multi"],
-	description: `mainData는 가장 최근 근무한 직장과 관련된 정보\n\naddData는 나머지 직장과 관련된 정보\n\nisIrregular는 정보의 입력을 개별입력으로 받았는지 여부`,
-	body: {
-		type: "object",
-		properties: multiBodyProp,
-		examples: multiBodyExamples,
+	schema: {
+		tags: ["multi"],
+		description: `mainData는 가장 최근 근무한 직장과 관련된 정보\n\naddData는 나머지 직장과 관련된 정보\n\nisIrregular는 정보의 입력을 개별입력으로 받았는지 여부`,
+		body: {
+			type: "object",
+			properties: multiBodyProp,
+			examples: multiBodyExamples,
+		},
 	},
 };
