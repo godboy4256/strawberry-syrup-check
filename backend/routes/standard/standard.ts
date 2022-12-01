@@ -1,11 +1,11 @@
 import { FastifyInstance } from "fastify";
 import dayjs from "dayjs";
 
-import { getDateVal, calWorkingDay, calLeastPayInfo, getFailResult, getReceiveDay } from "../router_funcs/common";
-import { DefinedParamErrorMesg, DefineParamInfo } from "../share/validate";
-import { standardPath } from "../share/pathList";
+import { getDateVal, calWorkingDay, calLeastPayInfo, getFailResult, getReceiveDay } from "../../router_funcs/common";
+import { DefinedParamErrorMesg, DefineParamInfo } from "../../share/validate";
+import { standardPath } from "../../share/pathList";
 
-export default function (fastify: FastifyInstance, options: any, done: any) {
+export default function standardRoute(fastify: FastifyInstance, options: any, done: any) {
 	fastify.post(
 		standardPath.standard,
 		{
