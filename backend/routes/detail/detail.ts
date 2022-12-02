@@ -298,6 +298,9 @@ export default function detailRoute(fastify: FastifyInstance, options: any, done
 
 		const lastWorkDay = dayjs(req.body.lastWorkDay);
 		const now = dayjs(new Date());
+		if (Math.floor(now.diff(lastWorkDay, "day", true)) > 365)
+			return { succ: false, mesg: DefinedParamErrorMesg.expire };
+
 		const limitPermitDay = lastWorkDay.subtract(18, "month").format("YYYY-MM-DD").split("-").map(Number);
 
 		if (req.body.isSpecial) {

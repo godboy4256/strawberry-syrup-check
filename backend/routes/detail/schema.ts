@@ -55,7 +55,7 @@ const dayJobBodyProp = {
 	disable: DefineParamInfo.disabled, // 장애여부
 	isSpecial: { type: "boolean" }, // 건설직 여부
 	lastWorkDay: DefineParamInfo.lastWorkDay, // 마지막 근무일
-	daysWorkTme: DefineParamInfo.dayWorkTime, // 소정 근로시간
+	dayWorkTime: DefineParamInfo.dayWorkTime, // 소정 근로시간
 	workRecord: DefineParamInfo.workRecord,
 	dayAvgPay: { type: "number", minimum: 0 },
 	sumWorkDay: { type: "number", minimum: 0 },
