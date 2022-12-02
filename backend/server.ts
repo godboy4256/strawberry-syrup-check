@@ -39,10 +39,8 @@ server.register(fastifySwagger, swaggerConfig);
 
 server.get("/", (req, res) => res.sendFile("index.html"));
 server.get("/privacy_policy_page", (req, res) => res.sendFile("PrivatePolicy.html"));
+server.get("/robots.txt", (req, res) => res.sendFile("robots.txt"));
 server.register(routes);
-// server.register(import("./routes/standard"));
-// server.register(import("./routes/detail/detail"), { prefix: "/detail" });
-// server.register(import("./routes/multi/multi"), { prefix: "/multi" });
 
 function serverStart() {
 	server.listen({ port: 8080, host: "0.0.0.0" }, (err, addr) => {
