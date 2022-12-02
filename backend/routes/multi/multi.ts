@@ -54,7 +54,6 @@ export default function multiRoute(fastify: FastifyInstance, options: any, done:
 		const joinDays = mainRetiredDay.diff(mainEnterDay, "day"); // 재직일수 퇴지금 계산용
 
 		// 1. 신청일이 이직일로 부터 1년 초과 확인
-
 		const now = dayjs(new Date());
 		if (Math.floor(now.diff(mainRetiredDay, "day", true)) > 365)
 			return { succ: false, mesg: DefinedParamErrorMesg.expire };
