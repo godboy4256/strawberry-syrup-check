@@ -38,7 +38,8 @@ export default function standardRoute(fastify: FastifyInstance, options: any, do
 					? calLeastPayInfo(retiredDay, retiredDayArray, req.body.salary, 8, true)
 					: calLeastPayInfo(retiredDay, retiredDayArray, req.body.salary, 8);
 			const { workingDays, workingYears } = calWorkingDay(enterDay, retiredDay);
-			const receiveDay = getReceiveDay(workingYears);
+			const joinYears = Math.floor(retiredDay.diff(enterDay, "day") / 365);
+			const receiveDay = getReceiveDay(joinYears);
 
 			const leastRequireWorkingDay = 180; // 실업급여를 받기위한 최소 피보험기간
 			if (workingDays <= leastRequireWorkingDay)
