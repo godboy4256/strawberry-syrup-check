@@ -106,10 +106,23 @@ export default function multiRoute(fastify: FastifyInstance, options: any, done:
 		// 최소조건 (기한내 필요 피보험단위(예시 180일) 만족, 이직 후 1년 이내) 만족 후
 
 		// 6. 전체 피보험단위를 산정하기위한 합산 가능 유형 필터링
-		const addCadiates: TaddData[] = addDatas.filter((addData, idx, addDatas) => {
-			if (idx === 0) return mainEnterDay.diff(addData.retiredDay, "day") > 1095;
-			return dayjs(addDatas[idx - 1].enterDay).diff(addData.retiredDay, "day") > 1095;
-		});
+		// const addCadiates: TaddData[] = addDatas.filter((addData, idx, addDatas) => {
+		// 	if (idx === 0) return mainEnterDay.diff(addData.retiredDay, "day") <= 1095;
+		// 	return dayjs(addDatas[idx - 1].enterDay).diff(addData.retiredDay, "day") <= 1095;
+		// });
+
+		const addCadiates: TaddData[] = [];
+		for (let i = 0; i < addDatas.length; i++) {
+			if (i === 0) {
+				if (mainEnterDay.diff(addDatas[i].retiredDay, "day") <= 1095) addCadiates.push(addDatas[i]);
+			} else if (i !== 0) {
+				if (dayjs(addDatas[i - 1].enterDay).diff(addDatas[i].retiredDay, "day") <= 1095) {
+					addCadiates.push(addDatas[i]);
+				}
+			} else {
+				break;
+			}
+		}
 
 		// 7. 피보험 단위기간 산정
 		const workingDays = mergeWorkingDays(mainData, addCadiates);
