@@ -124,22 +124,21 @@ export default function detailRoute(fastify: FastifyInstance, options: any, done
 		// 일반 예술인은 12개월 급여를 입력한 순간 이직일 이전 24개월 동안 9개월 이상의 피보험단위기간을 만족한다.
 		const { enterDay, retiredDay } = getDateVal(req.body.enterDay, req.body.retiredDay);
 
-		const employmentDate = Math.floor(retiredDay.diff(enterDay, "day", true));
-		if (employmentDate < 0) return { succ: false, mesg: DefinedParamErrorMesg.ealryRetire };
+		const artWorkingDays = Math.floor(retiredDay.diff(enterDay, "day", true) + 1); // 예술인은 유/무급 휴일 개념이 없으며 가입기간 전체를 피보험 단위기간으로 취급한다.
+		if (artWorkingDays < 0) return { succ: false, mesg: DefinedParamErrorMesg.ealryRetire };
 
 		const now = dayjs(new Date());
 		if (Math.floor(now.diff(retiredDay, "day", true)) > 365)
 			return { succ: false, mesg: DefinedParamErrorMesg.expire };
 
 		////////////////////////////////////////////////////////////////////////////////////////////////// 예술인
-		const artWorkingDays = Math.floor(retiredDay.diff(enterDay, "day", true) + 1); // 예술인은 유/무급 휴일 개념이 없으며 가입기간 전체를 피보험 단위기간으로 취급한다.
-		const emplymentYears = Math.floor(employmentDate / 365);
+		const artWokringYears = Math.floor(artWorkingDays / 365);
 		const { artDayAvgPay, artRealDayPay, artRealMonthPay } = calArtPay(
 			req.body.sumTwelveMonthSalary,
 			artWorkingDays,
 			req.body.isSpecial
 		);
-		const receiveDay = getReceiveDay(emplymentYears, req.body.age, req.body.disabled);
+		const receiveDay = getReceiveDay(artWokringYears, req.body.age, req.body.disabled);
 
 		/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 		let workDayForMulti = 0; // 이 과정은 중복 가입된 상황을 고려하지 않는다.
@@ -155,7 +154,11 @@ export default function detailRoute(fastify: FastifyInstance, options: any, done
 		}
 		/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-		const [requireWorkingYear, nextReceiveDay] = getNextReceiveDay(emplymentYears, req.body.age, req.body.disabled);
+		const [requireWorkingYear, nextReceiveDay] = getNextReceiveDay(
+			artWokringYears,
+			req.body.age,
+			req.body.disabled
+		);
 		if (nextReceiveDay === 0) {
 			return {
 				succ: true,
@@ -164,7 +167,7 @@ export default function detailRoute(fastify: FastifyInstance, options: any, done
 				artRealDayPay,
 				receiveDay,
 				artRealMonthPay,
-				severancePay: employmentDate >= 365 ? Math.ceil((artDayAvgPay * 30 * employmentDate) / 365) : 0,
+				severancePay: artWorkingDays >= 365 ? Math.ceil((artDayAvgPay * 30 * artWorkingDays) / 365) : 0,
 				artWorkingDays,
 				workDayForMulti,
 			};
@@ -176,7 +179,7 @@ export default function detailRoute(fastify: FastifyInstance, options: any, done
 				artRealDayPay,
 				receiveDay,
 				artRealMonthPay,
-				severancePay: employmentDate >= 365 ? Math.ceil((artDayAvgPay * 30 * employmentDate) / 365) : 0,
+				severancePay: artWorkingDays >= 365 ? Math.ceil((artDayAvgPay * 30 * artWorkingDays) / 365) : 0,
 				artWorkingDays,
 				needDay: requireWorkingYear * 365 - artWorkingDays, // 예술인에 맞게 변경필요 피보험 단위기간 관련
 				nextAvailableAmountCost: nextReceiveDay * artRealDayPay,
