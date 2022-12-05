@@ -234,10 +234,6 @@ export default function detailRoute(fastify: FastifyInstance, options: any, done
 				requireMonths: isPermit[2],
 			};
 
-		// const birthArray = req.body.birth.split("-");
-		// const age = new Date().getFullYear() - new Date(req.body.birth).getFullYear();
-		// if (new Date(`${new Date().getFullYear()}-${birthArray[1]}-${birthArray[2]}`).getTime() >= new Date().getTime()) age - 1;
-
 		let workingMonth: number;
 		let sumOneYearPay: number;
 		let sumOneYearWorkDay: number;
@@ -329,8 +325,6 @@ export default function detailRoute(fastify: FastifyInstance, options: any, done
 			isPermit = dayJobCheckPermit(limitPermitDay, req.body.sumWorkDay, true);
 		}
 		if (!isPermit[0]) return { succ: false, workingDay: isPermit[1], requireWorkingDay: isPermit[2] };
-
-		// req.body.sumWorkDay, dayAvgPay
 
 		const { realDayPay, realMonthPay } =
 			lastWorkDay.get("year") === 2023

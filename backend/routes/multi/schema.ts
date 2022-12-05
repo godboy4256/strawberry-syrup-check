@@ -3,7 +3,16 @@ import { DefineParamInfo } from "../../share/validate";
 const multiBodyProp = {
 	mainData: {
 		type: "object",
-		required: ["workCate", "enterDay", "retiredDay", "workingDays", "age", "disable", "dayAvgPay", "realDayPay"],
+		required: [
+			"workCate",
+			"enterDay",
+			"retiredDay",
+			"workingDays",
+			"age",
+			"disable",
+			"dayAvgPay",
+			"realDayPay",
+		],
 		properties: {
 			workCate: DefineParamInfo.workCate,
 			isIrregular: { type: "boolean" },
