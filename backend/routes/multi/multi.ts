@@ -92,14 +92,24 @@ export default function multiRoute(fastify: FastifyInstance, options: any, done:
 		const permitAddCandidates: TaddData[] = addDatas.filter((addData) =>
 			dayjs(addData.retiredDay).isSameOrAfter(limitDay, "date")
 		);
-		const permitWorkingDays = permitAddCandidates.reduce((acc, obj) => acc + obj.permitDays, mainData.workingDays);
+		const permitWorkingDays = permitAddCandidates.reduce(
+			(acc, obj) => acc + obj.permitDays,
+			mainData.workingDays
+		);
 
 		// 😎 이 부분에서 피보험단위기간을 계산하기위해서 상세형과 같은 형태의 데이터를 입력받아야하나?
 
 		//5. 수급 불인정 조건에 맞는 경우 불인정 메세지 리턴
 		if (permitWorkingDays < leastRequireWorkingDay)
-			return { succ: false, permitWorkingDays, requireDays: leastRequireWorkingDay - permitWorkingDays };
-		if (permitAddCandidates.length !== 0 && permitAddCandidates[permitAddCandidates.length - 1].isIrregular)
+			return {
+				succ: false,
+				permitWorkingDays,
+				requireDays: leastRequireWorkingDay - permitWorkingDays,
+			};
+		if (
+			permitAddCandidates.length !== 0 &&
+			permitAddCandidates[permitAddCandidates.length - 1].isIrregular
+		)
 			return { succ: false, mesg: "isIrregular" };
 
 		// 최소조건 (기한내 필요 피보험단위(예시 180일) 만족, 이직 후 1년 이내) 만족 후
