@@ -1,18 +1,11 @@
+import dayjs from "dayjs";
+
 import { DefineParamInfo } from "../../share/validate";
 
 const multiBodyProp = {
 	mainData: {
 		type: "object",
-		required: [
-			"workCate",
-			"enterDay",
-			"retiredDay",
-			"workingDays",
-			"age",
-			"disable",
-			"dayAvgPay",
-			"realDayPay",
-		],
+		required: ["workCate", "enterDay", "retiredDay", "workingDays", "age", "disable", "dayAvgPay", "realDayPay"],
 		properties: {
 			workCate: DefineParamInfo.workCate,
 			isIrregular: { type: "boolean" },
@@ -95,4 +88,24 @@ export const multiSchema = {
 			examples: multiBodyExamples,
 		},
 	},
+};
+
+export type TmainData = {
+	workCate: 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8;
+	isIrregular: boolean;
+	enterDay: string | dayjs.Dayjs;
+	retiredDay: string | dayjs.Dayjs;
+	workingDays: number;
+	age: number;
+	disable: boolean;
+	dayAvgPay: number;
+	realDayPay: number;
+};
+export type TaddData = {
+	workCate: 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8;
+	isIrregular: boolean;
+	enterDay: string | dayjs.Dayjs;
+	retiredDay: string | dayjs.Dayjs;
+	workingDays: number;
+	permitDays: number;
 };

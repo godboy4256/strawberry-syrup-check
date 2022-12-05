@@ -6,29 +6,11 @@ import { getReceiveDay } from "../../router_funcs/common";
 import { DefinedParamErrorMesg, DefineParamInfo } from "../../share/validate";
 import { permitRangeData, requiredWorkingDay } from "../../data/data";
 import { getEmployerReceiveDay } from "../detail/detail";
-import { multiSchema } from "./schema";
+
+import { multiSchema, TaddData, TmainData } from "./schema";
+import { commonCasePermitCheck, doubleCasePermitCheck } from "./service";
 
 dayjs.extend(isSameOrAfter);
-
-type TmainData = {
-	workCate: 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8;
-	isIrregular: boolean;
-	enterDay: string | dayjs.Dayjs;
-	retiredDay: string | dayjs.Dayjs;
-	workingDays: number;
-	age: number;
-	disable: boolean;
-	dayAvgPay: number;
-	realDayPay: number;
-};
-type TaddData = {
-	workCate: 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8;
-	isIrregular: boolean;
-	enterDay: string | dayjs.Dayjs;
-	retiredDay: string | dayjs.Dayjs;
-	workingDays: number;
-	permitDays: number;
-};
 
 export default function multiRoute(fastify: FastifyInstance, options: any, done: any) {
 	fastify.post("/", multiSchema, (req: any, res: FastifyReply) => {
@@ -89,27 +71,57 @@ export default function multiRoute(fastify: FastifyInstance, options: any, done:
 		const limitDay = mainRetiredDay.subtract(permitRange, "month");
 
 		// 4.  18개월 또는 24개월 시점을 고려해서 기간내의 피보험 단위기간 합산
+
 		const permitAddCandidates: TaddData[] = addDatas.filter((addData) =>
 			dayjs(addData.retiredDay).isSameOrAfter(limitDay, "date")
 		);
-		const permitWorkingDays = permitAddCandidates.reduce(
-			(acc, obj) => acc + obj.permitDays,
-			mainData.workingDays
-		);
+
+		// 이중취득 여부 확인
+		let isDouble = false; // 이중취득 여부
+		let tempWorkCount = { count: 0, permitDays: 0 };
+		let artWorkCount = { count: 0, permitMonths: 0 };
+		let specialWorkCount = { count: 0, permitMonths: 0 }; // 특고
+
+		const artWorkCates = [2, 4];
+		const specialWorkCates = [3, 5];
+
+		permitAddCandidates.map((permitAddCandidate, idx, permitAddCandidates) => {
+			if (artWorkCates.includes(permitAddCandidate.workCate)) {
+				artWorkCount.count++;
+				artWorkCount.permitMonths += permitAddCandidate.permitDays;
+			} else if (specialWorkCates.includes(permitAddCandidate.workCate)) {
+				specialWorkCount.count++;
+				specialWorkCount.permitMonths += permitAddCandidate.permitDays;
+			} else {
+				tempWorkCount.count++;
+				tempWorkCount.permitDays += permitAddCandidate.permitDays;
+			}
+		});
+		console.log(permitAddCandidates);
+		console.log(tempWorkCount);
+		console.log(artWorkCount);
+		console.log(specialWorkCount);
+
+		if ((tempWorkCount.count >= 1 && artWorkCount.count >= 1) || specialWorkCount.count >= 1) isDouble = true;
+
+		const isPermit = isDouble
+			? doubleCasePermitCheck(tempWorkCount.permitDays, artWorkCount.permitMonths, specialWorkCount.permitMonths)
+			: commonCasePermitCheck(permitAddCandidates, mainData);
+
+		console.log(isPermit);
+		// 이중 취득이 아닌 경우
+		// const permitWorkingDays = permitAddCandidates.reduce((acc, obj) => acc + obj.permitDays, mainData.workingDays);
 
 		// 😎 이 부분에서 피보험단위기간을 계산하기위해서 상세형과 같은 형태의 데이터를 입력받아야하나?
 
 		//5. 수급 불인정 조건에 맞는 경우 불인정 메세지 리턴
-		if (permitWorkingDays < leastRequireWorkingDay)
+		if (isPermit)
 			return {
 				succ: false,
-				permitWorkingDays,
-				requireDays: leastRequireWorkingDay - permitWorkingDays,
+				// permitWorkingDays,
+				// requireDays: leastRequireWorkingDay - permitWorkingDays,
 			};
-		if (
-			permitAddCandidates.length !== 0 &&
-			permitAddCandidates[permitAddCandidates.length - 1].isIrregular
-		)
+		if (permitAddCandidates.length !== 0 && permitAddCandidates[permitAddCandidates.length - 1].isIrregular)
 			return { succ: false, mesg: "isIrregular" };
 
 		// 최소조건 (기한내 필요 피보험단위(예시 180일) 만족, 이직 후 1년 이내) 만족 후
