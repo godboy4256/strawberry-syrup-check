@@ -8,7 +8,7 @@ import { permitRangeData, requiredWorkingDay } from "../../data/data";
 import { getEmployerReceiveDay } from "../detail/detail";
 
 import { multiSchema, TaddData, TmainData } from "./schema";
-import { commonCasePermitCheck, doubleCasePermitCheck } from "./service";
+import { commonCasePermitCheck, doubleCasePermitCheck, mergeWorkingDays } from "./function";
 
 dayjs.extend(isSameOrAfter);
 
@@ -39,6 +39,8 @@ export default function multiRoute(fastify: FastifyInstance, options: any, done:
 		const now = dayjs(new Date());
 		if (Math.floor(now.diff(mainRetiredDay, "day", true)) > 365)
 			return { succ: false, mesg: DefinedParamErrorMesg.expire };
+
+		// mainData의 근로형태가 예술인 특고인경우 예술인 또는 특고로 3개월 이상 근무해야한다.
 
 		// 2. 마지막 직장의 입사일과 전직장의 이직일 사이 기간이 3년을 초과하는 지 확인
 		const secondRetiredDay = dayjs(addDatas[0].retiredDay);
@@ -105,7 +107,12 @@ export default function multiRoute(fastify: FastifyInstance, options: any, done:
 		if ((tempWorkCount.count >= 1 && artWorkCount.count >= 1) || specialWorkCount.count >= 1) isDouble = true;
 
 		const isPermit = isDouble
-			? doubleCasePermitCheck(tempWorkCount.permitDays, artWorkCount.permitMonths, specialWorkCount.permitMonths)
+			? doubleCasePermitCheck(
+					tempWorkCount.permitDays,
+					artWorkCount.permitMonths,
+					specialWorkCount.permitMonths,
+					mainData.workCate
+			  )
 			: commonCasePermitCheck(permitAddCandidates, mainData);
 
 		console.log(isPermit);
@@ -165,50 +172,50 @@ export default function multiRoute(fastify: FastifyInstance, options: any, done:
 
 // 중복 제거는 했는데 피보험단위기간 산정 규칙에 맞지 않음
 // compareData = 하나씩 늘어남 가장 처음은 mainData 이후는 addData가 0개부터 1개씩 늘어나서 최대 9개 또는 10개
-function mergeWorkingDays(mainData: TmainData, addDatas: (TmainData | TaddData)[]) {
-	let workingDays = mainData.workingDays;
+// function mergeWorkingDays(mainData: TmainData, addDatas: (TmainData | TaddData)[]) {
+// 	let workingDays = mainData.workingDays;
 
-	addDatas.map((addData, idx, addDatas) => {
-		addData.enterDay = dayjs(addData.enterDay);
-		addData.retiredDay = dayjs(addData.retiredDay);
+// 	addDatas.map((addData, idx, addDatas) => {
+// 		addData.enterDay = dayjs(addData.enterDay);
+// 		addData.retiredDay = dayjs(addData.retiredDay);
 
-		if (idx === 0) {
-			mainData.enterDay = dayjs(mainData.enterDay);
-			mainData.retiredDay = dayjs(mainData.retiredDay);
+// 		if (idx === 0) {
+// 			mainData.enterDay = dayjs(mainData.enterDay);
+// 			mainData.retiredDay = dayjs(mainData.retiredDay);
 
-			if (addData.enterDay > mainData.enterDay) {
-				if (addData.enterDay < mainData.retiredDay) {
-					if (addData.retiredDay > mainData.retiredDay)
-						workingDays += mainData.retiredDay.diff(addData.enterDay, "day");
-				}
-			}
-			if (addData.enterDay < mainData.enterDay) {
-				if (addData.retiredDay < mainData.retiredDay)
-					workingDays += addData.retiredDay.diff(addData.enterDay, "day");
-				if (addData.retiredDay > mainData.enterDay)
-					workingDays += mainData.enterDay.diff(addData.enterDay, "day");
-			}
-		} else {
-			for (let i = 1; i <= idx; i++) {
-				const compareData = { ...addDatas[idx - i] };
-				compareData.enterDay = dayjs(compareData.enterDay);
-				compareData.retiredDay = dayjs(compareData.retiredDay);
+// 			if (addData.enterDay > mainData.enterDay) {
+// 				if (addData.enterDay < mainData.retiredDay) {
+// 					if (addData.retiredDay > mainData.retiredDay)
+// 						workingDays += mainData.retiredDay.diff(addData.enterDay, "day");
+// 				}
+// 			}
+// 			if (addData.enterDay < mainData.enterDay) {
+// 				if (addData.retiredDay < mainData.retiredDay)
+// 					workingDays += addData.retiredDay.diff(addData.enterDay, "day");
+// 				if (addData.retiredDay > mainData.enterDay)
+// 					workingDays += mainData.enterDay.diff(addData.enterDay, "day");
+// 			}
+// 		} else {
+// 			for (let i = 1; i <= idx; i++) {
+// 				const compareData = { ...addDatas[idx - i] };
+// 				compareData.enterDay = dayjs(compareData.enterDay);
+// 				compareData.retiredDay = dayjs(compareData.retiredDay);
 
-				if (addData.enterDay > compareData.enterDay) {
-					if (addData.enterDay < compareData.retiredDay) {
-						if (addData.retiredDay > compareData.retiredDay)
-							workingDays += compareData.retiredDay.diff(addData.enterDay, "day");
-					}
-				}
-				if (addData.enterDay < compareData.enterDay) {
-					if (addData.retiredDay < compareData.retiredDay)
-						workingDays += addData.retiredDay.diff(addData.enterDay, "day");
-					if (addData.retiredDay > compareData.enterDay)
-						workingDays += compareData.enterDay.diff(addData.enterDay, "day");
-				}
-			}
-		}
-	});
+// 				if (addData.enterDay > compareData.enterDay) {
+// 					if (addData.enterDay < compareData.retiredDay) {
+// 						if (addData.retiredDay > compareData.retiredDay)
+// 							workingDays += compareData.retiredDay.diff(addData.enterDay, "day");
+// 					}
+// 				}
+// 				if (addData.enterDay < compareData.enterDay) {
+// 					if (addData.retiredDay < compareData.retiredDay)
+// 						workingDays += addData.retiredDay.diff(addData.enterDay, "day");
+// 					if (addData.retiredDay > compareData.enterDay)
+// 						workingDays += compareData.enterDay.diff(addData.enterDay, "day");
+// 				}
+// 			}
+// 		}
+// 	});
 
-	return workingDays;
-}
+// 	return workingDays;
+// }
