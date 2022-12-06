@@ -1,11 +1,11 @@
 import { FastifyInstance } from "fastify";
 import dayjs from "dayjs";
 
-import { getDateVal, calWorkingDay, calLeastPayInfo, getFailResult, getReceiveDay } from "../router_funcs/common";
-import { DefinedParamErrorMesg, DefineParamInfo } from "../share/validate";
-import { standardPath } from "../share/pathList";
+import { getDateVal, calWorkingDay, calLeastPayInfo, getFailResult, getReceiveDay } from "../../router_funcs/common";
+import { DefinedParamErrorMesg, DefineParamInfo } from "../../share/validate";
+import { standardPath } from "../../share/pathList";
 
-export default function (fastify: FastifyInstance, options: any, done: any) {
+export default function standardRoute(fastify: FastifyInstance, options: any, done: any) {
 	fastify.post(
 		standardPath.standard,
 		{
@@ -38,7 +38,8 @@ export default function (fastify: FastifyInstance, options: any, done: any) {
 					? calLeastPayInfo(retiredDay, retiredDayArray, req.body.salary, 8, true)
 					: calLeastPayInfo(retiredDay, retiredDayArray, req.body.salary, 8);
 			const { workingDays, workingYears } = calWorkingDay(enterDay, retiredDay);
-			const receiveDay = getReceiveDay(workingYears);
+			const joinYears = Math.floor(retiredDay.diff(enterDay, "day") / 365);
+			const receiveDay = getReceiveDay(joinYears);
 
 			const leastRequireWorkingDay = 180; // 실업급여를 받기위한 최소 피보험기간
 			if (workingDays <= leastRequireWorkingDay)

@@ -2,9 +2,9 @@ runtime: nodejs16
 
 service: default
 
-# env_variables:
+env_variables:
+    TZ: "Asia/Seoul"
 #     PS: "PROD"
-#     TZ: "Asia/Seoul"
 
 entrypoint: node ./build/server.js
 
