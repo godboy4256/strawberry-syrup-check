@@ -37,15 +37,16 @@ export const doubleCasePermitCheck = (
 
 export const commonCasePermitCheck = (permitAddCandidates: TaddData[], mainData: TmainData) => {
 	const leastRequireWorkingDay = requiredWorkingDay[mainData.workCate];
-	return (
-		leastRequireWorkingDay > permitAddCandidates.reduce((acc, obj) => acc + obj.permitDays, mainData.workingDays)
-	);
+	const permitWorkingDays = permitAddCandidates.reduce((acc, obj) => acc + obj.permitDays, mainData.workingDays);
+	const result: [boolean, number] = [false, permitWorkingDays];
+	result[0] = leastRequireWorkingDay > permitWorkingDays;
+	return result;
 };
 
 // 중복 제거는 했는데 피보험단위기간 산정 규칙에 맞지 않음
 // compareData = 하나씩 늘어남 가장 처음은 mainData 이후는 addData가 0개부터 1개씩 늘어나서 최대 9개 또는 10개
 export function mergeWorkingDays(mainData: TmainData, addDatas: (TmainData | TaddData)[]) {
-	let workingDays = mainData.workingDays;
+	let workingDays = dayjs(mainData.retiredDay).diff(mainData.enterDay, "day");
 
 	addDatas.map((addData, idx, addDatas) => {
 		addData.enterDay = dayjs(addData.enterDay);
