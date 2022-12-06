@@ -77,7 +77,7 @@ export default function multiRoute(fastify: FastifyInstance, options: any, done:
 		const permitRange = permitRangeData[mainData.workCate];
 		const limitDay = mainRetiredDay.subtract(permitRange, "month");
 
-		// 5.  18개월 또는 24개월 시점을 고려해서 기간내의 피보험 단위기간 합산
+		// 5.  18개월 또는 24개월 시점을 고려해서 기간내의 직장 필터
 		const permitAddCandidates: TaddData[] = addDatas.filter((addData) =>
 			dayjs(addData.retiredDay).isSameOrAfter(limitDay, "date")
 		);
@@ -126,12 +126,13 @@ export default function multiRoute(fastify: FastifyInstance, options: any, done:
 		// 😎 이 부분에서 피보험단위기간을 계산하기위해서 상세형과 같은 형태의 데이터를 입력받아야하나?
 
 		// 6. 수급 불인정 조건에 맞는 경우 불인정 메세지 리턴
-		if (isPermit)
-			return {
-				succ: false,
-				// permitWorkingDays,
-				// requireDays: leastRequireWorkingDay - permitWorkingDays,
-			};
+		if (!isPermit[0]) {
+			if (isDouble)
+				return { succ: false, requireDays: isPermit[1], mesg: "근로자로 requireDays만큼 더 일해야 한다." };
+			return { succ: false, permitWorkingDays: isPermit[1], requireDays: leastRequireWorkingDay - isPermit[1] };
+		}
+
+		// 마지막 근로형태가 불규칙이라면 수급 불인정
 		if (permitAddCandidates.length !== 0 && permitAddCandidates[permitAddCandidates.length - 1].isIrregular)
 			return { succ: false, mesg: "isIrregular" };
 
@@ -151,9 +152,9 @@ export default function multiRoute(fastify: FastifyInstance, options: any, done:
 			}
 		}
 
-		// 8. 피보험 단위기간 산정
+		// 8. 피보험 단위기간 산정 => 피보험기간 산정으로 변경 필요?
 		const workingDays = mergeWorkingDays(mainData, addCadiates);
-		const workingYears = Math.floor(workingDays / mainData.workCate === 2 ? 12 : 365); // 월 단위의 경우 12로 나눈다. 자영업자는 이거
+		const workingYears = Math.floor(workingDays / 365); // 월 단위의 경우 12로 나눈다. 자영업자는 이거
 		const tempReceiveDay =
 			mainData.workCate === 5
 				? getEmployerReceiveDay(workingYears)
