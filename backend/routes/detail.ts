@@ -345,11 +345,15 @@ export default function (fastify: FastifyInstance, options: any, done: any) {
 			}
 
 			const workingYear = Math.floor(workingMonth / 12);
-			const receiveDay = getReceiveDay(workingYear, req.body.age, req.body.disable);
+			const receiveDay = getReceiveDay(workingYear, req.body.age, req.body.disabled);
 			// const receiveDay = getReceiveDay(workingYear, age, req.body.disable);
 
 			const { artRealDayPay, artRealMonthPay } = calArtPay(sumOneYearPay, sumOneYearWorkDay, req.body.isSpecial);
-			const [requireWorkingYear, nextReceiveDay] = getNextReceiveDay(workingYear, req.body.age, req.body.disable);
+			const [requireWorkingYear, nextReceiveDay] = getNextReceiveDay(
+				workingYear,
+				req.body.age,
+				req.body.disabled
+			);
 			// const [requireWorkingYear, nextReceiveDay] = getNextReceiveDay(workingYear, age, req.body.disable);
 
 			if (nextReceiveDay === 0) {
@@ -385,11 +389,10 @@ export default function (fastify: FastifyInstance, options: any, done: any) {
 					type: "object",
 					required: [
 						"age",
-						"disable",
+						"disabled",
 						"isSpecial",
 						"lastWorkDay",
-						"workRecord",
-						"dayAvg{ay",
+						"dayAvgPay",
 						"sumWorkDay",
 						"isOverTen",
 						"hasWork",
@@ -909,7 +912,7 @@ export function getEmployerReceiveDay(workYear: number) {
 // 	if (Array.isArray(sumPay)) {
 // 		dayAvgPay = Math.ceil(sumPay[0] / sumWorkDay);
 // 	} else {
-// 		dayAvgPay = Math.ceil(sumPay / sumWorkDay);
+// 		dayAvgPay = Math.ceil(sumPay / sumWorkDay);저
 // 	}
 // 	let realDayPay = Math.ceil(dayAvgPay * 0.6);
 // 	if (realDayPay > 66000) realDayPay = 66000;

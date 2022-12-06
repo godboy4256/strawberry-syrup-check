@@ -10,14 +10,15 @@ import DetailedHandler from "../object/detailed";
 import WorkTypes from "../components/calculator/WorkTypes";
 import { Year_Option_Generater } from "../utils/date";
 import { CreatePopup } from "../components/common/Popup";
-import "./../styles/detail.css";
 import NumberInput from "../components/inputs/Pay";
 import NumberUpDown from "../components/inputs/NumberUpDown";
 import Button from "../components/inputs/Button";
 import InputHandler from "../object/Inputs";
+import "./../styles/detail.css";
 
 class IndividualInputClass extends InputHandler {
 	public _Data = {};
+	public _Data_arr = [];
 }
 
 const handler2 = new IndividualInputClass({});
@@ -26,34 +27,39 @@ const handler = new DetailedHandler({});
 const IndividualInput = ({ label = "개별 입력란", description }: { label?: string; description: string[] }) => {
 	const current_year_list = Year_Option_Generater(10);
 	const onClickPopUpDate = (year: string) => {
-		CreatePopup(`${String(year)}년`, <DateInputIndividual handler={handler2} />, "confirm", () => {
-			console.log(handler2._Data);
-			handler.SetPageVal(year, {
-				year: year,
-				month: [],
-			});
-		});
+		CreatePopup(
+			`${String(year)}년`,
+			<DateInputIndividual
+				type={handler.GetPageVal("workCate")}
+				handler={handler2}
+				lastWorkDay={handler.GetPageVal("lastWorkDay")}
+			/>,
+			"confirm",
+			() => {
+				const months = Object.keys(handler2._Data).map((el) => {
+					return handler2._Data[el];
+				});
+				handler2._Data_arr.push({
+					year: Number(year),
+					months,
+				});
+				handler.SetPageVal("workRecord", handler2._Data_arr);
+				handler.SetPageVal("sumWorkDay", handler.sumDayJobWorkingDay(handler2._Data_arr)[0]);
+				handler.SetPageVal("dayAvgPay", handler.sumDayJobWorkingDay(handler2._Data_arr)[1]);
+			}
+		);
 	};
-	// 최종적으로 데이터를 보낼때는 여기 ->
-
-	// {
-	// 	year: 2018,
-	// 	months: [
-	// 		{ month: 12, workDay: 10, pay: 200000 },
-	// 		{ month: 10, workDay: 26, pay: 1800000 },
-	// 		{ month: 8, workDay: 12, pay: 320000 },
-	// 		{ month: 7, workDay: 12, pay: 320000 },
-	// 		{ month: 6, workDay: 10, pay: 200000 },
-	// 		{ month: 2, workDay: 10, pay: 100000 },
-	// 	],
-	// }
 	return (
 		<>
 			<label className="fs_16 write_label">{label}</label>
 			<div className="lndividual_input_container flex_box">
 				{current_year_list.map((el) => {
 					return (
-						<div onClick={() => onClickPopUpDate(el)} key={String(Date.now()) + el} className="fs_16 pd_810">
+						<div
+							onClick={() => onClickPopUpDate(el)}
+							key={String(Date.now()) + el}
+							className="fs_16 pd_810"
+						>
 							{el}
 						</div>
 					);
@@ -66,7 +72,17 @@ const IndividualInput = ({ label = "개별 입력란", description }: { label?: 
 	);
 };
 
-const _Belong_Form_Tab = ({ label, options, form01, form02 }: { label: string; options: string[]; form01: ReactElement; form02: ReactElement }) => {
+const _Belong_Form_Tab = ({
+	label,
+	options,
+	form01,
+	form02,
+}: {
+	label: string;
+	options: string[];
+	form01: ReactElement;
+	form02: ReactElement;
+}) => {
 	const [state, setState] = useState(options[0]);
 	return (
 		<>
@@ -97,8 +113,21 @@ const _DetailCal01 = ({ handler }) => {
 	return (
 		<>
 			<DateInputNormal params="enterDay" label="입사일" callBack={handler.SetPageVal} />
-			{handler.GetPageVal("retired") && <DateInputNormal params="retiredDay" label="퇴사일" callBack={handler.SetPageVal} description="insurance_end_day" />}
-			<Check type="box_type" options={["월", "화", "수", "목", "금", "토", "일"]} label="근무 요일" params="weekDay" callBack={handler.SetPageVal} />
+			{handler.GetPageVal("retired") && (
+				<DateInputNormal
+					params="retiredDay"
+					label="퇴사일"
+					callBack={handler.SetPageVal}
+					description="insurance_end_day"
+				/>
+			)}
+			<Check
+				type="box_type"
+				options={["월", "화", "수", "목", "금", "토", "일"]}
+				label="근무 요일"
+				params="weekDay"
+				callBack={handler.SetPageVal}
+			/>
 			<SelectInput
 				params="dayWorkTime"
 				callBack={handler.SetPageVal}
@@ -107,7 +136,13 @@ const _DetailCal01 = ({ handler }) => {
 				label="근무시간"
 				options={["근무 시간을 선택해주세요.", "3시간 미만", "4시간", "5시간", "6시간", "7시간", "8시간 이상"]}
 			/>
-			<TabInputs label="월 급여" type="salary" params="salary" callBack={handler.SetPageVal} valueDay={handler.GetPageVal} />
+			<TabInputs
+				label="월 급여"
+				type="salary"
+				params="salary"
+				callBack={handler.SetPageVal}
+				valueDay={handler.GetPageVal}
+			/>
 		</>
 	);
 };
@@ -115,29 +150,50 @@ const _DetailCal01 = ({ handler }) => {
 const _DetailCal02 = ({ handler }) => {
 	return (
 		<>
-			<Check type="is_true_type" options={["건설일용직에 해당합니다."]} label="특수" params="isSpecial" callBack={handler.SetPageVal} />
+			<Check
+				type="is_true_type"
+				options={["건설일용직에 해당합니다."]}
+				label="특수"
+				params="isSpecial"
+				callBack={handler.SetPageVal}
+			/>
 			<_Belong_Form_Tab
 				label="근로 정보"
 				options={["개별 입력", "결과만 입력"]}
 				form01={
 					<>
 						<DateInputNormal params="lastWorkDay" label="마지막 근무일" callBack={handler.SetPageVal} />
-						<DateInputNormal params="lastWorkDay" label="신청 예정일" callBack={handler.SetPageVal} />
+						<DateInputNormal params="planToDo" label="신청 예정일" callBack={handler.SetPageVal} />
 						<IndividualInput description={["근무한 연월의 정보만 입력하시면 됩니다."]} />
-						<DateInputNormal params="lastWorkDay" label="최근 근로일 정로" callBack={handler.SetPageVal} />
+						<DateInputNormal
+							params="isOverTen"
+							label="최근 근로일 정보"
+							callBack={handler.SetPageVal}
+							planToDo={handler.GetPageVal}
+						/>
 					</>
 				}
 				form02={
 					<>
-						<>
-							<DateInputNormal params="lastWorkDay" label="마지막 근무일" callBack={handler.SetPageVal} />
-							<NumberInput params="" label="고용보험 총 기간" num_unit="원" callBack={handler.SetPageVal} k_parser={false} />
-							<div className="fs_10 description">
-								※ 업무시작일이 아닌 <span className="font_color_main fs_10">고용보험 전체 가입기간</span>을 기재해 주세요.
-							</div>
-							<NumberInput params="dayAvgPay" label="1일 평균임금" num_unit="원" callBack={handler.SetPageVal} />
-							<div className="fs_14">※ 세전 금액으로 입력해 주세요.</div>
-						</>
+						<DateInputNormal params="lastWorkDay" label="마지막 근무일" callBack={handler.SetPageVal} />
+						<NumberInput
+							params="sumWorkDay"
+							label="고용보험 총 기간"
+							num_unit={["총", "일"]}
+							callBack={handler.SetPageVal}
+							k_parser={false}
+						/>
+						<div className="fs_10 description">
+							※ 업무시작일이 아닌 <span className="font_color_main fs_10">고용보험 전체 가입기간</span>을
+							기재해 주세요.
+						</div>
+						<NumberInput
+							params="dayAvgPay"
+							label="1일 평균임금"
+							num_unit="원"
+							callBack={handler.SetPageVal}
+						/>
+						<div className="fs_14">※ 세전 금액으로 입력해 주세요.</div>
 					</>
 				}
 			/>
@@ -145,15 +201,60 @@ const _DetailCal02 = ({ handler }) => {
 	);
 };
 const _DetailCal03 = ({ handler }) => {
+	console.log(handler.GetPageVal("workCate"));
 	return (
 		<_Belong_Form_Tab
 			label="예술인/단기예술인"
 			options={["예술인", "단기예술인"]}
 			form01={
 				<>
-					<DateInputNormal params="lastWorkDay" label="고용보험 가입일" callBack={handler.SetPageVal} />
-					<DateInputNormal params="lastWorkDay" label="고용보험 종료일" callBack={handler.SetPageVal} description="insurance_end_day" />
-					<NumberInput params="" label="퇴직 전 12개월 급여 총액" num_unit="원" callBack={handler.SetPageVal} />
+					<_Belong_Form_Tab
+						label="월 소득(세전)"
+						options={["바로계산", "개별입력"]}
+						form01={
+							<>
+								<DateInputNormal
+									params="enterDay"
+									label="고용보험 가입일"
+									callBack={handler.SetPageVal}
+								/>
+								<DateInputNormal
+									params="retiredDay"
+									label="고용보험 종료일"
+									callBack={handler.SetPageVal}
+									description="insurance_end_day"
+								/>
+								<NumberInput
+									params="sumTwelveMonthSalary"
+									label="퇴직 전 12개월 급여 총액"
+									num_unit="원"
+									callBack={handler.SetPageVal}
+								/>
+							</>
+						}
+						form02={
+							<>
+								<DateInputNormal
+									params="lastWorkDay"
+									label="고용보험 가입일"
+									callBack={handler.SetPageVal}
+								/>
+								<DateInputNormal
+									params="enterDay"
+									label="고용보험 종료일"
+									callBack={handler.SetPageVal}
+									description="insurance_end_day"
+								/>
+								<NumberInput
+									params="sumTwelveMonthSalary"
+									label="퇴직 전 12개월 급여 총액"
+									num_unit="원"
+									callBack={handler.SetPageVal}
+								/>
+								<IndividualInput description={["근무한 연월의 정보만 입력하시면 됩니다."]} />
+							</>
+						}
+					/>
 				</>
 			}
 			form02={
@@ -164,17 +265,38 @@ const _DetailCal03 = ({ handler }) => {
 						<>
 							<DateInputNormal params="lastWorkDay" label="마지막 근무일" callBack={handler.SetPageVal} />
 							<IndividualInput description={["근무한 연월의 정보만 입력하시면 됩니다."]} />
-							<DateInputNormal params="lastWorkDay" label="신청 예정일" callBack={handler.SetPageVal} />
-							<DateInputNormal params="lastWorkDay" label="최근 근로일 정보" callBack={handler.SetPageVal} />
+							<DateInputNormal label="신청 예정일" params="planToDo" callBack={handler.SetPageVal} />
+							<DateInputNormal
+								planToDo={handler.GetPageVal}
+								params="lastWorkDay"
+								label="최근 근로일 정보"
+								callBack={handler.SetPageVal}
+							/>
 						</>
 					}
 					form02={
 						<>
 							<>
-								<DateInputNormal params="lastWorkDay" label="마지막 근무일" callBack={handler.SetPageVal} />
-								<DateInputNormal params="lastWorkDay" label="신청 예정일" callBack={handler.SetPageVal} />
-								<NumberInput params="" label="고용보험 총 기간" num_unit={["년", "개월"]} callBack={handler.SetPageVal} double={true} k_parser={false} />
-								<NumberInput params="" label="퇴직 전 12개월 급여 총액" num_unit="원" callBack={handler.SetPageVal} />
+								<DateInputNormal
+									params="lastWorkDay"
+									label="마지막 근무일"
+									callBack={handler.SetPageVal}
+								/>
+
+								<NumberInput
+									params=""
+									label="고용보험 총 기간"
+									num_unit={["년", "개월"]}
+									callBack={handler.SetPageVal}
+									double={true}
+									k_parser={false}
+								/>
+								<NumberInput
+									params="sumTwelveMonthSalary"
+									label="퇴직 전 12개월 급여 총액"
+									num_unit="원"
+									callBack={handler.SetPageVal}
+								/>
 							</>
 						</>
 					}
@@ -192,8 +314,21 @@ const _DetailCal04 = ({ handler }) => {
 	return (
 		<>
 			<DateInputNormal params="enterDay" label="입사일" callBack={handler.SetPageVal} />
-			{handler.GetPageVal("retired") && <DateInputNormal params="retiredDay" label="퇴사일" callBack={handler.SetPageVal} description="enter_day" />}
-			<Check type="box_type" options={["월", "화", "수", "목", "금", "토", "일"]} label="근무 요일" params="weekDay" callBack={handler.SetPageVal} />
+			{handler.GetPageVal("retired") && (
+				<DateInputNormal
+					params="retiredDay"
+					label="퇴사일"
+					callBack={handler.SetPageVal}
+					description="enter_day"
+				/>
+			)}
+			<Check
+				type="box_type"
+				options={["월", "화", "수", "목", "금", "토", "일"]}
+				label="근무 요일"
+				params="weekDay"
+				callBack={handler.SetPageVal}
+			/>
 			<NumberUpDown label="근무시간" label_unit="주" unit="시간" callBack={onChangeUpDownArr} params="time" />
 			<NumberUpDown label="근무일수" label_unit="주" unit="일" callBack={onChangeUpDownArr} params="week" />
 			<TabInputs label="월 급여" type="salary" params="salary" callBack={handler.SetPageVal} />
@@ -211,8 +346,19 @@ const _DetailCal05 = ({ handler }) => {
 			<div className="pd_810 fs_14">상세형 / {handler.GetPageVal("isRetiree") ? "퇴직자" : "퇴직예정자 "}</div>
 			<div className="public_side_padding">
 				<DateInputNormal params="enterDay" label="고용보험 가입일" callBack={handler.SetPageVal} />
-				<DateInputNormal params="retiredDay" label="고용보험 종료일" callBack={handler.SetPageVal} description="self-employment" />
-				<TabInputs label="고용 보험 등급" type="select" params="insuranceGrade" callBack={onChangeEmployerArr} valueDay={handler.GetPageVal} />
+				<DateInputNormal
+					params="retiredDay"
+					label="고용보험 종료일"
+					callBack={handler.SetPageVal}
+					description="self-employment"
+				/>
+				<TabInputs
+					label="고용 보험 등급"
+					type="select"
+					params="insuranceGrade"
+					callBack={onChangeEmployerArr}
+					valueDay={handler.GetPageVal}
+				/>
 			</div>
 		</div>
 	);
@@ -222,12 +368,27 @@ const _DetailCalComp = () => {
 	return (
 		<div id={`${workCate !== 6 ? "detail_comp_container" : ""}`}>
 			<Header title="정보입력" leftLink="/" leftType="BACK" />
-			{workCate !== 6 && <div className="pd_810 fs_14">상세형 / {handler.GetPageVal("isRetiree") ? "퇴직자" : "퇴직예정자 "}</div>}
+			{workCate !== 6 && (
+				<div className="pd_810 fs_14">
+					상세형 / {handler.GetPageVal("isRetiree") ? "퇴직자" : "퇴직예정자 "}
+				</div>
+			)}
 			<div className={`${workCate !== 6 ? "public_side_padding" : ""}`}>
 				{workCate !== 6 && (
 					<>
-						<DateInputNormal params="age" label="생년월일" callBack={handler.SetPageVal} year={Year_Option_Generater(73)} />
-						<Check type="circle_type" params="disabled" callBack={handler.SetPageVal} label="장애여부" options={["장애인", "비장애인"]} />
+						<DateInputNormal
+							params="age"
+							label="생년월일"
+							callBack={handler.SetPageVal}
+							year={Year_Option_Generater(73)}
+						/>
+						<Check
+							type="circle_type"
+							params="disabled"
+							callBack={handler.SetPageVal}
+							label="장애여부"
+							options={["장애인", "비장애인"]}
+						/>
 					</>
 				)}
 				{(workCate === 0 || workCate === 1) && <_DetailCal01 handler={handler} />}
@@ -246,7 +407,6 @@ const DetailCalPage = () => {
 	useEffect(() => {
 		handler.setCompState = setCompState;
 	}, []);
-
 	return (
 		<div id="detail_container" className="header_top_space">
 			{compState === 1 && <IsRetiree handler={handler} type="상세형" />}

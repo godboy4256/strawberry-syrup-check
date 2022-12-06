@@ -95,6 +95,10 @@
 #date_next_btn {
 	transform: rotate(180deg);
 }
+#date_next_btn.acitve,
+#date_prev_btn.acitve {
+	visibility: hidden;
+}
 #date_buttons {
 	padding: 10px 23px 20px;
 	display: flex;
@@ -122,19 +126,37 @@
 	padding-top: 5px;
 }
 .date_indiviual_page {
-	border-bottom: 1px solid rgba(0, 0, 0, 0.2);
-	border-left: 1px solid rgba(0, 0, 0, 0.2);
-	border-right: 1px solid rgba(0, 0, 0, 0.2);
 	width: 100%;
 }
+.date_indiviual_page.type_2 {
+	display: flex;
+	flex-wrap: wrap;
+	padding: 18px 20px;
+	width: 340px;
+}
+
+.date_indiviual_page.type_2 > div {
+	width: 50%;
+	border-left: 1px solid #ccc;
+	border-right: 1px solid #ccc;
+}
+.date_indiviual_page.type_2 > div:nth-child(5),
+.date_indiviual_page.type_2 > div:nth-child(6) {
+	border-bottom: 1px solid #ccc;
+}
+.date_indiviual_page.type_2 > div:nth-child(2n) {
+	border-left: none;
+}
 .indiviual_input_container input {
-	padding: 4px 10px;
+	padding: 11px 10px;
 	text-align: center;
 	line-height: 21px;
 	font-size: 14px;
 	width: 100%;
 	border-top: 1px solid rgba(0, 0, 0, 0.2);
-	border-right: 1px solid rgba(0, 0, 0, 0.2);
+}
+.indiviual_input_container input.total {
+	padding: 4px 10px;
 }
 .indiviual_input_container input:last-child {
 	border-right: none;
@@ -149,9 +171,12 @@
 	text-align: center;
 	font-size: 14px;
 	line-height: 21px;
-	padding: 4px 10px;
+	padding: 11px 10px;
 	line-height: 21px;
 	border-top: 1px solid rgba(0, 0, 0, 0.2);
+}
+.indiviual_input_header.total {
+	padding: 4px 10px;
 }
 .date_indiviual_prev,
 .date_indiviual_next {
