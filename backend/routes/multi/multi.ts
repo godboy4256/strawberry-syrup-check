@@ -54,9 +54,6 @@ export default function multiRoute(fastify: FastifyInstance, options: any, done:
 		// 1095일은 365일 * 3 즉 3년
 		// 다음 근로 정보가 3년을 초과하는 경우 가장 최근 근로 정보만 이용해서 계산
 		if (diffMainToSecond > 1095) {
-			// const permitWorkingDays = mainData.workingDays; // 상세형에서permit을 이미 받았슴
-			// if (permitWorkingDays < leastRequireWorkingDay) return { succ: false, permitWorkingDays, requireDays: leastRequireWorkingDay - permitWorkingDays };
-
 			// 최소조건 (기한내 필요 피보험단위(예시 180일) 만족, 이직 후 1년 이내) 만족 후
 			const workingDays = mainData.workingDays;
 			const workingYears = Math.floor(workingDays / 365);
@@ -174,53 +171,3 @@ export default function multiRoute(fastify: FastifyInstance, options: any, done:
 
 	done();
 }
-
-// 중복 제거는 했는데 피보험단위기간 산정 규칙에 맞지 않음
-// compareData = 하나씩 늘어남 가장 처음은 mainData 이후는 addData가 0개부터 1개씩 늘어나서 최대 9개 또는 10개
-// function mergeWorkingDays(mainData: TmainData, addDatas: (TmainData | TaddData)[]) {
-// 	let workingDays = mainData.workingDays;
-
-// 	addDatas.map((addData, idx, addDatas) => {
-// 		addData.enterDay = dayjs(addData.enterDay);
-// 		addData.retiredDay = dayjs(addData.retiredDay);
-
-// 		if (idx === 0) {
-// 			mainData.enterDay = dayjs(mainData.enterDay);
-// 			mainData.retiredDay = dayjs(mainData.retiredDay);
-
-// 			if (addData.enterDay > mainData.enterDay) {
-// 				if (addData.enterDay < mainData.retiredDay) {
-// 					if (addData.retiredDay > mainData.retiredDay)
-// 						workingDays += mainData.retiredDay.diff(addData.enterDay, "day");
-// 				}
-// 			}
-// 			if (addData.enterDay < mainData.enterDay) {
-// 				if (addData.retiredDay < mainData.retiredDay)
-// 					workingDays += addData.retiredDay.diff(addData.enterDay, "day");
-// 				if (addData.retiredDay > mainData.enterDay)
-// 					workingDays += mainData.enterDay.diff(addData.enterDay, "day");
-// 			}
-// 		} else {
-// 			for (let i = 1; i <= idx; i++) {
-// 				const compareData = { ...addDatas[idx - i] };
-// 				compareData.enterDay = dayjs(compareData.enterDay);
-// 				compareData.retiredDay = dayjs(compareData.retiredDay);
-
-// 				if (addData.enterDay > compareData.enterDay) {
-// 					if (addData.enterDay < compareData.retiredDay) {
-// 						if (addData.retiredDay > compareData.retiredDay)
-// 							workingDays += compareData.retiredDay.diff(addData.enterDay, "day");
-// 					}
-// 				}
-// 				if (addData.enterDay < compareData.enterDay) {
-// 					if (addData.retiredDay < compareData.retiredDay)
-// 						workingDays += addData.retiredDay.diff(addData.enterDay, "day");
-// 					if (addData.retiredDay > compareData.enterDay)
-// 						workingDays += compareData.enterDay.diff(addData.enterDay, "day");
-// 				}
-// 			}
-// 		}
-// 	});
-
-// 	return workingDays;
-// }
