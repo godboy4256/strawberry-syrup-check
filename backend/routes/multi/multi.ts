@@ -8,7 +8,7 @@ import { permitRangeData, requiredWorkingDay } from "../../data/data";
 import { getEmployerReceiveDay } from "../detail/detail";
 
 import { multiSchema, TaddData, TmainData } from "./schema";
-import { commonCasePermitCheck, doubleCasePermitCheck } from "./service";
+import { commonCasePermitCheck, doubleCasePermitCheck, mergeWorkingDays } from "./function";
 
 dayjs.extend(isSameOrAfter);
 
@@ -40,7 +40,14 @@ export default function multiRoute(fastify: FastifyInstance, options: any, done:
 		if (Math.floor(now.diff(mainRetiredDay, "day", true)) > 365)
 			return { succ: false, mesg: DefinedParamErrorMesg.expire };
 
-		// 2. 마지막 직장의 입사일과 전직장의 이직일 사이 기간이 3년을 초과하는 지 확인
+		// 2. mainData의 근로형태가 예술인 특고인경우 예술인 또는 특고로 3개월 이상 근무해야한다.
+		if (mainData.workCate === 2 || mainData.workCate === 3) {
+			if (mainData.workingDays < 90) return { succ: false, mesg: "예술인/특고로 3개월 이상 근무해야합니다" };
+		}
+		if (mainData.workCate === 4 || mainData.workCate === 5) {
+			if (mainData.workingDays < 3) return { succ: false, mesg: "단기 예술인/특고로 3개월 이상 근무해야합니다" };
+		}
+		// 3. 마지막 직장의 입사일과 전직장의 이직일 사이 기간이 3년을 초과하는 지 확인
 		const secondRetiredDay = dayjs(addDatas[0].retiredDay);
 		const diffMainToSecond = Math.floor(mainEnterDay.diff(secondRetiredDay, "day", true));
 
@@ -66,12 +73,11 @@ export default function multiRoute(fastify: FastifyInstance, options: any, done:
 		}
 		// 여기서 부터는 3년 내에 다른 직장 정보가 유효한 경우
 
-		// 3. 마지막 직장의 이직일로 부터 18개월 또는 24개월 이전 날짜 확인
+		// 4. 마지막 직장의 이직일로 부터 18개월 또는 24개월 이전 날짜 확인
 		const permitRange = permitRangeData[mainData.workCate];
 		const limitDay = mainRetiredDay.subtract(permitRange, "month");
 
-		// 4.  18개월 또는 24개월 시점을 고려해서 기간내의 피보험 단위기간 합산
-
+		// 5.  18개월 또는 24개월 시점을 고려해서 기간내의 직장 필터
 		const permitAddCandidates: TaddData[] = addDatas.filter((addData) =>
 			dayjs(addData.retiredDay).isSameOrAfter(limitDay, "date")
 		);
@@ -105,7 +111,12 @@ export default function multiRoute(fastify: FastifyInstance, options: any, done:
 		if ((tempWorkCount.count >= 1 && artWorkCount.count >= 1) || specialWorkCount.count >= 1) isDouble = true;
 
 		const isPermit = isDouble
-			? doubleCasePermitCheck(tempWorkCount.permitDays, artWorkCount.permitMonths, specialWorkCount.permitMonths)
+			? doubleCasePermitCheck(
+					tempWorkCount.permitDays,
+					artWorkCount.permitMonths,
+					specialWorkCount.permitMonths,
+					mainData.workCate
+			  )
 			: commonCasePermitCheck(permitAddCandidates, mainData);
 
 		console.log(isPermit);
@@ -114,19 +125,20 @@ export default function multiRoute(fastify: FastifyInstance, options: any, done:
 
 		// 😎 이 부분에서 피보험단위기간을 계산하기위해서 상세형과 같은 형태의 데이터를 입력받아야하나?
 
-		//5. 수급 불인정 조건에 맞는 경우 불인정 메세지 리턴
-		if (isPermit)
-			return {
-				succ: false,
-				// permitWorkingDays,
-				// requireDays: leastRequireWorkingDay - permitWorkingDays,
-			};
+		// 6. 수급 불인정 조건에 맞는 경우 불인정 메세지 리턴
+		if (!isPermit[0]) {
+			if (isDouble)
+				return { succ: false, requireDays: isPermit[1], mesg: "근로자로 requireDays만큼 더 일해야 한다." };
+			return { succ: false, permitWorkingDays: isPermit[1], requireDays: leastRequireWorkingDay - isPermit[1] };
+		}
+
+		// 마지막 근로형태가 불규칙이라면 수급 불인정
 		if (permitAddCandidates.length !== 0 && permitAddCandidates[permitAddCandidates.length - 1].isIrregular)
 			return { succ: false, mesg: "isIrregular" };
 
 		// 최소조건 (기한내 필요 피보험단위(예시 180일) 만족, 이직 후 1년 이내) 만족 후
 
-		// 6. 전체 피보험단위를 산정하기위한 합산 가능 유형 필터링
+		// 7. 전체 피보험단위를 산정하기위한 합산 가능 유형 필터링
 		const addCadiates: TaddData[] = [];
 		for (let i = 0; i < addDatas.length; i++) {
 			if (i === 0) {
@@ -140,16 +152,16 @@ export default function multiRoute(fastify: FastifyInstance, options: any, done:
 			}
 		}
 
-		// 7. 피보험 단위기간 산정
+		// 8. 피보험 단위기간 산정 => 피보험기간 산정으로 변경 필요?
 		const workingDays = mergeWorkingDays(mainData, addCadiates);
-		const workingYears = Math.floor(workingDays / mainData.workCate === 2 ? 12 : 365); // 월 단위의 경우 12로 나눈다. 자영업자는 이거
+		const workingYears = Math.floor(workingDays / 365); // 월 단위의 경우 12로 나눈다. 자영업자는 이거
 		const tempReceiveDay =
 			mainData.workCate === 5
 				? getEmployerReceiveDay(workingYears)
 				: getReceiveDay(workingYears, mainData.age, mainData.disable);
 		const receiveDay = tempReceiveDay === 120 ? 120 : tempReceiveDay - 30;
 
-		// 8.
+		// 9.
 		return {
 			succ: true,
 			amountCost: mainData.realDayPay * receiveDay,
@@ -165,50 +177,50 @@ export default function multiRoute(fastify: FastifyInstance, options: any, done:
 
 // 중복 제거는 했는데 피보험단위기간 산정 규칙에 맞지 않음
 // compareData = 하나씩 늘어남 가장 처음은 mainData 이후는 addData가 0개부터 1개씩 늘어나서 최대 9개 또는 10개
-function mergeWorkingDays(mainData: TmainData, addDatas: (TmainData | TaddData)[]) {
-	let workingDays = mainData.workingDays;
+// function mergeWorkingDays(mainData: TmainData, addDatas: (TmainData | TaddData)[]) {
+// 	let workingDays = mainData.workingDays;
 
-	addDatas.map((addData, idx, addDatas) => {
-		addData.enterDay = dayjs(addData.enterDay);
-		addData.retiredDay = dayjs(addData.retiredDay);
+// 	addDatas.map((addData, idx, addDatas) => {
+// 		addData.enterDay = dayjs(addData.enterDay);
+// 		addData.retiredDay = dayjs(addData.retiredDay);
 
-		if (idx === 0) {
-			mainData.enterDay = dayjs(mainData.enterDay);
-			mainData.retiredDay = dayjs(mainData.retiredDay);
+// 		if (idx === 0) {
+// 			mainData.enterDay = dayjs(mainData.enterDay);
+// 			mainData.retiredDay = dayjs(mainData.retiredDay);
 
-			if (addData.enterDay > mainData.enterDay) {
-				if (addData.enterDay < mainData.retiredDay) {
-					if (addData.retiredDay > mainData.retiredDay)
-						workingDays += mainData.retiredDay.diff(addData.enterDay, "day");
-				}
-			}
-			if (addData.enterDay < mainData.enterDay) {
-				if (addData.retiredDay < mainData.retiredDay)
-					workingDays += addData.retiredDay.diff(addData.enterDay, "day");
-				if (addData.retiredDay > mainData.enterDay)
-					workingDays += mainData.enterDay.diff(addData.enterDay, "day");
-			}
-		} else {
-			for (let i = 1; i <= idx; i++) {
-				const compareData = { ...addDatas[idx - i] };
-				compareData.enterDay = dayjs(compareData.enterDay);
-				compareData.retiredDay = dayjs(compareData.retiredDay);
+// 			if (addData.enterDay > mainData.enterDay) {
+// 				if (addData.enterDay < mainData.retiredDay) {
+// 					if (addData.retiredDay > mainData.retiredDay)
+// 						workingDays += mainData.retiredDay.diff(addData.enterDay, "day");
+// 				}
+// 			}
+// 			if (addData.enterDay < mainData.enterDay) {
+// 				if (addData.retiredDay < mainData.retiredDay)
+// 					workingDays += addData.retiredDay.diff(addData.enterDay, "day");
+// 				if (addData.retiredDay > mainData.enterDay)
+// 					workingDays += mainData.enterDay.diff(addData.enterDay, "day");
+// 			}
+// 		} else {
+// 			for (let i = 1; i <= idx; i++) {
+// 				const compareData = { ...addDatas[idx - i] };
+// 				compareData.enterDay = dayjs(compareData.enterDay);
+// 				compareData.retiredDay = dayjs(compareData.retiredDay);
 
-				if (addData.enterDay > compareData.enterDay) {
-					if (addData.enterDay < compareData.retiredDay) {
-						if (addData.retiredDay > compareData.retiredDay)
-							workingDays += compareData.retiredDay.diff(addData.enterDay, "day");
-					}
-				}
-				if (addData.enterDay < compareData.enterDay) {
-					if (addData.retiredDay < compareData.retiredDay)
-						workingDays += addData.retiredDay.diff(addData.enterDay, "day");
-					if (addData.retiredDay > compareData.enterDay)
-						workingDays += compareData.enterDay.diff(addData.enterDay, "day");
-				}
-			}
-		}
-	});
+// 				if (addData.enterDay > compareData.enterDay) {
+// 					if (addData.enterDay < compareData.retiredDay) {
+// 						if (addData.retiredDay > compareData.retiredDay)
+// 							workingDays += compareData.retiredDay.diff(addData.enterDay, "day");
+// 					}
+// 				}
+// 				if (addData.enterDay < compareData.enterDay) {
+// 					if (addData.retiredDay < compareData.retiredDay)
+// 						workingDays += addData.retiredDay.diff(addData.enterDay, "day");
+// 					if (addData.retiredDay > compareData.enterDay)
+// 						workingDays += compareData.enterDay.diff(addData.enterDay, "day");
+// 				}
+// 			}
+// 		}
+// 	});
 
-	return workingDays;
-}
+// 	return workingDays;
+// }
