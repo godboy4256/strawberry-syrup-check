@@ -705,18 +705,3 @@ export function getEmployerReceiveDay(workYear: number) {
 	if (workYear >= 5 && workYear < 10) return 180;
 	return 210;
 }
-
-// function calDayjobPay(sumPay: number[] | number, sumWorkDay: number) {
-// 	let dayAvgPay = 0;
-// 	if (Array.isArray(sumPay)) {
-// 		dayAvgPay = Math.ceil(sumPay[0] / sumWorkDay);
-// 	} else {
-// 		dayAvgPay = Math.ceil(sumPay / sumWorkDay);
-// 	}
-// 	let realDayPay = Math.ceil(dayAvgPay * 0.6);
-// 	if (realDayPay > 66000) realDayPay = 66000;
-// 	else if (realDayPay < 60120) realDayPay = 60120;
-// 	const realMonthPay = realDayPay * 30;
-
-// 	return { dayAvgPay, realDayPay, realMonthPay };
-// }
