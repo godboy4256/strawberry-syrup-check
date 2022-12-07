@@ -5,7 +5,7 @@ import isSameOrAfter from "dayjs/plugin/isSameOrAfter";
 import { getReceiveDay } from "../../router_funcs/common";
 import { DefinedParamErrorMesg, DefineParamInfo } from "../../share/validate";
 import { permitRangeData, requiredWorkingDay } from "../../data/data";
-import { getEmployerReceiveDay } from "../detail/detail";
+import { getEmployerReceiveDay } from "../detail/function";
 
 import { multiSchema, TaddData, TmainData } from "./schema";
 import { commonCasePermitCheck, doubleCasePermitCheck, mergeWorkingDays } from "./function";
