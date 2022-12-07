@@ -40,8 +40,15 @@ const NumberInput = ({
 					{label && <label className="write_label fs_16">{label}</label>}
 					<div className={`input_style ${value ? "select" : ""}`}>
 						{by_date && by_date}
-						<input value={value} placeholder={placeholder && placeholder} className={value ? "select" : ""} onChange={onChangeSetValue} type="text" />
-						{num_unit}
+						{num_unit[0]}
+						<input
+							value={value}
+							placeholder={placeholder && placeholder}
+							className={value ? "select" : ""}
+							onChange={onChangeSetValue}
+							type="text"
+						/>
+						{num_unit[1]}
 					</div>
 					{k_parser ? <div className="fs_12 kr_value">{money_korean(String(value))} 원</div> : null}
 				</div>
@@ -52,7 +59,13 @@ const NumberInput = ({
 						<div>
 							<div className={`input_style ${value ? "select" : ""}`}>
 								{by_date && by_date}
-								<input value={value} placeholder={placeholder && placeholder} className={value ? "select" : ""} onChange={onChangeSetValue} type="text" />
+								<input
+									value={value}
+									placeholder={placeholder && placeholder}
+									className={value ? "select" : ""}
+									onChange={onChangeSetValue}
+									type="text"
+								/>
 								{num_unit[0]}
 							</div>
 							{k_parser ? <div className="fs_12 kr_value">{money_korean(String(value))} 원</div> : null}
@@ -60,7 +73,13 @@ const NumberInput = ({
 						<div>
 							<div className={`input_style ${value ? "select" : ""}`}>
 								{by_date && by_date}
-								<input value={value} placeholder={placeholder && placeholder} className={value ? "select" : ""} onChange={onChangeSetValue} type="text" />
+								<input
+									value={value}
+									placeholder={placeholder && placeholder}
+									className={value ? "select" : ""}
+									onChange={onChangeSetValue}
+									type="text"
+								/>
 								{num_unit[1]}
 							</div>
 							{k_parser ? <div className="fs_12 kr_value">{money_korean(String(value))} 원</div> : null}

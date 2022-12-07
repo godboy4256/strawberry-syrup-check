@@ -1,22 +1,8 @@
+import { Http2ServerRequest } from "http2";
 import { Dispatch, SetStateAction } from "react";
 import { getAge } from "../utils/date";
 import { sendToServer } from "../utils/sendToserver";
 import InputHandler from "./Inputs";
-
-function sumDayJobWorkingDay(workRecord: any[], isSimple: boolean = false) {
-	let sumWorkDay = 0;
-
-	if (isSimple) {
-		return 1;
-	} else {
-		workRecord.map((v: { year: number; months: any[] }) => {
-			v.months.map((v: { month: number; workDay: number }) => {
-				sumWorkDay += v.workDay;
-			});
-		});
-	}
-	return sumWorkDay;
-}
 
 class DetailedHandler extends InputHandler {
 	public result: {};
@@ -27,9 +13,28 @@ class DetailedHandler extends InputHandler {
 	public setIsValueSelect03: Dispatch<SetStateAction<number>>;
 	public insuranceGrade = (insuranceGrade) => {
 		for (let i = 0; i < Object.keys(insuranceGrade).length; i++) {
-			insuranceGrade[Object.keys(insuranceGrade)[i]] = Number(insuranceGrade[Object.keys(insuranceGrade)[i]].split("등급")[0]);
+			insuranceGrade[Object.keys(insuranceGrade)[i]] = Number(
+				insuranceGrade[Object.keys(insuranceGrade)[i]].split("등급")[0]
+			);
 		}
 		return insuranceGrade;
+	};
+	sumDayJobWorkingDay = (workRecord: any[], isSimple: boolean = false) => {
+		let sumWorkDay = 0;
+		let sumPay = 0;
+		let dayAvgPay;
+		if (isSimple) {
+			return 1;
+		} else {
+			workRecord.map((v: { year: number; months: any[] }) => {
+				v.months.map((v: { month: number; workDay: number; pay?: number }) => {
+					sumWorkDay += v.workDay;
+					sumPay += v.pay;
+				});
+			});
+			dayAvgPay = Math.ceil(sumPay / sumWorkDay);
+		}
+		return [sumWorkDay, dayAvgPay];
 	};
 	public Action_Cal_Result = async () => {
 		const weekDay =
@@ -58,7 +63,16 @@ class DetailedHandler extends InputHandler {
 				}
 			});
 
-		const url = this._Data.workCate === 0 && this._Data.workCate === 1 ? "/detail/standard" : this._Data.workCate === 5 ? "/detail/veryshort" : this._Data.workCate === 6 && "/detail/employer";
+		const url =
+			this._Data.workCate === 0 && this._Data.workCate === 1
+				? "/detail/standard"
+				: this._Data.workCate === 2
+				? "/detail/dayjob"
+				: this._Data.workCate === 3
+				? "/detail/art"
+				: this._Data.workCate === 5
+				? "/detail/veryshort"
+				: this._Data.workCate === 6 && "/detail/employer";
 		const to_server =
 			this._Data.workCate === 0 && this._Data.workCate === 1 // 정규직 / 기간제
 				? {
@@ -74,10 +88,15 @@ class DetailedHandler extends InputHandler {
 						...this._Data,
 						age: getAge(new Date(String(this._Data.age))).age,
 						disabled: this._Data.disabled === "장애인" ? true : false,
+						isOverTen: this._Data.isOverTen ? this._Data.isOverTen : false,
+						hasWork: this._Data.hasWork ? this._Data.hasWork : false,
 				  }
 				: this._Data.workCate === 3 || this._Data.workCate === 4 // 예술인 / 단기 예술인 / 특고 / 단기 특고
 				? {
 						...this._Data,
+						age: getAge(new Date(String(this._Data.age))).age,
+						disabled: this._Data.disabled === "장애인" ? true : false,
+						sumTwelveMonthSalary: [this._Data.sumTwelveMonthSalary],
 				  }
 				: this._Data.workCate === 5 // 초단 시간
 				? {
@@ -95,7 +114,7 @@ class DetailedHandler extends InputHandler {
 				  }
 				: {};
 		console.log(to_server);
-		// this.result = await sendToServer(url, to_server);
+		this.result = await sendToServer(url, to_server);
 		// this.setCompState(4);
 	};
 }

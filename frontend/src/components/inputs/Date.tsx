@@ -1,4 +1,4 @@
-import React, { ChangeEvent, Dispatch, SetStateAction, useEffect, useState } from "react";
+import React, { ChangeEvent, Dispatch, MouseEvent, SetStateAction, useEffect, useState } from "react";
 import IMGDate from "../../assets/image/date_icon.svg";
 import IMGRedDirection from "../../assets/image/red_direction.svg";
 import IMGPrev from "../../assets/image/new/i_date_prev.svg";
@@ -8,6 +8,7 @@ import SelectInput from "./Select";
 import InputHandler from "../../object/Inputs";
 import { GetDateArr, Month_Calculator, Year_Option_Generater } from "../../utils/date";
 import "../../styles/date.css";
+import { table } from "console";
 
 const currentDate = GetDateArr(null);
 
@@ -18,6 +19,7 @@ class DateHandler extends InputHandler {
 	public setDays: Dispatch<SetStateAction<number[]>>;
 
 	public current_year_list = Year_Option_Generater(10);
+	public plan_todo_data = [];
 
 	SelectCallback = (params: string, value: string) => {
 		this.SetPageVal(params, value);
@@ -75,15 +77,31 @@ class DateHandler extends InputHandler {
 		return days_arr;
 	};
 
-	Action_Get_Date = (callback: CallableFunction, setValueState: Dispatch<SetStateAction<string>>, params: string) => {
-		const viewDate = `${this._Data.year ? this._Data.year : currentDate[0]}-${this._Data.month ? this._Data.month : currentDate[1]}-${this._Data.day ? this._Data.day : currentDate[2]}`;
-		callback(params, viewDate);
-		setValueState(viewDate);
+	Action_Get_Date = (
+		callBack: CallableFunction,
+		setValueState: Dispatch<SetStateAction<string>>,
+		params?: string
+	) => {
+		const viewDate = `${this._Data.year ? this._Data.year : currentDate[0]}-${
+			this._Data.month ? this._Data.month : currentDate[1]
+		}-${this._Data.day ? this._Data.day : currentDate[2]}`;
+		if (params === "isOverTen") {
+			callBack(params, this.plan_todo_data.length >= 10 ? true : false);
+			callBack("hasWork", [
+				this.plan_todo_data.length >= 14 ? true : false,
+				this.plan_todo_data.reduce((prev, curr) => {
+					return new Date(prev).getTime() <= new Date(curr).getTime() ? curr : prev;
+				}),
+			]);
+		} else {
+			callBack(params, viewDate);
+			setValueState(viewDate);
+		}
 	};
 }
 
-const _DaysComp = ({ handler }) => {
-	const [selectedDate, setSelectedDate] = useState<number>(currentDate[2]);
+const _DaysComp = ({ handler, planToDo }) => {
+	const [selectedDate, setSelectedDate] = useState<any>(planToDo ? [] : currentDate[2]);
 	const [days, setDays] = useState(handler.Days_Option_Generater(currentDate[0], currentDate[1]));
 	useEffect(() => {
 		handler.setDays = setDays;
@@ -96,13 +114,34 @@ const _DaysComp = ({ handler }) => {
 						key={String(el + Date.now()) + idx}
 						onClick={() => {
 							if (!el) return;
-							setSelectedDate(Number(el));
-							handler.setDay(Number(el));
-							handler.SetPageVal("day", el);
+							if (planToDo) {
+								if (selectedDate.includes(el)) {
+									const delete_arr = [...selectedDate];
+									const delete_num = delete_arr.indexOf(el);
+									delete_arr.splice(delete_num, 1);
+									setSelectedDate(delete_arr);
+								}
+								setSelectedDate([...selectedDate, el]);
+								handler.plan_todo_data = selectedDate.map((el) => {
+									return `${planToDo[0]}-${planToDo[1]}-${el}`;
+								});
+							} else {
+								setSelectedDate(Number(el));
+								handler.setDay(Number(el));
+								handler.SetPageVal("day", el);
+							}
 						}}
-						className={`fs_16 ${Number(el) === selectedDate ? "select" : ""}`}
+						className={`fs_16 ${
+							Number(el) === selectedDate || (Array.isArray(selectedDate) && selectedDate.includes(el))
+								? "select"
+								: ""
+						}`}
 					>
-						{Number(el) === selectedDate ? <div className="select_box fs_16">{el}</div> : el}
+						{Number(el) === selectedDate || (Array.isArray(selectedDate) && selectedDate.includes(el)) ? (
+							<div className="select_box fs_16">{el}</div>
+						) : (
+							el
+						)}
 					</div>
 				);
 			})}
@@ -110,31 +149,97 @@ const _DaysComp = ({ handler }) => {
 	);
 };
 
-const _DateHeader = ({ handler }) => {
-	const [year, setYear] = useState(currentDate[0]);
-	const [month, setMonth] = useState(currentDate[1]);
-	const [day, setDay] = useState(currentDate[2]);
+const _DateHeader = ({ handler, planTodo }) => {
+	const [year, setYear] = useState(planTodo ? planTodo[0] : currentDate[0]);
+	const [month, setMonth] = useState(planTodo ? planTodo[1] : currentDate[1]);
+	const [day, setDay] = useState(planTodo ? planTodo[2] : currentDate[2]);
 	useEffect(() => {
 		handler.setYear = setYear;
 		handler.setMonth = setMonth;
 		handler.setDay = setDay;
 	}, []);
-	return <div className="date_input_header">{`${year}년 ${month}월 ${day}일`}</div>;
+	return (
+		<div className="date_input_header">
+			{year}년 {month}월 {!planTodo ? `${day} 일` : ""}
+		</div>
+	);
 };
 
-const _DatePopUp = ({ handler, year }: { handler: any; year: any[] }) => {
+const _DatePopUp = ({ handler, year, planToDo }: { handler: any; year: any[]; planToDo?: any }) => {
+	const planTodo = planToDo && GetDateArr(planToDo("planToDo"));
+	const [planToDoButton, setState] = useState(false);
+	const [planToDoYear, setPlanToDoYear] = useState(planTodo && planTodo[0]);
+	const [planToDoMonth, setPlanToDoMonth] = useState(planTodo && planTodo[1]);
 	return (
 		<div className="date_input_container">
-			<_DateHeader handler={handler} />
+			<_DateHeader handler={handler} planTodo={planTodo} />
 			<div id="date_input_controllbar">
-				<button id="date_prev_btn" onClick={handler.SelectDatePrevClick}>
+				<button
+					id="date_prev_btn"
+					className={planToDo ? (planToDoButton ? "acitve" : "") : ""}
+					onClick={() => {
+						if (planToDo) {
+							setState(true);
+							if (planToDoMonth === 1) {
+								setPlanToDoYear((prev) => prev - 1);
+							}
+							setPlanToDoMonth((prev) => {
+								if (prev === 1) {
+									return 12;
+								}
+								return prev - 1;
+							});
+						}
+						handler.SelectDatePrevClick();
+						handler.setDays(handler.Days_Option_Generater(planToDoYear, planToDoMonth));
+					}}
+				>
 					<img src={IMGRedDirection} alt="Date Prev Button" />
 				</button>
 				<div id="date_select_box">
-					<SelectInput selected={currentDate[0]} type="date_normal" options={year} params="year" callBack={handler.SelectCallback} />
-					<SelectInput selected={currentDate[1]} type="date_normal" options={[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]} params="month" callBack={handler.SelectCallback} />
+					{planToDo ? (
+						<div>
+							{planToDoYear}년 {planToDoMonth}월
+						</div>
+					) : (
+						<>
+							<SelectInput
+								selected={currentDate[0]}
+								type="date_normal"
+								options={year}
+								params="year"
+								callBack={handler.SelectCallback}
+							/>
+							<SelectInput
+								selected={currentDate[1]}
+								type="date_normal"
+								options={[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]}
+								params="month"
+								callBack={handler.SelectCallback}
+							/>
+						</>
+					)}
 				</div>
-				<button id="date_next_btn" onClick={handler.SelectDateNextClick}>
+				<button
+					id="date_next_btn"
+					className={planToDo ? (!planToDoButton ? "acitve" : "") : ""}
+					onClick={() => {
+						if (planToDo) {
+							setState(false);
+							if (planToDoMonth === 12) {
+								setPlanToDoYear((prev) => prev + 1);
+							}
+							setPlanToDoMonth((prev) => {
+								if (prev === 12) {
+									return 1;
+								}
+								return prev + 1;
+							});
+						}
+						handler.SelectDateNextClick();
+						handler.setDays(handler.Days_Option_Generater(planToDoYear, planToDoMonth));
+					}}
+				>
 					<img src={IMGRedDirection} alt="Date Next Button" />
 				</button>
 			</div>
@@ -147,7 +252,7 @@ const _DatePopUp = ({ handler, year }: { handler: any; year: any[] }) => {
 				<div>금</div>
 				<div>토</div>
 			</div>
-			<_DaysComp handler={handler} />
+			<_DaysComp handler={handler} planToDo={planTodo} />
 		</div>
 	);
 };
@@ -155,29 +260,38 @@ const _DatePopUp = ({ handler, year }: { handler: any; year: any[] }) => {
 export const DateInputNormal = ({
 	params,
 	label,
-	callBack,
+	planToDo,
 	description,
 	year,
 	placeholder,
+	callBack,
 }: {
-	params: string;
+	params?: string;
 	label?: string;
-	callBack: CallableFunction;
+	planToDo?: any;
 	description?: string | "enter_day" | "insurance_end_day" | "self-employment";
 	year?: number[];
 	placeholder?: string;
+	callBack?: CallableFunction;
 }) => {
 	const handler = new DateHandler({});
 	const [dateValue, setDateValue] = useState("");
 	const onClickDateOn = () => {
-		CreatePopup(undefined, <_DatePopUp handler={handler} year={year ? year : handler.current_year_list} />, "date", () => handler.Action_Get_Date(callBack, setDateValue, params));
+		CreatePopup(
+			undefined,
+			<_DatePopUp handler={handler} planToDo={planToDo} year={year ? year : handler.current_year_list} />,
+			"date",
+			() => handler.Action_Get_Date(callBack, setDateValue, params)
+		);
 	};
 	return (
 		<>
 			<div className="w_100">
 				{label && <label className="write_label fs_16">{label}</label>}
 				<div onClick={onClickDateOn} className={`date_container ${!dateValue ? "unselect" : ""}`}>
-					<div className={`date_value ${!dateValue ? "unselect" : ""}`}>{!dateValue ? (placeholder ? placeholder : "날짜를 선택해주세요.") : dateValue}</div>
+					<div className={`date_value ${!dateValue ? "unselect" : ""}`}>
+						{!dateValue ? (placeholder ? placeholder : "날짜를 선택해주세요.") : dateValue}
+					</div>
 					<div className={`date_icon ${!dateValue ? "unselect" : ""}`}>
 						<img src={IMGDate} alt="Date Icon" />
 					</div>
@@ -211,108 +325,231 @@ export const DateInputNormal = ({
 	);
 };
 
-const _IndiviualInput = ({ average_work = false, callBack, params }: { average_work?: boolean; callBack: CallableFunction; params: string }) => {
-	const onChangeInput = (params_num: number, value: any) => {
-		callBack(`${params}_${params_num}`, value);
+const _IndiviualInput = ({
+	callBack,
+	params,
+	type,
+	total,
+}: {
+	callBack: CallableFunction;
+	params: string;
+	type?: number;
+	total?: boolean;
+}) => {
+	const indiviual_export_data = { month: Number(params) };
+	const onChangeInput = (params_in: string, value: any) => {
+		indiviual_export_data[params_in] = Number(value);
+		callBack(params, indiviual_export_data);
 	};
 	return (
 		<div className="indiviual_input_container fs_14">
-			<div className="flex_box">
-				<input placeholder="근로 일수" onChange={(e: ChangeEvent<HTMLInputElement>) => onChangeInput(1, e.currentTarget.value)} />
-				{average_work && <input placeholder="월 평균 근로시간" onChange={(e: ChangeEvent<HTMLInputElement>) => onChangeInput(2, e.currentTarget.value)} />}
-			</div>
-			<input placeholder="월 임금총액" onChange={(e: ChangeEvent<HTMLInputElement>) => onChangeInput(3, e.currentTarget.value)} />
+			{type === 2 && (
+				<input
+					className={total ? "total" : ""}
+					placeholder="근로일수"
+					onChange={(e: ChangeEvent<HTMLInputElement>) => onChangeInput("pay", e.currentTarget.value)}
+				/>
+			)}
+			{(type === 3 || type === 4 || total) && (
+				<input
+					className={total ? "total" : ""}
+					placeholder="월 임금총액"
+					onChange={(e: ChangeEvent<HTMLInputElement>) => onChangeInput("pay", e.currentTarget.value)}
+				/>
+			)}
 		</div>
 	);
 };
 
-export const DateInputIndividual = ({ handler }) => {
+export const DateInputIndividual = ({ handler, lastWorkDay, type }) => {
 	const [direction, setDirection] = useState(1);
-	const lastMonth = GetDateArr(handler.GetPageVal("lastWorkDay"))[1];
+	const lastMonth = GetDateArr(lastWorkDay)[1];
 	const month_arr = Month_Calculator(lastMonth, "before", 12);
-	const processing = month_arr.splice(-2).concat(month_arr);
+	const month_arr_splice = month_arr.splice(-2).concat(month_arr);
 	return (
-		<div className="date_indiviual_container">
-			{direction === 1 ? (
+		<>
+			{type === 3 || type === 4 ? (
 				<>
-					<button className="date_indiviual_prev" onClick={() => setDirection(2)}>
-						<img src={IMGPrev} alt="prev button" />
-					</button>
-					<div className="date_indiviual_page">
+					<div className="date_indiviual_page type_2">
 						<div>
-							<div className="indiviual_input_header">{processing[3]}</div>
-							<_IndiviualInput average_work={true} callBack={handler.SetPageVal} params={`${processing[3]}`} />
+							<div className="indiviual_input_header">{month_arr_splice[5]} 월</div>
+							<_IndiviualInput
+								callBack={handler.SetPageVal}
+								params={`${month_arr_splice[5]}`}
+								type={type}
+							/>
 						</div>
 						<div>
-							<div className="indiviual_input_header">{processing[2]}</div>
-							<_IndiviualInput average_work={true} callBack={handler.SetPageVal} params={`${processing[2]}`} />
+							<div className="indiviual_input_header">{month_arr_splice[4]} 월</div>
+							<_IndiviualInput
+								callBack={handler.SetPageVal}
+								params={`${month_arr_splice[4]}`}
+								type={type}
+							/>
 						</div>
-						<div className="unset_indiviual_input">
-							<div className="indiviual_input_header">{processing[1]}</div>
-							<div className="unset_box">UnSet</div>
-							<div className="unset_box">UnSet</div>
+						<div>
+							<div className="indiviual_input_header">{month_arr_splice[3]} 월</div>
+							<_IndiviualInput
+								callBack={handler.SetPageVal}
+								params={`${month_arr_splice[3]}`}
+								type={type}
+							/>
 						</div>
-						<div className="unset_indiviual_input">
-							<div className="indiviual_input_header">{processing[0]}</div>
-							<div className="unset_box">UnSet</div>
-							<div className="unset_box">UnSet</div>
+						<div>
+							<div className="indiviual_input_header">{month_arr_splice[2]} 월</div>
+							<_IndiviualInput
+								callBack={handler.SetPageVal}
+								params={`${month_arr_splice[2]}`}
+								type={type}
+							/>
+						</div>
+						<div>
+							<div className="indiviual_input_header">{month_arr_splice[1]} 월</div>
+							<_IndiviualInput
+								callBack={handler.SetPageVal}
+								params={`${month_arr_splice[1]}`}
+								type={type}
+							/>
+						</div>
+						<div>
+							<div className="indiviual_input_header">{month_arr_splice[0]} 월</div>
+							<_IndiviualInput
+								callBack={handler.SetPageVal}
+								params={`${month_arr_splice[0]}`}
+								type={type}
+							/>
 						</div>
 					</div>
-				</>
-			) : direction === 2 ? (
-				<>
-					<button className="date_indiviual_next" onClick={() => setDirection(1)}>
-						<img src={IMGNext} alt="next button" />
-					</button>
-					<div className="date_indiviual_page">
-						<div>
-							<div className="indiviual_input_header">{processing[7]}</div>
-							<_IndiviualInput callBack={handler.SetPageVal} params={`${processing[7]}`} />
-						</div>
-						<div>
-							<div className="indiviual_input_header">{processing[6]}</div>
-							<_IndiviualInput callBack={handler.SetPageVal} params={`${processing[6]}`} />
-						</div>
-						<div>
-							<div className="indiviual_input_header">{processing[5]}</div>
-							<_IndiviualInput callBack={handler.SetPageVal} params={`${processing[5]}`} />
-						</div>
-						<div>
-							<div className="indiviual_input_header">{processing[4]}</div>
-							<_IndiviualInput callBack={handler.SetPageVal} params={`${processing[4]}`} />
-						</div>
-					</div>
-					<button className="date_indiviual_prev" onClick={() => setDirection(3)}>
-						<img src={IMGPrev} alt="prev button" />
-					</button>
 				</>
 			) : (
-				direction === 3 && (
-					<>
-						<div className="date_indiviual_page">
-							<div>
-								<div className="indiviual_input_header">{processing[11]}</div>
-								<_IndiviualInput callBack={handler.SetPageVal} params={`${processing[11]}`} />
-							</div>
-							<div>
-								<div className="indiviual_input_header">{processing[10]}</div>
-								<_IndiviualInput callBack={handler.SetPageVal} params={`${processing[10]}`} />
-							</div>
-							<div>
-								<div className="indiviual_input_header">{processing[9]}</div>
-								<_IndiviualInput callBack={handler.SetPageVal} params={`${processing[9]}`} />
-							</div>
-							<div>
-								<div className="indiviual_input_header">{processing[8]}</div>
-								<_IndiviualInput callBack={handler.SetPageVal} params={`${processing[8]}`} />
-							</div>
-						</div>
-						<button className="date_indiviual_next" onClick={() => setDirection(2)}>
-							<img src={IMGNext} alt="next button" />
-						</button>
-					</>
+				type === 2 && (
+					<div className="date_indiviual_container">
+						{direction === 1 ? (
+							<>
+								<button className="date_indiviual_prev" onClick={() => setDirection(2)}>
+									<img src={IMGPrev} alt="prev button" />
+								</button>
+								<div className="date_indiviual_page">
+									<div>
+										<div className="indiviual_input_header total">{month_arr_splice[3]}월</div>
+										<_IndiviualInput
+											type={type}
+											total={true}
+											callBack={handler.SetPageVal}
+											params={`${month_arr_splice[3]}`}
+										/>
+									</div>
+									<div>
+										<div className="indiviual_input_header total">{month_arr_splice[2]}월</div>
+										<_IndiviualInput
+											type={type}
+											total={true}
+											callBack={handler.SetPageVal}
+											params={`${month_arr_splice[2]}`}
+										/>
+									</div>
+									<div className="unset_indiviual_input">
+										<div className="indiviual_input_header">{month_arr_splice[1]}월</div>
+										<div className="unset_box">UnSet</div>
+										<div className="unset_box">UnSet</div>
+									</div>
+									<div className="unset_indiviual_input">
+										<div className="indiviual_input_header">{month_arr_splice[0]}월</div>
+										<div className="unset_box">UnSet</div>
+										<div className="unset_box">UnSet</div>
+									</div>
+								</div>
+							</>
+						) : direction === 2 ? (
+							<>
+								<button className="date_indiviual_next" onClick={() => setDirection(1)}>
+									<img src={IMGNext} alt="next button" />
+								</button>
+								<div className="date_indiviual_page">
+									<div>
+										<div className="indiviual_input_header">{month_arr_splice[7]} 월</div>
+										<_IndiviualInput
+											type={type}
+											callBack={handler.SetPageVal}
+											params={`${month_arr_splice[7]}`}
+										/>
+									</div>
+									<div>
+										<div className="indiviual_input_header">{month_arr_splice[6]} 월</div>
+										<_IndiviualInput
+											type={type}
+											callBack={handler.SetPageVal}
+											params={`${month_arr_splice[6]}`}
+										/>
+									</div>
+									<div>
+										<div className="indiviual_input_header">{month_arr_splice[5]} 월</div>
+										<_IndiviualInput
+											type={type}
+											callBack={handler.SetPageVal}
+											params={`${month_arr_splice[5]}`}
+										/>
+									</div>
+									<div>
+										<div className="indiviual_input_header total">{month_arr_splice[4]} 월</div>
+										<_IndiviualInput
+											type={type}
+											total={true}
+											callBack={handler.SetPageVal}
+											params={`${month_arr_splice[2]}`}
+										/>
+									</div>
+								</div>
+								<button className="date_indiviual_prev" onClick={() => setDirection(3)}>
+									<img src={IMGPrev} alt="prev button" />
+								</button>
+							</>
+						) : (
+							direction === 3 && (
+								<>
+									<div className="date_indiviual_page">
+										<div>
+											<div className="indiviual_input_header">{month_arr_splice[11]} 월</div>
+											<_IndiviualInput
+												type={type}
+												callBack={handler.SetPageVal}
+												params={`${month_arr_splice[11]}`}
+											/>
+										</div>
+										<div>
+											<div className="indiviual_input_header">{month_arr_splice[10]} 월</div>
+											<_IndiviualInput
+												type={type}
+												callBack={handler.SetPageVal}
+												params={`${month_arr_splice[10]}`}
+											/>
+										</div>
+										<div>
+											<div className="indiviual_input_header">{month_arr_splice[9]} 월</div>
+											<_IndiviualInput
+												type={type}
+												callBack={handler.SetPageVal}
+												params={`${month_arr_splice[9]}`}
+											/>
+										</div>
+										<div>
+											<div className="indiviual_input_header">{month_arr_splice[8]} 월</div>
+											<_IndiviualInput
+												type={type}
+												callBack={handler.SetPageVal}
+												params={`${month_arr_splice[8]}`}
+											/>
+										</div>
+									</div>
+									<button className="date_indiviual_next" onClick={() => setDirection(2)}>
+										<img src={IMGNext} alt="next button" />
+									</button>
+								</>
+							)
+						)}
+					</div>
 				)
 			)}
-		</div>
+		</>
 	);
 };
