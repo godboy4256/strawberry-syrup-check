@@ -43,7 +43,7 @@ const shortArtBodyProp = {
 	sumOneYearWorkDay: { type: "array", minItems: 2, items: { type: "number" } },
 	isSpecial: { type: "boolean" },
 	isOverTen: { type: "boolean" },
-	hasWork: { type: "array", items: [{ type: "boolean" }, { type: "string" }] },
+	hasWork: { type: "array" },
 };
 
 const dayJobBodyProp = {

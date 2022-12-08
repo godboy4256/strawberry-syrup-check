@@ -54,19 +54,21 @@ export default function multiRoute(fastify: FastifyInstance, options: any, done:
 		// 1095일은 365일 * 3 즉 3년
 		// 다음 근로 정보가 3년을 초과하는 경우 가장 최근 근로 정보만 이용해서 계산
 		if (diffMainToSecond > 1095) {
-			// 최소조건 (기한내 필요 피보험단위(예시 180일) 만족, 이직 후 1년 이내) 만족 후
-			const workingDays = mainData.workingDays;
-			const workingYears = Math.floor(workingDays / 365);
-			const receiveDay = getReceiveDay(workingYears, mainData.age, mainData.disable);
+			// // 최소조건 (기한내 필요 피보험단위(예시 180일) 만족, 이직 후 1년 이내) 만족 후
+			// const workingDays = mainData.workingDays;
+			// const workingYears = Math.floor(workingDays / 365);
+			// const receiveDay = getReceiveDay(workingYears, mainData.age, mainData.disable);
 
-			return {
-				succ: true,
-				amountCost: mainData.realDayPay * receiveDay,
-				realDayPay: mainData.realDayPay,
-				receiveDay,
-				realMonthPay: mainData.realDayPay * 30,
-				severancePay: joinDays >= 365 ? mainData.dayAvgPay * 30 * Math.floor(joinDays / 365) : 0,
-			};
+			// return {
+			// 	succ: true,
+			// 	amountCost: mainData.realDayPay * receiveDay,
+			// 	realDayPay: mainData.realDayPay,
+			// 	receiveDay,
+			// 	realMonthPay: mainData.realDayPay * 30,
+			// 	severancePay: joinDays >= 365 ? mainData.dayAvgPay * 30 * Math.floor(joinDays / 365) : 0,
+			// };
+			res.statusCode = 204;
+			return { succ: false, mesg: "" };
 		}
 		// 여기서 부터는 3년 내에 다른 직장 정보가 유효한 경우
 
