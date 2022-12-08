@@ -156,7 +156,11 @@ export default function multiRoute(fastify: FastifyInstance, options: any, done:
 			mainData.workCate === 5
 				? getEmployerReceiveDay(workingYears)
 				: getReceiveDay(workingYears, mainData.age, mainData.disable);
-		const receiveDay = tempReceiveDay === 120 ? 120 : tempReceiveDay - 30;
+		const receiveDay = addCadiates[addCadiates.length - 1].isIrregular
+			? tempReceiveDay === 120
+				? 120
+				: tempReceiveDay - 30
+			: tempReceiveDay;
 
 		// 9.
 		return {
