@@ -68,7 +68,7 @@ export default function multiRoute(fastify: FastifyInstance, options: any, done:
 			// 	severancePay: joinDays >= 365 ? mainData.dayAvgPay * 30 * Math.floor(joinDays / 365) : 0,
 			// };
 			res.statusCode = 204;
-			return { succ: false, mesg: "" };
+			return { succ: true, mesg: "" };
 		}
 		// 여기서 부터는 3년 내에 다른 직장 정보가 유효한 경우
 
