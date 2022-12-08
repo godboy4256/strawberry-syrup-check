@@ -135,7 +135,7 @@ export default function multiRoute(fastify: FastifyInstance, options: any, done:
 
 		// 최소조건 (기한내 필요 피보험단위(예시 180일) 만족, 이직 후 1년 이내) 만족 후
 
-		// 7. 전체 피보험단위를 산정하기위한 합산 가능 유형 필터링
+		// 7. 전체 피보험기간을 산정하기위한 합산 가능 유형 필터링
 		const addCadiates: TaddData[] = [];
 		for (let i = 0; i < addDatas.length; i++) {
 			if (i === 0) {
