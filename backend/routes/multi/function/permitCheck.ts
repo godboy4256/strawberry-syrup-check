@@ -1,6 +1,6 @@
 import dayjs from "dayjs";
-import { requiredWorkingDay } from "../../data/data";
-import { TaddData, TmainData } from "./schema";
+import { requiredWorkingDay } from "../../../data/data";
+import { TaddData, TmainData } from "../schema";
 
 export const doubleCasePermitCheck = (
 	tempWoringDays: number,
@@ -8,16 +8,13 @@ export const doubleCasePermitCheck = (
 	specialWorkingMonths: number,
 	mainWorkCate: number
 ) => {
-	console.log("hi");
 	let result: [boolean, number] = [false, 0];
 	if (mainWorkCate === 2 || mainWorkCate === 4) {
-		console.log("hi01");
 		result[0] = artDoubleCheckFormula(tempWoringDays, artWorkingMonths, specialWorkingMonths);
 		if (!result[0]) {
 			result.push(calRequireDays(tempWoringDays, artWorkingMonths, specialWorkingMonths, artDoubleCheckFormula));
 		}
 	} else if (mainWorkCate === 3 || mainWorkCate === 5) {
-		console.log("hi02");
 		result[0] = specialDoubleCheckFormula(tempWoringDays, artWorkingMonths, specialWorkingMonths);
 		if (!result[0]) {
 			result.push(
@@ -25,7 +22,6 @@ export const doubleCasePermitCheck = (
 			);
 		}
 	} else {
-		console.log("hi03");
 		result[0] = tempDoubleCheckFormula(tempWoringDays, artWorkingMonths, specialWorkingMonths);
 		if (!result[0]) {
 			result.push(calRequireDays(tempWoringDays, artWorkingMonths, specialWorkingMonths, tempDoubleCheckFormula));
@@ -43,9 +39,7 @@ export const commonCasePermitCheck = (permitAddCandidates: TaddData[], mainData:
 	return result;
 };
 
-// 중복 제거는 했는데 피보험단위기간 산정 규칙에 맞지 않음
-// compareData = 하나씩 늘어남 가장 처음은 mainData 이후는 addData가 0개부터 1개씩 늘어나서 최대 9개 또는 10개
-export function mergeWorkingDays(mainData: TmainData, addDatas: (TmainData | TaddData)[]) {
+export const mergeWorkingDays = (mainData: TmainData, addDatas: (TmainData | TaddData)[]) => {
 	let workingDays = dayjs(mainData.retiredDay).diff(mainData.enterDay, "day");
 
 	addDatas.map((addData, idx, addDatas) => {
@@ -91,7 +85,7 @@ export function mergeWorkingDays(mainData: TmainData, addDatas: (TmainData | Tad
 	});
 
 	return workingDays;
-}
+};
 
 const calRequireDays = (
 	tempWoringDays: number,

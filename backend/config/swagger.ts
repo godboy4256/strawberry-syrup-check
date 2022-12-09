@@ -3,7 +3,6 @@ import { FastifyDynamicSwaggerOptions } from "@fastify/swagger";
 export const swaggerConfig: FastifyDynamicSwaggerOptions = {
 	routePrefix: "/documentation",
 	openapi: {
-		// servers: [{ url: "http://localhost" }, { url: "https://moneysylove.com" }],
 		info: {
 			title: "딸기시럽",
 			description: "딸기시럽 API 문서",

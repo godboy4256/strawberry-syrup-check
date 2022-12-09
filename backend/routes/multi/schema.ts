@@ -78,6 +78,19 @@ const multiBodyExamples = [
 	},
 ];
 
+const multiResponse = {
+	204: {
+		description:
+			"mainData의 정보만 사용할 수 있는 경우 상태 코드 204를 리턴한다.\n\n상세형 계산의 결과를 그대로 사용한다.",
+		type: "object",
+		properties: {
+			succ: { type: "boolean" },
+			mesg: { type: "string" },
+		},
+		examples: [{ succ: true, mesg: "" }],
+	},
+};
+
 export const multiSchema = {
 	schema: {
 		tags: ["multi"],
@@ -87,6 +100,7 @@ export const multiSchema = {
 			properties: multiBodyProp,
 			examples: multiBodyExamples,
 		},
+		response: multiResponse,
 	},
 };
 
