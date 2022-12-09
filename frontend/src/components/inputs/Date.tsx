@@ -396,10 +396,12 @@ const _IndiviualInput = ({
   callBack,
   params,
   total,
+  pay = false,
 }: {
   callBack: CallableFunction;
   params: string;
   total?: boolean;
+  pay?: boolean;
 }) => {
   const indiviual_export_data: any = { month: Number(params) };
   const onChangeInput = (params_in: string, value: any) => {
@@ -415,13 +417,15 @@ const _IndiviualInput = ({
           onChangeInput("day", e.currentTarget.value)
         }
       />
-      <input
-        className={total ? "total" : ""}
-        placeholder="월 임금총액"
-        onChange={(e: ChangeEvent<HTMLInputElement>) =>
-          onChangeInput("pay", e.currentTarget.value)
-        }
-      />
+      {pay && (
+        <input
+          className={total ? "total" : ""}
+          placeholder="월 임금총액"
+          onChange={(e: ChangeEvent<HTMLInputElement>) =>
+            onChangeInput("pay", e.currentTarget.value)
+          }
+        />
+      )}
     </div>
   );
 };
@@ -520,6 +524,7 @@ export const DateInputIndividual = ({
                       total={true}
                       callBack={handler.SetPageVal}
                       params={`${month_arr_splice[3]}`}
+                      pay={true}
                     />
                   </div>
                   <div>
@@ -530,6 +535,7 @@ export const DateInputIndividual = ({
                       total={true}
                       callBack={handler.SetPageVal}
                       params={`${month_arr_splice[2]}`}
+                      pay={true}
                     />
                   </div>
                   <div className="unset_indiviual_input">
@@ -592,6 +598,7 @@ export const DateInputIndividual = ({
                       total={true}
                       callBack={handler.SetPageVal}
                       params={`${month_arr_splice[2]}`}
+                      pay={true}
                     />
                   </div>
                 </div>
