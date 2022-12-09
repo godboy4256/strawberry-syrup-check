@@ -1,4 +1,4 @@
-import React, { ChangeEvent, useState } from "react";
+import { ChangeEvent, useState } from "react";
 import { money_korean } from "../../utils/pays";
 import "../../styles/input.css";
 
@@ -16,7 +16,7 @@ const NumberInput = ({
   label?: string;
   by_date?: string;
   num_unit?: string | string[];
-  callBack: CallableFunction;
+  callBack?: CallableFunction;
   placeholder?: string;
   k_parser?: boolean;
   double?: boolean;
@@ -29,14 +29,15 @@ const NumberInput = ({
     if (isNaN(protoNum) || toStringNum.length > 11) {
       return;
     } else {
-      callBack(Array.isArray(params) ? params[0] : params, protoNum);
+      callBack &&
+        callBack(Array.isArray(params) ? params[0] : params, protoNum);
       setValue(toStringNum);
     }
   };
   const onClickSetValue2 = (e: ChangeEvent<HTMLInputElement>) => {
     let protoNum: number = Number(e.currentTarget.value.split(",").join(""));
     let toStringNum: string = String(Number(protoNum).toLocaleString());
-    callBack(params[1], protoNum);
+    callBack && callBack(params?.[1], protoNum);
     setValue2(toStringNum);
   };
   return (
@@ -46,7 +47,7 @@ const NumberInput = ({
           {label && <label className="write_label fs_16">{label}</label>}
           <div className={`input_style ${value ? "select" : ""}`}>
             {by_date && by_date}
-            {num_unit[0]}
+            {num_unit?.[0]}
             <input
               value={value}
               placeholder={placeholder && placeholder}
@@ -54,7 +55,7 @@ const NumberInput = ({
               onChange={onChangeSetValue}
               type="text"
             />
-            {num_unit[1]}
+            {num_unit?.[1]}
           </div>
           {k_parser ? (
             <div className="fs_12 kr_value">
@@ -75,7 +76,7 @@ const NumberInput = ({
                   onChange={onChangeSetValue}
                   type="text"
                 />
-                {num_unit[0]}
+                {num_unit?.[0]}
               </div>
               {k_parser ? (
                 <div className="fs_12 kr_value">
@@ -92,7 +93,7 @@ const NumberInput = ({
                   onChange={onClickSetValue2}
                   type="text"
                 />
-                {num_unit[1]}
+                {num_unit?.[1]}
               </div>
               {k_parser ? (
                 <div className="fs_12 kr_value">
