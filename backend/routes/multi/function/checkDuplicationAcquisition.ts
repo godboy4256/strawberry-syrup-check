@@ -1,3 +1,4 @@
+import dayjs from "dayjs";
 import { TaddData, TmainData } from "../schema";
 
 const checkDuplicationDays = (mainData: TmainData, permitAddCandidates: TaddData[]) => {
@@ -75,4 +76,21 @@ export const checkDuplicateAcquisition = (mainData: TmainData, permitAddCandidat
 		isDoubleAcquisition = true;
 
 	return { isDoubleAcquisition, tempWorkCount, artWorkCount, specialWorkCount };
+};
+
+export const makeAddCadiates = (addDatas: TaddData[], mainEnterDay: dayjs.Dayjs) => {
+	const addCadiates: TaddData[] = [];
+	for (let i = 0; i < addDatas.length; i++) {
+		if (i === 0) {
+			if (mainEnterDay.diff(addDatas[i].retiredDay, "day") <= 1095) addCadiates.push(addDatas[i]);
+		} else if (i !== 0) {
+			if (dayjs(addDatas[i - 1].enterDay).diff(addDatas[i].retiredDay, "day") <= 1095) {
+				addCadiates.push(addDatas[i]);
+			}
+		} else {
+			break;
+		}
+	}
+
+	return addCadiates;
 };

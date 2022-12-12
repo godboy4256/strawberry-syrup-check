@@ -14,6 +14,7 @@ import {
 import { DefinedParamErrorMesg } from "../../share/validate";
 import { detailPath } from "../../share/pathList";
 import { employerPayTable } from "../../data/data";
+
 import { artSchema, dayJobSchema, employerSchema, shortArtSchema, standardSchema, veryShortSchema } from "./schema";
 import {
 	artShortCheckPermit,
@@ -153,12 +154,9 @@ export default function detailRoute(fastify: FastifyInstance, options: any, done
 		// 복수형 여부
 		if (req.body.isEnd) {
 			const limitDay = dayjs(req.body.limitDay); // 마지막 직장 퇴사일로 부터 필요한 개월 수(18 또는 24) 전
-			// 이 직장의 입사일이 기준일 이후 인가?
-			if (enterDay.isSameOrAfter(limitDay, "day")) {
-				workDayForMulti = artWorkingDays;
-			} else {
-				workDayForMulti = Math.floor(retiredDay.diff(limitDay, "day", true) + 1);
-			}
+			workDayForMulti = enterDay.isSameOrAfter(limitDay, "day")
+				? artWorkingDays
+				: Math.floor(retiredDay.diff(limitDay, "day", true) + 1);
 		}
 		/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -252,6 +250,18 @@ export default function detailRoute(fastify: FastifyInstance, options: any, done
 
 		const { artRealDayPay, artRealMonthPay } = calArtPay(sumOneYearPay, sumOneYearWorkDay, req.body.isSpecial);
 		const [requireWorkingYear, nextReceiveDay] = getNextReceiveDay(workingYear, req.body.age, req.body.disable);
+
+		///////////////////////////////////////////////////////////////
+		let workDayForMulti = 0;
+		if (req.body.isEnd) {
+			const limitDay = dayjs(req.body.limitDay);
+			const enterDay = dayjs(new Date());
+
+			workDayForMulti = enterDay.isSameOrAfter(limitDay, "day")
+				? lastWorkDay.diff(enterDay, "day")
+				: lastWorkDay.diff(limitDay, "day");
+		}
+		///////////////////////////////////////////////////////////////
 
 		if (nextReceiveDay === 0) {
 			return {

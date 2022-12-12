@@ -40,10 +40,12 @@ const shortArtBodyProp = {
 	lastWorkDay: DefineParamInfo.lastWorkDay, // 마지막 근무일
 	workRecord: DefineParamInfo.workRecord,
 	sumOneYearPay: { type: "number", minimum: 0 },
-	sumOneYearWorkDay: { type: "array", minItems: 2, items: { type: "number" } },
+	sumOneYearWorkDay: { type: "array", minItems: 2, items: { type: "number" } }, // [월, 근무일]
 	isSpecial: { type: "boolean" },
 	isOverTen: { type: "boolean" },
 	hasWork: { type: "array" },
+	isEnd: { type: "boolean" },
+	limitDay: { type: "string" },
 };
 
 const dayJobBodyProp = {
