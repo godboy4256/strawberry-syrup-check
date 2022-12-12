@@ -277,20 +277,6 @@ export default function detailRoute(fastify: FastifyInstance, options: any, done
 	});
 
 	fastify.post(detailPath.dayJob, dayJobSchema, (req: any, res) => {
-		/**
-		 * 1. 이직일 이전 18개월 동안 피보험 단위기간이 180일 이상?
-		 * 	1-1. 이상이라면 계속 진행
-		 * 	1-2. 이상이 아니라면 수급불인정 메세지 리턴
-		 * 2. 마지막 근무일이 신청일(조회일을 신청일로 가정)과 비교하여 1개월을 초과하면 PASS
-		 * 	2-1. PASS하면 계속 진행
-		 * 	2-2. PASS하지 못하면 신청일 이전 1개월 동안 근로일 수 10일 미만 인지 확인 (true OR false)
-		 * 		2-2-1. 위의 단계를 통과하지 못하고 건설직인 경우 최근 14일 내에 근로 내역이 없는 지 확인
-		 * 			2-2-1-1. 없다면 수급 인정 있다면 수급 불인정
-		 * 3. 근로일 정보에서 근로일수와 임금 총액을 합산
-		 * 	3-1. 기초일액, 일 수급액, 소정급여일수, 월 수급액
-		 * 4. 더 많은 수급액을 받을 수 있는 지를 기준으로 결과 값 리턴(수급인정 메세지를 리턴하면서 퇴직금)
-		 */
-
 		const lastWorkDay = dayjs(req.body.lastWorkDay);
 		const now = dayjs(new Date());
 		if (Math.floor(now.diff(lastWorkDay, "day", true)) > 365)

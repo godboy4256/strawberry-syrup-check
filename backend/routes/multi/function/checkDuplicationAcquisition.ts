@@ -3,7 +3,6 @@ import { TaddData, TmainData } from "../schema";
 const checkDuplicationDays = (mainData: TmainData, permitAddCandidates: TaddData[]) => {
 	let isDuplicate = false;
 
-	console.log("HI~~");
 	for (let i = 0; i < permitAddCandidates.length; i++) {
 		if (
 			permitAddCandidates[i].enterDay < mainData.enterDay &&
@@ -26,7 +25,6 @@ const checkDuplicationDays = (mainData: TmainData, permitAddCandidates: TaddData
 
 	for (let i = 0; i < permitAddCandidates.length; i++) {
 		if (isDuplicate) break;
-		console.log(permitAddCandidates[i]);
 		for (let j = i + 1; j < permitAddCandidates.length; j++) {
 			if (
 				permitAddCandidates[j].enterDay < permitAddCandidates[i].enterDay &&
@@ -43,15 +41,13 @@ const checkDuplicationDays = (mainData: TmainData, permitAddCandidates: TaddData
 				permitAddCandidates[j].retiredDay > permitAddCandidates[i].retiredDay
 			)
 				isDuplicate = true;
-
-			console.log(permitAddCandidates[j]);
 		}
 	}
 
 	return isDuplicate;
 };
 
-export const checkDuplicationAcquisition = (mainData: TmainData, permitAddCandidates: TaddData[]) => {
+export const checkDuplicateAcquisition = (mainData: TmainData, permitAddCandidates: TaddData[]) => {
 	let isDoubleAcquisition = false; // 이중취득 여부
 	let tempWorkCount = { count: 0, permitDays: 0 };
 	let artWorkCount = { count: 0, permitMonths: 0 };

@@ -147,7 +147,7 @@ export const dayJobSchema = {
 		tags: ["detail"],
 		body: {
 			type: "object",
-			required: ["age", "disable", "isSpecial", "lastWorkDay", "dayAvgPay", "sumWorkDay", "isOverTen"],
+			required: ["age", "disable", "isSpecial", "lastWorkDay", "dayAvgPay", "sumWorkDay", "isOverTen", "hasWork"],
 			properties: dayJobBodyProp,
 		},
 	},

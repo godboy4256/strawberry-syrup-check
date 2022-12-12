@@ -3,12 +3,11 @@ import dayjs from "dayjs";
 import isSameOrAfter from "dayjs/plugin/isSameOrAfter";
 
 import { getReceiveDay } from "../../router_funcs/common";
-import { DefinedParamErrorMesg, DefineParamInfo } from "../../share/validate";
 import { permitRangeData, requiredWorkingDay } from "../../data/data";
 import { getEmployerReceiveDay } from "../detail/function";
 
 import { multiSchema, TaddData, TmainData } from "./schema";
-import { checkDuplicationAcquisition } from "./function/checkDuplicationAcquisition";
+import { checkDuplicateAcquisition } from "./function/checkDuplicationAcquisition";
 import { commonCasePermitCheck, doubleCasePermitCheck, mergeWorkingDays } from "./function/permitCheck";
 import { checkBasicRequirements } from "./function/checkBasicRequirements";
 
@@ -49,7 +48,7 @@ export default function multiRoute(fastify: FastifyInstance, options: any, done:
 			return { succ: false, mesg: "isIrregular" };
 
 		// 6. 이중취득 여부 확인
-		const { isDoubleAcquisition, tempWorkCount, artWorkCount, specialWorkCount } = checkDuplicationAcquisition(
+		const { isDoubleAcquisition, tempWorkCount, artWorkCount, specialWorkCount } = checkDuplicateAcquisition(
 			mainData,
 			permitAddCandidates
 		);
