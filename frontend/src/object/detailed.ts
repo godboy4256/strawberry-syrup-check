@@ -1,24 +1,32 @@
 import { Dispatch, SetStateAction } from "react";
-import { getAge } from "../utils/date";
+import { getAge, GetDateArr } from "../utils/date";
 import { sendToServer } from "../utils/sendToserver";
 import InputHandler from "./Inputs";
 
 class DetailedHandler extends InputHandler {
-  public result: {};
-  public setCompState: Dispatch<SetStateAction<number>>;
-  public setTab: Dispatch<SetStateAction<string>>;
-  public setIsValueSelect01: Dispatch<SetStateAction<number>>;
-  public setIsValueSelect02: Dispatch<SetStateAction<number>>;
-  public setIsValueSelect03: Dispatch<SetStateAction<number>>;
-  public insuranceGrade = (insuranceGrade) => {
-    for (let i = 0; i < Object.keys(insuranceGrade).length; i++) {
-      insuranceGrade[Object.keys(insuranceGrade)[i]] = Number(
-        insuranceGrade[Object.keys(insuranceGrade)[i]].split("등급")[0]
-      );
-    }
-    return insuranceGrade;
+  public result: {} = {};
+  public setCompState: Dispatch<SetStateAction<number>> | undefined = undefined;
+  public setTab: Dispatch<SetStateAction<string>> | undefined = undefined;
+  public setIsValueSelect01: Dispatch<SetStateAction<number>> | undefined =
+    undefined;
+  public setIsValueSelect02: Dispatch<SetStateAction<number>> | undefined =
+    undefined;
+  public setIsValueSelect03: Dispatch<SetStateAction<number>> | undefined =
+    undefined;
+  public insuranceGrade = (retiredDay: Date, enterDay: Date) => {
+    const retiredDayYear = GetDateArr(retiredDay)[0];
+    const enterDayYear = GetDateArr(enterDay)[0];
+    const answer: any = {};
+    new Array(retiredDayYear - enterDayYear + 1)
+      .fill(1)
+      .forEach((_, idx: number) => {
+        answer[enterDayYear + idx] = this._Data[`year${idx}`]
+          ? this._Data[`year${idx}`].split("등급")[0]
+          : this._Data["year0"].split("등급")[0];
+      });
+    return answer;
   };
-  sumDayJobWorkingDay = (workRecord: any[], isSimple: boolean = false) => {
+  sumDayJobWorkingDay: any = (workRecord: any[], isSimple: boolean = false) => {
     let sumWorkDay = 0;
     let sumPay = 0;
     let dayAvgPay;
@@ -26,9 +34,9 @@ class DetailedHandler extends InputHandler {
       return 1;
     } else {
       workRecord.map((v: { year: number; months: any[] }) => {
-        v.months.map((v: { month: number; workDay: number; pay?: number }) => {
-          sumWorkDay += v.workDay;
-          sumPay += v.pay;
+        v.months.map((v: { month: number; day: number; pay: number }) => {
+          sumWorkDay += v.day;
+          sumPay += v?.pay;
         });
       });
       dayAvgPay = Math.ceil(sumPay / sumWorkDay);
@@ -71,8 +79,8 @@ class DetailedHandler extends InputHandler {
         }
       });
 
-    const url =
-      this._Data.workCate === 0 && this._Data.workCate === 1
+    const url: string | boolean =
+      this._Data.workCate === 0 || this._Data.workCate === 1
         ? "/detail/standard"
         : this._Data.workCate === 2
         ? "/detail/dayjob"
@@ -82,10 +90,10 @@ class DetailedHandler extends InputHandler {
           ? "/detail/art/short"
           : "/detail/art"
         : this._Data.workCate === 5
-        ? "/detail/veryshort"
+        ? "/detail/veryShort"
         : this._Data.workCate === 6 && "/detail/employer";
     const to_server =
-      this._Data.workCate === 0 && this._Data.workCate === 1 // 정규직 / 기간제
+      this._Data.workCate === 0 || this._Data.workCate === 1 // 정규직 / 기간제
         ? {
             ...this._Data,
             salary: Array.isArray(this._Data.salary)
@@ -100,11 +108,21 @@ class DetailedHandler extends InputHandler {
           }
         : this._Data.workCate === 2 // 일용직
         ? {
-            ...this._Data,
+            retired: this._Data.retired,
+            workCate: this._Data.workCate,
+            retireReason: this._Data.retireReason,
+            dayWorkTime: Number(this._Data.dayWorkTime.split("시간")[0]),
+            lastWorkDay: this._Data.lastWorkDay,
+            isSpecial: this._Data.isSpecial,
             age: getAge(new Date(String(this._Data.age))).age,
-            disabled: this._Data.disabled === "장애인" ? true : false,
+            disable: this._Data.disabled === "장애인" ? true : false,
             isOverTen: this._Data.isOverTen ? this._Data.isOverTen : false,
-            hasWork: this._Data.hasWork ? this._Data.hasWork : false,
+            sumWorkDay: this._Data.workRecord
+              ? this.sumDayJobWorkingDay(this._Data.workRecord)[0]
+              : this._Data.sumWorkDay,
+            dayAvgPay: this._Data.workRecord
+              ? this.sumDayJobWorkingDay(this._Data.workRecord)[1]
+              : this._Data.dayAvgPay,
           }
         : this._Data.workCate === 3 // 예술인
         ? this._Data.is_short === "단기예술인"
@@ -171,17 +189,22 @@ class DetailedHandler extends InputHandler {
             ...this._Data,
             age: getAge(new Date(String(this._Data.age))).age,
             weekDay,
-            disabled: this._Data.disabled === "장애인" ? true : false,
+            disable: this._Data.disabled === "장애인" ? true : false,
             dayWorkTime:
               this._Data.dayWorkTime["time"] / this._Data.dayWorkTime["week"],
+            reitredDay: this._Data.retiredDay,
           }
         : this._Data.workCate === 6 // 자영업자
         ? {
             enterDay: this._Data.enterDay,
             retiredDay: this._Data.retiredDay,
-            insuranceGrade: this.insuranceGrade(this._Data.insuranceGrade),
+            insuranceGrade: this.insuranceGrade(
+              this._Data.retiredDay,
+              this._Data.enterDay
+            ),
           }
         : {};
+    console.log(this._Data.insuranceGrade);
     console.log(to_server);
     this.result = await sendToServer(url, to_server);
     // this.setCompState(4);

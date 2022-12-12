@@ -1,4 +1,4 @@
-import React, { ReactElement, useEffect, useState } from "react";
+import { ReactElement, useEffect, useState } from "react";
 import IsRetiree from "../components/calculator/IsRetiree";
 import {
   DateInputIndividual,
@@ -207,6 +207,24 @@ const _DetailCal02 = ({ handler }: { handler: any }) => {
               label="마지막 근무일"
               callBack={handler.SetPageVal}
             />
+            <SelectInput
+              selected={"시간을 선택해주세요."}
+              type="normal"
+              label="마지막 근무시간"
+              options={[
+                "시간을 선택해주세요.",
+                "1시간",
+                "2시간",
+                "3시간",
+                "4시간",
+                "5시간",
+                "6시간",
+                "7시간",
+                "8시간 이상",
+              ]}
+              params="dayWorkTime"
+              callBack={handler.SetPageVal}
+            />
             <DateInputNormal
               params="planToDo"
               label="신청 예정일"
@@ -228,6 +246,24 @@ const _DetailCal02 = ({ handler }: { handler: any }) => {
             <DateInputNormal
               params="lastWorkDay"
               label="마지막 근무일"
+              callBack={handler.SetPageVal}
+            />
+            <SelectInput
+              selected={"시간을 선택해주세요."}
+              type="normal"
+              label="마지막 근무시간"
+              options={[
+                "시간을 선택해주세요.",
+                "1시간",
+                "2시간",
+                "3시간",
+                "4시간",
+                "5시간",
+                "6시간",
+                "7시간",
+                "8시간 이상",
+              ]}
+              params="dayWorkTime"
               callBack={handler.SetPageVal}
             />
             <NumberInput
@@ -405,11 +441,6 @@ const _DetailCal04 = ({ handler }: { handler: any }) => {
   );
 };
 const _DetailCal05 = ({ handler }: { handler: any }) => {
-  const employer_select_data: any = {};
-  const onChangeEmployerArr = (in_params: string, value: string) => {
-    employer_select_data[in_params] = value;
-    handler.SetPageVal("insuranceGrade", employer_select_data);
-  };
   return (
     <div className={`full_height_layout`}>
       <div className="pd_810 fs_14">
@@ -430,8 +461,7 @@ const _DetailCal05 = ({ handler }: { handler: any }) => {
         <TabInputs
           label="고용 보험 등급"
           type="select"
-          params="insuranceGrade"
-          callBack={onChangeEmployerArr}
+          callBack={handler.SetPageVal}
           valueDay={handler.GetPageVal}
         />
       </div>

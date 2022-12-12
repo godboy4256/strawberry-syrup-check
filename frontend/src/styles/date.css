@@ -1,203 +1,206 @@
 .date_container {
-	border: 1px solid rgba(255, 101, 89, 1);
-	border-radius: 5px;
-	width: 100%;
-	display: flex;
-	overflow: hidden;
+  border: 1px solid rgba(255, 101, 89, 1);
+  border-radius: 5px;
+  width: 100%;
+  display: flex;
+  overflow: hidden;
 }
 .date_container.unselect {
-	border-color: rgba(0, 0, 0, 0.2);
+  border-color: rgba(0, 0, 0, 0.2);
 }
 .date_container .date_value {
-	width: 100%;
-	color: rgba(255, 191, 186, 1);
-	padding: 9px 0;
-	text-align: center;
+  width: 100%;
+  color: rgba(255, 191, 186, 1);
+  padding: 9px 0;
+  text-align: center;
 }
 .date_container .date_value.unselect {
-	color: rgba(0, 0, 0, 0.2);
+  color: rgba(0, 0, 0, 0.2);
 }
 .date_container .date_icon {
-	background-color: rgba(255, 101, 89, 1);
-	width: 40px;
-	display: flex;
-	justify-content: center;
-	align-items: center;
+  background-color: rgba(255, 101, 89, 1);
+  width: 40px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 .date_container .date_icon.unselect {
-	background-color: rgba(0, 0, 0, 0.2);
+  background-color: rgba(0, 0, 0, 0.2);
 }
 .date_input_container {
-	width: 340px;
-	border-radius: 10px;
+  width: 340px;
+  border-radius: 10px;
 }
 .date_input_header {
-	border-top-left-radius: 10px;
-	border-top-right-radius: 10px;
-	background-color: rgba(234, 91, 80, 1);
-	padding: 16px 0;
-	color: white;
-	font-size: 21px;
-	text-align: center;
-	font-weight: 400;
+  border-top-left-radius: 10px;
+  border-top-right-radius: 10px;
+  background-color: rgba(234, 91, 80, 1);
+  padding: 16px 0;
+  color: white;
+  font-size: 21px;
+  text-align: center;
+  font-weight: 400;
 }
 .date_input_container .date_input_dates .select {
-	position: relative;
+  position: relative;
 }
 .date_input_container .date_input_dates .select_box {
-	position: absolute;
-	top: 50%;
-	left: 50%;
-	transform: translate(-50%, -50%);
-	color: white;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  color: white;
 }
 .date_input_container .date_input_dates .select::before {
-	content: "";
-	width: 31px;
-	height: 31px;
-	display: block;
-	position: absolute;
-	top: 50%;
-	left: 50%;
-	transform: translate(-50%, -50%);
-	background-color: rgba(255, 73, 58, 1);
-	border-radius: 50%;
+  content: "";
+  width: 31px;
+  height: 31px;
+  display: block;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background-color: rgba(255, 73, 58, 1);
+  border-radius: 50%;
 }
 .date_input_container .date_input_days,
 .date_input_container .date_input_dates {
-	width: 100%;
-	display: flex;
-	flex-wrap: wrap;
-	padding: 0 23px;
+  width: 100%;
+  display: flex;
+  flex-wrap: wrap;
+  padding: 0 23px;
 }
 .date_input_container .date_input_days > div,
 .date_input_container .date_input_dates > div {
-	width: 14.28%;
-	height: 40px;
-	line-height: 40px;
-	text-align: center;
+  width: 14.28%;
+  height: 40px;
+  line-height: 40px;
+  text-align: center;
 }
 .date_input_container .date_input_dates > div:nth-child(7n) {
-	color: rgba(45, 91, 255, 1);
+  color: rgba(45, 91, 255, 1);
 }
 .date_input_container .date_input_dates > div:nth-child(7n + 1) {
-	color: rgba(255, 68, 68, 1);
+  color: rgba(255, 68, 68, 1);
 }
 #date_input_controllbar {
-	width: 100%;
-	display: flex;
-	justify-content: space-between;
-	padding: 22px 23px 6px;
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  padding: 22px 23px 6px;
 }
 #date_input_controllbar button {
-	line-height: 0;
+  line-height: 0;
 }
 #date_next_btn {
-	transform: rotate(180deg);
+  transform: rotate(180deg);
 }
 #date_next_btn.acitve,
 #date_prev_btn.acitve {
-	visibility: hidden;
+  visibility: hidden;
 }
 #date_buttons {
-	padding: 10px 23px 20px;
-	display: flex;
-	justify-content: flex-end;
+  padding: 10px 23px 20px;
+  display: flex;
+  justify-content: flex-end;
 }
 #date_buttons button {
-	border-radius: 37px;
-	padding: 6px 9px;
+  border-radius: 37px;
+  padding: 6px 9px;
 }
 #date_select_box {
-	display: flex;
+  display: flex;
 }
 #date_select_cancel {
-	border: 1px solid rgba(255, 73, 58, 1);
-	color: rgba(255, 73, 58, 1);
-	margin-right: 10px;
+  border: 1px solid rgba(255, 73, 58, 1);
+  color: rgba(255, 73, 58, 1);
+  margin-right: 10px;
 }
 #date_select_ok {
-	background-color: rgba(255, 73, 58, 1);
-	color: white;
+  background-color: rgba(255, 73, 58, 1);
+  color: white;
 }
 .date_description {
-	display: flex;
-	line-height: 21px;
-	padding-top: 5px;
+  display: flex;
+  line-height: 21px;
+  padding-top: 5px;
 }
 .date_indiviual_page {
-	width: 100%;
+  width: 100%;
+  border-bottom: 1px solid #ccc;
+  border-left: 1px solid #ccc;
+  border-right: 1px solid #ccc;
 }
 .date_indiviual_page.type_2 {
-	display: flex;
-	flex-wrap: wrap;
-	padding: 18px 20px;
-	width: 340px;
+  display: flex;
+  flex-wrap: wrap;
+  padding: 18px 20px;
+  width: 340px;
 }
 
 .date_indiviual_page.type_2 > div {
-	width: 50%;
-	border-left: 1px solid #ccc;
-	border-right: 1px solid #ccc;
+  width: 50%;
+  border-left: 1px solid #ccc;
+  border-right: 1px solid #ccc;
 }
 .date_indiviual_page.type_2 > div:nth-child(5),
 .date_indiviual_page.type_2 > div:nth-child(6) {
-	border-bottom: 1px solid #ccc;
+  border-bottom: 1px solid #ccc;
 }
 .date_indiviual_page.type_2 > div:nth-child(2n) {
-	border-left: none;
+  border-left: none;
 }
 .indiviual_input_container input {
-	padding: 11px 10px;
-	text-align: center;
-	line-height: 21px;
-	font-size: 14px;
-	width: 100%;
-	border-top: 1px solid rgba(0, 0, 0, 0.2);
+  padding: 11px 10px;
+  text-align: center;
+  line-height: 21px;
+  font-size: 14px;
+  width: 100%;
+  border-top: 1px solid rgba(0, 0, 0, 0.2);
 }
 .indiviual_input_container input.total {
-	padding: 4px 10px;
+  padding: 4px 10px;
 }
 .indiviual_input_container input:last-child {
-	border-right: none;
+  border-right: none;
 }
 .date_indiviual_container {
-	min-width: 340px;
-	padding: 30px 50px;
+  min-width: 340px;
+  padding: 30px 50px;
 }
 .indiviual_input_header {
-	width: 100%;
-	background-color: #ffe3e2;
-	text-align: center;
-	font-size: 14px;
-	line-height: 21px;
-	padding: 11px 10px;
-	line-height: 21px;
-	border-top: 1px solid rgba(0, 0, 0, 0.2);
+  width: 100%;
+  background-color: #ffe3e2;
+  text-align: center;
+  font-size: 14px;
+  line-height: 21px;
+  padding: 11px 10px;
+  line-height: 21px;
+  border-top: 1px solid rgba(0, 0, 0, 0.2);
 }
 .indiviual_input_header.total {
-	padding: 4px 10px;
+  padding: 4px 10px;
 }
 .date_indiviual_prev,
 .date_indiviual_next {
-	position: absolute;
-	top: 50%;
-	transform: translateY(-50%);
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
 }
 .date_indiviual_prev {
-	left: 15px;
+  left: 15px;
 }
 .date_indiviual_next {
-	right: 15px;
+  right: 15px;
 }
 .unset_indiviual_input > .indiviual_input_header {
-	background-color: rgba(0, 0, 0, 0.2);
+  background-color: rgba(0, 0, 0, 0.2);
 }
 .unset_box {
-	padding: 4px 10px;
-	line-height: 21px;
-	font-size: 0;
+  padding: 4px 10px;
+  line-height: 21px;
+  font-size: 0;
 }
 .unset_box:last-child {
-	border-top: 1px solid rgba(0, 0, 0, 0.2);
+  border-top: 1px solid rgba(0, 0, 0, 0.2);
 }
