@@ -1,3 +1,5 @@
+import dayjs from "dayjs";
+
 export function calArtPay(sumOneYearPay: number[] | number, artWorkingDays: number, isSpecial: boolean = false) {
 	let artDayAvgPay = 0;
 	if (Array.isArray(sumOneYearPay)) {
@@ -166,3 +168,18 @@ export function getEmployerReceiveDay(workYear: number) {
 	if (workYear >= 5 && workYear < 10) return 180;
 	return 210;
 }
+
+export const calVeryShortAllWorkDay = (enterDay: dayjs.Dayjs, retiredDay: dayjs.Dayjs, weekDay: number[]) => {
+	const diffToEnter = Math.floor(Math.floor(enterDay.diff("1951-01-01", "day", true)) / 7); // 입사일 - 1951.1.1.
+	const diffToRetired = Math.floor(Math.floor(retiredDay.diff("1951-01-01", "day", true)) / 7); // 퇴사일 - 1951.1.1.
+
+	let allWorkDay = (diffToRetired - diffToEnter) * weekDay.length;
+
+	if (enterDay.day() <= weekDay[0]) allWorkDay += 2;
+	if (enterDay.day() <= weekDay[1]) allWorkDay += 1;
+
+	if (retiredDay.day() >= weekDay[1]) allWorkDay += 2;
+	if (retiredDay.day() >= weekDay[0]) allWorkDay += 1;
+
+	return allWorkDay;
+};

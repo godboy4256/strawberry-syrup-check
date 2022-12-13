@@ -72,6 +72,8 @@ const veryShortBodyProp = {
 	weekDay: DefineParamInfo.weekDay, // 주의
 	dayWorkTime: DefineParamInfo.weekWorkTime,
 	salary: DefineParamInfo.salary,
+	isEnd: { type: "boolean" },
+	limitDay: { type: "string" },
 };
 
 const employerBodyProp = {
@@ -80,6 +82,8 @@ const employerBodyProp = {
 	insuranceGrade: {
 		type: "object",
 	},
+	isEnd: { type: "boolean" },
+	limitDay: { type: "string" },
 };
 
 const employerBodyExamples = [
