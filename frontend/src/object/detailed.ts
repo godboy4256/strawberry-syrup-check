@@ -26,7 +26,27 @@ class DetailedHandler extends InputHandler {
       });
     return answer;
   };
-  sumDayJobWorkingDay: any = (workRecord: any[], isSimple: boolean = false) => {
+
+  public emeploymentInsuranceTotal = (workRecord: any) => {
+    let year = 0;
+    let month = 0;
+    workRecord.forEach((el: any) => {
+      el.months.forEach((it: any) => {
+        if (it.day > 10) {
+          if (month > 12) {
+            year += 1;
+          }
+          month += 1;
+        }
+      });
+    });
+    return [year, month];
+  };
+
+  public sumDayJobWorkingDay: (workRecord: any, isSimple?: any) => any = (
+    workRecord: any[],
+    isSimple: boolean = false
+  ) => {
     let sumWorkDay = 0;
     let sumPay = 0;
     let dayAvgPay;
@@ -136,11 +156,7 @@ class DetailedHandler extends InputHandler {
               sumOneYearWorkDay:
                 this._Data.input === "결과만 입력"
                   ? [this._Data.employ_year, this._Data.employ_month]
-                  : this._Data.workRecord.map((el: any) => {
-                      return el.months.map((el: any) => {
-                        return Number(el.day);
-                      });
-                    })[0],
+                  : this.emeploymentInsuranceTotal(this._Data.workRecord),
               sumOneYearPay:
                 this._Data.input === "결과만 입력"
                   ? this._Data.sumOneYearPay
@@ -207,7 +223,7 @@ class DetailedHandler extends InputHandler {
     console.log(this._Data.insuranceGrade);
     console.log(to_server);
     this.result = await sendToServer(url, to_server);
-    // this.setCompState(4);
+    this.setCompState && this.setCompState(4);
   };
 }
 

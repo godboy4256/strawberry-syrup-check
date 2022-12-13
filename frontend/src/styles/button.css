@@ -1,62 +1,60 @@
 .normal_main {
-	border-radius: 5px;
-	padding: 12px 41px;
-	background-color: rgba(255, 101, 89, 1);
-	color: white;
+  border-radius: 5px;
+  padding: 12px 41px;
+  background-color: rgba(255, 101, 89, 1);
+  color: white;
 }
-
 .normal_sub {
-	border-radius: 5px;
-	padding: 12px 41px;
-	border: 1px solid rgba(255, 101, 89, 1);
-	background-color: white;
+  border-radius: 5px;
+  padding: 12px 41px;
+  border: 1px solid rgba(255, 101, 89, 1);
+  background-color: white;
 }
-
 .popup_ok {
-	padding: 9px 0;
-	width: 100%;
-	background-color: rgba(255, 73, 58, 1);
-	color: white;
+  padding: 9px 0;
+  width: 100%;
+  background-color: rgba(255, 73, 58, 1);
+  color: white;
 }
 .popup_confirm {
-	padding: 9px 0;
-	width: 100%;
-	background-color: rgba(255, 73, 58, 1);
-	color: white;
+  padding: 9px 0;
+  width: 100%;
+  background-color: rgba(255, 73, 58, 1);
+  color: white;
 }
 .popup_cancel {
-	padding: 9px 0;
-	width: 100%;
-	background-color: white;
-	border: 1px solid rgba(255, 73, 58, 1);
-	color: rgba(255, 73, 58, 1);
+  padding: 9px 0;
+  width: 100%;
+  background-color: white;
+  border: 1px solid rgba(255, 73, 58, 1);
+  color: rgba(255, 73, 58, 1);
 }
 .date_select {
-	padding: 4.5px 17px;
-	border-radius: 20px;
-	background-color: #ff493a;
-	color: white;
-	margin-left: 15px;
+  padding: 4.5px 17px;
+  border-radius: 20px;
+  background-color: #ff493a;
+  color: white;
+  margin-left: 15px;
 }
 .date_cancel {
-	padding: 4.5px 17px;
-	border-radius: 20px;
-	border: 1px solid #ff493a;
-	color: #ff493a;
-	margin-left: 15px;
+  padding: 4.5px 17px;
+  border-radius: 20px;
+  border: 1px solid #ff493a;
+  color: #ff493a;
+  margin-left: 15px;
 }
 .bottom {
-	width: 100%;
-	background-color: rgba(255, 101, 89, 1);
-	color: white;
-	padding: 9px 0;
-	position: absolute;
-	bottom: 0;
-	left: 0;
+  width: 100%;
+  background-color: rgba(255, 101, 89, 1);
+  color: white;
+  padding: 9px 0;
+  position: absolute;
+  bottom: 0;
+  left: 0;
 }
 .btn_description {
-	text-align: center;
-	font-size: 14px;
-	margin-top: 5px;
-	margin-bottom: 45px;
+  text-align: center;
+  font-size: 14px;
+  margin-top: 5px;
+  margin-bottom: 45px;
 }

@@ -1,57 +1,115 @@
 #result_container {
-	text-align: center;
+  width: 100%;
+  padding: 0 30px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  min-height: calc(100vh - 132px);
 }
-
-#result_comment01 {
-	padding-bottom: 15px;
-	line-height: 27px;
+#result_container .help_link {
+  margin-top: 7.5px;
+  margin-bottom: 10px;
 }
-#result_comment02 {
-	padding: 25px 0 15px;
+#result_emoticon {
+  width: 158px;
+  margin: 15px 0 25px;
 }
-#result_main h3 {
-	padding: 3px 0;
+#result_comment {
+  margin-bottom: 15px;
 }
-#result_main h3 div {
-	width: 168px;
-	line-height: 38px;
-	text-align: center;
+#result_top {
+  width: 100%;
+  padding: 3px 0;
+  margin-bottom: 25px;
 }
-#result_main_content {
-	padding: 10px 0;
-	text-align: center;
-	border: 1px solid rgba(255, 101, 89, 1);
+#result_top_header {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 8px 15px;
+  font-weight: 800;
 }
-#result_day {
-	margin-bottom: 5px;
-	line-height: 18px;
+#result_top_header span {
+  display: block;
+  width: 168px;
+  text-align: center;
 }
-#result_month {
-	margin-bottom: 5px;
-	line-height: 24px;
+#result_top_header span {
+  line-height: 37.5px;
 }
-#result_severance_pay {
-	padding: 3px 0;
-	margin-bottom: 25px;
+#result_top_content {
+  padding: 10px 15px;
+  border: 1px solid #ff7d73;
 }
-#result_severance_pay div {
-	line-height: 38px;
-	width: 152px;
+#result_top_content > div {
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
-#result_disapproval {
-	margin-bottom: 86px;
+#result_top_content > div:first-of-type {
+  margin-bottom: 5px;
 }
-#result_disapproval > div {
-	line-height: 40px;
-	justify-content: center;
+#severance_pay_container {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
 }
-#result_disapproval div div {
-	width: 135px;
+#severance_pay_comment {
+  margin-bottom: 15px;
+  text-align: center;
 }
-#result_remaining_days {
-	line-height: 1.5;
-	margin-bottom: 3px;
+#severance_pay_box {
+  padding: 8px 15px;
+  line-height: 37.5px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
 }
-#result_remaining_days > div {
-	margin-bottom: 5px;
+#severance_pay_box span {
+  width: 152px;
+  text-align: center;
+}
+#result_guide_comment01 {
+  margin: 25px 0;
+  text-align: center;
+}
+#result_guide_comment02 {
+  width: 100%;
+  margin-bottom: 25px;
+}
+#result_guide_comment03 {
+  margin-top: 15px;
+  margin-bottom: 15px;
+}
+#result_guide_comment02 > div {
+  width: 100%;
+  word-break: break-all;
+  color: rgba(0, 0, 0, 0.4);
+}
+.guide_card {
+  width: 100%;
+  text-align: center;
+  border: 1px solid rgba(0, 0, 0, 0.4);
+  padding: 10px;
+  line-height: 21px;
+}
+#result_button_container {
+  display: flex;
+}
+#result_button_container button {
+  width: 50%;
+}
+#result_unsupply_container {
+  margin-bottom: 80px;
+}
+#result_unsupply_container > div {
+  padding: 9px 30px;
+  align-items: center;
+  justify-content: space-between;
+}
+.unsupply_result_value {
+  width: 135px;
+  display: block;
+  text-align: center;
 }

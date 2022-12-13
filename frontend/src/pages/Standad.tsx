@@ -1,16 +1,17 @@
-import React, { useState, Dispatch, SetStateAction, useEffect } from "react";
+import { useState, Dispatch, SetStateAction, useEffect } from "react";
 import IsRetiree from "../components/calculator/IsRetiree";
 import Button from "../components/inputs/Button";
 import { DateInputNormal } from "../components/inputs/Date";
 import NumberInput from "../components/inputs/Pay";
 import InputHandler from "../object/Inputs";
 import { sendToServer } from "../utils/sendToserver";
-import Result from "../components/calculator/Result";
 import { GetDateArr } from "../utils/date";
 import Header from "../components/layout/Header";
 import IMGBasicCuriousEmoticon from "../assets/image/emoticon/basic_curious.svg";
 import IMGBasicEngryEmoticon from "../assets/image/emoticon/basic_angry.svg";
 import "./../styles/basic.css";
+import { ResultComp } from "../components/calculator/Result";
+import CalContainer from "../components/calculator/CalContainer";
 
 const currentDate = GetDateArr(null);
 
@@ -29,15 +30,12 @@ const handler = new BasicCalHandler({});
 
 const _BasicCalComp = () => {
   return (
-    <div className="full_height_layout">
+    <div className="full_height_layout_cal">
       <Header
         title={handler.GetPageVal("retired") ? "퇴직자" : "퇴직예정자"}
         leftLink="/"
         leftType="BACK"
       />
-      <div className="fs_14 pd_810">
-        기본형 / {handler.GetPageVal("retired") ? "퇴직자" : "퇴직예정자"}
-      </div>
       <div className="public_side_padding">
         <div id="strobarry_character">
           <img
@@ -84,13 +82,15 @@ const BasicCalPage = () => {
   }, []);
 
   return (
-    <>
-      <div id="basic_container">
-        {compState === 1 && <IsRetiree handler={handler} type="기본형" />}
+    <CalContainer type="기본형" GetValue={handler.GetPageVal}>
+      <>
+        {compState === 1 && <IsRetiree handler={handler} />}
         {compState === 2 && <_BasicCalComp />}
-        {compState === 3 && <Result result={handler.result} />}
-      </div>
-    </>
+        {compState === 3 && (
+          <ResultComp cal_type="basic" result_data={handler.result} />
+        )}
+      </>
+    </CalContainer>
   );
 };
 

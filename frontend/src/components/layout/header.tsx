@@ -1,9 +1,9 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { Link } from "react-router-dom";
 import IMGBack from "../../assets/image/new/header_back.svg";
 import IMGLogo from "../../assets/image/logo.svg";
-import "../../styles/header.css";
 import SideMenu from "./FadeMenu";
+import "../../styles/header.css";
 
 const Header = ({
   title,
@@ -11,7 +11,7 @@ const Header = ({
   leftLink,
 }: {
   title?: string;
-  leftType?: string;
+  leftType?: "BACK" | "LOGO";
   leftLink: string;
 }) => {
   const [onMenu, setOnMenu] = useState(false);
