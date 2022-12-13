@@ -4,23 +4,17 @@ import IMGBasicEmoticon from "../../assets/image/new/basic.svg";
 import IMGHelpIcon from "../../assets/image/new/help_icon.svg";
 import "../../styles/retiree.css";
 import Header from "../layout/Header";
+import HelpLink from "../common/HelpLink";
 
-const CalIsRetiree = ({
-  handler,
-  type,
-}: {
-  handler: any;
-  type: "기본형" | "상세형" | "복수형";
-}) => {
+const CalIsRetiree = ({ handler }: { handler: any }) => {
   const onClickIsRetiree = (isRetiree: boolean) => {
     handler.SetPageVal("retired", isRetiree);
     handler.setCompState(2);
   };
   return (
-    <div className="full_height_layout">
+    <div className="full_height_layout_cal">
       <Header title="퇴직자 vs 퇴직예정자" leftLink="/" leftType="BACK" />
       <div id="retiree_container">
-        <div className="pd_810 fs_14">{type}</div>
         <div id="retiree_main">
           <div id="strobarry_character">
             <img src={IMGBasicEmoticon} alt="Basic Strawberry Emoticon" />
@@ -38,10 +32,12 @@ const CalIsRetiree = ({
             description="재직중이지만 실업급여가 궁금하다면?"
           />
         </div>
-        <Link className="help_link pd_810" to="">
-          <img src={IMGHelpIcon} alt="help icon" />
-          퇴직사유 알아보기
-        </Link>
+        <HelpLink
+          text="퇴직사유 알아보기"
+          link="/"
+          direction="l"
+          className="pd_810"
+        />
       </div>
     </div>
   );

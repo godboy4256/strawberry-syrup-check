@@ -8,11 +8,9 @@ export const getAge = (birthdate?: Date) => {
   const yearDiff = birthdate && today.getFullYear() - birthdate.getFullYear();
   const monthDiff = birthdate && today.getMonth() - birthdate.getMonth();
   const dateDiff = birthdate && today.getDate() - birthdate.getDate();
-
   const isBeforeBirthDay =
     (monthDiff && monthDiff < 0) ||
     (monthDiff === 0 && dateDiff && dateDiff < 0);
-
   return {
     age: yearDiff && yearDiff + (isBeforeBirthDay ? -1 : 0),
     yearAge: yearDiff,

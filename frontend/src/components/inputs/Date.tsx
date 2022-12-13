@@ -455,6 +455,7 @@ export const DateInputIndividual = ({
               <_IndiviualInput
                 callBack={handler.SetPageVal}
                 params={`${month_arr_splice[5]}`}
+                pay={true}
               />
             </div>
             <div>
@@ -464,6 +465,7 @@ export const DateInputIndividual = ({
               <_IndiviualInput
                 callBack={handler.SetPageVal}
                 params={`${month_arr_splice[4]}`}
+                pay={true}
               />
             </div>
             <div>
@@ -473,6 +475,7 @@ export const DateInputIndividual = ({
               <_IndiviualInput
                 callBack={handler.SetPageVal}
                 params={`${month_arr_splice[3]}`}
+                pay={true}
               />
             </div>
             <div>
@@ -482,6 +485,7 @@ export const DateInputIndividual = ({
               <_IndiviualInput
                 callBack={handler.SetPageVal}
                 params={`${month_arr_splice[2]}`}
+                pay={true}
               />
             </div>
             <div>
@@ -491,6 +495,7 @@ export const DateInputIndividual = ({
               <_IndiviualInput
                 callBack={handler.SetPageVal}
                 params={`${month_arr_splice[1]}`}
+                pay={true}
               />
             </div>
             <div>
@@ -500,6 +505,7 @@ export const DateInputIndividual = ({
               <_IndiviualInput
                 callBack={handler.SetPageVal}
                 params={`${month_arr_splice[0]}`}
+                pay={true}
               />
             </div>
           </div>

@@ -1,58 +1,59 @@
 @font-face {
-	font-family: NanumSrRegular;
-	src: url("../assets/fonts/NanumSquareRoundR.ttf");
+  font-family: NanumSrRegular;
+  src: url("../assets/fonts/NanumSquareRoundR.ttf");
 }
 
 @font-face {
-	font-family: NanumSrBold;
-	src: url("../assets/fonts/NanumSquareRoundEB.ttf");
+  font-family: NanumSrBold;
+  src: url("../assets/fonts/NanumSquareRoundEB.ttf");
 }
 
 * {
-	margin: 0;
-	padding: 0;
-	color: rgba(0, 0, 0, 0.8);
-	font-size: 18px;
-	font-family: NanumSrRegular;
-	outline: none;
-	box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  color: rgba(0, 0, 0, 0.8);
+  font-size: 18px;
+  font-family: NanumSrRegular;
+  outline: none;
+  box-sizing: border-box;
 }
 body {
-	background-color: white;
+  background-color: white;
 }
 li {
-	list-style: none;
+  list-style: none;
 }
 a {
-	text-decoration: none;
-	display: block;
-	color: black;
+  text-decoration: none;
+  display: block;
+  color: black;
 }
 button {
-	background: none;
-	border: none;
-	cursor: pointer;
-	font-size: 18px;
-	font-family: NanumSrBold;
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 18px;
+  font-family: NanumSrBold;
+  white-space: nowrap;
 }
 label {
-	display: block;
+  display: block;
 }
 input {
-	border: none;
-	background: none;
+  border: none;
+  background: none;
 }
 select {
-	border: none;
-	background: none;
-	appearance: none;
+  border: none;
+  background: none;
+  appearance: none;
 }
 .font_family_bold {
-	font-family: NanumSrBold;
+  font-family: NanumSrBold;
 }
 .lh_27 {
-	line-height: 27px;
+  line-height: 27px;
 }
 .lh_37 {
-	line-height: 37px;
+  line-height: 37px;
 }

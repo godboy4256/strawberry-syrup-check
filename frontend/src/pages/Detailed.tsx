@@ -5,7 +5,6 @@ import {
   DateInputNormal,
 } from "../components/inputs/Date";
 import Header from "../components/layout/Header";
-import Result from "../components/calculator/Result";
 import Check from "../components/inputs/Check";
 import SelectInput from "../components/inputs/Select";
 import TabInputs from "../components/inputs/TabInputs";
@@ -18,6 +17,8 @@ import NumberUpDown from "../components/inputs/NumberUpDown";
 import Button from "../components/inputs/Button";
 import InputHandler from "../object/Inputs";
 import "./../styles/detail.css";
+import { ResultComp } from "../components/calculator/Result";
+import CalContainer from "../components/calculator/CalContainer";
 
 class IndividualInputClass extends InputHandler {
   public _Data: any = {};
@@ -442,7 +443,7 @@ const _DetailCal04 = ({ handler }: { handler: any }) => {
 };
 const _DetailCal05 = ({ handler }: { handler: any }) => {
   return (
-    <div className={`full_height_layout`}>
+    <div id="detail_container_employ">
       <div className="pd_810 fs_14">
         상세형 / {handler.GetPageVal("isRetiree") ? "퇴직자" : "퇴직예정자 "}
       </div>
@@ -473,11 +474,6 @@ const _DetailCalComp = () => {
   return (
     <div id={`${workCate !== 6 ? "detail_comp_container" : ""}`}>
       <Header title="정보입력" leftLink="/" leftType="BACK" />
-      {workCate !== 6 && (
-        <div className="pd_810 fs_14">
-          상세형 / {handler.GetPageVal("isRetiree") ? "퇴직자" : "퇴직예정자 "}
-        </div>
-      )}
       <div className={`${workCate !== 6 ? "public_side_padding" : ""}`}>
         {workCate !== 6 && (
           <>
@@ -521,12 +517,19 @@ const DetailCalPage = () => {
     handler.setCompState = setCompState;
   }, []);
   return (
-    <div id="detail_container" className="header_top_space">
-      {compState === 1 && <IsRetiree handler={handler} type="상세형" />}
-      {compState === 2 && <WorkTypes handler={handler} />}
-      {compState === 3 && <_DetailCalComp />}
-      {compState === 4 && <Result result={handler.result} />}
-    </div>
+    <CalContainer GetValue={handler.GetPageVal} type="상세형">
+      <>
+        {compState === 1 && <IsRetiree handler={handler} />}
+        {compState === 2 && <WorkTypes handler={handler} />}
+        {compState === 3 && <_DetailCalComp />}
+        {compState === 4 && (
+          <ResultComp
+            cal_type={handler.GetPageVal("workCate")}
+            result_data={handler.result}
+          />
+        )}
+      </>
+    </CalContainer>
   );
 };
 

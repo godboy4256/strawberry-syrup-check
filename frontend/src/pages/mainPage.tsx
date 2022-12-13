@@ -11,6 +11,7 @@ import { Link } from "react-router-dom";
 import Header from "../components/layout/Header";
 import { useState, useEffect, SetStateAction, Dispatch } from "react";
 import "../styles/mainpage.css";
+import Loading from "../components/common/Loading";
 
 interface MainPagesHandler {
   setSlideComment: Dispatch<SetStateAction<number>> | undefined;
@@ -27,6 +28,7 @@ const SlideGuideDirection = () => {
   }, []);
   return (
     <>
+      <Loading />
       <div id="slide_guide_direction">
         <div className="fs_14">
           {slideComment === 0
@@ -76,7 +78,7 @@ const MainPage = () => {
           <h3 className="fs_25 lh_37 font_family_bold">실업급여 계산기</h3>
           <Slider {...settings}>
             <Link to="standad" className="main_slide_card">
-              <button className="box_shadow_style01">
+              <div className="box_shadow_style01">
                 <h4>
                   <img src={IMGTitleBasic} alt="기본형 타이틀" />
                 </h4>
@@ -84,10 +86,10 @@ const MainPage = () => {
                 <p className="bg_color_main fs_18 font_color_white font_family_bold lh_27">
                   이미 퇴사한 사람뿐 아니라 재직 중인 사람도
                 </p>
-              </button>
+              </div>
             </Link>
             <Link to="detailed" className="main_slide_card">
-              <button className="box_shadow_style01">
+              <div className="box_shadow_style01">
                 <h4>
                   <img src={IMGTitleDetail} alt="상세형 타이틀" />
                 </h4>
@@ -95,10 +97,10 @@ const MainPage = () => {
                 <p className="bg_color_main fs_18 font_color_white font_family_bold lh_27">
                   근로형태, 퇴직사유 등 사용자가 직접 입력
                 </p>
-              </button>
+              </div>
             </Link>
             <Link to="multi" className="main_slide_card">
-              <button className="box_shadow_style01">
+              <div className="box_shadow_style01">
                 <h4>
                   <img src={IMGTitleMulti} alt="복수형 타이틀" />
                 </h4>
@@ -106,7 +108,7 @@ const MainPage = () => {
                 <p className="bg_color_main fs_18 font_color_white font_family_bold lh_27">
                   두 곳 이상의 회사에서 재직한 경우 합산
                 </p>
-              </button>
+              </div>
             </Link>
           </Slider>
         </div>
