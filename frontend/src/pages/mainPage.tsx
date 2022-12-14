@@ -28,7 +28,6 @@ const SlideGuideDirection = () => {
   }, []);
   return (
     <>
-      <Loading />
       <div id="slide_guide_direction">
         <div className="fs_14">
           {slideComment === 0
