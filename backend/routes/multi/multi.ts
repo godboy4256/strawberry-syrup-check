@@ -73,7 +73,7 @@ export default function multiRoute(fastify: FastifyInstance, options: any, done:
 		// 9. 전체 피보험기간을 산정하기위한 합산 가능 유형 필터링
 		const addCadiates = makeAddCadiates(addDatas, mainEnterDay);
 
-		// 10. 피보험 단위기간 산정 => 피보험기간 산정으로 변경 필요?
+		// 10. 피보험기간 산정
 		const workingDays = mergeWorkingDays(mainData, addCadiates);
 		const workingYears = Math.floor(workingDays / 365); // 월 단위의 경우 12로 나눈다. 자영업자는 이거
 		const tempReceiveDay =
