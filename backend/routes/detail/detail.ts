@@ -556,9 +556,12 @@ export default function detailRoute(fastify: FastifyInstance, options: any, done
 		// 퇴직금, 다음 단계 없음
 		return {
 			succ: true,
+			retired: req.body.retired,
 			amountCost: realDayPay * receiveDay,
 			realDayPay,
+			receiveDay,
 			realMonthPay,
+			workingDay,
 			workDayForMulti,
 		};
 	});

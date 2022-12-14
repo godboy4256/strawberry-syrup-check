@@ -7,7 +7,7 @@ import { permitRangeData, requiredWorkingDay } from "../../data/data";
 import { getEmployerReceiveDay } from "../detail/function";
 
 import { multiSchema, TaddData, TmainData } from "./schema";
-import { checkDuplicateAcquisition, makeAddCadiates } from "./function/checkDuplicationAcquisition";
+import { getDuplicateAcquisitionInfo, makeAddCadiates } from "./function/checkDuplicationAcquisition";
 import { commonCasePermitCheck, doubleCasePermitCheck, mergeWorkingDays } from "./function/permitCheck";
 import { checkBasicRequirements } from "./function/checkBasicRequirements";
 
@@ -48,24 +48,25 @@ export default function multiRoute(fastify: FastifyInstance, options: any, done:
 			return { succ: false, mesg: "isIrregular" };
 
 		// 6. 이중취득 여부 확인
-		const { isDoubleAcquisition, tempWorkCount, artWorkCount, specialWorkCount } = checkDuplicateAcquisition(
+		const { isDuplicateAcquisition, tempWorkCount, artWorkCount, specialWorkCount } = getDuplicateAcquisitionInfo(
 			mainData,
 			permitAddCandidates
 		);
 
 		// 7. 수급 인정/불인정 판단
-		const isPermit = isDoubleAcquisition
-			? doubleCasePermitCheck(
-					tempWorkCount.permitDays,
-					artWorkCount.permitMonths,
-					specialWorkCount.permitMonths,
-					mainData.workCate
-			  )
-			: commonCasePermitCheck(permitAddCandidates, mainData);
+		const isPermit =
+			isDuplicateAcquisition && mainData.workCate !== 8
+				? doubleCasePermitCheck(
+						tempWorkCount.permitDays,
+						artWorkCount.permitMonths,
+						specialWorkCount.permitMonths,
+						mainData.workCate
+				  )
+				: commonCasePermitCheck(permitAddCandidates, mainData);
 
 		// 8. 수급 불인정 조건에 맞는 경우 불인정 메세지 리턴
 		if (!isPermit[0]) {
-			if (isDoubleAcquisition)
+			if (isDuplicateAcquisition)
 				return { succ: false, requireDays: isPermit[1], mesg: "근로자로 requireDays만큼 더 일해야 한다." };
 			return { succ: false, permitWorkingDays: isPermit[1], requireDays: leastRequireWorkingDay - isPermit[1] };
 		}
@@ -73,9 +74,11 @@ export default function multiRoute(fastify: FastifyInstance, options: any, done:
 		// 9. 전체 피보험기간을 산정하기위한 합산 가능 유형 필터링
 		const addCadiates = makeAddCadiates(addDatas, mainEnterDay);
 
-		// 10. 피보험 단위기간 산정 => 피보험기간 산정으로 변경 필요?
+		// 10. 피보험기간 산정
 		const workingDays = mergeWorkingDays(mainData, addCadiates);
 		const workingYears = Math.floor(workingDays / 365); // 월 단위의 경우 12로 나눈다. 자영업자는 이거
+
+		// 11. 소정급여일수 산정
 		const tempReceiveDay =
 			mainData.workCate === 5
 				? getEmployerReceiveDay(workingYears)
@@ -86,7 +89,7 @@ export default function multiRoute(fastify: FastifyInstance, options: any, done:
 				: tempReceiveDay - 30
 			: tempReceiveDay;
 
-		// 11.
+		// 12. 결과 리턴
 		return {
 			succ: true,
 			amountCost: mainData.realDayPay * receiveDay,

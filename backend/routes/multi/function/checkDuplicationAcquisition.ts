@@ -1,81 +1,62 @@
 import dayjs from "dayjs";
 import { TaddData, TmainData } from "../schema";
 
-const checkDuplicationDays = (mainData: TmainData, permitAddCandidates: TaddData[]) => {
-	let isDuplicate = false;
+const checkDuplicateAcquisition = (mainData: TmainData, permitAddCandidates: TaddData[]) => {
+	let isDoubleAcquisition = false;
+	const checkWorkCates = [2, 3, 4, 5];
 
 	for (let i = 0; i < permitAddCandidates.length; i++) {
 		if (
 			permitAddCandidates[i].enterDay < mainData.enterDay &&
-			permitAddCandidates[i].retiredDay > mainData.enterDay
+			permitAddCandidates[i].retiredDay > mainData.enterDay &&
+			(checkWorkCates.includes(mainData.workCate) || checkWorkCates.includes(permitAddCandidates[i].workCate))
 		)
-			isDuplicate = true;
+			return (isDoubleAcquisition = true);
 
 		if (
 			permitAddCandidates[i].enterDay > mainData.enterDay &&
-			permitAddCandidates[i].retiredDay < mainData.retiredDay
+			permitAddCandidates[i].retiredDay < mainData.retiredDay &&
+			(checkWorkCates.includes(mainData.workCate) || checkWorkCates.includes(permitAddCandidates[i].workCate))
 		)
-			isDuplicate = true;
+			return (isDoubleAcquisition = true);
 
 		if (
 			permitAddCandidates[i].enterDay > mainData.enterDay &&
-			permitAddCandidates[i].retiredDay > mainData.retiredDay
+			permitAddCandidates[i].retiredDay > mainData.retiredDay &&
+			(checkWorkCates.includes(mainData.workCate) || checkWorkCates.includes(permitAddCandidates[i].workCate))
 		)
-			isDuplicate = true;
+			return (isDoubleAcquisition = true);
 	}
 
-	for (let i = 0; i < permitAddCandidates.length; i++) {
-		if (isDuplicate) break;
-		for (let j = i + 1; j < permitAddCandidates.length; j++) {
-			if (
-				permitAddCandidates[j].enterDay < permitAddCandidates[i].enterDay &&
-				permitAddCandidates[j].retiredDay > permitAddCandidates[i].enterDay
-			)
-				isDuplicate = true;
-			if (
-				permitAddCandidates[j].enterDay > permitAddCandidates[i].enterDay &&
-				permitAddCandidates[j].retiredDay < permitAddCandidates[i].retiredDay
-			)
-				isDuplicate = true;
-			if (
-				permitAddCandidates[j].enterDay > permitAddCandidates[i].enterDay &&
-				permitAddCandidates[j].retiredDay > permitAddCandidates[i].retiredDay
-			)
-				isDuplicate = true;
-		}
-	}
-
-	return isDuplicate;
+	return isDoubleAcquisition;
 };
 
-export const checkDuplicateAcquisition = (mainData: TmainData, permitAddCandidates: TaddData[]) => {
-	let isDoubleAcquisition = false; // 이중취득 여부
+export const getDuplicateAcquisitionInfo = (mainData: TmainData, permitAddCandidates: TaddData[]) => {
 	let tempWorkCount = { count: 0, permitDays: 0 };
 	let artWorkCount = { count: 0, permitMonths: 0 };
 	let specialWorkCount = { count: 0, permitMonths: 0 }; // 특고
 
-	const artWorkCates = [2, 4];
-	const specialWorkCates = [3, 5];
+	const isDuplicateAcquisition = checkDuplicateAcquisition(mainData, permitAddCandidates);
 
-	permitAddCandidates.map((permitAddCandidate, idx, permitAddCandidates) => {
-		if (artWorkCates.includes(permitAddCandidate.workCate)) {
-			artWorkCount.count++;
-			artWorkCount.permitMonths += permitAddCandidate.permitDays;
-		} else if (specialWorkCates.includes(permitAddCandidate.workCate)) {
-			specialWorkCount.count++;
-			specialWorkCount.permitMonths += permitAddCandidate.permitDays;
-		} else {
-			tempWorkCount.count++;
-			tempWorkCount.permitDays += permitAddCandidate.permitDays;
-		}
-	});
+	if (isDuplicateAcquisition) {
+		const artWorkCates = [2, 4];
+		const specialWorkCates = [3, 5];
 
-	const hasDuplicateDays = checkDuplicationDays(mainData, permitAddCandidates);
+		permitAddCandidates.map((permitAddCandidate) => {
+			if (artWorkCates.includes(permitAddCandidate.workCate)) {
+				artWorkCount.count++;
+				artWorkCount.permitMonths += permitAddCandidate.permitDays;
+			} else if (specialWorkCates.includes(permitAddCandidate.workCate)) {
+				specialWorkCount.count++;
+				specialWorkCount.permitMonths += permitAddCandidate.permitDays;
+			} else {
+				tempWorkCount.count++;
+				tempWorkCount.permitDays += permitAddCandidate.permitDays;
+			}
+		});
+	}
 
-	if ((hasDuplicateDays && tempWorkCount.count >= 1 && artWorkCount.count >= 1) || specialWorkCount.count >= 1)
-		isDoubleAcquisition = true;
-
-	return { isDoubleAcquisition, tempWorkCount, artWorkCount, specialWorkCount };
+	return { isDuplicateAcquisition, tempWorkCount, artWorkCount, specialWorkCount };
 };
 
 export const makeAddCadiates = (addDatas: TaddData[], mainEnterDay: dayjs.Dayjs) => {
