@@ -7,7 +7,7 @@ import { permitRangeData, requiredWorkingDay } from "../../data/data";
 import { getEmployerReceiveDay } from "../detail/function";
 
 import { multiSchema, TaddData, TmainData } from "./schema";
-import { checkDuplicateAcquisition } from "./function/checkDuplicationAcquisition";
+import { checkDuplicateAcquisition, makeAddCadiates } from "./function/checkDuplicationAcquisition";
 import { commonCasePermitCheck, doubleCasePermitCheck, mergeWorkingDays } from "./function/permitCheck";
 import { checkBasicRequirements } from "./function/checkBasicRequirements";
 
@@ -71,18 +71,7 @@ export default function multiRoute(fastify: FastifyInstance, options: any, done:
 		}
 
 		// 9. 전체 피보험기간을 산정하기위한 합산 가능 유형 필터링
-		const addCadiates: TaddData[] = [];
-		for (let i = 0; i < addDatas.length; i++) {
-			if (i === 0) {
-				if (mainEnterDay.diff(addDatas[i].retiredDay, "day") <= 1095) addCadiates.push(addDatas[i]);
-			} else if (i !== 0) {
-				if (dayjs(addDatas[i - 1].enterDay).diff(addDatas[i].retiredDay, "day") <= 1095) {
-					addCadiates.push(addDatas[i]);
-				}
-			} else {
-				break;
-			}
-		}
+		const addCadiates = makeAddCadiates(addDatas, mainEnterDay);
 
 		// 10. 피보험 단위기간 산정 => 피보험기간 산정으로 변경 필요?
 		const workingDays = mergeWorkingDays(mainData, addCadiates);
