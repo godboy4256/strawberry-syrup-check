@@ -1,4 +1,20 @@
+import { Dayjs } from "dayjs";
 import { DefineParamInfo } from "../../share/validate";
+
+export type TstandardInput = {
+	retired: boolean;
+	workCate: number;
+	retireReason: number;
+	age: number;
+	disabled: boolean;
+	enterDay: Dayjs;
+	retiredDay: Dayjs;
+	weekDay: number[];
+	dayWorkTime: number;
+	salary: number[];
+	isEnd?: boolean;
+	limitDay?: string;
+};
 
 const standardBodyProp = {
 	retired: DefineParamInfo.retired,

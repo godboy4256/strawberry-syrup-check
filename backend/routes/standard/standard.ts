@@ -3,6 +3,7 @@ import dayjs from "dayjs";
 
 import { calLeastPayInfo, getFailResult, getReceiveDay } from "../../router_funcs/common";
 import { standardPath } from "../../share/pathList";
+
 import { standardSchema, TmainData } from "./schema";
 import { checkBasicRequirements, calWorkingDay } from "./function";
 
@@ -28,16 +29,16 @@ export default function standardRoute(fastify: FastifyInstance, options: any, do
 				: calLeastPayInfo(mainData.retiredDay, retiredDayArray, mainData.salary, 8);
 
 		// 3. 소정급여일수 산정
-		const joinYears = Math.floor(mainData.retiredDay.diff(mainData.enterDay, "day") / 365);
+		const joinYears = Math.floor(employmentDate / 365);
 		const receiveDay = getReceiveDay(joinYears);
 
 		// 4. 피보험단위기간 산정
 		const limitDay = mainData.retiredDay.subtract(18, "month");
-		const workingDays = calWorkingDay(mainData.enterDay, limitDay); // 피보험단위기간
+		const workingDays = calWorkingDay(limitDay, mainData.retiredDay); // 피보험단위기간
 
 		// 5. 수급 인정/ 불인정에 따라 결과 리턴
 		const leastRequireWorkingDay = 180; // 실업급여를 받기위한 최소 피보험기간
-		if (workingDays <= leastRequireWorkingDay)
+		if (workingDays < leastRequireWorkingDay)
 			return getFailResult(
 				mainData.retired,
 				mainData.retiredDay,
