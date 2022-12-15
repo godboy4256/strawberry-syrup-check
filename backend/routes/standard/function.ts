@@ -1,6 +1,6 @@
 import dayjs from "dayjs";
 
-import { DefinedParamErrorMesg } from "share/validate";
+import { DefinedParamErrorMesg } from "../../share/validate";
 import { TmainData } from "./schema";
 
 export const checkBasicRequirements = (mainData: TmainData, employmentDate: number) => {

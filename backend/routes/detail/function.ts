@@ -1,5 +1,5 @@
 import dayjs, { Dayjs } from "dayjs";
-import { DefinedParamErrorMesg } from "share/validate";
+import { DefinedParamErrorMesg } from "../../share/validate";
 
 export function calArtPay(sumOneYearPay: number[] | number, artWorkingDays: number, isSpecial: boolean = false) {
 	let dayAvgPay = 0;
