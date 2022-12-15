@@ -1,4 +1,12 @@
+import { Dayjs } from "dayjs";
 import { DefineParamInfo } from "../../share/validate";
+
+export type TmainData = {
+	retired: boolean;
+	enterDay: Dayjs;
+	retiredDay: Dayjs;
+	salary: number[];
+};
 
 const standardBodyProp = {
 	retired: DefineParamInfo.retired,
