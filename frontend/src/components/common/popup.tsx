@@ -1,19 +1,13 @@
-import { Dispatch, ReactElement, SetStateAction, useState } from "react";
+import { ReactElement, useState } from "react";
 import Button from "../inputs/Button";
 import "../../styles/popup.css";
-
-interface IPopUpHandler {
-  create_func: Dispatch<SetStateAction<ReactElement | string | boolean>>;
-  confirm_func: () => void;
-  cancel_func: () => void;
-  title: string;
-  popup_type: "confirm" | "only_check" | "date" | "none";
-}
 
 const PopUpHandler: any = {
   create_func: undefined,
   confirm_func: undefined,
   cancel_func: undefined,
+  cancel_text: undefined,
+  confirm_text: undefined,
   title: undefined,
   popup_type: undefined,
 };
@@ -23,8 +17,6 @@ const PopUpGlobal = () => {
   PopUpHandler.create_func = setContent;
   const onClickConfirm = () => {
     if (PopUpHandler.confirm_func) PopUpHandler.confirm_func();
-    PopUpHandler.title = undefined;
-    setContent(false);
   };
   const onClickCancel = () => {
     if (PopUpHandler.cancel_func) PopUpHandler.cancel_func();
@@ -41,32 +33,56 @@ const PopUpGlobal = () => {
                 {PopUpHandler.title}
               </div>
             )}
-            {content && content}
+            <div className={typeof content === "string" ? "string_popup" : ""}>
+              {content && content}
+            </div>
             <div id={`${PopUpHandler.popup_type}_button_container`}>
               {PopUpHandler.popup_type === "date" ? (
                 <>
                   <Button
-                    text="취소"
+                    text={
+                      PopUpHandler.cancel_text
+                        ? PopUpHandler.cancel_text
+                        : "아니오"
+                    }
                     type="date_cancel"
                     click_func={onClickCancel}
                   />
                   <Button
-                    text="선택"
+                    text={
+                      PopUpHandler.confirm_text
+                        ? PopUpHandler.confirm_text
+                        : "예"
+                    }
                     type="date_select"
                     click_func={onClickConfirm}
                   />
                 </>
               ) : PopUpHandler.popup_type === "only_check" ? (
-                <Button text="예" type="popup_ok" click_func={() => {}} />
+                <Button
+                  text={
+                    PopUpHandler.confirm_text ? PopUpHandler.confirm_text : "예"
+                  }
+                  type="popup_ok"
+                  click_func={() => setContent(false)}
+                />
               ) : PopUpHandler.popup_type === "confirm" ? (
                 <div id="popup_confirm_container">
                   <Button
-                    text="아니오"
+                    text={
+                      PopUpHandler.cancel_text
+                        ? PopUpHandler.cancel_text
+                        : "아니오"
+                    }
                     type="popup_cancel"
                     click_func={onClickCancel}
                   />
                   <Button
-                    text="예"
+                    text={
+                      PopUpHandler.confirm_text
+                        ? PopUpHandler.confirm_text
+                        : "예"
+                    }
                     type="popup_confirm"
                     click_func={onClickConfirm}
                   />
@@ -85,14 +101,21 @@ const CreatePopup = (
   content: ReactElement | string = "팝업",
   popup_type: "confirm" | "only_check" | "date" | "none" = "confirm",
   confirm_func?: () => void,
-  cancel_func?: () => void
+  cancel_func?: () => void,
+  confirm_text?: string,
+  cancel_text?: string
 ) => {
   PopUpHandler.create_func(content);
   PopUpHandler.popup_type = popup_type;
-  if (title) PopUpHandler.title = title;
+  if (title) {
+    PopUpHandler.title = title;
+  } else {
+    PopUpHandler.title = undefined;
+  }
   if (confirm_func) PopUpHandler.confirm_func = confirm_func;
   if (cancel_func) PopUpHandler.cancel_func = cancel_func;
-  // resetPopUpHandler();
+  if (confirm_text) PopUpHandler.confirm_text = confirm_text;
+  if (cancel_text) PopUpHandler.cancel_text = cancel_text;
 };
 
 const ClosePopup = () => {

@@ -4,7 +4,7 @@ import { sendToServer } from "../utils/sendToserver";
 import InputHandler from "./Inputs";
 
 class DetailedHandler extends InputHandler {
-  public result: {} = {};
+  public result: any = {};
   public setCompState: Dispatch<SetStateAction<number>> | undefined = undefined;
   public setTab: Dispatch<SetStateAction<string>> | undefined = undefined;
   public setIsValueSelect01: Dispatch<SetStateAction<number>> | undefined =
@@ -13,6 +13,7 @@ class DetailedHandler extends InputHandler {
     undefined;
   public setIsValueSelect03: Dispatch<SetStateAction<number>> | undefined =
     undefined;
+
   public insuranceGrade = (retiredDay: Date, enterDay: Date) => {
     const retiredDayYear = GetDateArr(retiredDay)[0];
     const enterDayYear = GetDateArr(enterDay)[0];
@@ -220,10 +221,15 @@ class DetailedHandler extends InputHandler {
             ),
           }
         : {};
-    console.log(this._Data.insuranceGrade);
     console.log(to_server);
     this.result = await sendToServer(url, to_server);
-    this.setCompState && this.setCompState(4);
+    if (this._Data.workCate === 3 || this._Data.workCate === 4) {
+      this.result["is_short"] = this._Data.is_short;
+    }
+    this.setCompState && this.setCompState(5);
+    setTimeout(() => {
+      this.setCompState && this.setCompState(4);
+    }, 2000);
   };
 }
 

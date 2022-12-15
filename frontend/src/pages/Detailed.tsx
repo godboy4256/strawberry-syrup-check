@@ -19,6 +19,7 @@ import InputHandler from "../object/Inputs";
 import "./../styles/detail.css";
 import { ResultComp } from "../components/calculator/Result";
 import CalContainer from "../components/calculator/CalContainer";
+import Loading from "../components/common/Loading";
 
 class IndividualInputClass extends InputHandler {
   public _Data: any = {};
@@ -442,6 +443,9 @@ const _DetailCal04 = ({ handler }: { handler: any }) => {
   );
 };
 const _DetailCal05 = ({ handler }: { handler: any }) => {
+  useEffect(() => {
+    handler._Data = [];
+  }, []);
   return (
     <div id="detail_container_employ">
       <div className="pd_810 fs_14">
@@ -515,21 +519,28 @@ const DetailCalPage = () => {
   const [compState, setCompState] = useState(1);
   useEffect(() => {
     handler.setCompState = setCompState;
+    handler._Data = {};
   }, []);
   return (
-    <CalContainer GetValue={handler.GetPageVal} type="상세형">
-      <>
-        {compState === 1 && <IsRetiree handler={handler} />}
-        {compState === 2 && <WorkTypes handler={handler} />}
-        {compState === 3 && <_DetailCalComp />}
-        {compState === 4 && (
-          <ResultComp
-            cal_type={handler.GetPageVal("workCate")}
-            result_data={handler.result}
-          />
-        )}
-      </>
-    </CalContainer>
+    <>
+      {compState === 5 ? (
+        <Loading />
+      ) : (
+        <CalContainer GetValue={handler.GetPageVal} type="상세형">
+          <>
+            {compState === 1 && <IsRetiree handler={handler} />}
+            {compState === 2 && <WorkTypes handler={handler} />}
+            {compState === 3 && <_DetailCalComp />}
+            {compState === 4 && (
+              <ResultComp
+                cal_type={handler.GetPageVal("workCate")}
+                result_data={handler.result}
+              />
+            )}
+          </>
+        </CalContainer>
+      )}
+    </>
   );
 };
 

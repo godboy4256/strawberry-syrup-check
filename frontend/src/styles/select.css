@@ -1,80 +1,88 @@
 #date_normal {
-	margin: 0 5px;
-	border: 1px solid #000;
-	border-radius: 5px;
-	padding: 6px 12px;
-	display: flex;
-	justify-content: space-between;
-	align-items: center;
+  margin: 0 5px;
+  border: 1px solid #000;
+  border-radius: 5px;
+  padding: 6px 12px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
 }
 
 #date_normal img {
-	margin-left: 8px;
+  margin-left: 8px;
 }
 
 .select_custom#normal {
-	width: 100%;
-	display: flex;
-	border: 1px solid rgba(0, 0, 0, 0.2);
+  width: 100%;
+  display: flex;
+  border: 1px solid rgba(0, 0, 0, 0.2);
 }
 
 .select_custom#normal select {
-	width: 100%;
-	padding: 10px 0;
-	text-align: center;
-	line-height: 21px;
-	color: rgba(0, 0, 0, 0.2);
+  width: 100%;
+  padding: 10px 0;
+  text-align: center;
+  line-height: 21px;
+  color: rgba(0, 0, 0, 0.2);
 }
 
 .select_icon {
-	width: 39px;
-	display: flex;
-	justify-content: center;
-	align-items: center;
-	background-color: rgba(0, 0, 0, 0.2);
-	flex: none;
+  width: 39px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: rgba(0, 0, 0, 0.2);
+  flex: none;
 }
 
 .select_custom#normal.active {
-	border: 1px solid rgba(255, 101, 89, 1);
+  border: 1px solid rgba(255, 101, 89, 1);
 }
 .select_custom#normal.active select {
-	color: rgba(255, 101, 89, 1);
+  color: rgba(255, 101, 89, 1);
 }
 .select_custom#normal.active .select_icon {
-	background-color: rgba(255, 101, 89, 1);
+  background-color: rgba(255, 101, 89, 1);
 }
 
 .select_popup {
-	background-color: rgba(255, 227, 226, 1);
-	padding: 30px 25px;
-	width: 252px;
-	height: 252px;
-	overflow-y: auto;
+  background-color: rgba(255, 227, 226, 1);
+  padding: 30px 25px;
+  width: 252px;
+  height: 252px;
+  overflow-y: auto;
 }
 
 .popup_select_option {
-	text-align: center;
-	width: 240px;
-	border: 1px solid rgba(255, 101, 89, 1);
-	margin-bottom: 14px;
+  text-align: center;
+  width: 240px;
+  border: 1px solid #ccc;
+  color: #ccc;
+  margin-bottom: 14px;
+}
+.popup_select_option.select {
+  border: 1px solid #ff6559;
+  color: #ff6559;
 }
 .popup_select_option:last-child {
-	margin-bottom: 0;
+  margin-bottom: 0;
 }
 
 .options {
-	width: 100%;
-	padding: 9px 0;
-	background-color: rgba(255, 101, 89, 1);
-	color: white;
-	margin-bottom: 20px;
-	border-radius: 5px;
+  width: 100%;
+  padding: 9px 0;
+  background-color: rgba(255, 101, 89, 1);
+  color: white;
+  margin-bottom: 20px;
+  border-radius: 5px;
 }
 
 .options:last-child {
-	margin-bottom: 0;
+  margin-bottom: 0;
 }
 .popup_select_container {
-	padding: 40px 30px;
+  padding: 24px 30px;
+}
+.popup_select_container div {
+  line-height: 24px;
 }

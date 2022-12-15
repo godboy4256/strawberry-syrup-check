@@ -1,10 +1,7 @@
 #detail_container {
   position: relative;
 }
-#detail_container_comp1 .public_side_padding {
-  margin-top: 40px;
-}
-.comp01_select_templete {
+.comp_select_templete {
   width: 100%;
   border-radius: 2px;
   display: flex;
@@ -12,42 +9,42 @@
   border: 1px solid rgba(0, 0, 0, 0.2);
   color: rgba(0, 0, 0, 0.2);
 }
-.comp01_select_templete_step {
+.comp_select_templete_step {
   display: flex;
   align-items: center;
   color: rgba(0, 0, 0, 0.2);
 }
-.comp01_select_templete_title {
+.comp_select_templete_title {
   color: rgba(0, 0, 0, 0.2);
 }
-.comp01_select_templete_step .boundary {
+.comp_select_templete_step .boundary {
   width: 1px;
   height: 26px;
   background-color: rgba(0, 0, 0, 0.2);
   margin: 0 10px;
   display: block;
 }
-.comp01_select_templete.turn_to_enter {
+.comp_select_templete.next {
   border-color: #ff493a;
 }
-.comp01_select_templete.turn_to_enter .comp01_select_templete_step .boundary {
+.comp_select_templete.next .comp_select_templete_step .boundary {
   background-color: #ff493a;
 }
-.comp01_select_templete.turn_to_enter .comp01_select_templete_step,
-.comp01_select_templete.turn_to_enter .comp01_select_templete_title,
-.comp01_select_templete.turn_to_enter .un_value_font_color {
+.comp_select_templete.next .comp_select_templete_step,
+.comp_select_templete.next .comp_select_templete_title,
+.comp_select_templete.next .un_value_font_color {
   color: #ff493a;
 }
-.comp01_select_templete.done {
+.comp_select_templete.select {
   border-color: black;
 }
-.comp01_select_templete.done .comp01_select_templete_step .boundary {
+.comp_select_templete.select .comp01_select_templete_step .boundary {
   background-color: black;
 }
-.comp01_select_templete.done .comp01_select_templete_title,
-.comp01_select_templete.done .comp01_select_templete_step,
-.comp01_select_templete.done .comp01_select_templete_step .boundary,
-.comp01_select_templete.done .un_value_font_color {
+.comp_select_templete.select .comp_select_templete_title,
+.comp_select_templete.select .comp_select_templete_step,
+.comp_select_templete.select .comp_select_templete_step .boundary,
+.comp_select_templete.select .un_value_font_color {
   color: black;
 }
 .info01_icon {

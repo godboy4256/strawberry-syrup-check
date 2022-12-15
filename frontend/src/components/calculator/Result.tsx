@@ -17,11 +17,10 @@ import EMTDetailVeryShortsUnSupply from "../../assets/image/emoticon/detail_very
 
 import EMTBasicUnSupplyUnRetiree from "../../assets/image/emoticon/standad_unretiree_unsupply.svg";
 import EMTBasicUnSupplyRetiree from "../../assets/image/emoticon/standad_retiree_unsupply.svg";
-import Header from "../layout/Header";
-import "../../styles/result.css";
 import HelpLink from "../common/HelpLink";
 import Button from "../inputs/Button";
-import Loading from "../common/Loading";
+import Header from "../layout/Header";
+import "../../styles/result.css";
 
 const _SupplyResult = ({
   total,
@@ -135,15 +134,19 @@ const _UnSupplyResult = ({
   unit,
   workingDateNum,
   requireDateNum,
-  guide_card = false,
-  helps,
+  average_guide,
+  helps = ["피보험단위기간이란 무엇인가요?", "근무일수가 부족하다면?"],
+  helps_to = ["/", "/"],
+  twoweek_guide = false,
 }: {
   emoticon: string;
   unit: "day" | "month";
   workingDateNum: number;
   requireDateNum: number;
-  guide_card?: boolean;
-  helps?: string | string[];
+  average_guide?: string;
+  helps?: string[];
+  helps_to?: string[];
+  twoweek_guide?: boolean;
 }) => {
   return (
     <div id="result_container">
@@ -151,24 +154,59 @@ const _UnSupplyResult = ({
       <h3 id="result_comment" className="lh_27 fs_18 font_family_bold">
         실업급여를 받으실 수 없습니다.
       </h3>
-      <div id="result_unsupply_container" className="bg_color_main">
-        <div className="font_color_white flex_box fs_14">
-          현재 근무{unit === "day" ? "일" : "월"}수 :
-          <span className="unsupply_result_value font_color_white">
-            {workingDateNum}
-          </span>
-          {unit === "day" ? "일" : "달"}
+      {twoweek_guide ? (
+        <div id="twoweek_guide_container lh_27">
+          <div className="fs_14">
+            신청일 이전 14일 간 근로내역이
+            <br />
+            없어야 합니다.
+          </div>
+          <div className="font_color_main lh_27">
+            N년 N월 N일 이후 신청하시면
+            <br /> 실업급여를 받으실 수 있습니다.
+          </div>
         </div>
-        <div className="font_color_white flex_box fs_14">
-          부족한 근무{unit === "day" ? "일" : "월"}수 :{" "}
-          <span className="unsupply_result_value font_color_white">
-            {requireDateNum}
-          </span>
-          {unit === "day" ? "일" : "달"}
+      ) : (
+        <div id="result_unsupply_container" className="bg_color_main">
+          <div className="font_color_white flex_box fs_14">
+            현재 근무{unit === "day" ? "일" : "월"}수 :
+            <span className="unsupply_result_value font_color_white">
+              {workingDateNum}
+            </span>
+            {unit === "day" ? "일" : "달"}
+          </div>
+          <div className="font_color_white flex_box fs_14">
+            부족한 근무{unit === "day" ? "일" : "월"}수 :{" "}
+            <span className="unsupply_result_value font_color_white">
+              {requireDateNum}
+            </span>
+            {unit === "day" ? "일" : "달"}
+          </div>
         </div>
-      </div>
-      <HelpLink text="피보험단위기간이란 무엇인가요?" link="/" direction="l" />
-      <HelpLink text="근무일수가 부족하다면?" link="/" direction="l" />
+      )}
+      {average_guide &&
+        (typeof average_guide === "number" ? (
+          <div id="average_guide_container" className="font_color_main lh_27">
+            월 평균소득 {average_guide} 이상으로
+            <br /> {requireDateNum}일 더 일하셔야 합니다.
+          </div>
+        ) : (
+          <div id="average_guide_container" className="guide_normal fs_14">
+            {average_guide}
+          </div>
+        ))}
+      {helps?.map((el: string, idx: number) => {
+        return (
+          <HelpLink
+            className={`result_help_link${idx + 1}`}
+            key={Date.now() + idx}
+            text={el}
+            link={helps_to ? helps_to[idx] : "/"}
+            direction="l"
+          />
+        );
+      })}
+
       <div id="result_guide_comment03" className="fs_12 flex_right">
         이전에 다녔던 직장이 있다면 <br />
         <span className="font_color_main fs_12">복수형 계산기</span>로
@@ -261,8 +299,9 @@ export const ResultComp = ({
           <_UnSupplyResult
             emoticon={EMTDetailDayJobUnSupply}
             unit="day"
-            workingDateNum={result_data.workingDays}
+            workingDateNum={result_data.workingDay}
             requireDateNum={result_data.requireWorkingDay}
+            average_guide="신청일 이전 1달 간 근로일수가 10일 미만이어야 합니다."
           />
         ))}
       {cal_type === 3 &&
@@ -282,6 +321,15 @@ export const ResultComp = ({
             unit="day"
             workingDateNum={result_data.workingMonths}
             requireDateNum={result_data.requireMonths}
+            helps={
+              result_data.is_short === "단기 예술인"
+                ? ["단기예술인 실업급여의 계산방법이 궁금하신가요?"]
+                : ["저는 여러 건을 합치면 월 평균 기준이 되는데요?"]
+            }
+            helps_to={result_data.is_short === "단기 예술인" ? ["/"] : ["/"]}
+            average_guide={
+              result_data.is_short !== "단기 예술인" ? "50만원" : ""
+            }
           />
         ))}
       {cal_type === 4 &&
