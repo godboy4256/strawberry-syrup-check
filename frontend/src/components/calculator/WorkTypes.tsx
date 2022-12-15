@@ -1,36 +1,68 @@
-import { useState } from "react";
+import { MouseEventHandler, useState } from "react";
+import { ClosePopup, CreatePopup } from "../common/Popup";
 import SelectInput from "../inputs/Select";
 import Header from "../layout/Header";
 import IMGWorkTypeSelect from "./../../assets/image/new/detail_info01_select.svg";
 import IMGWorkTypeUnSelect from "./../../assets/image/new/detail_info01_unselect.svg";
 
-const _container_class_name = (state: number) => {
-  return state === 1
-    ? "turn_to_enter"
-    : state === 2
-    ? "done"
-    : state === 3 && "unset";
-};
+const work_cate = [
+  "정규직",
+  "기간제",
+  "일용직",
+  "(단기) 예술인",
+  "(단기) 특고·프리랜서",
+  "초단시간",
+  "자영업",
+];
 
-const _Comp1SelectTemplete1 = ({ handler }: { handler: any }) => {
-  const [valueState, setValueState] = useState(1);
-  handler.setIsValueSelect01 = setValueState;
+const retire_reason = [
+  "권고사직",
+  "계약만료",
+  "질병",
+  "임신/출산/육아",
+  "회사 잘못",
+  "원거리 통근",
+  "정년퇴직",
+  "기타 비자발적 사유",
+];
+
+const retire_reason_popup = [
+  `회사로부터 퇴사를 권유받아 자진퇴사 하셨나요?`,
+  `계약기간의 만료로 회사를 계속 다닐 수 없게 되셨나요? 주의) 계약만료 후 회사의 재계약 제안을 근로자가 거부한 경우 수급자격이 인정되지 않습니다.`,
+  `근로자 본인이 아프거나 가족의 질병으로 간호가 필요하신가요?`,
+  `만 8세 이하 또는 초등학교 2학년 이하의 자녀의 육아를 위하여 퇴직하셨나요?`,
+  `근로조건이 채용시 보다 낮아지셨나요? Ex) 임금체불, 최저임금 미달, 연장 근로위반, 평균임금 미만, 불합리한 차별대우, 성적 괴롭힘, 직장내 괴롭힘, 폐업, 고용조정 등`,
+  `회사의 이전, 전근, 가족과 함께 하기 위해 또는 결혼으로 인한 이사 등의 사유로 출퇴근 3시간 이상이 소요되고 있나요?`,
+  `만 60세 이상이고 자발적으로 퇴직하셨나요?`,
+  `정해진 사유 외 기타 비자발적 사유는 고용노동센터에 반드시 문의하시기 바랍니다. 경우에 따라 실업급여를 수급하시지 못할 수도 있습니다.`,
+];
+
+const _CompSelectTemplete = ({
+  level,
+  name,
+  selectState,
+  callBack,
+}: {
+  level: number;
+  name: string;
+  selectState?: "select" | "next" | "none";
+  callBack?: MouseEventHandler;
+}) => {
   return (
     <>
       <div
-        className={`comp01_select_templete pd_810 ${_container_class_name(
-          valueState
-        )}`}
+        className={`comp_select_templete pd_810 ${
+          selectState ? selectState : ""
+        }`}
+        onClick={callBack ? callBack : () => {}}
       >
-        <div className="comp01_select_templete_step fs_14">
-          1단계 <span className="boundary"></span>
+        <div className="comp_select_templete_step fs_14">
+          {level}단계 <span className="boundary"></span>
         </div>
-        <div className="comp01_select_templete_title fs_16">근로형태</div>
-        <div className="flex_left fs_14 un_value_font_color">
-          {valueState === 2 ? "수정 >" : "입력 >"}
-        </div>
+        <div className="comp_select_templete_title fs_16">{name}</div>
+        <div className="flex_left fs_14 un_value_font_color">{"입력 >"}</div>
       </div>
-      {valueState === 2 ? (
+      {selectState === "select" ? (
         <img
           className="info01_icon"
           src={IMGWorkTypeSelect}
@@ -40,117 +72,90 @@ const _Comp1SelectTemplete1 = ({ handler }: { handler: any }) => {
         <img
           className="info01_icon"
           src={IMGWorkTypeUnSelect}
-          alt="comp1 select icon "
+          alt="comp select icon "
         />
       )}
     </>
-  );
-};
-const _Comp1SelectTemplete2 = ({ handler }: { handler: any }) => {
-  const [valueState, setValueState] = useState(3);
-  handler.setIsValueSelect02 = setValueState;
-  return (
-    <>
-      <div
-        className={`comp01_select_templete pd_810 ${_container_class_name(
-          valueState
-        )}`}
-      >
-        <div className="comp01_select_templete_step fs_14">
-          2단계 <span className="boundary"></span>
-        </div>
-        <div className="comp01_select_templete_title fs_16">퇴직사유</div>
-        <div className="flex_left fs_14 un_value_font_color">
-          {valueState === 2 ? "수정 >" : "입력 >"}
-        </div>
-      </div>
-      {valueState === 2 ? (
-        <img
-          className="info01_icon"
-          src={IMGWorkTypeSelect}
-          alt="comp1 unselect icon "
-        />
-      ) : (
-        <img
-          className="info01_icon"
-          src={IMGWorkTypeUnSelect}
-          alt="comp1 select icon "
-        />
-      )}
-    </>
-  );
-};
-
-const _Comp1SelectTemplete3 = ({ handler }: { handler: any }) => {
-  const [valueState, setValueState] = useState(3);
-  handler.setIsValueSelect03 = setValueState;
-  const onClickMoveToCal = () => {
-    handler.setCompState(3);
-  };
-  return (
-    <div
-      onClick={onClickMoveToCal}
-      className={`w_100 comp01_select_templete pd_810 ${_container_class_name(
-        valueState
-      )}`}
-    >
-      <div className="comp01_select_templete_step fs_14">
-        3단계 <span className="boundary"></span>
-      </div>
-      <div className="comp01_select_templete_title fs_16">개별 근로정보</div>
-      <div className="flex_left fs_14 un_value_font_color">
-        {valueState === 2 ? "수정 >" : "입력 >"}
-      </div>
-    </div>
   );
 };
 
 const WorkTypes = ({ handler }: { handler: any }) => {
+  const [workRypeInfo1, setState1] = useState<"select" | "next" | "none">(
+    "next"
+  );
+  const [workRypeInfo2, setState2] = useState<"select" | "next" | "none">(
+    "none"
+  );
+  const [workRypeInfo3, setState3] = useState<"select" | "next" | "none">(
+    "none"
+  );
   return (
     <>
       <Header title="정보입력" leftLink="/" leftType="BACK" />
       <div id="detail_container_comp1" className="full_height_layout_cal">
         <div className="public_side_padding">
           <SelectInput
-            callBack={(params: string, value: string) => {
+            label="근로형태 선택"
+            popUpCallBack={(params: string, value: string) => {
               handler.SetPageVal(params, value);
-              handler.setIsValueSelect01(2);
-              handler.setIsValueSelect02(1);
+              setState1("select");
+              if (!handler.GetPageVal("retireReason")) setState2("next");
+              ClosePopup();
             }}
-            popup_focus_template={<_Comp1SelectTemplete1 handler={handler} />}
+            callBack={handler.SetPageVal}
+            popup_focus_template={
+              <_CompSelectTemplete
+                level={1}
+                name="근로형태 선택"
+                selectState={workRypeInfo1}
+              />
+            }
+            popup_select={handler.GetPageVal}
             params="workCate"
-            options={[
-              "정규직",
-              "기간제",
-              "일용직",
-              "(단기) 예술인",
-              "(단기) 특고·프리랜서",
-              "초단시간",
-              "자영업",
-            ]}
+            options={work_cate}
             type="popup"
           />
           <SelectInput
-            callBack={(params: string, value: string) => {
+            label="퇴직사유 선택"
+            popUpCallBack={(params: string, value: string) => {
               handler.SetPageVal(params, value);
-              handler.setIsValueSelect02(2);
-              handler.setIsValueSelect03(1);
+              setState2("select");
+              setState3("next");
             }}
-            popup_focus_template={<_Comp1SelectTemplete2 handler={handler} />}
+            callBack={handler.SetPageVal}
+            popup_focus_template={
+              <_CompSelectTemplete
+                level={2}
+                name="퇴직사유"
+                selectState={workRypeInfo2}
+              />
+            }
+            popup_select={handler.GetPageVal}
             params="retireReason"
-            options={[
-              "권고사직",
-              "계약만료",
-              "질병",
-              "임신/출산/육아",
-              "회사 잘못",
-              "원거리 통근",
-              "정년퇴직",
-              "기타 비자발적 사유",
-            ]}
+            options={retire_reason}
+            check_popup={retire_reason_popup}
             type="popup"
           />
-          <_Comp1SelectTemplete3 handler={handler} />
+          <_CompSelectTemplete
+            level={3}
+            name="개별 근로정보"
+            selectState={workRypeInfo3}
+            callBack={() => {
+              if (
+                handler.GetPageVal("workCate") &&
+                handler.GetPageVal("retireReason")
+              ) {
+                handler.setCompState(3);
+              } else {
+                CreatePopup(
+                  undefined,
+                  "근로형태와 퇴직사유를 모두 선택해주세요.",
+                  "only_check"
+                );
+                return;
+              }
+            }}
+          />
         </div>
       </div>
     </>
