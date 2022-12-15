@@ -21,16 +21,6 @@ export function getDateVal(reqEnterDay: string, reqRetiredDay: string | null = n
 	return result;
 }
 
-export function calWorkingDay(enterDay: dayjs.Dayjs, retiredDay: dayjs.Dayjs) {
-	const allDays = Math.floor(retiredDay.diff(enterDay, "day", true) + 1); // 퇴사일 - 입사일
-	const difftoEnter = Math.floor(Math.floor(enterDay.diff("1951-01-01", "day", true)) / 7); // 입사일 - 1951.1.1.
-	const diffToretired = Math.floor(Math.floor(retiredDay.diff("1951-01-01", "day", true)) / 7); // 퇴사일 - 1951.1.1.
-	const sundayCount = diffToretired - difftoEnter;
-	const workingDays = allDays - sundayCount; // 피보험 기간 일수
-	const workingYears = Math.floor(workingDays / 365); // 피보험 기간 년수
-	return { workingDays, workingYears };
-}
-
 export function calLeastPayInfo(
 	retiredDay: dayjs.Dayjs,
 	retiredDayArray: any[],
@@ -78,17 +68,13 @@ export function getFailResult(
 			requireDays: leastRequireWorkingDay - workingDays, // 부족 근무일수
 		};
 	}
-	const [availableDay, dDay] = calDday(
-		new Date(retiredDay.format("YYYY-MM-DD")),
-		leastRequireWorkingDay - workingDays
-	);
+	const availableDay = calDday(new Date(retiredDay.format("YYYY-MM-DD")), leastRequireWorkingDay - workingDays);
 	return {
 		succ: false,
 		retired: retired,
 		workingDays, // 현 근무일수
 		requireDays: leastRequireWorkingDay - workingDays, // 부족 근무일수
 		availableDay, // 피보험기간이 180일이 되는 날
-		// dDay, // D-day 근무일수가 180일이 되는 다음 날까지 남은 기간 => 부족이하고 디데이는 다름
 		availableAmountCost: realDayPay * receiveDay, // 총 수급액: 실업급여 일 수급액 * 소정급여일수
 		dayPay: realDayPay, // 일 수급액
 		receiveDays: receiveDay, // 소정급여일수는 항상 120일로 최소단위 적용
@@ -125,17 +111,17 @@ export function getNextReceiveDay(workingYears: number, age: number, disabled: b
 }
 
 export function calDday(retiredDay: Date, needDay: number) {
-	let count = 0;
+	// let count = 0;
 	for (let i = 0; i < needDay; i++) {
 		if (retiredDay.getDay() === 6) {
 			i--;
 			retiredDay.setDate(retiredDay.getDate() + 1);
-			count++;
+			// count++;
 			continue;
 		}
 		retiredDay.setDate(retiredDay.getDate() + 1);
-		count++;
+		// count++;
 	}
 
-	return [`${retiredDay.getFullYear()}-${retiredDay.getMonth() + 1}-${retiredDay.getDate()}`, count];
+	return `${retiredDay.getFullYear()}-${retiredDay.getMonth() + 1}-${retiredDay.getDate()}`;
 }
