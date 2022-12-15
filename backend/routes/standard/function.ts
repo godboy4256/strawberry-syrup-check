@@ -15,11 +15,11 @@ export const checkBasicRequirements = (mainData: TmainData, employmentDate: numb
 	return { succ: true };
 };
 
-export function calWorkingDay(enterDay: dayjs.Dayjs, limitDay: dayjs.Dayjs) {
-	const allDays = Math.floor(limitDay.diff(enterDay, "day", true) + 1); // 퇴사일 - 입사일
-	const diffToEnter = Math.floor(Math.floor(enterDay.diff("1951-01-01", "day", true)) / 7); // 입사일 - 1951.1.1.
-	const diffToLimit = Math.floor(Math.floor(limitDay.diff("1951-01-01", "day", true)) / 7); // 퇴사일 - 1951.1.1.
-	const sundayCount = diffToLimit - diffToEnter;
+export function calWorkingDay(limitDay: dayjs.Dayjs, retiredDay: dayjs.Dayjs) {
+	const allDays = Math.floor(retiredDay.diff(limitDay, "day", true) + 1); // 퇴사일 - 입사일
+	const diffToLimit = Math.floor(Math.floor(limitDay.diff("1951-01-01", "day", true)) / 7); // 입사일 - 1951.1.1.
+	const diffToRetired = Math.floor(Math.floor(retiredDay.diff("1951-01-01", "day", true)) / 7); // 퇴사일 - 1951.1.1.
+	const sundayCount = diffToRetired - diffToLimit;
 	const workingDays = allDays - sundayCount; // 피보험 기간 일수
 	return workingDays;
 }
