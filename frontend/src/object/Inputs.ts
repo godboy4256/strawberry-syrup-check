@@ -1,5 +1,5 @@
 export default class InputHandler {
-  protected _Data: any = {};
+  public _Data: any = {};
   constructor(keyList_: {}) {
     this._Data = keyList_;
   }

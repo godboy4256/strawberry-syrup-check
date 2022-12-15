@@ -17,7 +17,7 @@ import {
   Year_Option_Generater,
 } from "../../utils/date";
 import "../../styles/date.css";
-import { CreatePopup } from "../common/Popup";
+import { ClosePopup, CreatePopup } from "../common/Popup";
 
 const currentDate = GetDateArr(null);
 
@@ -331,14 +331,20 @@ export const DateInputNormal = ({
   const [dateValue, setDateValue] = useState("");
   const onClickDateOn = () => {
     CreatePopup(
-      undefined,
+      "",
       <_DatePopUp
         handler={handler}
         planToDo={planToDo}
         year={year ? year : handler.current_year_list}
       />,
       "date",
-      () => handler.Action_Get_Date(callBack && callBack, setDateValue, params)
+      () => {
+        handler.Action_Get_Date(callBack && callBack, setDateValue, params);
+        ClosePopup();
+      },
+      undefined,
+      "선택",
+      "취소"
     );
   };
   return (

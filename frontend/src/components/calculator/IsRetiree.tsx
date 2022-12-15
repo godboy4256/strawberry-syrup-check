@@ -2,9 +2,9 @@ import Button from "../inputs/Button";
 import { Link } from "react-router-dom";
 import IMGBasicEmoticon from "../../assets/image/new/basic.svg";
 import IMGHelpIcon from "../../assets/image/new/help_icon.svg";
-import "../../styles/retiree.css";
 import Header from "../layout/Header";
 import HelpLink from "../common/HelpLink";
+import "../../styles/retiree.css";
 
 const CalIsRetiree = ({ handler }: { handler: any }) => {
   const onClickIsRetiree = (isRetiree: boolean) => {

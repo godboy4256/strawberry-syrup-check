@@ -12,6 +12,7 @@ import IMGBasicEngryEmoticon from "../assets/image/emoticon/basic_angry.svg";
 import "./../styles/basic.css";
 import { ResultComp } from "../components/calculator/Result";
 import CalContainer from "../components/calculator/CalContainer";
+import Loading from "../components/common/Loading";
 
 const currentDate = GetDateArr(null);
 
@@ -22,8 +23,11 @@ class BasicCalHandler extends InputHandler {
     if (!this._Data.retiredDay) {
       this._Data.retiredDay = currentDate.join("-");
     }
+    this.setCompState && this.setCompState(4);
     this.result = await sendToServer("/standard", this._Data);
-    this.setCompState && this.setCompState(3);
+    setTimeout(() => {
+      this.setCompState && this.setCompState(3);
+    }, 2000);
   };
 }
 const handler = new BasicCalHandler({});
@@ -79,18 +83,24 @@ const BasicCalPage = () => {
   const [compState, setCompState] = useState(1);
   useEffect(() => {
     handler.setCompState = setCompState;
+    handler._Data = {};
   }, []);
-
   return (
-    <CalContainer type="기본형" GetValue={handler.GetPageVal}>
-      <>
-        {compState === 1 && <IsRetiree handler={handler} />}
-        {compState === 2 && <_BasicCalComp />}
-        {compState === 3 && (
-          <ResultComp cal_type="basic" result_data={handler.result} />
-        )}
-      </>
-    </CalContainer>
+    <>
+      {compState === 4 ? (
+        <Loading />
+      ) : (
+        <CalContainer type="기본형" GetValue={handler.GetPageVal}>
+          <>
+            {compState === 1 && <IsRetiree handler={handler} />}
+            {compState === 2 && <_BasicCalComp />}
+            {compState === 3 && (
+              <ResultComp cal_type="basic" result_data={handler.result} />
+            )}
+          </>
+        </CalContainer>
+      )}
+    </>
   );
 };
 
