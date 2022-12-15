@@ -1,4 +1,4 @@
-import dayjs from "dayjs";
+import dayjs, { Dayjs } from "dayjs";
 import { FastifyInstance } from "fastify";
 import isSameOrAfter from "dayjs/plugin/isSameOrAfter";
 import weekOfYear from "dayjs/plugin/weekOfYear";
@@ -15,16 +15,24 @@ import { DefinedParamErrorMesg } from "../../share/validate";
 import { detailPath } from "../../share/pathList";
 import { employerPayTable } from "../../data/data";
 
-import { artSchema, dayJobSchema, employerSchema, shortArtSchema, standardSchema, veryShortSchema } from "./schema";
+import {
+	artSchema,
+	dayJobSchema,
+	employerSchema,
+	shortArtSchema,
+	standardSchema,
+	TstandardInput,
+	veryShortSchema,
+} from "./schema";
 import {
 	artShortCheckPermit,
 	calArtPay,
-	calArtShortWorkingMonth,
 	calDayjobPay,
+	calDetailWorkingDay,
 	calVeryShortAllWorkDay,
+	checkBasicRequirements,
 	dayJobCheckPermit,
 	getEmployerReceiveDay,
-	sumArtShortPay,
 } from "./function";
 
 dayjs.extend(isSameOrAfter);
@@ -32,60 +40,47 @@ dayjs.extend(weekOfYear);
 
 export default function detailRoute(fastify: FastifyInstance, options: any, done: any) {
 	fastify.post(detailPath.standard, standardSchema, async (req: any, res) => {
-		const { enterDay, retiredDay, retiredDayArray } = getDateVal(req.body.enterDay, req.body.retiredDay);
+		const mainData: TstandardInput = {
+			...req.body,
+			enterDay: dayjs(req.body.enterDay),
+			retiredDay: dayjs(req.body.retiredDay),
+		};
+		const retiredDayArray = req.body.retiredDay.split("-");
 
-		const employmentDate = Math.floor(retiredDay.diff(enterDay, "day", true));
-		if (employmentDate < 0) return { succ: false, mesg: DefinedParamErrorMesg.ealryRetire };
+		// 1. 기본 조건 확인
+		const employmentDate = Math.floor(mainData.retiredDay.diff(mainData.enterDay, "day", true));
+		const checkResult = checkBasicRequirements(mainData, employmentDate);
+		if (!checkResult.succ) return { checkResult };
 
-		const { dayAvgPay, realDayPay, realMonthPay } = calLeastPayInfo(
-			retiredDay,
-			retiredDayArray,
-			req.body.salary,
-			req.body.dayWorkTime
-		);
+		// 2. 급여 산정
+		const { dayAvgPay, realDayPay, realMonthPay } =
+			retiredDayArray[0] === "2023"
+				? calLeastPayInfo(mainData.retiredDay, retiredDayArray, mainData.salary, 8, true)
+				: calLeastPayInfo(mainData.retiredDay, retiredDayArray, mainData.salary, 8);
 
-		/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-		const diffToEnter = Math.floor(Math.floor(enterDay.diff("1951-01-01", "day", true)) / 7); // 입사일 - 1951.1.1.
-		const diffToRetired = Math.floor(Math.floor(retiredDay.diff("1951-01-01", "day", true)) / 7); // 퇴사일 - 1951.
+		// 3. 소정급여일수 산정
+		const joinYears = Math.floor(employmentDate / 365);
+		const receiveDay = getReceiveDay(joinYears, req.body.age, req.body.disabled);
 
-		function findEnterDayIndex(day: number) {
-			return day === enterDay.day();
-		}
-		function findRetiredDayIndex(day: number) {
-			return day === retiredDay.day();
-		}
-		const firstWeekWorkDay = req.body.weekDay.length - req.body.weekDay.findIndex(findEnterDayIndex) + 1; // 유급 휴일 추가
-		const lastWeekWorkDay = req.body.weekDay.findIndex(findRetiredDayIndex) + 2; // index는 0부터 시작해서 보정, 유급 휴일 추가
+		// 4. 피보험단위기간 산정
+		const limitDay = mainData.retiredDay.subtract(18, "month");
+		const workingDays = calDetailWorkingDay(limitDay, mainData.retiredDay, mainData.weekDay);
 
-		const workingDays =
-			(diffToRetired - diffToEnter) * req.body.weekDay.length + firstWeekWorkDay + lastWeekWorkDay;
-		const employmentYears = Math.floor(employmentDate / 365);
-		/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+		// 5. 복수형에 사용되는 마지막 직장인 경우 workDawyForMulti 계산
 		let workDayForMulti = 0; // 이 과정은 중복 가입된 상황을 고려하지 않는다.
-		// 복수형 여부
 		if (req.body.isEnd) {
-			const limitDay = dayjs(req.body.limitDay); // 마지막 직장 퇴사일로 부터 필요한 개월 수(18 또는 24) 전
-			// 이 직장의 입사일이 기준일 이후 인가?
-			if (enterDay.isSameOrAfter(limitDay, "day")) {
-				workDayForMulti = workingDays;
-			} else {
-				const diffToEnter = Math.floor(Math.floor(limitDay.diff("1951-01-01", "day", true)) / 7); // diffTOEnter를 limitDay에 맞춰서 변경
-				const firstWeekWorkDay = req.body.weekDay.length - req.body.weekDay.findIndex(findEnterDayIndex) + 1; // 유급 휴일 추가
-				const lastWeekWorkDay = req.body.weekDay.findIndex(findRetiredDayIndex) + 2; // index는 0부터 시작해서 보정, 유급 휴일 추가
-
-				workDayForMulti =
-					(diffToRetired - diffToEnter) * req.body.weekDay.length + firstWeekWorkDay + lastWeekWorkDay;
-			}
+			const limitDayForMulti = dayjs(req.body.limitDay); // 마지막 직장 퇴사일로 부터 필요한 개월 수(18 또는 24) 전
+			workDayForMulti = mainData.enterDay.isSameOrAfter(limitDayForMulti, "day")
+				? workingDays
+				: calDetailWorkingDay(limitDayForMulti, mainData.retiredDay, mainData.weekDay);
 		}
-		/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-		const receiveDay = getReceiveDay(employmentYears, req.body.age, req.body.disabled);
 
-		// isPermit
+		// 6. 수급 인정 / 불인정에 따라 결과 리턴
 		const leastRequireWorkingDay = 180;
 		if (workingDays < leastRequireWorkingDay)
 			return getFailResult(
 				req.body.retired,
-				retiredDay,
+				mainData.retiredDay,
 				workingDays,
 				realDayPay,
 				realMonthPay,
@@ -94,14 +89,10 @@ export default function detailRoute(fastify: FastifyInstance, options: any, done
 				true
 			);
 
-		const [requireWorkingYear, nextReceiveDay] = getNextReceiveDay(
-			employmentYears,
-			req.body.age,
-			req.body.disabled
-		);
+		// 이 때 다음 단계 수급이 가능하다면 같이 전달
+		const [requireWorkingYear, nextReceiveDay] = getNextReceiveDay(joinYears, req.body.age, req.body.disabled);
 		if (nextReceiveDay === 0) {
 			return {
-				// 공통 => 분리 예정
 				succ: true,
 				retired: req.body.retired,
 				amountCost: realDayPay * receiveDay,
@@ -122,7 +113,10 @@ export default function detailRoute(fastify: FastifyInstance, options: any, done
 				realMonthPay,
 				severancePay: employmentDate >= 1 ? Math.ceil((dayAvgPay * 30 * employmentDate) / 365) : 0,
 				workingDays,
-				needDay: calDday(new Date(retiredDay.format("YYYY-MM-DD")), requireWorkingYear * 365 - workingDays)[1],
+				needDay: calDday(
+					new Date(mainData.retiredDay.format("YYYY-MM-DD")),
+					requireWorkingYear * 365 - workingDays
+				)[1],
 				nextAmountCost: nextReceiveDay * realDayPay,
 				morePay: nextReceiveDay * realDayPay - receiveDay * realDayPay,
 				workDayForMulti, // 복수형에서만 사용

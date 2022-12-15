@@ -1,4 +1,5 @@
-import dayjs from "dayjs";
+import dayjs, { Dayjs } from "dayjs";
+import { DefinedParamErrorMesg } from "share/validate";
 
 export function calArtPay(sumOneYearPay: number[] | number, artWorkingDays: number, isSpecial: boolean = false) {
 	let dayAvgPay = 0;
@@ -193,3 +194,44 @@ export const calVeryShortAllWorkDay = (enterDay: dayjs.Dayjs, retiredDay: dayjs.
 
 	return allWorkDay;
 };
+
+export const checkBasicRequirements = (mainData: any, employmentDate: number) => {
+	const mainRetiredDay = dayjs(mainData.retiredDay);
+
+	// 1. 신청일이 이직일로 부터 1년 초과 확인
+	const now = dayjs(new Date());
+	if (Math.floor(now.diff(mainRetiredDay, "day", true)) > 365)
+		return { succ: false, mesg: DefinedParamErrorMesg.expire };
+
+	// 2.퇴사일이 입사일보다 빠른지 확인
+	if (employmentDate < 0) return { succ: false, mesg: DefinedParamErrorMesg.ealryRetire };
+
+	// 3. mainData의 근로형태가 예술인 특고인경우 예술인 또는 특고로 3개월 이상 근무해야한다.
+	if (mainData.workCate === 2 || mainData.workCate === 3) {
+		if (mainData.workingDays < 90) return { succ: false, mesg: "예술인/특고로 3개월 이상 근무해야합니다" };
+	}
+	if (mainData.workCate === 4 || mainData.workCate === 5) {
+		if (mainData.workingDays < 3) return { succ: false, mesg: "단기 예술인/특고로 3개월 이상 근무해야합니다" };
+	}
+
+	return { succ: true };
+};
+
+export function calDetailWorkingDay(limitDay: Dayjs, retiredDay: Dayjs, weekDay: number[]) {
+	function findLimitDayIndex(day: number) {
+		return day === limitDay.day();
+	}
+	function findRetiredDayIndex(day: number) {
+		return day === retiredDay.day();
+	}
+
+	const diffToLimit = Math.floor(Math.floor(limitDay.diff("1951-01-01", "day", true)) / 7); // 입사일 - 1951.1.1.
+	const diffToRetired = Math.floor(Math.floor(retiredDay.diff("1951-01-01", "day", true)) / 7); // 퇴사일 - 1951.
+
+	const firstWeekWorkDay = weekDay.length - weekDay.findIndex(findLimitDayIndex) + 1; // 유급 휴일 추가
+	const lastWeekWorkDay = weekDay.findIndex(findRetiredDayIndex) + 2; // index는 0부터 시작해서 보정, 유급 휴일 추가
+
+	const workingDays = (diffToRetired - diffToLimit) * weekDay.length + firstWeekWorkDay + lastWeekWorkDay;
+
+	return workingDays;
+}
