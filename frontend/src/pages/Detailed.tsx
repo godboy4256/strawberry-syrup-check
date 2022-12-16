@@ -11,15 +11,15 @@ import TabInputs from "../components/inputs/TabInputs";
 import DetailedHandler from "../object/detailed";
 import WorkTypes from "../components/calculator/WorkTypes";
 import { Year_Option_Generater } from "../utils/date";
-import { CreatePopup } from "../components/common/Popup";
+import { ClosePopup, CreatePopup } from "../components/common/Popup";
 import NumberInput from "../components/inputs/Pay";
 import NumberUpDown from "../components/inputs/NumberUpDown";
 import Button from "../components/inputs/Button";
 import InputHandler from "../object/Inputs";
-import "./../styles/detail.css";
 import { ResultComp } from "../components/calculator/Result";
 import CalContainer from "../components/calculator/CalContainer";
 import Loading from "../components/common/Loading";
+import "./../styles/detail.css";
 
 class IndividualInputClass extends InputHandler {
   public _Data: any = {};
@@ -63,6 +63,7 @@ const IndividualInput = ({
           "dayAvgPay",
           handler.sumDayJobWorkingDay(handler2._Data_arr)[1]
         );
+        ClosePopup();
       }
     );
   };
