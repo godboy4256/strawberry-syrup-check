@@ -13,16 +13,13 @@ import "./../styles/basic.css";
 import { ResultComp } from "../components/calculator/Result";
 import CalContainer from "../components/calculator/CalContainer";
 import Loading from "../components/common/Loading";
-
-const currentDate = GetDateArr(null);
+import { CheckValiDation } from "../utils/validate";
 
 class BasicCalHandler extends InputHandler {
   public result: {} = {};
   public setCompState: Dispatch<SetStateAction<number>> | undefined = undefined;
   public Action_Cal_Result = async () => {
-    if (!this._Data.retiredDay) {
-      this._Data.retiredDay = currentDate.join("-");
-    }
+    if (!CheckValiDation("standad", this._Data)) return;
     this.setCompState && this.setCompState(4);
     this.result = await sendToServer("/standard", this._Data);
     setTimeout(() => {

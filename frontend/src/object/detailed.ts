@@ -1,6 +1,7 @@
 import { Dispatch, SetStateAction } from "react";
 import { getAge, GetDateArr } from "../utils/date";
 import { sendToServer } from "../utils/sendToserver";
+import { CheckValiDation } from "../utils/validate";
 import InputHandler from "./Inputs";
 
 class DetailedHandler extends InputHandler {
@@ -124,19 +125,35 @@ class DetailedHandler extends InputHandler {
             dayWorkTime: Number(
               String(this._Data.dayWorkTime).split("시간")[0]
             ),
-            disabled: this._Data.disabled === "장애인" ? true : false,
-            age: getAge(new Date(String(this._Data.age))).age,
+            disabled:
+              this._Data.disabled === "장애인"
+                ? true
+                : this._Data.disabled === "비장애인"
+                ? false
+                : null,
+            age: isNaN(Number(getAge(new Date(String(this._Data.age))).age))
+              ? null
+              : getAge(new Date(String(this._Data.age))).age,
           }
         : this._Data.workCate === 2 // 일용직
         ? {
             retired: this._Data.retired,
             workCate: this._Data.workCate,
             retireReason: this._Data.retireReason,
-            dayWorkTime: Number(this._Data.dayWorkTime.split("시간")[0]),
+            dayWorkTime: this._Data.dayWorkTime
+              ? Number(this._Data.dayWorkTime.split("시간")[0])
+              : null,
             lastWorkDay: this._Data.lastWorkDay,
             isSpecial: this._Data.isSpecial,
-            age: getAge(new Date(String(this._Data.age))).age,
-            disable: this._Data.disabled === "장애인" ? true : false,
+            age: isNaN(Number(getAge(new Date(String(this._Data.age))).age))
+              ? null
+              : getAge(new Date(String(this._Data.age))).age,
+            disable:
+              this._Data.disabled === "장애인"
+                ? true
+                : this._Data.disabled === "비장애인"
+                ? false
+                : null,
             isOverTen: this._Data.isOverTen ? this._Data.isOverTen : false,
             sumWorkDay: this._Data.workRecord
               ? this.sumDayJobWorkingDay(this._Data.workRecord)[0]
@@ -152,8 +169,15 @@ class DetailedHandler extends InputHandler {
               workCate: this._Data.workCate,
               retireReason: this._Data.retireReason,
               lastWorkDay: this._Data.lastWorkDay,
-              age: getAge(new Date(String(this._Data.age))).age,
-              disable: this._Data.disabled === "장애인" ? true : false,
+              age: isNaN(Number(getAge(new Date(String(this._Data.age))).age))
+                ? null
+                : getAge(new Date(String(this._Data.age))).age,
+              disable:
+                this._Data.disabled === "장애인"
+                  ? true
+                  : this._Data.disabled === "비장애인"
+                  ? false
+                  : null,
               sumOneYearWorkDay:
                 this._Data.input === "결과만 입력"
                   ? [this._Data.employ_year, this._Data.employ_month]
@@ -167,9 +191,18 @@ class DetailedHandler extends InputHandler {
             }
           : {
               ...this._Data,
-              age: getAge(new Date(String(this._Data.age))).age,
-              disabled: this._Data.disabled === "장애인" ? true : false,
-              sumTwelveMonthSalary: [this._Data.sumTwelveMonthSalary],
+              age: isNaN(Number(getAge(new Date(String(this._Data.age))).age))
+                ? null
+                : getAge(new Date(String(this._Data.age))).age,
+              disabled:
+                this._Data.disabled === "장애인"
+                  ? true
+                  : this._Data.disabled === "비장애인"
+                  ? false
+                  : null,
+              sumTwelveMonthSalary: this._Data.sumTwelveMonthSalary
+                ? [this._Data.sumTwelveMonthSalary]
+                : null,
             }
         : this._Data.workCate === 4 // 특고
         ? this._Data.is_short === "단기특고"
@@ -198,8 +231,15 @@ class DetailedHandler extends InputHandler {
           : {
               ...this._Data,
               age: getAge(new Date(String(this._Data.age))).age,
-              disabled: this._Data.disabled === "장애인" ? true : false,
-              sumTwelveMonthSalary: [this._Data.sumTwelveMonthSalary],
+              disabled:
+                this._Data.disabled === "장애인"
+                  ? true
+                  : this._Data.disabled === "비장애인"
+                  ? false
+                  : null,
+              sumTwelveMonthSalary: this._Data.sumTwelveMonthSalary
+                ? [this._Data.sumTwelveMonthSalary]
+                : null,
             }
         : this._Data.workCate === 5 // 초단 시간
         ? {
@@ -221,7 +261,22 @@ class DetailedHandler extends InputHandler {
             ),
           }
         : {};
-    console.log(to_server);
+
+    const validCheckType =
+      (this._Data.workCate === 0 || this._Data.workCate) === 1
+        ? "detail_standad"
+        : this._Data.workCate === 3 || this._Data.workCate === 4
+        ? "detail_art"
+        : this._Data.workCate === 2
+        ? "detail_dayjob"
+        : this._Data.workCate === 5
+        ? "detail_veryshorts"
+        : this._Data.workCate === 6 && "detail_employ";
+
+    if (
+      !CheckValiDation(validCheckType ? validCheckType : "standad", to_server)
+    )
+      return;
     this.result = await sendToServer(url, to_server);
     if (this._Data.workCate === 3 || this._Data.workCate === 4) {
       this.result["is_short"] = this._Data.is_short;

@@ -329,7 +329,7 @@ export const DateInputNormal = ({
 }) => {
   const handler = new DateHandler({});
   const [dateValue, setDateValue] = useState("");
-  const onClickDateOn = () => {
+  const popupDate = () => {
     CreatePopup(
       "",
       <_DatePopUp
@@ -346,6 +346,22 @@ export const DateInputNormal = ({
       "선택",
       "취소"
     );
+  };
+  const onClickDateOn = () => {
+    if (planToDo) {
+      if (!planToDo("planToDo")) {
+        CreatePopup(
+          undefined,
+          "신청 예정일을 선택한 후 입력가능합니다.",
+          "only_check"
+        );
+        return;
+      } else {
+        popupDate();
+      }
+    } else {
+      popupDate();
+    }
   };
   return (
     <>

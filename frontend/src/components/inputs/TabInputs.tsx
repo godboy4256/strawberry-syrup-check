@@ -3,6 +3,7 @@ import NumberInput from "./Pay";
 import "../../styles/salarytab.css";
 import SelectInput from "./Select";
 import { GetDateArr } from "../../utils/date";
+import { CreatePopup } from "../common/Popup";
 
 const before_month_cal = (retiredDay: string) => {
   const targetDate = retiredDay.split("-"),
@@ -69,7 +70,13 @@ const TabInputs = ({
             className={`fs_16 ${
               salarytab === "three_month" ? "three_month" : ""
             } ${salarytab == "all" ? "un_all" : ""}`}
-            onClick={() => setSalaryTab("three_month")}
+            onClick={() => {
+              if (valueDay("retiredDay")) {
+                setSalaryTab("three_month");
+              } else {
+                CreatePopup(undefined, "퇴사일을 선택해주세요.");
+              }
+            }}
           >
             퇴직전 3개월
           </button>
