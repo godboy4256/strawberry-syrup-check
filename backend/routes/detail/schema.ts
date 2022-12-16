@@ -9,11 +9,57 @@ export type TstandardInput = {
 	disabled: boolean;
 	enterDay: Dayjs;
 	retiredDay: Dayjs;
+
 	weekDay: number[];
 	dayWorkTime: number;
 	salary: number[];
-	isEnd?: boolean;
-	limitDay?: string;
+
+	isEnd: boolean;
+	limitDay: string;
+};
+
+export type TartInput = {
+	retired: boolean;
+	workCate: number;
+	retireReason: number;
+	age: number;
+	disabled: boolean;
+	enterDay: Dayjs;
+	retiredDay: Dayjs;
+	sumTwelveMonthSalary: number[];
+
+	isSpecial: boolean;
+
+	isEnd: boolean;
+	limitDay: string;
+};
+
+export type TdayJobInput = {
+	retired: boolean;
+	workCate: number;
+	retireReason: number;
+	age: number;
+	disable: boolean;
+	isSpecial: boolean;
+	lastWorkDay: Dayjs;
+	dayWorkTime: number;
+	workRecord?: object[];
+	dayAvgPay: number;
+	sumWorkDay: number;
+	isOverTen: boolean;
+	hasWork: [boolean, string];
+};
+
+export type TveryShortInput = {
+	age: number;
+	disable: boolean;
+	enterDay: Dayjs;
+	retiredDay: Dayjs;
+	weekDay: number[]; // 주의
+	dayWorkTime: number;
+	salary: number[];
+	isEnd: boolean;
+	limitDay: string;
 };
 
 const standardBodyProp = {
@@ -149,7 +195,7 @@ export const artSchema = {
 				"enterDay",
 				"retiredDay",
 				"sumTwelveMonthSalary",
-				// "workRecord",
+				"isSpecial",
 			],
 			properties: artBodyProp,
 		},
