@@ -9,9 +9,27 @@ export type TstandardInput = {
 	disabled: boolean;
 	enterDay: Dayjs;
 	retiredDay: Dayjs;
+
 	weekDay: number[];
 	dayWorkTime: number;
 	salary: number[];
+
+	isEnd?: boolean;
+	limitDay?: string;
+};
+
+export type TartInput = {
+	retired: boolean;
+	workCate: number;
+	retireReason: number;
+	age: number;
+	disabled: boolean;
+	enterDay: Dayjs;
+	retiredDay: Dayjs;
+	sumTwelveMonthSalary: number[];
+
+	isSpecial: boolean;
+
 	isEnd?: boolean;
 	limitDay?: string;
 };
@@ -149,7 +167,7 @@ export const artSchema = {
 				"enterDay",
 				"retiredDay",
 				"sumTwelveMonthSalary",
-				// "workRecord",
+				"isSpecial",
 			],
 			properties: artBodyProp,
 		},
