@@ -21,15 +21,18 @@ import {
 	shortArtSchema,
 	standardSchema,
 	TartInput,
+	TdayJobInput,
 	TstandardInput,
+	TveryShortInput,
 	veryShortSchema,
 } from "./schema";
 import {
 	artShortCheckPermit,
 	calArtPay,
-	calDayjobPay,
+	calDayJobPay,
 	calDetailWorkingDay,
-	calVeryShortAllWorkDay,
+	calVeryShortWorkDay,
+	calVeryshortPay,
 	checkBasicRequirements,
 	dayJobCheckPermit,
 	getEmployerReceiveDay,
@@ -305,13 +308,17 @@ export default function detailRoute(fastify: FastifyInstance, options: any, done
 	});
 
 	fastify.post(detailPath.dayJob, dayJobSchema, (req: any, res) => {
-		const lastWorkDay = dayjs(req.body.lastWorkDay);
+		const mainData: TdayJobInput = {
+			...req.body,
+			lastWorkDay: dayjs(req.body.lastWorkDay),
+		};
+
+		// 1. 신청일이 이직일로 부터 1년 초과 확인
 		const now = dayjs(new Date());
-		if (Math.floor(now.diff(lastWorkDay, "day", true)) > 365)
+		if (Math.floor(now.diff(mainData.lastWorkDay, "day", true)) > 365)
 			return { succ: false, mesg: DefinedParamErrorMesg.expire };
 
-		const limitPermitDay = lastWorkDay.subtract(18, "month").format("YYYY-MM-DD").split("-").map(Number);
-
+		// 2. 추가 조건 확인 (건설직 여부 기준)
 		if (req.body.isSpecial) {
 			if (req.body.isOverTen && req.body.hasWork[0])
 				return { succ: false, mesg: dayjs(req.body.hasWork[1]).add(14, "day").format("YYYY-MM-DD") };
@@ -320,12 +327,15 @@ export default function detailRoute(fastify: FastifyInstance, options: any, done
 				return { succ: false, mesg: "신청일 이전 1달 간 근로일수가 10일 미만이어야 합니다." };
 		}
 
+		const limitPermitDay = mainData.lastWorkDay.subtract(18, "month").format("YYYY-MM-DD").split("-").map(Number);
+
+		// 3. 피보험단위기간 산정
 		let isPermit: (number | boolean)[];
 		let sortedData: any[];
 		if (req.body.hasOwnProperty("workRecord")) {
 			const overDatePool = dayjs(new Date(req.body.workRecord[0].year, req.body.workRecord[0].months[0].month, 0))
 				.subtract(1, "month")
-				.isSameOrAfter(lastWorkDay);
+				.isSameOrAfter(mainData.lastWorkDay);
 			if (overDatePool) return { succ: false, mesg: "입력한 근무일이 마지막 근무일 이 후 입니다." };
 
 			sortedData = req.body.workRecord.sort((a: any, b: any) => {
@@ -339,13 +349,18 @@ export default function detailRoute(fastify: FastifyInstance, options: any, done
 		}
 		if (!isPermit[0]) return { succ: false, workingDay: isPermit[1], requireWorkingDay: isPermit[2] };
 
+		// 4. 급여 산정
 		const { realDayPay, realMonthPay } =
-			lastWorkDay.get("year") === 2023
-				? calDayjobPay(req.body.dayAvgPay, req.body.dayWorkTime, true)
-				: calDayjobPay(req.body.dayAvgPay, req.body.dayWorkTime);
-		const workingYear = Math.floor(req.body.sumWorkDay / 365);
-		const receiveDay = getReceiveDay(workingYear, req.body.age, req.body.disable);
-		const [requireWorkingYear, nextReceiveDay] = getNextReceiveDay(workingYear, req.body.age, req.body.disable);
+			mainData.lastWorkDay.get("year") === 2023
+				? calDayJobPay(req.body.dayAvgPay, req.body.dayWorkTime, true)
+				: calDayJobPay(req.body.dayAvgPay, req.body.dayWorkTime);
+
+		// 5. 소정급여일수 산정
+		const joinYear = Math.floor(req.body.sumWorkDay / 365);
+		const receiveDay = getReceiveDay(joinYear, req.body.age, req.body.disable);
+
+		// 6 다음 단계 수급이 가능하다면 같이 전달
+		const [requireWorkingYear, nextReceiveDay] = getNextReceiveDay(joinYear, req.body.age, req.body.disable);
 
 		if (!nextReceiveDay)
 			return {
@@ -371,68 +386,51 @@ export default function detailRoute(fastify: FastifyInstance, options: any, done
 	});
 
 	fastify.post(detailPath.veryShort, veryShortSchema, (req: any, res) => {
-		const retiredDay = dayjs(req.body.retiredDay);
-		const enterDay = dayjs(req.body.enterDay);
+		const mainData: TveryShortInput = {
+			...req.body,
+			enterDay: dayjs(req.body.enterDay),
+			retiredDay: dayjs(req.body.retiredDay),
+		};
 		const retiredDayArr = req.body.retiredDay.split("-").map(Number);
-		// const limitPermitDay = lastWorkDay.subtract(24, "month").format("YYYY-MM-DD").split("-").map(Number);
-		const limitPermitDay = retiredDay.subtract(24, "month");
-		const diffToEnter = Math.floor(Math.floor(enterDay.diff("1951-01-01", "day", true)) / 7); // 입사일 - 1951.1.1.
-		const diffToRetired = Math.floor(Math.floor(retiredDay.diff("1951-01-01", "day", true)) / 7); // 퇴사일 - 1951.1.1.
 
-		// 전체 피보험 단위 기간
-		const allWorkDay = calVeryShortAllWorkDay(enterDay, retiredDay, req.body.weekDay);
+		// 24개월 내에 피보험 단위 기간
+		const limitDay = mainData.retiredDay.subtract(24, "month");
+		const permitWorkDay = mainData.enterDay.isSameOrAfter(limitDay)
+			? calVeryShortWorkDay(mainData.enterDay, mainData.retiredDay, mainData.weekDay)
+			: calVeryShortWorkDay(limitDay, mainData.retiredDay, mainData.weekDay);
 
-		////////////////////////////////////////////////////////////// 24개월 내에 피보험 단위 기간
-		const diffToLimitPermitDay = Math.floor(Math.floor(limitPermitDay.diff("1951-01-01", "day", true)) / 7); // 24개월 기준일 - 1951.1.1.
-		let permitWorkDay: number;
-		if (enterDay.isSameOrAfter(limitPermitDay.format("YYYY-MM-DD"))) {
-			permitWorkDay = (diffToRetired - diffToEnter) * req.body.weekDay.length;
-			if (retiredDay.day() >= req.body.weekDay[1]) permitWorkDay += 2;
-			if (retiredDay.day() >= req.body.weekDay[0]) permitWorkDay += 1;
-		} else {
-			permitWorkDay = (diffToRetired - diffToLimitPermitDay) * req.body.weekDay.length; // if (enterDay < limitDay)
-			if (limitPermitDay.day() <= req.body.weekDay[1]) permitWorkDay += 2;
-			if (limitPermitDay.day() <= req.body.weekDay[0]) permitWorkDay += 1;
-		}
-
-		if (enterDay.day() <= req.body.weekDay[0]) permitWorkDay += 2;
-		if (enterDay.day() <= req.body.weekDay[1]) permitWorkDay += 1;
-		//////////////////////////////////////////////////////////////
-
+		// 수급 인정/ 불인정 판단
 		const isPermit = permitWorkDay >= 180 ? [true] : [false, permitWorkDay, 180 - permitWorkDay];
 		if (!isPermit[0]) return { succ: false, workingDay: isPermit[1], requireWorkingDay: isPermit[2] };
 
-		const lastThreeMonth = []; // 퇴사일 전 월 부터 3개월
-		for (let i = 0; i < 3; i++) {
-			lastThreeMonth.push(retiredDay.subtract(i, "month").month() + 1); // 이게 정상 작동한다면 calLeastPayInfo의 수정이 필요함
-		}
+		// 전체 피보험 단위 기간
+		const allWorkDay = calVeryShortWorkDay(mainData.enterDay, mainData.retiredDay, req.body.weekDay);
+
+		// 퇴사일 전 3개월 총일수
 		let sumLastThreeMonthDays = 0;
-		for (let count = 0; count < 3; count++) {
-			sumLastThreeMonthDays += new Date(retiredDayArr[0], lastThreeMonth[count], 0).getDate();
+		for (let i = 0; i < 3; i++) {
+			const month = mainData.retiredDay.subtract(i, "month").month() + 1; // 이게 정상 작동한다면 calLeastPayInfo의 수정이 필요함
+			sumLastThreeMonthDays += new Date(retiredDayArr[0], month, 0).getDate();
 		}
 
-		const sumSalary =
-			req.body.salary.length === 3
-				? req.bodysalary.reduce((acc: number, val: number) => acc + val, 0)
-				: req.body.salary[0] * 3;
-		const dayAvgPay = Math.ceil(sumSalary / sumLastThreeMonthDays);
-		const highLimit = Math.floor(66000 * (req.body.dayWorkTime / 8));
-		const lowLimit = Math.floor(60120 * (req.body.dayWorkTime / 8));
-		let realDayPay = Math.ceil(dayAvgPay * 0.6) * Math.ceil(req.body.dayWorkTime / 8); // 급여 계산식 확인, 하한액  60120원, 상한액 66000
-		if (realDayPay > highLimit) realDayPay = highLimit;
-		if (realDayPay < lowLimit) realDayPay = lowLimit;
-		const realMonthPay = realDayPay * 30;
-		const workingYears = Math.floor(allWorkDay / 365);
+		// 급여 산정
+		const { realDayPay, realMonthPay } = calVeryshortPay(
+			mainData.salary,
+			sumLastThreeMonthDays,
+			mainData.dayWorkTime
+		);
 
+		// 소정급여일수 산정
+		const workingYears = Math.floor(allWorkDay / 365);
 		const receiveDay = getReceiveDay(workingYears, req.body.age, req.body.disable);
 		const [requireWorkingYear, nextReceiveDay] = getNextReceiveDay(workingYears, req.body.age, req.body.disable);
 
 		let workDayForMulti = 0;
 		if (req.body.isEnd) {
 			const limitDay = dayjs(req.body.limitDay);
-			workDayForMulti = enterDay.isSameOrAfter(limitDay, "day")
+			workDayForMulti = mainData.enterDay.isSameOrAfter(limitDay, "day")
 				? allWorkDay
-				: calVeryShortAllWorkDay(limitDay, retiredDay, req.body.weekDay);
+				: calVeryShortWorkDay(limitDay, mainData.retiredDay, req.body.weekDay);
 		}
 
 		if (nextReceiveDay === 0) {

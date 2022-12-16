@@ -157,7 +157,7 @@ export function sumDayJobWorkingDay(workRecord: any[], isSimple: boolean = false
 
 	return sumWorkDay;
 }
-export function calDayjobPay(dayAvgPay: number, dayWorkTime: number, is2023: boolean = false) {
+export function calDayJobPay(dayAvgPay: number, dayWorkTime: number, is2023: boolean = false) {
 	let realDayPay = Math.ceil(dayAvgPay * 0.6);
 	const highLimit = is2023
 		? Math.floor(66000 * Math.floor(dayWorkTime / 8))
@@ -167,7 +167,7 @@ export function calDayjobPay(dayAvgPay: number, dayWorkTime: number, is2023: boo
 		: Math.floor(60120 * Math.floor(dayWorkTime / 8));
 
 	if (realDayPay > highLimit) realDayPay = highLimit;
-	else if (realDayPay < lowLimit) realDayPay = lowLimit;
+	if (realDayPay < lowLimit) realDayPay = lowLimit;
 	const realMonthPay = realDayPay * 30;
 
 	return { dayAvgPay, realDayPay, realMonthPay };
@@ -180,27 +180,25 @@ export function getEmployerReceiveDay(workYear: number) {
 	return 210;
 }
 
-export const calVeryShortAllWorkDay = (enterDay: dayjs.Dayjs, retiredDay: dayjs.Dayjs, weekDay: number[]) => {
-	const diffToEnter = Math.floor(Math.floor(enterDay.diff("1951-01-01", "day", true)) / 7); // 입사일 - 1951.1.1.
+export const calVeryShortWorkDay = (limmitDay: dayjs.Dayjs, retiredDay: dayjs.Dayjs, weekDay: number[]) => {
+	const diffToLimit = Math.floor(Math.floor(limmitDay.diff("1951-01-01", "day", true)) / 7); // 입사일 - 1951.1.1.
 	const diffToRetired = Math.floor(Math.floor(retiredDay.diff("1951-01-01", "day", true)) / 7); // 퇴사일 - 1951.1.1.
 
-	let allWorkDay = (diffToRetired - diffToEnter) * weekDay.length;
+	let workDay = (diffToRetired - diffToLimit) * weekDay.length;
 
-	if (enterDay.day() <= weekDay[0]) allWorkDay += 2;
-	if (enterDay.day() <= weekDay[1]) allWorkDay += 1;
+	if (limmitDay.day() <= weekDay[0]) workDay += 2;
+	if (limmitDay.day() <= weekDay[1]) workDay += 1;
 
-	if (retiredDay.day() >= weekDay[1]) allWorkDay += 2;
-	if (retiredDay.day() >= weekDay[0]) allWorkDay += 1;
+	if (retiredDay.day() >= weekDay[1]) workDay += 2;
+	if (retiredDay.day() >= weekDay[0]) workDay += 1;
 
-	return allWorkDay;
+	return workDay;
 };
 
 export const checkBasicRequirements = (mainData: any, employmentDate: number) => {
-	const mainRetiredDay = dayjs(mainData.retiredDay);
-
 	// 1. 신청일이 이직일로 부터 1년 초과 확인
 	const now = dayjs(new Date());
-	if (Math.floor(now.diff(mainRetiredDay, "day", true)) > 365)
+	if (Math.floor(now.diff(mainData.retiredDay, "day", true)) > 365)
 		return { succ: false, mesg: DefinedParamErrorMesg.expire };
 
 	// 2.퇴사일이 입사일보다 빠른지 확인
@@ -234,4 +232,17 @@ export function calDetailWorkingDay(limitDay: Dayjs, retiredDay: Dayjs, weekDay:
 	const workingDays = (diffToRetired - diffToLimit) * weekDay.length + firstWeekWorkDay + lastWeekWorkDay;
 
 	return workingDays;
+}
+
+export function calVeryshortPay(salary: number[], sumLastThreeMonthDays: number, dayWorkTime: number) {
+	const sumSalary = salary.length === 3 ? salary.reduce((acc: number, val: number) => acc + val, 0) : salary[0] * 3;
+	const dayAvgPay = Math.ceil(sumSalary / sumLastThreeMonthDays);
+	const highLimit = Math.floor(66000 * (dayWorkTime / 8));
+	const lowLimit = Math.floor(60120 * (dayWorkTime / 8));
+	let realDayPay = Math.ceil(dayAvgPay * 0.6) * Math.ceil(dayWorkTime / 8); // 급여 계산식 확인, 하한액  60120원, 상한액 66000
+	if (realDayPay > highLimit) realDayPay = highLimit;
+	if (realDayPay < lowLimit) realDayPay = lowLimit;
+	const realMonthPay = realDayPay * 30;
+
+	return { dayAvgPay, realDayPay, realMonthPay };
 }
