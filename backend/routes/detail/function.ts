@@ -1,3 +1,4 @@
+import { employerPayTable } from "../../data/data";
 import dayjs, { Dayjs } from "dayjs";
 import { DefinedParamErrorMesg } from "../../share/validate";
 
@@ -245,4 +246,71 @@ export function calVeryshortPay(salary: number[], sumLastThreeMonthDays: number,
 	const realMonthPay = realDayPay * 30;
 
 	return { dayAvgPay, realDayPay, realMonthPay };
+}
+
+export function makeEmployerJoinInfo(enterDay: Dayjs, retiredDay: Dayjs) {
+	const workList = [];
+	const yearCount = retiredDay.year() - enterDay.year();
+
+	for (let i = yearCount; i >= 0; i--) {
+		let workElement = [enterDay.year() + i];
+		if (i === 0) {
+			for (let month = 12; month >= enterDay.month() + 1; month--) {
+				workElement.push(month);
+				workList.push(workElement);
+				workElement = [enterDay.year() + i];
+			}
+		} else if (i === yearCount) {
+			for (let month = retiredDay.month() + 1; month >= 1; month--) {
+				workElement.push(month);
+				workList.push(workElement);
+				workElement = [enterDay.year() + i];
+			}
+		} else {
+			for (let month = 12; month >= 1; month--) {
+				workElement.push(month);
+				workList.push(workElement);
+				workElement = [enterDay.year() + i];
+			}
+		}
+	}
+
+	return workList;
+}
+
+export function calEmployerSumPay(
+	workList: number[][],
+	enterDay: Dayjs,
+	retiredDay: Dayjs,
+	limitYear: number,
+	limitMonth: number,
+	insuranceGrade: any
+) {
+	let sumPay = 0;
+	workList.map((workElement, idx) => {
+		const grade: 1 | 2 | 3 | 4 | 5 | 6 | 7 = insuranceGrade[workElement[0]];
+
+		if (idx === 0) {
+			const lastMonthPay =
+				workElement[0] >= 2019 ? employerPayTable["2019"][grade] : employerPayTable["2018"][grade];
+			sumPay += Math.floor(lastMonthPay / retiredDay.daysInMonth()) * retiredDay.date();
+		} else if (idx === workList.length - 1) {
+			const firstMonthPay =
+				workElement[0] >= 2019 ? employerPayTable["2019"][grade] : employerPayTable["2018"][grade];
+			sumPay +=
+				Math.floor(firstMonthPay / enterDay.daysInMonth()) * (enterDay.daysInMonth() - enterDay.date() + 1);
+		} else if (workElement[0] > limitYear) {
+			workElement[0] >= 2019
+				? (sumPay += employerPayTable["2019"][grade])
+				: (sumPay += employerPayTable["2018"][grade]);
+		} else if (workElement[0] === limitYear) {
+			if (workElement[1] >= limitMonth) {
+				workElement[0] >= 2019
+					? (sumPay += employerPayTable["2019"][grade])
+					: (sumPay += employerPayTable["2018"][grade]);
+			}
+		}
+	});
+
+	return sumPay;
 }
