@@ -98,6 +98,7 @@ const WorkTypes = ({ handler }: { handler: any }) => {
             label="근로형태 선택"
             popUpCallBack={(params: string, value: string) => {
               handler.SetPageVal(params, value);
+              if (value === undefined) handler.SetPageVal(params, 0);
               setState1("select");
               if (!handler.GetPageVal("retireReason")) setState2("next");
               ClosePopup();
@@ -142,7 +143,7 @@ const WorkTypes = ({ handler }: { handler: any }) => {
             selectState={workRypeInfo3}
             callBack={() => {
               if (
-                handler.GetPageVal("workCate") &&
+                handler.GetPageVal("workCate") !== undefined &&
                 handler.GetPageVal("retireReason")
               ) {
                 handler.setCompState(3);

@@ -318,7 +318,7 @@ export const ResultComp = ({
         ) : (
           <_UnSupplyResult
             emoticon={EMTDetailArtsUnSupply}
-            unit="day"
+            unit="month"
             workingDateNum={result_data.workingMonths}
             requireDateNum={result_data.requireMonths}
             helps={
@@ -346,7 +346,7 @@ export const ResultComp = ({
         ) : (
           <_UnSupplyResult
             emoticon={EMTDetailSpecialsUnSupply}
-            unit="day"
+            unit="month"
             workingDateNum={result_data.workingMonths}
             requireDateNum={result_data.requireMonths}
           />
@@ -386,8 +386,8 @@ export const ResultComp = ({
           <_UnSupplyResult
             emoticon={EMTDetailEmployUnSupply}
             unit="day"
-            workingDateNum={result_data.workingDays}
-            requireDateNum={result_data.requireDays}
+            workingDateNum={result_data.workingDay}
+            requireDateNum={result_data.requireDay}
           />
         ))}
       <div id="result_button_container">

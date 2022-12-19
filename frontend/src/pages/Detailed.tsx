@@ -393,11 +393,6 @@ const _DetailCal03 = ({ handler }: { handler: any }) => {
   );
 };
 const _DetailCal04 = ({ handler }: { handler: any }) => {
-  const up_down_data: any = {};
-  const onChangeUpDownArr = (in_params: string, value: string) => {
-    up_down_data[in_params] = value;
-    handler.SetPageVal("dayWorkTime", up_down_data);
-  };
   return (
     <>
       <DateInputNormal
@@ -424,14 +419,14 @@ const _DetailCal04 = ({ handler }: { handler: any }) => {
         label="근무시간"
         label_unit="주"
         unit="시간"
-        callBack={onChangeUpDownArr}
+        callBack={handler.SetPageVal}
         params="time"
       />
       <NumberUpDown
         label="근무일수"
         label_unit="주"
         unit="일"
-        callBack={onChangeUpDownArr}
+        callBack={handler.SetPageVal}
         params="week"
       />
       <TabInputs
@@ -439,19 +434,14 @@ const _DetailCal04 = ({ handler }: { handler: any }) => {
         type="salary"
         params="salary"
         callBack={handler.SetPageVal}
+        valueDay={handler.GetPageVal}
       />
     </>
   );
 };
 const _DetailCal05 = ({ handler }: { handler: any }) => {
-  useEffect(() => {
-    handler._Data = [];
-  }, []);
   return (
     <div id="detail_container_employ">
-      <div className="pd_810 fs_14">
-        상세형 / {handler.GetPageVal("isRetiree") ? "퇴직자" : "퇴직예정자 "}
-      </div>
       <div className="public_side_padding">
         <DateInputNormal
           params="enterDay"
