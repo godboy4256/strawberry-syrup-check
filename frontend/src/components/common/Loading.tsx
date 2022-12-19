@@ -3,7 +3,7 @@ import IMGLoading02 from "../../assets/image/gif/loading02.gif";
 import "../../styles/loading.css";
 
 const Loading = () => {
-  const loading_random_all_num = 2;
+  const loading_random_all_num = 1;
   const loading_random_value_num = Math.round(
     loading_random_all_num * Math.random()
   );

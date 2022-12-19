@@ -19,6 +19,7 @@ class DetailedHandler extends InputHandler {
     const retiredDayYear = GetDateArr(retiredDay)[0];
     const enterDayYear = GetDateArr(enterDay)[0];
     const answer: any = {};
+    if (!this._Data["year0"]) return;
     new Array(retiredDayYear - enterDayYear + 1)
       .fill(1)
       .forEach((_, idx: number) => {
@@ -32,17 +33,21 @@ class DetailedHandler extends InputHandler {
   public emeploymentInsuranceTotal = (workRecord: any) => {
     let year = 0;
     let month = 0;
-    workRecord.forEach((el: any) => {
-      el.months.forEach((it: any) => {
-        if (it.day > 10) {
-          if (month > 12) {
-            year += 1;
+    if (!workRecord) {
+      return null;
+    } else {
+      workRecord.forEach((el: any) => {
+        el.months.forEach((it: any) => {
+          if (it.day > 10) {
+            if (month > 12) {
+              year += 1;
+            }
+            month += 1;
           }
-          month += 1;
-        }
+        });
       });
-    });
-    return [year, month];
+      return [year, month];
+    }
   };
 
   public sumDayJobWorkingDay: (workRecord: any, isSimple?: any) => any = (
@@ -118,13 +123,15 @@ class DetailedHandler extends InputHandler {
       this._Data.workCate === 0 || this._Data.workCate === 1 // 정규직 / 기간제
         ? {
             ...this._Data,
-            salary: Array.isArray(this._Data.salary)
-              ? this._Data.salary
-              : [this._Data.salary],
+            salary: this._Data.salary
+              ? Array.isArray(this._Data.salary)
+                ? this._Data.salary
+                : [this._Data.salary]
+              : null,
             weekDay,
-            dayWorkTime: Number(
-              String(this._Data.dayWorkTime).split("시간")[0]
-            ),
+            dayWorkTime: this._Data.dayWorkTime
+              ? Number(this._Data.dayWorkTime.split("시간")[0])
+              : null,
             disabled:
               this._Data.disabled === "장애인"
                 ? true
@@ -144,7 +151,7 @@ class DetailedHandler extends InputHandler {
               ? Number(this._Data.dayWorkTime.split("시간")[0])
               : null,
             lastWorkDay: this._Data.lastWorkDay,
-            isSpecial: this._Data.isSpecial,
+            isSpecial: this._Data.isSpecial ? this._Data.isSpecial : false,
             age: isNaN(Number(getAge(new Date(String(this._Data.age))).age))
               ? null
               : getAge(new Date(String(this._Data.age))).age,
@@ -154,7 +161,12 @@ class DetailedHandler extends InputHandler {
                 : this._Data.disabled === "비장애인"
                 ? false
                 : null,
-            isOverTen: this._Data.isOverTen ? this._Data.isOverTen : false,
+            isOverTen:
+              this._Data.isOverTen === undefined
+                ? null
+                : this._Data.isOverTen === true
+                ? this._Data.isOverTen
+                : false,
             sumWorkDay: this._Data.workRecord
               ? this.sumDayJobWorkingDay(this._Data.workRecord)[0]
               : this._Data.sumWorkDay,
@@ -180,13 +192,22 @@ class DetailedHandler extends InputHandler {
                   : null,
               sumOneYearWorkDay:
                 this._Data.input === "결과만 입력"
-                  ? [this._Data.employ_year, this._Data.employ_month]
+                  ? this._Data.employ_year && this._Data.employ_month
+                    ? [this._Data.employ_year, this._Data.employ_month]
+                    : null
                   : this.emeploymentInsuranceTotal(this._Data.workRecord),
               sumOneYearPay:
                 this._Data.input === "결과만 입력"
                   ? this._Data.sumOneYearPay
-                  : this.getSumOneYearPay(this._Data.workRecord),
-              isOverTen: this._Data.isOverTen ? this._Data.isOverTen : false,
+                  : this._Data.workRecord
+                  ? this.getSumOneYearPay(this._Data.workRecord)
+                  : null,
+              isOverTen:
+                this._Data.isOverTen === undefined
+                  ? null
+                  : this._Data.isOverTen === true
+                  ? this._Data.isOverTen
+                  : false,
               hasWork: [false, "11"],
             }
           : {
@@ -211,26 +232,30 @@ class DetailedHandler extends InputHandler {
               workCate: this._Data.workCate,
               retireReason: this._Data.retireReason,
               lastWorkDay: this._Data.lastWorkDay,
-              age: getAge(new Date(String(this._Data.age))).age,
+              age: isNaN(Number(getAge(new Date(String(this._Data.age))).age))
+                ? null
+                : getAge(new Date(String(this._Data.age))).age,
               disable: this._Data.disabled === "장애인" ? true : false,
               sumOneYearWorkDay:
                 this._Data.input === "결과만 입력"
                   ? [this._Data.employ_year, this._Data.employ_month]
-                  : this._Data.workRecord.map((el: any) => {
-                      return el.months.map((el: any) => {
-                        return Number(el.day);
-                      });
-                    })[0],
+                  : this.emeploymentInsuranceTotal(this._Data.workRecord),
               sumOneYearPay:
                 this._Data.input === "결과만 입력"
                   ? this._Data.sumOneYearPay
-                  : this.getSumOneYearPay(this._Data.workRecord),
+                    ? this._Data.sumOneYearPay
+                    : null
+                  : this._Data.workRecord
+                  ? this.getSumOneYearPay(this._Data.workRecord)
+                  : null,
               isOverTen: this._Data.isOverTen ? this._Data.isOverTen : false,
               hasWork: [false, "11"],
             }
           : {
               ...this._Data,
-              age: getAge(new Date(String(this._Data.age))).age,
+              age: isNaN(Number(getAge(new Date(String(this._Data.age))).age))
+                ? null
+                : getAge(new Date(String(this._Data.age))).age,
               disabled:
                 this._Data.disabled === "장애인"
                   ? true
@@ -243,40 +268,79 @@ class DetailedHandler extends InputHandler {
             }
         : this._Data.workCate === 5 // 초단 시간
         ? {
-            ...this._Data,
-            age: getAge(new Date(String(this._Data.age))).age,
+            enterDay: this._Data.enterDay ? this._Data.enterDay : null,
+            age: isNaN(Number(getAge(new Date(String(this._Data.age))).age))
+              ? null
+              : getAge(new Date(String(this._Data.age))).age,
             weekDay,
-            disable: this._Data.disabled === "장애인" ? true : false,
+            disable:
+              this._Data.disabled === "장애인"
+                ? true
+                : this._Data.disabled === "비장애인"
+                ? false
+                : null,
             dayWorkTime:
-              this._Data.dayWorkTime["time"] / this._Data.dayWorkTime["week"],
-            reitredDay: this._Data.retiredDay,
+              this._Data["time"] && this._Data["week"]
+                ? Math.floor(this._Data["time"] / this._Data["week"])
+                : null,
+            reitredDay: this._Data.retiredDay ? this._Data.retiredDay : null,
+            salary: this._Data.salary
+              ? Array.isArray(this._Data.salary)
+                ? this._Data.salary
+                : [this._Data.salary]
+              : null,
+            time: this._Data.time ? this._Data.time : null,
+            week: this._Data.week ? this._Data.week : null,
           }
         : this._Data.workCate === 6 // 자영업자
         ? {
+            retireReason: this._Data.retireReason
+              ? this._Data.retireReason
+              : null,
+            retired: this._Data.retired ? this._Data.retired : null,
+            workCate: this._Data.workCate ? this._Data.workCate : null,
             enterDay: this._Data.enterDay,
             retiredDay: this._Data.retiredDay,
-            insuranceGrade: this.insuranceGrade(
-              this._Data.retiredDay,
-              this._Data.enterDay
-            ),
+            insuranceGrade:
+              this._Data.retiredDay && this._Data.enterDay
+                ? this.insuranceGrade(
+                    this._Data.retiredDay,
+                    this._Data.enterDay
+                  )
+                  ? this.insuranceGrade(
+                      this._Data.retiredDay,
+                      this._Data.enterDay
+                    )
+                  : null
+                : null,
           }
         : {};
 
+    console.log(this._Data);
+
     const validCheckType =
-      (this._Data.workCate === 0 || this._Data.workCate) === 1
+      this._Data.workCate === 0 || this._Data.workCate === 1
         ? "detail_standad"
         : this._Data.workCate === 3 || this._Data.workCate === 4
-        ? "detail_art"
+        ? this._Data.is_short === "단기예술인" ||
+          this._Data.is_short === "단기특고"
+          ? "detail_shorts"
+          : "detail_art"
         : this._Data.workCate === 2
         ? "detail_dayjob"
         : this._Data.workCate === 5
         ? "detail_veryshorts"
         : this._Data.workCate === 6 && "detail_employ";
 
+    delete to_server.popup_select;
+
     if (
       !CheckValiDation(validCheckType ? validCheckType : "standad", to_server)
     )
       return;
+    delete to_server.week;
+    delete to_server.time;
+
     this.result = await sendToServer(url, to_server);
     if (this._Data.workCate === 3 || this._Data.workCate === 4) {
       this.result["is_short"] = this._Data.is_short;
