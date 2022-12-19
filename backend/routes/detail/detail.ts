@@ -36,6 +36,8 @@ import {
 	checkBasicRequirements,
 	dayJobCheckPermit,
 	getEmployerReceiveDay,
+	makeEmployerJoinInfo,
+	calEmployerSumPay,
 } from "./function";
 
 dayjs.extend(isSameOrAfter);
@@ -459,83 +461,34 @@ export default function detailRoute(fastify: FastifyInstance, options: any, done
 	fastify.post(detailPath.employer, employerSchema, (req: any, res) => {
 		const enterDay: dayjs.Dayjs = dayjs(req.body.enterDay);
 		const retiredDay: dayjs.Dayjs = dayjs(req.body.retiredDay);
-		const insuranceGradeObj = req.body.insuranceGrade;
+		const insuranceGrade = req.body.insuranceGrade;
 
 		// 1. 자영업자로서 최소 1년간 고용보험에 보험료를 납부해야함
-		const workingDay = Math.floor(retiredDay.diff(enterDay, "day", true));
+		const workingDay = Math.floor(retiredDay.diff(enterDay, "day", true)) + 1;
 		if (workingDay < 365) return { succ: false, workingDay, requireDay: 365 - workingDay };
 
-		// 2.  몇 년 몇 월에 가입했는 지 배열로 작성(시작월과 종료월은 제외)
-		const workList = [];
-		const yearCount = retiredDay.year() - enterDay.year();
+		// 2.  몇 년 몇 월에 가입했는 지 배열로 작성
+		const workList = makeEmployerJoinInfo(enterDay, retiredDay);
 
-		for (let i = yearCount; i >= 0; i--) {
-			let workElement = [enterDay.year() + i];
-			if (i === 0) {
-				for (let month = 12; month >= enterDay.month() + 1; month--) {
-					workElement.push(month);
-					workList.push(workElement);
-					workElement = [enterDay.year() + i];
-				}
-			} else if (i === yearCount) {
-				for (let month = retiredDay.month() + 1; month >= 1; month--) {
-					workElement.push(month);
-					workList.push(workElement);
-					workElement = [enterDay.year() + i];
-				}
-			} else {
-				for (let month = 12; month >= 1; month--) {
-					workElement.push(month);
-					workList.push(workElement);
-					workElement = [enterDay.year() + i];
-				}
-			}
-		}
-		// console.log(workList);
-		const workYear = Math.floor(workingDay / 365);
 		// 3. 피보험긴간이 3년 이상인 경우, 미만인 경우를 확인하기 위해서 3년전 년/월 계산
 		const limitYear = retiredDay.subtract(36, "month").year();
 		const limitMonth = retiredDay.subtract(36, "month").month() + 1;
 
-		// 4. 폐업일 이전 3년치의 급여와, 피보험단위 산정
-		let sumPay = 0;
-		let sumWorkDay = 0;
-		workList.map((workElement, idx) => {
-			const grade: 1 | 2 | 3 | 4 | 5 | 6 | 7 = insuranceGradeObj[workElement[0]];
+		// 4. 폐업일 이전 3년치의 급여와, 피보험단위기간 산정
+		const sumPay = calEmployerSumPay(workList, enterDay, retiredDay, limitYear, limitMonth, insuranceGrade);
 
-			if (idx === 0) {
-				const lastMonthPay =
-					workElement[0] >= 2019 ? employerPayTable["2019"][grade] : employerPayTable["2018"][grade];
-				sumPay += Math.floor(lastMonthPay / retiredDay.daysInMonth()) * retiredDay.date();
-				sumWorkDay += retiredDay.date();
-			} else if (idx === workList.length - 1) {
-				const firstMonthPay =
-					workElement[0] >= 2019 ? employerPayTable["2019"][grade] : employerPayTable["2018"][grade];
-				sumPay +=
-					Math.floor(firstMonthPay / enterDay.daysInMonth()) * (enterDay.daysInMonth() - enterDay.date() + 1);
-				sumWorkDay += enterDay.daysInMonth() - enterDay.date() + 1;
-			} else if (workElement[0] > limitYear) {
-				workElement[0] >= 2019
-					? (sumPay += employerPayTable["2019"][grade])
-					: (sumPay += employerPayTable["2018"][grade]);
-				sumWorkDay += dayjs(new Date(`${workElement[0]}-${workElement[1]}-01`)).daysInMonth();
-			} else if (workElement[0] === limitYear) {
-				if (workElement[1] >= limitMonth) {
-					workElement[0] >= 2019
-						? (sumPay += employerPayTable["2019"][grade])
-						: (sumPay += employerPayTable["2018"][grade]);
-					sumWorkDay += dayjs(new Date(`${workElement[0]}-${workElement[1]}-01`)).daysInMonth();
-				}
-			}
-		});
-
-		const dayAvgPay = Math.floor(sumPay / sumWorkDay); // 기초일액
+		// 5. 급여 산정(기초일액, 일수령액, 월수령액)
+		const dayAvgPay = Math.floor(sumPay / workingDay); // 기초일액
 		let realDayPay = Math.floor(dayAvgPay * 0.6);
 		if (realDayPay < 60240) realDayPay = 60240;
 		if (realDayPay > 66000) realDayPay = 66000;
 		const realMonthPay = realDayPay * 30;
+
+		// 6. 소정급여일수 산정
+		const workYear = Math.floor(workingDay / 365);
 		const receiveDay = getEmployerReceiveDay(workYear); // 소정 급여일수 테이블이 다르다
 
+		// 7. 복수형에 사용되는 마지막 직장인 경우 workDawyForMulti 계산
 		let workDayForMulti = 0;
 		if (req.body.isEnd) {
 			const limitDay = dayjs(req.body.limitDay);
@@ -544,7 +497,7 @@ export default function detailRoute(fastify: FastifyInstance, options: any, done
 				: Math.floor(retiredDay.diff(limitDay, "day", true));
 		}
 
-		// 퇴직금, 다음 단계 없음
+		// 8. 결과 리턴, 퇴직금, 다음 단계 없음
 		return {
 			succ: true,
 			retired: req.body.retired,
