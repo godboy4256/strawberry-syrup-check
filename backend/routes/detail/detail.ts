@@ -67,7 +67,8 @@ export default function detailRoute(fastify: FastifyInstance, options: any, done
 		const receiveDay = getReceiveDay(joinYears, req.body.age, req.body.disabled);
 
 		// 4. 피보험단위기간 산정
-		const limitDay = mainData.retiredDay.subtract(18, "month");
+		const tempLimitDay = mainData.retiredDay.subtract(18, "month");
+		const limitDay = mainData.enterDay.isSameOrAfter(tempLimitDay) ? mainData.enterDay : tempLimitDay;
 		const workingDays = calDetailWorkingDay(limitDay, mainData.retiredDay, mainData.weekDay);
 
 		// 5. 복수형에 사용되는 마지막 직장인 경우 workDawyForMulti 계산
@@ -202,8 +203,8 @@ export default function detailRoute(fastify: FastifyInstance, options: any, done
 		}
 
 		const lastWorkDay = dayjs(req.body.lastWorkDay);
-		const beforeTwoYearArr = lastWorkDay.subtract(24, "month").format("YYYY-MM-DD").split("-").map(Number);
-		const beforeOneYearArr = lastWorkDay.subtract(12, "month").format("YYYY-MM-DD").split("-").map(Number);
+		// const beforeTwoYearArr = lastWorkDay.subtract(24, "month").format("YYYY-MM-DD").split("-").map(Number);
+		// const beforeOneYearArr = lastWorkDay.subtract(12, "month").format("YYYY-MM-DD").split("-").map(Number);
 
 		// if (req.body.hasOwnProperty("workRecord")) {
 		// 	const overDatePool = dayjs(new Date(req.body.workRecord[0].year, req.body.workRecord[0].months[0].month, 0))
@@ -217,8 +218,7 @@ export default function detailRoute(fastify: FastifyInstance, options: any, done
 
 		////////////////////////////////////////////////////////////////// 새로 작성중
 		// 2. 수급 인정/불인정 판단
-		const sumTwoYearWorkDay = [1, 2];
-		const isPermit = artShortCheckPermit(sumTwoYearWorkDay, req.body.isSpecial);
+		const isPermit = artShortCheckPermit(req.body.sumTwoYearWorkDay, req.body.isSpecial);
 
 		//////////////////////////////////////////////////////////////////
 
@@ -248,13 +248,10 @@ export default function detailRoute(fastify: FastifyInstance, options: any, done
 
 		////////////////////////////////////////////////////////////////// 새로 작성중
 		// 4. 전체 피보험단위기간 계산
-		const sumWorkDay = [1, 2];
-		const workingMonth = req.body.sumWorkDay[0] * 12 + req.body.sumWorkDay[1];
 		////////////////////////////////////////////////////////////////// 새로 작성중
 		// if (!req.body.hasOwnProperty("workRecord")) {
 		// workingMonth = calArtShortWorkingMonth(req.body.sumOneYearWorkDay, true);
-		const sumOneYearPay = req.body.sumOneYearPay;
-		const sumOneYearWorkDay = req.body.sumOneYearWorkDay;
+
 		// } else {
 		// 	workingMonth = calArtShortWorkingMonth(sortedData);
 		// 	[sumOneYearPay, sumOneYearWorkDay] = sumArtShortPay(beforeOneYearArr, sortedData); // 12개월 총액
@@ -262,12 +259,16 @@ export default function detailRoute(fastify: FastifyInstance, options: any, done
 
 		// const employmentDate = lastWorkDay.diff();
 		// 5. 피보험기간 년수 계산
-		const workingYear = Math.floor(workingMonth / 12);
+		const workingYear = Math.floor(req.body.sumWorkDay / 12);
 		// 6. 소정급여일수 계산
 		const receiveDay = getReceiveDay(workingYear, req.body.age, req.body.disable);
 
 		// 7. 급여(일수령액, 월수령액) 계산
-		const { realDayPay, realMonthPay } = calArtPay(sumOneYearPay, sumOneYearWorkDay, req.body.isSpecial);
+		const { realDayPay, realMonthPay } = calArtPay(
+			req.body.sumOneYearPay,
+			req.body.sumOneYearWorkDay,
+			req.body.isSpecial
+		);
 		const [requireWorkingYear, nextReceiveDay] = getNextReceiveDay(workingYear, req.body.age, req.body.disable);
 
 		///////////////////////////////////////////////////////////////
@@ -302,7 +303,7 @@ export default function detailRoute(fastify: FastifyInstance, options: any, done
 			realDayPay,
 			receiveDay,
 			realMonthPay,
-			needMonth: requireWorkingYear * 12 - workingMonth,
+			needMonth: Math.floor((requireWorkingYear * 12 - req.body.sumWorkDay) * 10) / 10,
 			nextAvailableAmountCost: nextReceiveDay * realDayPay,
 			morePay: nextReceiveDay * realDayPay - realDayPay * receiveDay,
 			workDayForMulti,
@@ -394,6 +395,11 @@ export default function detailRoute(fastify: FastifyInstance, options: any, done
 			retiredDay: dayjs(req.body.retiredDay),
 		};
 		const retiredDayArr = req.body.retiredDay.split("-").map(Number);
+
+		// 기본 조건 확인
+		const employmentDate = Math.floor(mainData.retiredDay.diff(mainData.enterDay, "day", true) + 1);
+		const checkResult = checkBasicRequirements(mainData, employmentDate);
+		if (!checkResult.succ) return { checkResult };
 
 		// 24개월 내에 피보험 단위 기간
 		const limitDay = mainData.retiredDay.subtract(24, "month");

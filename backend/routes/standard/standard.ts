@@ -33,7 +33,8 @@ export default function standardRoute(fastify: FastifyInstance, options: any, do
 		const receiveDay = getReceiveDay(joinYears);
 
 		// 4. 피보험단위기간 산정
-		const limitDay = mainData.retiredDay.subtract(18, "month");
+		const tempLimitDay = mainData.retiredDay.subtract(18, "month");
+		const limitDay = mainData.enterDay.isSameOrAfter(tempLimitDay) ? mainData.enterDay : tempLimitDay;
 		const workingDays = calWorkingDay(limitDay, mainData.retiredDay); // 피보험단위기간
 
 		// 5. 수급 인정/ 불인정에 따라 결과 리턴
