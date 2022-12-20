@@ -20,10 +20,10 @@ vpc_access_connector:
     name: "projects/moneysylove/locations/asia-northeast3/connectors/moneysylove-conn-prod"
 
 handlers:
-    - url: /(.*\.(svg|png|jpg|css|js))$
-      static_files: page_resource/front/\1
-      upload: page_resource/front/.*\.(svg|png|jpg|css|js)$
-      #application_readable: true
+    # - url: /(.*\.(svg|png|jpg|css|js|gif))$
+    #   static_files: page_resource/front/\1
+    #   upload: page_resource/front/assets/.*\.(svg|png|jpg|css|js|gif|ttf)$
+    #application_readable: true
     # - url: /front
     #   static_dir: page_resource/front
     - url: /.*

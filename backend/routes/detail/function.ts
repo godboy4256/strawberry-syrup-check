@@ -21,15 +21,13 @@ export function calArtPay(sumOneYearPay: number[] | number, artWorkingDays: numb
 	return { dayAvgPay, realDayPay, realMonthPay };
 }
 
-export function artShortCheckPermit(sumTwoYearWorkDay: number[], isSpecial: boolean = false) {
-	const sumJoinMonth = sumTwoYearWorkDay[0] * 12 + sumTwoYearWorkDay[1]; // 월 단위의 피보험 단위기간
-
+export function artShortCheckPermit(sumTwoYearWorkDay: number, isSpecial: boolean = false) {
 	if (isSpecial) {
-		if (sumJoinMonth >= 12) return [true];
-		return [false, sumJoinMonth, 12 - sumJoinMonth]; // 인정 여부, 24개월 내 현재 피보험단위 기간, 부족 기간
+		if (sumTwoYearWorkDay >= 12) return [true];
+		return [false, sumTwoYearWorkDay, 12 - sumTwoYearWorkDay]; // 인정 여부, 24개월 내 현재 피보험단위 기간, 부족 기간
 	}
-	if (sumJoinMonth >= 9) return [true];
-	return [false, sumJoinMonth, 9 - sumJoinMonth]; // 인정 여부, 24개월 내 현재 피보험단위 기간, 부족 기간
+	if (sumTwoYearWorkDay >= 9) return [true];
+	return [false, sumTwoYearWorkDay, 9 - sumTwoYearWorkDay]; // 인정 여부, 24개월 내 현재 피보험단위 기간, 부족 기간
 }
 
 // export function artShortCheckPermit(
@@ -203,7 +201,7 @@ export const checkBasicRequirements = (mainData: any, employmentDate: number) =>
 		return { succ: false, mesg: DefinedParamErrorMesg.expire };
 
 	// 2.퇴사일이 입사일보다 빠른지 확인
-	if (employmentDate < 0) return { succ: false, mesg: DefinedParamErrorMesg.ealryRetire };
+	if (employmentDate <= 0) return { succ: false, mesg: DefinedParamErrorMesg.ealryRetire };
 
 	// 3. mainData의 근로형태가 예술인 특고인경우 예술인 또는 특고로 3개월 이상 근무해야한다.
 	if (mainData.workCate === 2 || mainData.workCate === 3) {
