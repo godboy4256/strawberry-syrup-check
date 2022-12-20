@@ -103,7 +103,7 @@ const shortArtBodyProp = {
 	lastWorkDay: DefineParamInfo.lastWorkDay, // 마지막 근무일
 	// workRecord: DefineParamInfo.workRecord,
 	sumOneYearPay: { type: "number", minimum: 0 },
-	sumOneYearWorkDay: { type: "array", minItems: 2, items: { type: "number" } }, // [월, 근무일]
+	sumOneYearWorkDay: { type: "number", minimum: 0 },
 	sumTwoYearWorkDay: { type: "number", minimum: 0 },
 	sumWorkDay: { type: "number", minimum: 0 },
 	isSpecial: { type: "boolean" },
@@ -229,7 +229,7 @@ export const veryShortSchema = {
 		tags: ["detail"],
 		body: {
 			type: "object",
-			required: ["age", "disable", "enterDay", "reitredDay", "weekDay", "dayWorkTime", "salary"],
+			required: ["age", "disable", "enterDay", "retiredDay", "weekDay", "dayWorkTime", "salary"],
 			properties: veryShortBodyProp,
 		},
 	},

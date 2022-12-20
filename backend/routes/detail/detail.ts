@@ -254,7 +254,7 @@ export default function detailRoute(fastify: FastifyInstance, options: any, done
 		// if (!req.body.hasOwnProperty("workRecord")) {
 		// workingMonth = calArtShortWorkingMonth(req.body.sumOneYearWorkDay, true);
 		const sumOneYearPay = req.body.sumOneYearPay;
-		const sumOneYearWorkDay = req.body.sumOneYearWorkDay[0] * 12 + req.body.sumOneYearWorkDay[1];
+		const sumOneYearWorkDay = req.body.sumOneYearWorkDay;
 		// } else {
 		// 	workingMonth = calArtShortWorkingMonth(sortedData);
 		// 	[sumOneYearPay, sumOneYearWorkDay] = sumArtShortPay(beforeOneYearArr, sortedData); // 12개월 총액
