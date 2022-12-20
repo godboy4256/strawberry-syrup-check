@@ -76,7 +76,7 @@ const MainPage = () => {
           <SlideGuideDirection />
           <h3 className="fs_25 lh_37 font_family_bold">실업급여 계산기</h3>
           <Slider {...settings}>
-            <Link to="standad" className="main_slide_card">
+            <Link to="standard" className="main_slide_card">
               <div className="box_shadow_style01">
                 <h4>
                   <img src={IMGTitleBasic} alt="기본형 타이틀" />

@@ -8,8 +8,8 @@ import "./styles/root.css";
 function App() {
   return (
     <Routes>
-      <Route path="/" element={<MainPage />} />
-      <Route path="/standad" element={<BasicCalPage />} />
+      <Route path="/main" element={<MainPage />} />
+      <Route path="/standard" element={<BasicCalPage />} />
       <Route path="/detailed" element={<DetailCalPage />} />
       <Route path="/multi" element={<MultiCalPage />} />
     </Routes>
