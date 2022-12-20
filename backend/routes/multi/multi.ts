@@ -47,6 +47,17 @@ export default function multiRoute(fastify: FastifyInstance, options: any, done:
 		if (permitAddCandidates.length !== 0 && permitAddCandidates[permitAddCandidates.length - 1].isIrregular)
 			return { succ: false, mesg: "isIrregular" };
 
+		/////////////////////////////////////////////////////////// 자영업자 관련 조건 확인
+		if (mainData.workCate === 8) {
+			let check = false;
+			permitAddCandidates.map((el, idx, arr) => {
+				if (el.workCate === 4 || el.workCate === 5 || el.workCate === 6) {
+				}
+				return true;
+			});
+		}
+		///////////////////////////////////////////////////////////
+
 		// 6. 이중취득 여부 확인
 		const { isDuplicateAcquisition, tempWorkCount, artWorkCount, specialWorkCount } = getDuplicateAcquisitionInfo(
 			mainData,
