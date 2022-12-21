@@ -208,36 +208,9 @@ export default function detailRoute(fastify: FastifyInstance, options: any, done
 		}
 
 		const lastWorkDay = dayjs(req.body.lastWorkDay);
-		// const beforeTwoYearArr = lastWorkDay.subtract(24, "month").format("YYYY-MM-DD").split("-").map(Number);
-		// const beforeOneYearArr = lastWorkDay.subtract(12, "month").format("YYYY-MM-DD").split("-").map(Number);
 
-		// if (req.body.hasOwnProperty("workRecord")) {
-		// 	const overDatePool = dayjs(new Date(req.body.workRecord[0].year, req.body.workRecord[0].months[0].month, 0))
-		// 		.subtract(1, "month")
-		// 		.isSameOrAfter(lastWorkDay);
-		// 	if (overDatePool) return { succ: false, mesg: "입력한 근무일이 마지막 근무일 이 후 입니다." };
-		// }
-
-		// let isPermit: (number | boolean)[] = [false, 0];
-		// let sortedData: any[];
-
-		////////////////////////////////////////////////////////////////// 새로 작성중
-		// 2. 수급 인정/불인정 판단
+		// 2. 수급 인정/불인정 판단 => 결과만 입력 계산기능 필요
 		const isPermit = artShortCheckPermit(req.body.sumTwoYearWorkDay, req.body.isSpecial);
-
-		//////////////////////////////////////////////////////////////////
-
-		// if (!req.body.hasOwnProperty("workRecord")){
-		// 	isPermit = artShortCheckPermit(beforeTwoYearArr, req.body.sumOneYearWorkDay, true, req.body.isSpecial);
-		// } else {
-		// 	sortedData = req.body.workRecord.sort((a: any, b: any) => {
-		// 		if (a.year < b.year) return 1;
-		// 		if (a.year > b.year) return -1;
-		// 		return 0;
-		// 	});
-
-		// 	isPermit = artShortCheckPermit(beforeTwoYearArr, sortedData, false, req.body.isSpecial);
-		// }
 
 		// 3. 수급 불인정 시 불인정 메세지 리턴
 		if (!isPermit[0])
@@ -247,22 +220,10 @@ export default function detailRoute(fastify: FastifyInstance, options: any, done
 				requireMonths: isPermit[2],
 			};
 
-		// let workingMonth: number;
-		// let sumOneYearPay: number;
-		// let sumOneYearWorkDay: number;
-
 		////////////////////////////////////////////////////////////////// 새로 작성중
 		// 4. 전체 피보험단위기간 계산
 		////////////////////////////////////////////////////////////////// 새로 작성중
-		// if (!req.body.hasOwnProperty("workRecord")) {
-		// workingMonth = calArtShortWorkingMonth(req.body.sumOneYearWorkDay, true);
 
-		// } else {
-		// 	workingMonth = calArtShortWorkingMonth(sortedData);
-		// 	[sumOneYearPay, sumOneYearWorkDay] = sumArtShortPay(beforeOneYearArr, sortedData); // 12개월 총액
-		// }
-
-		// const employmentDate = lastWorkDay.diff();
 		// 5. 피보험기간 년수 계산
 		const workingYear = Math.floor(req.body.sumWorkDay / 12);
 		// 6. 소정급여일수 계산
