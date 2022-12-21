@@ -35,7 +35,7 @@ export const commonCasePermitCheck = (permitAddCandidates: TaddData[], mainData:
 	const leastRequireWorkingDay = requiredWorkingDay[mainData.workCate];
 	const permitWorkingDays = permitAddCandidates.reduce((acc, obj) => acc + obj.permitDays, mainData.workingDays);
 	const result: [boolean, number] = [false, permitWorkingDays];
-	result[0] = leastRequireWorkingDay > permitWorkingDays;
+	result[0] = leastRequireWorkingDay <= permitWorkingDays;
 	return result;
 };
 
