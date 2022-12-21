@@ -1,4 +1,4 @@
-import dayjs, { Dayjs } from "dayjs";
+import dayjs from "dayjs";
 import { FastifyInstance } from "fastify";
 import isSameOrAfter from "dayjs/plugin/isSameOrAfter";
 
@@ -12,7 +12,6 @@ import {
 } from "../../router_funcs/common";
 import { DefinedParamErrorMesg } from "../../share/validate";
 import { detailPath } from "../../share/pathList";
-import { employerPayTable } from "../../data/data";
 
 import {
 	artSchema,
@@ -38,6 +37,7 @@ import {
 	getEmployerReceiveDay,
 	makeEmployerJoinInfo,
 	calEmployerSumPay,
+	checkJobCate,
 } from "./function";
 
 dayjs.extend(isSameOrAfter);
@@ -141,21 +141,26 @@ export default function detailRoute(fastify: FastifyInstance, options: any, done
 		const checkResult = checkBasicRequirements(mainData, employmentDate);
 		if (!checkResult.succ) return { checkResult };
 
-		// 2. 급여 산정
+		// 2. 특고 피보험자격취득일 조정
+		if (mainData.workCate === 3) {
+			mainData.enterDay = checkJobCate(mainData.enterDay, mainData.jobCate);
+		}
+
+		// 3. 급여 산정
 		const { dayAvgPay, realDayPay, realMonthPay } = calArtPay(
 			req.body.sumTwelveMonthSalary,
 			employmentDate,
 			req.body.isSpecial
 		);
 
-		// 3. 소정급여일수 산정
+		// 4. 소정급여일수 산정
 		const joinYears = Math.floor(employmentDate / 365);
 		const receiveDay = getReceiveDay(joinYears, req.body.age, req.body.disabled);
 
-		// 4. 피보험단위기간 산정
+		// 5. 피보험단위기간 산정
 		// 일반 예술인, 특고는 12개월 급여를 입력한 순간 이직일 이전 24개월 동안 9개월, 12개월 이상의 피보험단위기간을 만족한다.
 
-		// 5. 복수형에 사용되는 마지막 직장인 경우 workDawyForMulti 계산
+		// 6. 복수형에 사용되는 마지막 직장인 경우 workDawyForMulti 계산
 		let workDayForMulti = 0; // 이 과정은 중복 가입된 상황을 고려하지 않는다.
 		if (req.body.isEnd) {
 			const limitDay = dayjs(req.body.limitDay); // 마지막 직장 퇴사일로 부터 필요한 개월 수(18 또는 24) 전
@@ -164,7 +169,7 @@ export default function detailRoute(fastify: FastifyInstance, options: any, done
 				: Math.floor(mainData.retiredDay.diff(limitDay, "day", true) + 1);
 		}
 
-		// 6. 이 때 다음 단계 수급이 가능하다면 같이 전달, 현재 수급 불인정인 경우는 없다고 가정
+		// 7. 이 때 다음 단계 수급이 가능하다면 같이 전달, 현재 수급 불인정인 경우는 없다고 가정
 		const [requireWorkingYear, nextReceiveDay] = getNextReceiveDay(joinYears, req.body.age, req.body.disabled);
 		if (nextReceiveDay === 0) {
 			return {
@@ -214,7 +219,7 @@ export default function detailRoute(fastify: FastifyInstance, options: any, done
 		// }
 
 		// let isPermit: (number | boolean)[] = [false, 0];
-		let sortedData: any[];
+		// let sortedData: any[];
 
 		////////////////////////////////////////////////////////////////// 새로 작성중
 		// 2. 수급 인정/불인정 판단

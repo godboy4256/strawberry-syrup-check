@@ -21,6 +21,7 @@ export type TstandardInput = {
 export type TartInput = {
 	retired: boolean;
 	workCate: number;
+	jobCate: number;
 	retireReason: number;
 	age: number;
 	disabled: boolean;
@@ -81,6 +82,7 @@ const standardBodyProp = {
 const artBodyProp = {
 	retired: DefineParamInfo.retired,
 	workCate: DefineParamInfo.workCate,
+	jobCate: { type: "number", minimum: 0, maximum: 19 },
 	retireReason: DefineParamInfo.retireReason,
 	age: { type: "number" },
 	disabled: DefineParamInfo.disabled,
@@ -189,6 +191,7 @@ export const artSchema = {
 			required: [
 				"retired",
 				"workCate",
+				"jobCate",
 				"retireReason",
 				"age",
 				"disabled",
