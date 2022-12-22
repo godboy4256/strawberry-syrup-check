@@ -452,8 +452,8 @@ export default function detailRoute(fastify: FastifyInstance, options: any, done
 		const insuranceGrade = req.body.insuranceGrade;
 
 		// 1. 자영업자로서 최소 1년간 고용보험에 보험료를 납부해야함
-		const workingDay = Math.floor(retiredDay.diff(enterDay, "day", true)) + 1;
-		if (workingDay < 365) return { succ: false, workingDay, requireDay: 365 - workingDay };
+		const workingDays = Math.floor(retiredDay.diff(enterDay, "day", true)) + 1;
+		if (workingDays < 365) return { succ: false, workingDays, requireDay: 365 - workingDays };
 
 		// 2.  몇 년 몇 월에 가입했는 지 배열로 작성
 		const workList = makeEmployerJoinInfo(enterDay, retiredDay);
@@ -466,14 +466,14 @@ export default function detailRoute(fastify: FastifyInstance, options: any, done
 		const sumPay = calEmployerSumPay(workList, enterDay, retiredDay, limitYear, limitMonth, insuranceGrade);
 
 		// 5. 급여 산정(기초일액, 일수령액, 월수령액)
-		const dayAvgPay = Math.floor(sumPay / workingDay); // 기초일액
+		const dayAvgPay = Math.floor(sumPay / workingDays); // 기초일액
 		let realDayPay = Math.floor(dayAvgPay * 0.6);
 		if (realDayPay < 60240) realDayPay = 60240;
 		if (realDayPay > 66000) realDayPay = 66000;
 		const realMonthPay = realDayPay * 30;
 
 		// 6. 소정급여일수 산정
-		const workYear = Math.floor(workingDay / 365);
+		const workYear = Math.floor(workingDays / 365);
 		const receiveDay = getEmployerReceiveDay(workYear); // 소정 급여일수 테이블이 다르다
 
 		// 7. 복수형에 사용되는 마지막 직장인 경우 workDawyForMulti 계산
@@ -481,7 +481,7 @@ export default function detailRoute(fastify: FastifyInstance, options: any, done
 		if (req.body.isEnd) {
 			const limitDay = dayjs(req.body.limitDay);
 			workDayForMulti = enterDay.isSameOrAfter(limitDay, "day")
-				? workingDay
+				? workingDays
 				: Math.floor(retiredDay.diff(limitDay, "day", true));
 		}
 
@@ -493,7 +493,7 @@ export default function detailRoute(fastify: FastifyInstance, options: any, done
 			realDayPay,
 			receiveDay,
 			realMonthPay,
-			workingDay,
+			workingDays,
 			workDayForMulti,
 		};
 	});
