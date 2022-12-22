@@ -227,7 +227,7 @@ export default function detailRoute(fastify: FastifyInstance, options: any, done
 		// 5. 피보험기간 년수 계산
 		const workingYear = Math.floor(req.body.sumWorkDay / 12);
 		// 6. 소정급여일수 계산
-		const receiveDay = getReceiveDay(workingYear, req.body.age, req.body.disable);
+		const receiveDay = getReceiveDay(workingYear, req.body.age, req.body.disabled);
 
 		// 7. 급여(일수령액, 월수령액) 계산
 		const { realDayPay, realMonthPay } = calArtPay(
@@ -235,7 +235,7 @@ export default function detailRoute(fastify: FastifyInstance, options: any, done
 			req.body.sumOneYearWorkDay,
 			req.body.isSpecial
 		);
-		const [requireWorkingYear, nextReceiveDay] = getNextReceiveDay(workingYear, req.body.age, req.body.disable);
+		const [requireWorkingYear, nextReceiveDay] = getNextReceiveDay(workingYear, req.body.age, req.body.disabled);
 
 		///////////////////////////////////////////////////////////////
 		// 8. 복수형에서 사용하기위한 workDayForMulti 계산
@@ -326,10 +326,10 @@ export default function detailRoute(fastify: FastifyInstance, options: any, done
 
 		// 5. 소정급여일수 산정
 		const joinYear = Math.floor(req.body.sumWorkDay / 365);
-		const receiveDay = getReceiveDay(joinYear, req.body.age, req.body.disable);
+		const receiveDay = getReceiveDay(joinYear, req.body.age, req.body.disabled);
 
 		// 6 다음 단계 수급이 가능하다면 같이 전달
-		const [requireWorkingYear, nextReceiveDay] = getNextReceiveDay(joinYear, req.body.age, req.body.disable);
+		const [requireWorkingYear, nextReceiveDay] = getNextReceiveDay(joinYear, req.body.age, req.body.disabled);
 
 		if (!nextReceiveDay)
 			return {
@@ -396,8 +396,8 @@ export default function detailRoute(fastify: FastifyInstance, options: any, done
 
 		// 소정급여일수 산정
 		const workingYears = Math.floor(allWorkDay / 365);
-		const receiveDay = getReceiveDay(workingYears, req.body.age, req.body.disable);
-		const [requireWorkingYear, nextReceiveDay] = getNextReceiveDay(workingYears, req.body.age, req.body.disable);
+		const receiveDay = getReceiveDay(workingYears, req.body.age, req.body.disabled);
+		const [requireWorkingYear, nextReceiveDay] = getNextReceiveDay(workingYears, req.body.age, req.body.disabled);
 
 		let workDayForMulti = 0;
 		if (req.body.isEnd) {
