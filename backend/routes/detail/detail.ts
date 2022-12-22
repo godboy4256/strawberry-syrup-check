@@ -270,7 +270,7 @@ export default function detailRoute(fastify: FastifyInstance, options: any, done
 			receiveDay,
 			realMonthPay,
 			needMonth: Math.floor((requireWorkingYear * 12 - req.body.sumWorkDay) * 10) / 10,
-			nextAvailableAmountCost: nextReceiveDay * realDayPay,
+			nextAmountCost: nextReceiveDay * realDayPay,
 			morePay: nextReceiveDay * realDayPay - realDayPay * receiveDay,
 			workDayForMulti,
 		};
