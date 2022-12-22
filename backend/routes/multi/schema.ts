@@ -5,7 +5,7 @@ import { DefineParamInfo } from "../../share/validate";
 const multiBodyProp = {
 	mainData: {
 		type: "object",
-		required: ["workCate", "enterDay", "retiredDay", "workingDays", "age", "disable", "dayAvgPay", "realDayPay"],
+		required: ["workCate", "enterDay", "retiredDay", "workingDays", "age", "disabled", "dayAvgPay", "realDayPay"],
 		properties: {
 			workCate: DefineParamInfo.workCate,
 			isIrregular: { type: "boolean" },
@@ -13,7 +13,7 @@ const multiBodyProp = {
 			retiredDay: DefineParamInfo.retiredDay,
 			workingDays: { type: "number", minimum: 0 },
 			age: { type: "number", minimum: 0 },
-			disable: DefineParamInfo.disabled,
+			disabled: DefineParamInfo.disabled,
 			dayAvgPay: { type: "number", minimum: 0 },
 			realDayPay: { type: "number", minimum: 0 },
 		},
@@ -45,7 +45,7 @@ const multiBodyExamples = [
 			retiredDay: "2022-12-22",
 			workingDays: 180,
 			age: 29,
-			disable: false,
+			disabled: false,
 			dayAvgPay: 60000,
 			realDayPay: 60000,
 		},
@@ -111,7 +111,7 @@ export type TmainData = {
 	retiredDay: string | dayjs.Dayjs;
 	workingDays: number;
 	age: number;
-	disable: boolean;
+	disabled: boolean;
 	dayAvgPay: number;
 	realDayPay: number;
 };

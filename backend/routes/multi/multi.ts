@@ -23,10 +23,12 @@ export default function multiRoute(fastify: FastifyInstance, options: any, done:
 		const joinDays = mainRetiredDay.diff(mainEnterDay, "day"); // 재직일수 퇴직금 계산용
 
 		// 1. 기본 조건 확인
+		console.log("start" + 1);
 		const checkResult = checkBasicRequirements(mainData);
 		if (!checkResult.succ) return { checkResult };
 
 		// 2. 마지막 직장의 입사일과 전직장의 이직일 사이 기간이 3년을 초과하는 지 확인 & 다음 근로 정보가 3년을 초과하는 경우 가장 최근 근로 정보만 이용해서 계산
+		console.log("start" + 2);
 		const secondRetiredDay = dayjs(addDatas[0].retiredDay);
 		const diffMainToSecond = Math.floor(mainEnterDay.diff(secondRetiredDay, "day", true));
 		if (diffMainToSecond > 1095) {
@@ -35,36 +37,43 @@ export default function multiRoute(fastify: FastifyInstance, options: any, done:
 		}
 
 		// 3. 마지막 직장의 이직일로 부터 18개월 또는 24개월 이전 날짜 확인
+		console.log("start" + 3);
 		const permitRange = permitRangeData[mainData.workCate];
 		const limitDay = mainRetiredDay.subtract(permitRange, "month");
 
 		// 4.  18개월 또는 24개월 시점을 고려해서 기간내의 직장 필터
+		console.log("start" + 4);
 		const permitAddCandidates: TaddData[] = addDatas.filter((addData) =>
 			dayjs(addData.retiredDay).isSameOrAfter(limitDay, "date")
 		);
 
 		// 5. 마지막 근로형태가 불규칙이라면 수급 불인정 메세지 리턴
+		console.log("start" + 5);
 		if (permitAddCandidates.length !== 0 && permitAddCandidates[permitAddCandidates.length - 1].isIrregular)
 			return { succ: false, mesg: "isIrregular" };
 
 		/////////////////////////////////////////////////////////// 자영업자 관련 조건 확인
-		if (mainData.workCate === 8) {
-			let check = false;
-			permitAddCandidates.map((el, idx, arr) => {
-				if (el.workCate === 4 || el.workCate === 5 || el.workCate === 6) {
-				}
-				return true;
-			});
-		}
+		// if (mainData.workCate === 8) {
+		// 	let check = false;
+		// 	const select = mainData.workCate; // 자영업을 선택하는 경우
+		// 	permitAddCandidates.map((el, idx, arr) => {
+		// 		if (el.workCate === 4 || el.workCate === 5 || el.workCate === 6) {
+		// 		}
+		// 		return check;
+		// 	});
+		// }
 		///////////////////////////////////////////////////////////
 
 		// 6. 이중취득 여부 확인
+		console.log("start" + 6);
 		const { isDuplicateAcquisition, tempWorkCount, artWorkCount, specialWorkCount } = getDuplicateAcquisitionInfo(
 			mainData,
 			permitAddCandidates
 		);
 
 		// 7. 수급 인정/불인정 판단
+		console.log("start" + 7);
+		console.log(isDuplicateAcquisition && mainData.workCate !== 8);
 		const isPermit =
 			isDuplicateAcquisition && mainData.workCate !== 8
 				? doubleCasePermitCheck(
@@ -76,6 +85,8 @@ export default function multiRoute(fastify: FastifyInstance, options: any, done:
 				: commonCasePermitCheck(permitAddCandidates, mainData);
 
 		// 8. 수급 불인정 조건에 맞는 경우 불인정 메세지 리턴
+		console.log("start" + 8);
+		console.log(isPermit, leastRequireWorkingDay);
 		if (!isPermit[0]) {
 			if (isDuplicateAcquisition)
 				return { succ: false, requireDays: isPermit[1], mesg: "근로자로 requireDays만큼 더 일해야 한다." };
@@ -83,17 +94,20 @@ export default function multiRoute(fastify: FastifyInstance, options: any, done:
 		}
 
 		// 9. 전체 피보험기간을 산정하기위한 합산 가능 유형 필터링
+		console.log("start" + 9);
 		const addCadiates = makeAddCadiates(addDatas, mainEnterDay);
 
 		// 10. 피보험기간 산정
+		console.log("start" + 10);
 		const workingDays = mergeWorkingDays(mainData, addCadiates);
 		const workingYears = Math.floor(workingDays / 365); // 월 단위의 경우 12로 나눈다. 자영업자는 이거
 
 		// 11. 소정급여일수 산정
+		console.log("start" + 11);
 		const tempReceiveDay =
-			mainData.workCate === 5
+			mainData.workCate === 8
 				? getEmployerReceiveDay(workingYears)
-				: getReceiveDay(workingYears, mainData.age, mainData.disable);
+				: getReceiveDay(workingYears, mainData.age, mainData.disabled);
 		const receiveDay = addCadiates[addCadiates.length - 1].isIrregular
 			? tempReceiveDay === 120
 				? 120
@@ -101,6 +115,7 @@ export default function multiRoute(fastify: FastifyInstance, options: any, done:
 			: tempReceiveDay;
 
 		// 12. 결과 리턴
+		console.log("start" + 12);
 		return {
 			succ: true,
 			amountCost: mainData.realDayPay * receiveDay,

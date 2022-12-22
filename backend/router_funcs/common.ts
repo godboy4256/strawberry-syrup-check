@@ -75,10 +75,10 @@ export function getFailResult(
 		workingDays, // 현 근무일수
 		requireDays: leastRequireWorkingDay - workingDays, // 부족 근무일수
 		availableDay, // 피보험기간이 180일이 되는 날
-		availableAmountCost: realDayPay * receiveDay, // 총 수급액: 실업급여 일 수급액 * 소정급여일수
-		dayPay: realDayPay, // 일 수급액
+		amountCost: realDayPay * receiveDay, // 총 수급액: 실업급여 일 수급액 * 소정급여일수
+		realDayPay, // 일 수급액
 		receiveDays: receiveDay, // 소정급여일수는 항상 120일로 최소단위 적용
-		monthPay: realMonthPay, // 월 수급액
+		realMonthPay, // 월 수급액
 	};
 }
 

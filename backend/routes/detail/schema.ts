@@ -21,6 +21,7 @@ export type TstandardInput = {
 export type TartInput = {
 	retired: boolean;
 	workCate: number;
+	jobCate: number;
 	retireReason: number;
 	age: number;
 	disabled: boolean;
@@ -39,7 +40,7 @@ export type TdayJobInput = {
 	workCate: number;
 	retireReason: number;
 	age: number;
-	disable: boolean;
+	disabled: boolean;
 	isSpecial: boolean;
 	lastWorkDay: Dayjs;
 	dayWorkTime: number;
@@ -51,8 +52,9 @@ export type TdayJobInput = {
 };
 
 export type TveryShortInput = {
+	retired: boolean;
 	age: number;
-	disable: boolean;
+	disabled: boolean;
 	enterDay: Dayjs;
 	retiredDay: Dayjs;
 	weekDay: number[]; // 주의
@@ -81,6 +83,7 @@ const standardBodyProp = {
 const artBodyProp = {
 	retired: DefineParamInfo.retired,
 	workCate: DefineParamInfo.workCate,
+	jobCate: { type: "number", minimum: 0, maximum: 19 },
 	retireReason: DefineParamInfo.retireReason,
 	age: { type: "number" },
 	disabled: DefineParamInfo.disabled,
@@ -99,7 +102,7 @@ const shortArtBodyProp = {
 	retireReason: DefineParamInfo.retireReason, // 퇴직사유
 	enterDay: DefineParamInfo.enterDay,
 	age: { type: "number" },
-	disable: DefineParamInfo.disabled, // 장애여부
+	disabled: DefineParamInfo.disabled, // 장애여부
 	lastWorkDay: DefineParamInfo.lastWorkDay, // 마지막 근무일
 	// workRecord: DefineParamInfo.workRecord,
 	sumOneYearPay: { type: "number", minimum: 0 },
@@ -118,7 +121,7 @@ const dayJobBodyProp = {
 	workCate: DefineParamInfo.workCate, // 근로형태
 	retireReason: DefineParamInfo.retireReason, // 퇴직사유
 	age: { type: "number", minimum: 0 },
-	disable: DefineParamInfo.disabled, // 장애여부
+	disabled: DefineParamInfo.disabled, // 장애여부
 	isSpecial: { type: "boolean" }, // 건설직 여부
 	lastWorkDay: DefineParamInfo.lastWorkDay, // 마지막 근무일
 	dayWorkTime: DefineParamInfo.dayWorkTime, // 소정 근로시간
@@ -130,8 +133,9 @@ const dayJobBodyProp = {
 };
 
 const veryShortBodyProp = {
+	retired: DefineParamInfo.retired,
 	age: { type: "number", minimum: 0 },
-	disable: DefineParamInfo.disabled,
+	disabled: DefineParamInfo.disabled,
 	enterDay: DefineParamInfo.enterDay,
 	retiredDay: DefineParamInfo.retiredDay,
 	weekDay: DefineParamInfo.weekDay, // 주의
@@ -189,6 +193,7 @@ export const artSchema = {
 			required: [
 				"retired",
 				"workCate",
+				"jobCate",
 				"retireReason",
 				"age",
 				"disabled",
@@ -207,7 +212,7 @@ export const shortArtSchema = {
 		tags: ["detail"],
 		body: {
 			type: "object",
-			required: ["age", "disable", "lastWorkDay", "hasWork"],
+			required: ["age", "disabled", "lastWorkDay", "hasWork"],
 			properties: shortArtBodyProp,
 		},
 	},
@@ -218,7 +223,16 @@ export const dayJobSchema = {
 		tags: ["detail"],
 		body: {
 			type: "object",
-			required: ["age", "disable", "isSpecial", "lastWorkDay", "dayAvgPay", "sumWorkDay", "isOverTen", "hasWork"],
+			required: [
+				"age",
+				"disabled",
+				"isSpecial",
+				"lastWorkDay",
+				"dayAvgPay",
+				"sumWorkDay",
+				"isOverTen",
+				"hasWork",
+			],
 			properties: dayJobBodyProp,
 		},
 	},
@@ -229,7 +243,7 @@ export const veryShortSchema = {
 		tags: ["detail"],
 		body: {
 			type: "object",
-			required: ["age", "disable", "enterDay", "retiredDay", "weekDay", "dayWorkTime", "salary"],
+			required: ["retired", "age", "disabled", "enterDay", "retiredDay", "weekDay", "dayWorkTime", "salary"],
 			properties: veryShortBodyProp,
 		},
 	},

@@ -53,7 +53,7 @@ export default function standardRoute(fastify: FastifyInstance, options: any, do
 		return {
 			succ: true, // 수급 인정 여부
 			retired: mainData.retired, // 퇴직자/퇴직예정자
-			availableAmountCost: realDayPay * receiveDay, // 총 수급액
+			amountCost: realDayPay * receiveDay, // 총 수급액
 			realDayPay, // 일 수급액
 			receiveDay, // 소정 급여일수
 			realMonthPay, // 월 수급액

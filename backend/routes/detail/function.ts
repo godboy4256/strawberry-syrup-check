@@ -312,3 +312,13 @@ export function calEmployerSumPay(
 
 	return sumPay;
 }
+
+export function checkJobCate(enterDay: Dayjs, jobCate: number) {
+	const checkOne = dayjs("2021-07-01");
+	const checkTwo = dayjs("2022-01-01");
+	const checkThree = dayjs("2022-07-01");
+
+	if (jobCate <= 12) return enterDay.isSameOrAfter(checkOne) ? enterDay : checkOne;
+	if (jobCate >= 15) return enterDay.isSameOrAfter(checkOne) ? enterDay : checkTwo;
+	return enterDay.isSameOrAfter(checkOne) ? enterDay : checkThree;
+}
