@@ -1,9 +1,9 @@
 import { Fragment, useState } from "react";
 import NumberInput from "./Pay";
-import "../../styles/salarytab.css";
 import SelectInput from "./Select";
 import { GetDateArr } from "../../utils/date";
 import { CreatePopup } from "../common/Popup";
+import "../../styles/salarytab.css";
 
 const before_month_cal = (retiredDay: string) => {
   const targetDate = retiredDay.split("-"),
@@ -121,6 +121,7 @@ const TabInputs = ({
               <SelectInput
                 selected={"1등급"}
                 type="normal"
+                value_type="string"
                 options={["1등급", "2등급", "3등급", "4등급", "5등급"]}
                 params="year0"
                 callBack={callBack ? callBack : undefined}
@@ -146,6 +147,7 @@ const TabInputs = ({
                           <SelectInput
                             selected={"1등급"}
                             type="normal"
+                            value_type="string"
                             options={[
                               "1등급",
                               "2등급",

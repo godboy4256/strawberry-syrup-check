@@ -19,9 +19,17 @@ class BasicCalHandler extends InputHandler {
   public result: {} = {};
   public setCompState: Dispatch<SetStateAction<number>> | undefined = undefined;
   public Action_Cal_Result = async () => {
-    if (!CheckValiDation("standad", this._Data)) return;
+    const to_server = {
+      ...this._Data,
+      retiredDay: this._Data.retired
+        ? this._Data.retiredDay
+        : `${GetDateArr(null)[0]}-${GetDateArr(null)[1]}-${
+            GetDateArr(null)[2]
+          }`,
+    };
+    if (!CheckValiDation("standad", to_server)) return;
     this.setCompState && this.setCompState(4);
-    this.result = await sendToServer("/standard", this._Data);
+    this.result = await sendToServer("/standard", to_server);
     setTimeout(() => {
       this.setCompState && this.setCompState(3);
     }, 2000);
@@ -80,7 +88,6 @@ const BasicCalPage = () => {
   const [compState, setCompState] = useState(1);
   useEffect(() => {
     handler.setCompState = setCompState;
-    handler._Data = {};
   }, []);
   return (
     <>

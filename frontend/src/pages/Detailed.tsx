@@ -168,6 +168,7 @@ const _DetailCal01 = ({ handler }: { handler: any }) => {
         selected={"근무 시간을 선택해주세요."}
         type="normal"
         label="근무시간"
+        value_type="string"
         options={[
           "근무 시간을 선택해주세요.",
           "3시간 미만",
@@ -202,6 +203,7 @@ const _DetailCal02 = ({ handler }: { handler: any }) => {
       <_Belong_Form_Tab
         label="근로 정보"
         params="input"
+        callBack={handler.SetPageVal}
         options={["개별 입력", "결과만 입력"]}
         form01={
           <>
@@ -214,6 +216,7 @@ const _DetailCal02 = ({ handler }: { handler: any }) => {
               selected={"시간을 선택해주세요."}
               type="normal"
               label="마지막 근무시간"
+              value_type="string"
               options={[
                 "시간을 선택해주세요.",
                 "1시간",
@@ -255,6 +258,7 @@ const _DetailCal02 = ({ handler }: { handler: any }) => {
               selected={"시간을 선택해주세요."}
               type="normal"
               label="마지막 근무시간"
+              value_type="string"
               options={[
                 "시간을 선택해주세요.",
                 "1시간",
@@ -313,17 +317,51 @@ const _DetailCal03 = ({ handler }: { handler: any }) => {
       }
       form01={
         <>
+          {handler.GetPageVal("workCate") === 4 && (
+            <SelectInput
+              params="jobCate"
+              callBack={handler.SetPageVal}
+              selected={"직종을 선택해주세요."}
+              type="normal"
+              value_type="number"
+              label="직종"
+              options={[
+                "직종을 선택해주세요.",
+                "보험설계사",
+                "신용카드 회원모집인",
+                "대출모집인",
+                "학습지 방문강사",
+                "교육교구 방문강사",
+                "택배 기사",
+                "대여제품",
+                "대여제품 방문점검원",
+                "가전제품 배송 설치기사",
+                "방문판매원",
+                "건설기계조종사",
+                "방과후학교 강사",
+                "퀵서비스 기사",
+                "대리운전 기사",
+                "IT 소프트웨어 기술자",
+                "어린이 통학버스 기사",
+                "골프장 캐디",
+                "관공통역 안내사",
+                "화물차주 (유통배송기사, 택배 지간선기사, 특정품목운송차주)",
+              ]}
+            />
+          )}
           <DateInputNormal
             params="enterDay"
             label="고용보험 가입일"
             callBack={handler.SetPageVal}
           />
-          <DateInputNormal
-            params="retiredDay"
-            label="고용보험 종료일"
-            callBack={handler.SetPageVal}
-            description="insurance_end_day"
-          />
+          {handler.GetPageVal("retired") && (
+            <DateInputNormal
+              params="retiredDay"
+              label="고용보험 종료일"
+              callBack={handler.SetPageVal}
+              description="insurance_end_day"
+            />
+          )}
           <NumberInput
             params="sumTwelveMonthSalary"
             label="퇴직 전 12개월 급여 총액"
@@ -363,28 +401,26 @@ const _DetailCal03 = ({ handler }: { handler: any }) => {
           }
           form02={
             <>
-              <>
-                <DateInputNormal
-                  params="lastWorkDay"
-                  label="마지막 근무일"
-                  callBack={handler.SetPageVal}
-                />
+              <DateInputNormal
+                params="lastWorkDay"
+                label="마지막 근무일"
+                callBack={handler.SetPageVal}
+              />
 
-                <NumberInput
-                  params={["employ_year", "employ_month"]}
-                  label="고용보험 총 기간"
-                  num_unit={["년", "개월"]}
-                  callBack={handler.SetPageVal}
-                  double={true}
-                  k_parser={false}
-                />
-                <NumberInput
-                  params="sumOneYearPay"
-                  label="퇴직 전 12개월 급여 총액"
-                  num_unit="원"
-                  callBack={handler.SetPageVal}
-                />
-              </>
+              <NumberInput
+                params={["employ_year", "employ_month"]}
+                label="고용보험 총 기간"
+                num_unit={["년", "개월"]}
+                callBack={handler.SetPageVal}
+                double={true}
+                k_parser={false}
+              />
+              <NumberInput
+                params="sumOneYearPay"
+                label="퇴직 전 12개월 급여 총액"
+                num_unit="원"
+                callBack={handler.SetPageVal}
+              />
             </>
           }
         />

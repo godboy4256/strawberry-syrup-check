@@ -466,71 +466,127 @@ export const DateInputIndividual = ({
   const month_arr = Month_Calculator(lastMonth, "before", 12);
   const month_arr_splice = month_arr.splice(-2).concat(month_arr);
   return (
-    <>
+    <div className="date_indiviual_container">
       {type === 3 || type === 4 ? (
         <>
-          <div className="date_indiviual_page type_2">
-            <div>
-              <div className="indiviual_input_header">
-                {month_arr_splice[5]} 월
+          {direction === 1 ? (
+            <div className="date_indiviual_page type_2">
+              <div className="br_r">
+                <div className="indiviual_input_header">1 월</div>
+                <_IndiviualInput
+                  callBack={handler.SetPageVal}
+                  params="1"
+                  pay={true}
+                />
               </div>
-              <_IndiviualInput
-                callBack={handler.SetPageVal}
-                params={`${month_arr_splice[5]}`}
-                pay={true}
-              />
-            </div>
-            <div>
-              <div className="indiviual_input_header">
-                {month_arr_splice[4]} 월
+              <div>
+                <div className="indiviual_input_header">2 월</div>
+                <_IndiviualInput
+                  callBack={handler.SetPageVal}
+                  params="2"
+                  pay={true}
+                />
               </div>
-              <_IndiviualInput
-                callBack={handler.SetPageVal}
-                params={`${month_arr_splice[4]}`}
-                pay={true}
-              />
-            </div>
-            <div>
-              <div className="indiviual_input_header">
-                {month_arr_splice[3]} 월
+              <div className="br_r">
+                <div className="indiviual_input_header">3 월</div>
+                <_IndiviualInput
+                  callBack={handler.SetPageVal}
+                  params="3"
+                  pay={true}
+                />
               </div>
-              <_IndiviualInput
-                callBack={handler.SetPageVal}
-                params={`${month_arr_splice[3]}`}
-                pay={true}
-              />
-            </div>
-            <div>
-              <div className="indiviual_input_header">
-                {month_arr_splice[2]} 월
+              <div>
+                <div className="indiviual_input_header">4 월</div>
+                <_IndiviualInput
+                  callBack={handler.SetPageVal}
+                  params="4"
+                  pay={true}
+                />
               </div>
-              <_IndiviualInput
-                callBack={handler.SetPageVal}
-                params={`${month_arr_splice[2]}`}
-                pay={true}
-              />
-            </div>
-            <div>
-              <div className="indiviual_input_header">
-                {month_arr_splice[1]} 월
+              <div className="br_r">
+                <div className="indiviual_input_header">5 월</div>
+                <_IndiviualInput
+                  callBack={handler.SetPageVal}
+                  params="5"
+                  pay={true}
+                />
               </div>
-              <_IndiviualInput
-                callBack={handler.SetPageVal}
-                params={`${month_arr_splice[1]}`}
-                pay={true}
-              />
-            </div>
-            <div>
-              <div className="indiviual_input_header">
-                {month_arr_splice[0]} 월
+              <div>
+                <div className="indiviual_input_header">6 월</div>
+                <_IndiviualInput
+                  callBack={handler.SetPageVal}
+                  params="6"
+                  pay={true}
+                />
               </div>
-              <_IndiviualInput
-                callBack={handler.SetPageVal}
-                params={`${month_arr_splice[0]}`}
-                pay={true}
-              />
+              <button
+                className="date_indiviual_next"
+                onClick={() => setDirection(2)}
+              >
+                <img src={IMGNext} alt="e button" />
+              </button>
             </div>
-          </div>
+          ) : (
+            direction === 2 && (
+              <div className="date_indiviual_page type_2">
+                <button
+                  className="date_indiviual_prev"
+                  onClick={() => setDirection(1)}
+                >
+                  <img src={IMGPrev} alt="prev button" />
+                </button>
+
+                <div className="br_r">
+                  <div className="indiviual_input_header">7 월</div>
+                  <_IndiviualInput
+                    callBack={handler.SetPageVal}
+                    params="7"
+                    pay={true}
+                  />
+                </div>
+                <div>
+                  <div className="indiviual_input_header">8 월</div>
+                  <_IndiviualInput
+                    callBack={handler.SetPageVal}
+                    params="8"
+                    pay={true}
+                  />
+                </div>
+                <div className="br_r">
+                  <div className="indiviual_input_header">9 월</div>
+                  <_IndiviualInput
+                    callBack={handler.SetPageVal}
+                    params="9"
+                    pay={true}
+                  />
+                </div>
+                <div>
+                  <div className="indiviual_input_header">10 월</div>
+                  <_IndiviualInput
+                    callBack={handler.SetPageVal}
+                    params="10"
+                    pay={true}
+                  />
+                </div>
+                <div className="br_r">
+                  <div className="indiviual_input_header">11 월</div>
+                  <_IndiviualInput
+                    callBack={handler.SetPageVal}
+                    params="11"
+                    pay={true}
+                  />
+                </div>
+                <div>
+                  <div className="indiviual_input_header">12 월</div>
+                  <_IndiviualInput
+                    callBack={handler.SetPageVal}
+                    params="12"
+                    pay={true}
+                  />
+                </div>
+              </div>
+            )
+          )}
         </>
       ) : (
         type === 2 && (
@@ -690,6 +746,6 @@ export const DateInputIndividual = ({
           </div>
         )
       )}
-    </>
+    </div>
   );
 };

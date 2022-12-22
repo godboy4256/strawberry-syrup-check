@@ -49,6 +49,7 @@ const SelectInput = ({
   popUpCallBack,
   popup_select,
   check_popup,
+  value_type,
 }: {
   selected?: number | string;
   options: string[] | number[];
@@ -60,6 +61,7 @@ const SelectInput = ({
   popUpCallBack?: CallableFunction;
   popup_select?: CallableFunction;
   check_popup?: string[];
+  value_type?: "number" | "string";
 }) => {
   const onClickOnOptionList = (e: MouseEvent<HTMLDivElement>) => {
     CreatePopup(
@@ -132,13 +134,24 @@ const SelectInput = ({
                 onChange={(e: ChangeEvent<HTMLSelectElement>) => {
                   e.currentTarget.parentElement &&
                     e.currentTarget.parentElement.classList.add("active");
-                  callBack && callBack(params, e.currentTarget.value);
+                  callBack &&
+                    callBack(
+                      params,
+                      value_type === "string"
+                        ? e.currentTarget.value
+                        : Number(e.currentTarget.value)
+                    );
                 }}
                 defaultValue={selected}
               >
                 {options.map((el: string | number, idx: number) => {
                   return (
-                    <option className="fs_14" key={idx + Date.now()} value={el}>
+                    <option
+                      id={String(idx)}
+                      className="fs_14"
+                      key={idx + Date.now()}
+                      value={value_type === "string" ? el : idx}
+                    >
                       {el}
                     </option>
                   );
