@@ -160,7 +160,8 @@ export default function detailRoute(fastify: FastifyInstance, options: any, done
 		// 5. 피보험단위기간 산정
 		// 일반 예술인, 특고는 12개월 급여를 입력한 순간 이직일 이전 24개월 동안 9개월, 12개월 이상의 피보험단위기간을 만족한다.
 		const workingMonths = mainData.retiredDay.diff(mainData.enterDay, "month");
-		const isPermit = workingMonths > 9 ? true : false;
+		const isPermit =
+			mainData.workCate === 3 ? (workingMonths >= 12 ? true : false) : workingMonths >= 9 ? true : false;
 		if (isPermit)
 			return {
 				succ: false,
