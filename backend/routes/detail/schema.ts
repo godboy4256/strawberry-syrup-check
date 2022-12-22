@@ -52,6 +52,7 @@ export type TdayJobInput = {
 };
 
 export type TveryShortInput = {
+	retired: boolean;
 	age: number;
 	disabled: boolean;
 	enterDay: Dayjs;
@@ -132,6 +133,7 @@ const dayJobBodyProp = {
 };
 
 const veryShortBodyProp = {
+	retired: DefineParamInfo.retired,
 	age: { type: "number", minimum: 0 },
 	disabled: DefineParamInfo.disabled,
 	enterDay: DefineParamInfo.enterDay,
@@ -241,7 +243,7 @@ export const veryShortSchema = {
 		tags: ["detail"],
 		body: {
 			type: "object",
-			required: ["age", "disabled", "enterDay", "retiredDay", "weekDay", "dayWorkTime", "salary"],
+			required: ["retired", "age", "disabled", "enterDay", "retiredDay", "weekDay", "dayWorkTime", "salary"],
 			properties: veryShortBodyProp,
 		},
 	},

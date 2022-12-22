@@ -316,7 +316,8 @@ export default function detailRoute(fastify: FastifyInstance, options: any, done
 		} else {
 			isPermit = dayJobCheckPermit(limitPermitDay, req.body.sumWorkDay, true);
 		}
-		if (!isPermit[0]) return { succ: false, workingDay: isPermit[1], requireWorkingDay: isPermit[2] };
+		if (!isPermit[0])
+			return { succ: false, retired: mainData.retired, workingDays: isPermit[1], requireDays: isPermit[2] };
 
 		// 4. 급여 산정
 		const { realDayPay, realMonthPay } =
@@ -375,7 +376,8 @@ export default function detailRoute(fastify: FastifyInstance, options: any, done
 
 		// 수급 인정/ 불인정 판단
 		const isPermit = permitWorkDay >= 180 ? [true] : [false, permitWorkDay, 180 - permitWorkDay];
-		if (!isPermit[0]) return { succ: false, workingDay: isPermit[1], requireWorkingDay: isPermit[2] };
+		if (!isPermit[0])
+			return { succ: false, retired: mainData.retired, workingDays: isPermit[1], requireDays: isPermit[2] };
 
 		// 전체 피보험 단위 기간
 		const allWorkDay = calVeryShortWorkDay(mainData.enterDay, mainData.retiredDay, req.body.weekDay);
