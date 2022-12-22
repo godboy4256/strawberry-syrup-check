@@ -23,21 +23,13 @@ import Header from "../layout/Header";
 import "../../styles/result.css";
 
 const _SupplyResult = ({
-  total,
-  day_pay,
-  month_pay,
-  severance_pay,
-  day_num,
   emoticon,
   help,
+  result_data,
   guide_card = false,
 }: {
-  total: number;
-  day_pay: number;
-  day_num: number;
-  month_pay: number;
-  severance_pay: number;
   emoticon: string;
+  result_data: any;
   help?: [string, string];
   guide_card?: boolean;
 }) => {
@@ -51,28 +43,28 @@ const _SupplyResult = ({
         <div id="result_top_header" className="bg_color_main font_color_white">
           총 수령액 :
           <span className="fs_25 font_color_white font_family_bold">
-            {total?.toLocaleString()}
+            {result_data?.amountCost?.toLocaleString()}
           </span>
           원
         </div>
         <div id="result_top_content">
           <div className="lh_18 fs_12">
             하루
-            <span className="font_color_main fs_12">{` ${day_pay?.toLocaleString()} `}</span>{" "}
+            <span className="font_color_main fs_12">{` ${result_data?.realDayPay?.toLocaleString()} `}</span>{" "}
             원을
-            <span className="font_color_main fs_12">{` ${day_num?.toLocaleString()} `}</span>
+            <span className="font_color_main fs_12">{` ${result_data?.receiveDay?.toLocaleString()} `}</span>
             일 동안,
           </div>
           <div className="lh_27">
             월
             <span className="font_color_main">
-              {month_pay?.toLocaleString()}
+              {result_data?.realMonthPay?.toLocaleString()}
             </span>
             원 받아요!
           </div>
         </div>
       </div>
-      {severance_pay ? (
+      {result_data?.severancePay ? (
         <div id="severance_pay_container">
           <div
             id="severance_pay_comment"
@@ -86,7 +78,7 @@ const _SupplyResult = ({
           >
             예상 퇴직금 :
             <span className="fs_25  font_color_white">
-              {severance_pay?.toLocaleString()}
+              {result_data?.severancePay?.toLocaleString()}
             </span>
             원
           </div>
@@ -102,8 +94,6 @@ const _SupplyResult = ({
           <br />
           실업급여를 받지 못합니다.
         </div>
-        // 지금은 자영업자에 밖에 사용되지 않기 때문에 고정되어 있지만
-        // 추 후에 가이드 카드가 필요한 곳이 더 생길 경우 따로 객체를 만들어 가이드 컴포넌트를 관리
       )}
       <div id="result_guide_comment01" className="fs_14">
         계산 결과는 자동으로 저장되며, <br />
@@ -132,8 +122,7 @@ const _SupplyResult = ({
 const _UnSupplyResult = ({
   emoticon,
   unit,
-  workingDateNum,
-  requireDateNum,
+  result_data,
   average_guide,
   helps = ["피보험단위기간이란 무엇인가요?", "근무일수가 부족하다면?"],
   helps_to = ["/", "/"],
@@ -141,8 +130,7 @@ const _UnSupplyResult = ({
 }: {
   emoticon: string;
   unit: "day" | "month";
-  workingDateNum: number;
-  requireDateNum: number;
+  result_data: any;
   average_guide?: string;
   helps?: string[];
   helps_to?: string[];
@@ -171,14 +159,18 @@ const _UnSupplyResult = ({
           <div className="font_color_white flex_box fs_14">
             현재 근무{unit === "day" ? "일" : "월"}수 :
             <span className="unsupply_result_value font_color_white">
-              {workingDateNum}
+              {result_data?.workingDays
+                ? result_data?.workingDays
+                : result_data?.workingMonths}
             </span>
             {unit === "day" ? "일" : "달"}
           </div>
           <div className="font_color_white flex_box fs_14">
             부족한 근무{unit === "day" ? "일" : "월"}수 :{" "}
             <span className="unsupply_result_value font_color_white">
-              {requireDateNum}
+              {result_data?.requireDays
+                ? result_data?.requireDays
+                : result_data?.requireMonths}
             </span>
             {unit === "day" ? "일" : "달"}
           </div>
@@ -188,7 +180,7 @@ const _UnSupplyResult = ({
         (typeof average_guide === "number" ? (
           <div id="average_guide_container" className="font_color_main lh_27">
             월 평균소득 {average_guide} 이상으로
-            <br /> {requireDateNum}일 더 일하셔야 합니다.
+            <br /> {result_data?.requireWorkingDay}일 더 일하셔야 합니다.
           </div>
         ) : (
           <div id="average_guide_container" className="guide_normal fs_14">
@@ -230,68 +222,49 @@ export const ResultComp = ({
         // 정규직
         (result_data.succ ? (
           <_SupplyResult
-            total={result_data?.availableAmountCost}
-            day_pay={result_data?.realDayPay}
-            month_pay={result_data?.realMonthPay}
-            severance_pay={result_data?.severancePay}
-            day_num={result_data?.receiveDay}
+            result_data={result_data}
             emoticon={EMTDetailFullTimeSupply}
           />
         ) : (
           <_UnSupplyResult
             emoticon={EMTDetailFullTimeUnSupply}
             unit="day"
-            workingDateNum={result_data.workingDays}
-            requireDateNum={result_data.requireDays}
+            result_data={result_data}
           />
         ))}
       {cal_type === 1 &&
         // 기간제
         (result_data.succ ? (
           <_SupplyResult
-            total={result_data?.availableAmountCost}
-            day_pay={result_data?.realDayPay}
-            month_pay={result_data?.realMonthPay}
-            severance_pay={result_data?.severancePay}
-            day_num={result_data?.receiveDay}
+            result_data={result_data}
             emoticon={EMTDetailContractSupply}
           />
         ) : (
           <_UnSupplyResult
             emoticon={EMTDetailContractUnSupply}
             unit="day"
-            workingDateNum={result_data.workingDays}
-            requireDateNum={result_data.requireDays}
+            result_data={result_data}
           />
         ))}
       {cal_type === "basic" &&
         // 기본형
         (result_data.succ ? (
           <_SupplyResult
-            total={result_data?.availableAmountCost}
-            day_pay={result_data?.realDayPay}
-            month_pay={result_data?.realMonthPay}
-            severance_pay={result_data?.severancePay}
-            day_num={result_data?.receiveDay}
+            result_data={result_data}
             emoticon={EMTBasicSupplyRetiree}
           />
         ) : (
           <_UnSupplyResult
-            emoticon={EMTBasicUnSupplyUnRetiree}
+            emoticon={EMTBasicUnSupplyRetiree}
             unit="day"
-            workingDateNum={result_data.workingDays}
-            requireDateNum={result_data.requireDays}
+            result_data={result_data}
           />
         ))}
       {cal_type === 2 &&
         // 일용직
         (result_data.succ ? (
           <_SupplyResult
-            total={result_data?.amountCost}
-            day_pay={result_data?.realDayPay}
-            month_pay={result_data?.realMonthPay}
-            severance_pay={result_data?.severancePay}
-            day_num={result_data?.receiveDay}
+            result_data={result_data}
             emoticon={EMTDetailDayJobSupply}
             help={["", "일용직도 퇴직금을 받을 수 있다?"]}
           />
@@ -299,8 +272,7 @@ export const ResultComp = ({
           <_UnSupplyResult
             emoticon={EMTDetailDayJobUnSupply}
             unit="day"
-            workingDateNum={result_data.workingDay}
-            requireDateNum={result_data.requireWorkingDay}
+            result_data={result_data}
             average_guide="신청일 이전 1달 간 근로일수가 10일 미만이어야 합니다."
           />
         ))}
@@ -308,19 +280,14 @@ export const ResultComp = ({
         // 예술인 ,단기 예술인
         (result_data.succ ? (
           <_SupplyResult
-            total={result_data?.availableAmountCost}
-            day_pay={result_data?.artRealDayPay}
-            month_pay={result_data?.artRealMonthPay}
-            severance_pay={result_data?.severancePay}
-            day_num={result_data?.receiveDay}
+            result_data={result_data}
             emoticon={EMTDetailArtsSupply}
           />
         ) : (
           <_UnSupplyResult
             emoticon={EMTDetailArtsUnSupply}
             unit="month"
-            workingDateNum={result_data.workingMonths}
-            requireDateNum={result_data.requireMonths}
+            result_data={result_data}
             helps={
               result_data.is_short === "단기 예술인"
                 ? ["단기예술인 실업급여의 계산방법이 궁금하신가요?"]
@@ -336,49 +303,35 @@ export const ResultComp = ({
         // 특고 ,단기 특고
         (result_data.succ ? (
           <_SupplyResult
-            total={result_data?.availableAmountCost}
-            day_pay={result_data?.artRealDayPay}
-            month_pay={result_data?.artRealMonthPay}
-            severance_pay={result_data?.severancePay}
-            day_num={result_data?.receiveDay}
+            result_data={result_data}
             emoticon={EMTDetailSpecialsSupply}
           />
         ) : (
           <_UnSupplyResult
             emoticon={EMTDetailSpecialsUnSupply}
             unit="month"
-            workingDateNum={result_data.workingMonths}
-            requireDateNum={result_data.requireMonths}
+            result_data={result_data}
           />
         ))}
       {cal_type === 5 &&
         // 초단 시간
         (result_data.succ ? (
           <_SupplyResult
-            total={result_data?.amountCost}
-            day_pay={result_data?.realDayPay}
-            month_pay={result_data?.realMonthPay}
-            severance_pay={result_data?.severancePay}
-            day_num={result_data?.receiveDay}
+            result_data={result_data}
             emoticon={EMTDetailVeryShortsSupply}
           />
         ) : (
           <_UnSupplyResult
             emoticon={EMTDetailVeryShortsUnSupply}
             unit="day"
-            workingDateNum={result_data.workingDays}
-            requireDateNum={result_data.requireDays}
+            result_data={result_data}
           />
         ))}
       {cal_type === 6 &&
         // 자영업
         (result_data.succ ? (
           <_SupplyResult
-            total={result_data?.amountCost}
-            day_pay={result_data?.realDayPay}
-            month_pay={result_data?.realMonthPay}
-            severance_pay={result_data?.severancePay}
-            day_num={result_data?.receiveDay}
+            result_data={result_data}
             emoticon={EMTDetailEmploySupply}
             guide_card={true}
           />
@@ -386,8 +339,7 @@ export const ResultComp = ({
           <_UnSupplyResult
             emoticon={EMTDetailEmployUnSupply}
             unit="day"
-            workingDateNum={result_data.workingDay}
-            requireDateNum={result_data.requireDay}
+            result_data={result_data}
           />
         ))}
       <div id="result_button_container">

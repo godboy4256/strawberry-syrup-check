@@ -147,3 +147,9 @@
 .lh_18 {
   line-height: 18px;
 }
+.br_r {
+  border-right: 1px solid #ccc;
+}
+.br_l {
+  border-left: 1px solid #ccc;
+}

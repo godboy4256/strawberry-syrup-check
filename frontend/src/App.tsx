@@ -8,7 +8,7 @@ import "./styles/root.css";
 function App() {
   return (
     <Routes>
-      <Route path="/main" element={<MainPage />} />
+      <Route path="/" element={<MainPage />} />
       <Route path="/standard" element={<BasicCalPage />} />
       <Route path="/detailed" element={<DetailCalPage />} />
       <Route path="/multi" element={<MultiCalPage />} />
