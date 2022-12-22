@@ -453,7 +453,7 @@ export default function detailRoute(fastify: FastifyInstance, options: any, done
 
 		// 1. 자영업자로서 최소 1년간 고용보험에 보험료를 납부해야함
 		const workingDays = Math.floor(retiredDay.diff(enterDay, "day", true)) + 1;
-		if (workingDays < 365) return { succ: false, workingDays, requireDay: 365 - workingDays };
+		if (workingDays < 365) return { succ: false, workingDays, requireDays: 365 - workingDays };
 
 		// 2.  몇 년 몇 월에 가입했는 지 배열로 작성
 		const workList = makeEmployerJoinInfo(enterDay, retiredDay);
