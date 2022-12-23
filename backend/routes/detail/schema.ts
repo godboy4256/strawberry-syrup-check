@@ -104,12 +104,12 @@ const shortArtBodyProp = {
 	age: { type: "number" },
 	disabled: DefineParamInfo.disabled, // 장애여부
 	lastWorkDay: DefineParamInfo.lastWorkDay, // 마지막 근무일
-	// workRecord: DefineParamInfo.workRecord,
-	sumOneYearPay: { type: "number", minimum: 0 },
+	sumOneYearPay: { type: "number", minimum: 0 }, // 퇴직 전 12개월 급여 총액
 	sumOneYearWorkDay: { type: "number", minimum: 0 },
 	sumTwoYearWorkDay: { type: "number", minimum: 0 },
-	sumWorkDay: { type: "number", minimum: 0 },
+	sumWorkDay: { type: "number", minimum: 0 }, // 마지막 근무일
 	isSpecial: { type: "boolean" },
+	isSimple: { type: "boolean" },
 	isOverTen: { type: "boolean" },
 	hasWork: { type: "array" },
 	isEnd: { type: "boolean" },
