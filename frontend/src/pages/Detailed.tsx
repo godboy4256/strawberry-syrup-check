@@ -1,5 +1,5 @@
 import { ReactElement, useEffect, useState } from "react";
-import IsRetiree from "../components/calculator/IsRetiree";
+import CalIsRetiree from "../components/calculator/IsRetiree";
 import {
   DateInputIndividual,
   DateInputNormal,
@@ -301,6 +301,7 @@ const _DetailCal02 = ({ handler }: { handler: any }) => {
   );
 };
 const _DetailCal03 = ({ handler }: { handler: any }) => {
+  console.log(handler.GetPageVal("workCate"));
   return (
     <_Belong_Form_Tab
       callBack={handler.SetPageVal}
@@ -500,8 +501,15 @@ const _DetailCal05 = ({ handler }: { handler: any }) => {
     </div>
   );
 };
-const _DetailCalComp = () => {
-  const workCate = handler.GetPageVal("workCate");
+export const DetailCalComp = ({
+  workCate,
+  handler,
+  clickCallBack,
+}: {
+  workCate: number;
+  handler: any;
+  clickCallBack: CallableFunction;
+}) => {
   return (
     <div id={`${workCate !== 6 ? "detail_comp_container" : ""}`}>
       <Header title="정보입력" leftLink="/" leftType="BACK" />
@@ -535,7 +543,7 @@ const _DetailCalComp = () => {
         <Button
           text="계산하기"
           type="bottom"
-          click_func={handler.Action_Cal_Result}
+          click_func={() => clickCallBack()}
         />
       </div>
     </div>
@@ -555,9 +563,15 @@ const DetailCalPage = () => {
       ) : (
         <CalContainer GetValue={handler.GetPageVal} type="상세형">
           <>
-            {compState === 1 && <IsRetiree handler={handler} />}
+            {compState === 1 && <CalIsRetiree handler={handler} />}
             {compState === 2 && <WorkTypes handler={handler} />}
-            {compState === 3 && <_DetailCalComp />}
+            {compState === 3 && (
+              <DetailCalComp
+                handler={handler}
+                workCate={handler.GetPageVal("workCate")}
+                clickCallBack={handler.Action_Cal_Result}
+              />
+            )}
             {compState === 4 && (
               <ResultComp
                 cal_type={handler.GetPageVal("workCate")}
