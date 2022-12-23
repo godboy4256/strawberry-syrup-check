@@ -47,7 +47,8 @@ export default function standardRoute(fastify: FastifyInstance, options: any, do
 				realDayPay,
 				realMonthPay,
 				leastRequireWorkingDay,
-				receiveDay
+				receiveDay,
+				dayAvgPay
 			);
 
 		return {

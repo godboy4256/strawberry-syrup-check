@@ -11,12 +11,13 @@ import { swaggerConfig } from "./config/swagger";
 import { routes } from "./routes/routes";
 
 const server = fastify({
-	logger: {
-		timestamp: () => `,"time":"${new Date(Date.now()).toISOString()}"`,
-		transport: {
-			target: "pino-pretty",
-		},
-	},
+	// logger: {
+	// 	timestamp: () => `,"time":"${new Date(Date.now()).toISOString()}"`,
+	// 	transport: {
+	// 		target: "pino-pretty",
+	// 	},
+	// },
+	logger: false,
 });
 
 server.register(cors, {
@@ -38,7 +39,7 @@ server.setNotFoundHandler(function (req, reply) {
 server.register(fastifySwagger, swaggerConfig);
 
 // server.get("/", (req, res) => res.sendFile("index.html"));
-server.get("/", (req, res) => res.redirect("/main"));
+// server.get("/", (req, res) => res.redirect("/main"));
 server.get("/privacy_policy_page", (req, res) => res.sendFile("PrivatePolicy.html"));
 server.get("/robots.txt", (req, res) => res.sendFile("robots.txt"));
 server.register(routes);
