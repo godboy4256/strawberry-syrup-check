@@ -25,6 +25,7 @@ const null_check_list: any = {
     "disabled",
     "enterDay",
     "retiredDay",
+    "jobCate",
     "sumTwelveMonthSalary",
   ],
   detail_shorts: [

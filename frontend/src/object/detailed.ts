@@ -200,6 +200,8 @@ class DetailedHandler extends InputHandler {
                 : [this._Data.salary]
               : null,
             weekDay,
+            retireReason:
+              this._Data.cal_state === "multi" ? 1 : this._Data.retireReason,
             retiredDay: this._Data.retired
               ? this._Data.retiredDay
               : `${GetDateArr(null)[0]}-${GetDateArr(null)[1]}-${
@@ -223,7 +225,8 @@ class DetailedHandler extends InputHandler {
             hasWork: [false, "hasWork"],
             retired: this._Data.retired,
             workCate: this._Data.workCate,
-            retireReason: this._Data.retireReason,
+            retireReason:
+              this._Data.cal_state === "multi" ? 1 : this._Data.retireReason,
             dayWorkTime: this._Data.dayWorkTime
               ? Number(this._Data.dayWorkTime.split("시간")[0])
               : null,
@@ -258,7 +261,8 @@ class DetailedHandler extends InputHandler {
           ? {
               retired: this._Data.retired,
               workCate: this._Data.workCate,
-              retireReason: this._Data.retireReason,
+              retireReason:
+                this._Data.cal_state === "multi" ? 1 : this._Data.retireReason,
               lastWorkDay: this._Data.lastWorkDay,
               age: isNaN(Number(getAge(new Date(String(this._Data.age))).age))
                 ? null
@@ -297,6 +301,8 @@ class DetailedHandler extends InputHandler {
             }
           : {
               ...this._Data,
+              retireReason:
+                this._Data.cal_state === "multi" ? 1 : this._Data.retireReason,
               isSpecial: false,
               age: isNaN(Number(getAge(new Date(String(this._Data.age))).age))
                 ? null
@@ -322,7 +328,8 @@ class DetailedHandler extends InputHandler {
           ? {
               retired: this._Data.retired,
               workCate: this._Data.workCate,
-              retireReason: this._Data.retireReason,
+              retireReason:
+                this._Data.cal_state === "multi" ? 1 : this._Data.retireReason,
               lastWorkDay: this._Data.lastWorkDay,
               isSpecial: true,
               age: isNaN(Number(getAge(new Date(String(this._Data.age))).age))
@@ -351,6 +358,8 @@ class DetailedHandler extends InputHandler {
           : {
               ...this._Data,
               isSpecial: true,
+              retireReason:
+                this._Data.cal_state === "multi" ? 1 : this._Data.retireReason,
               age: isNaN(Number(getAge(new Date(String(this._Data.age))).age))
                 ? null
                 : getAge(new Date(String(this._Data.age))).age,
@@ -373,6 +382,8 @@ class DetailedHandler extends InputHandler {
         ? {
             retired: this._Data.retired,
             enterDay: this._Data.enterDay ? this._Data.enterDay : null,
+            retireReason:
+              this._Data.cal_state === "multi" ? 1 : this._Data.retireReason,
             age: isNaN(Number(getAge(new Date(String(this._Data.age))).age))
               ? null
               : getAge(new Date(String(this._Data.age))).age,
@@ -403,7 +414,9 @@ class DetailedHandler extends InputHandler {
         : this._Data.workCate === 6 // 자영업자
         ? {
             retireReason: this._Data.retireReason
-              ? this._Data.retireReason
+              ? this._Data.cal_state === "multi"
+                ? 1
+                : this._Data.retireReason
               : null,
             retired: this._Data.retired ? this._Data.retired : null,
             workCate: this._Data.workCate ? this._Data.workCate : null,

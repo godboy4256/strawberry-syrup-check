@@ -79,6 +79,25 @@ const _CompSelectTemplete = ({
   );
 };
 
+export const WorkCatePopup = ({
+  handler,
+  popUpCallBack,
+  popup_focus_template,
+}: any) => {
+  return (
+    <SelectInput
+      label="근로형태 선택"
+      popUpCallBack={popUpCallBack}
+      callBack={handler.SetPageVal}
+      popup_focus_template={popup_focus_template}
+      popup_select={handler.GetPageVal}
+      params="workCate"
+      options={work_cate}
+      type="popup"
+    />
+  );
+};
+
 const WorkTypes = ({ handler }: { handler: any }) => {
   const [workRypeInfo1, setState1] = useState<"select" | "next" | "none">(
     "next"
@@ -89,21 +108,21 @@ const WorkTypes = ({ handler }: { handler: any }) => {
   const [workRypeInfo3, setState3] = useState<"select" | "next" | "none">(
     "none"
   );
+  const popUpCallBack = (params: string, value: string) => {
+    handler.SetPageVal(params, value);
+    if (value === undefined) handler.SetPageVal(params, 0);
+    setState1("select");
+    if (!handler.GetPageVal("retireReason")) setState2("next");
+    ClosePopup();
+  };
   return (
     <>
       <Header title="정보입력" leftLink="/" leftType="BACK" />
       <div id="detail_container_comp1" className="full_height_layout_cal">
         <div className="public_side_padding">
-          <SelectInput
-            label="근로형태 선택"
-            popUpCallBack={(params: string, value: string) => {
-              handler.SetPageVal(params, value);
-              if (value === undefined) handler.SetPageVal(params, 0);
-              setState1("select");
-              if (!handler.GetPageVal("retireReason")) setState2("next");
-              ClosePopup();
-            }}
-            callBack={handler.SetPageVal}
+          <WorkCatePopup
+            handler={handler}
+            popUpCallBack={popUpCallBack}
             popup_focus_template={
               <_CompSelectTemplete
                 level={1}
@@ -111,10 +130,6 @@ const WorkTypes = ({ handler }: { handler: any }) => {
                 selectState={workRypeInfo1}
               />
             }
-            popup_select={handler.GetPageVal}
-            params="workCate"
-            options={work_cate}
-            type="popup"
           />
           <SelectInput
             label="퇴직사유 선택"
