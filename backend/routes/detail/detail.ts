@@ -223,7 +223,9 @@ export default function detailRoute(fastify: FastifyInstance, options: any, done
 		const lastWorkDay = dayjs(req.body.lastWorkDay);
 
 		// 2. 수급 인정/불인정 판단 => 결과만 입력 계산기능 필요
-		const isPermit = artShortCheckPermit(req.body.sumTwoYearWorkDay, req.body.isSpecial);
+		const isPermit = req.body.isSimple
+			? artShortCheckPermit(req.body.sumWorkDay, req.body.isSpecial)
+			: artShortCheckPermit(req.body.sumTwoYearWorkDay, req.body.isSpecial);
 
 		// 3. 수급 불인정 시 불인정 메세지 리턴
 		if (!isPermit[0])
@@ -244,11 +246,11 @@ export default function detailRoute(fastify: FastifyInstance, options: any, done
 		const receiveDay = getReceiveDay(workingYear, req.body.age, req.body.disabled);
 
 		// 7. 급여(일수령액, 월수령액) 계산
-		const { realDayPay, realMonthPay } = calArtPay(
-			req.body.sumOneYearPay,
-			req.body.sumOneYearWorkDay,
-			req.body.isSpecial
-		);
+		const sumOneYearWorkDay = req.body.isSimple
+			? lastWorkDay.diff(lastWorkDay.subtract(1, "year"), "day")
+			: req.body.sumOneYearWorkDay;
+		const { realDayPay, realMonthPay } = calArtPay(req.body.sumOneYearPay, sumOneYearWorkDay, req.body.isSpecial);
+
 		const [requireWorkingYear, nextReceiveDay] = getNextReceiveDay(workingYear, req.body.age, req.body.disabled);
 
 		///////////////////////////////////////////////////////////////

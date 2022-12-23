@@ -21,7 +21,7 @@ export function calArtPay(sumOneYearPay: number[] | number, artWorkingDays: numb
 	return { dayAvgPay, realDayPay, realMonthPay };
 }
 
-export function artShortCheckPermit(sumTwoYearWorkDay: number, isSpecial: boolean = false) {
+export function artShortCheckPermit(sumTwoYearWorkDay: number, isSpecial: boolean = false, isSimple: boolean = false) {
 	if (isSpecial) {
 		if (sumTwoYearWorkDay >= 12) return [true];
 		return [false, sumTwoYearWorkDay, 12 - sumTwoYearWorkDay]; // 인정 여부, 24개월 내 현재 피보험단위 기간, 부족 기간
