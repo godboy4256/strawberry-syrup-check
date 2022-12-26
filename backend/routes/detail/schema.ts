@@ -153,6 +153,7 @@ const employerBodyProp = {
 	},
 	isEnd: { type: "boolean" },
 	limitDay: { type: "string" },
+	isMany: { type: "boolean" }, // 복수형 여부
 };
 
 const employerBodyExamples = [
