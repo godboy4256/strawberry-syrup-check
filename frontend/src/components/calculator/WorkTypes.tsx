@@ -117,7 +117,7 @@ const WorkTypes = ({ handler }: { handler: any }) => {
   };
   return (
     <>
-      <Header title="정보입력" leftLink="/" leftType="BACK" />
+      <Header title="정보입력" leftLink="/main" leftType="BACK" />
       <div id="detail_container_comp1" className="full_height_layout_cal">
         <div className="public_side_padding">
           <WorkCatePopup

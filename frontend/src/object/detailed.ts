@@ -273,22 +273,30 @@ class DetailedHandler extends InputHandler {
                   : this._Data.disabled === "비장애인"
                   ? false
                   : null,
-              sumWorkDay: this.sumWorkDay(this._Data.workRecord),
-              sumTwoYearWorkDay: this.sumOneYearResult(
-                this._Data.workRecord,
-                this._Data.lastWorkDay,
-                "two_year"
-              ),
-              sumOneYearWorkDay: this.sumOneYearResult(
-                this._Data.workRecord,
-                this._Data.lastWorkDay,
-                "day"
-              ),
-              sumOneYearPay: this.sumOneYearResult(
-                this._Data.workRecord,
-                this._Data.lastWorkDay,
-                "pay"
-              ),
+              sumWorkDay: this._Data.workRecord
+                ? this.sumWorkDay(this._Data.workRecord)
+                : " ",
+              sumTwoYearWorkDay: this._Data.workRecord
+                ? this.sumOneYearResult(
+                    this._Data.workRecord,
+                    this._Data.lastWorkDay,
+                    "two_year"
+                  )
+                : " ",
+              sumOneYearWorkDay: this._Data.workRecord
+                ? this.sumOneYearResult(
+                    this._Data.workRecord,
+                    this._Data.lastWorkDay,
+                    "day"
+                  )
+                : " ",
+              sumOneYearPay: this._Data.workRecord
+                ? this.sumOneYearResult(
+                    this._Data.workRecord,
+                    this._Data.lastWorkDay,
+                    "pay"
+                  )
+                : " ",
               isOverTen:
                 this._Data.isOverTen === undefined
                   ? null
@@ -336,22 +344,30 @@ class DetailedHandler extends InputHandler {
                 ? null
                 : getAge(new Date(String(this._Data.age))).age,
               disable: this._Data.disabled === "장애인" ? true : false,
-              sumWorkDay: this.sumWorkDay(this._Data.workRecord),
-              sumTwoYearWorkDay: this.sumOneYearResult(
-                this._Data.workRecord,
-                this._Data.lastWorkDay,
-                "two_year"
-              ),
-              sumOneYearWorkDay: this.sumOneYearResult(
-                this._Data.workRecord,
-                this._Data.lastWorkDay,
-                "day"
-              ),
-              sumOneYearPay: this.sumOneYearResult(
-                this._Data.workRecord,
-                this._Data.lastWorkDay,
-                "pay"
-              ),
+              sumWorkDay: this._Data.workRecord
+                ? this.sumWorkDay(this._Data.workRecord)
+                : " ",
+              sumTwoYearWorkDay: this._Data.workRecord
+                ? this.sumOneYearResult(
+                    this._Data.workRecord,
+                    this._Data.lastWorkDay,
+                    "two_year"
+                  )
+                : " ",
+              sumOneYearWorkDay: this._Data.workRecord
+                ? this.sumOneYearResult(
+                    this._Data.workRecord,
+                    this._Data.lastWorkDay,
+                    "day"
+                  )
+                : " ",
+              sumOneYearPay: this._Data.workRecord
+                ? this.sumOneYearResult(
+                    this._Data.workRecord,
+                    this._Data.lastWorkDay,
+                    "pay"
+                  )
+                : " ",
               isOverTen: this._Data.isOverTen ? this._Data.isOverTen : false,
               hasWork: [false, "2022-10-22"],
             }
