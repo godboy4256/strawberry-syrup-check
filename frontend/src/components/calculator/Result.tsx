@@ -21,6 +21,7 @@ import HelpLink from "../common/HelpLink";
 import Button from "../inputs/Button";
 import Header from "../layout/Header";
 import "../../styles/result.css";
+import { Link } from "react-router-dom";
 
 const _SupplyResult = ({
   emoticon,
@@ -343,12 +344,18 @@ export const ResultComp = ({
           />
         ))}
       <div id="result_button_container">
-        <Button
-          text={result_data.succ ? "N달 더 일하면?" : "복수형 계산기로"}
-          type="popup_cancel"
-          click_func={() => {}}
-        />
-        <Button text="홈으로" type="popup_ok" click_func={() => {}} />
+        {cal_type !== "basic" && (
+          <Link to="/main">
+            <Button
+              text={result_data.succ ? "N달 더 일하면?" : "복수형 계산기로"}
+              type="popup_cancel"
+              click_func={() => {}}
+            />
+          </Link>
+        )}
+        <Link to="/main">
+          <Button text="홈으로" type="popup_ok" click_func={() => {}} />
+        </Link>
       </div>
     </>
   );

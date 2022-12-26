@@ -98,8 +98,8 @@
 #result_button_container {
   display: flex;
 }
-#result_button_container button {
-  width: 50%;
+#result_button_container a {
+  width: 100%;
 }
 #result_unsupply_container {
   width: 100%;
