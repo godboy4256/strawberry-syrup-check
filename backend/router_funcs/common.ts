@@ -42,7 +42,7 @@ export function calLeastPayInfo(
 	const dayAvgPay = Math.ceil(sumSalary / sumLastThreeMonthDays); // 1일 평균 급여액
 	const highLimit = is2023 ? Math.floor(66000 * (dayWorkTime / 8)) : Math.floor(66000 * (dayWorkTime / 8));
 	const lowLimit = is2023 ? Math.floor(61568 * (dayWorkTime / 8)) : Math.floor(60120 * (dayWorkTime / 8));
-	let realDayPay = Math.floor(Math.ceil(dayAvgPay * 0.6) * (Math.ceil((dayWorkTime / 8) * 100) / 100)); // 실업급여 일 수급액
+	let realDayPay = Math.ceil(Math.ceil(dayAvgPay * 0.6) * (Math.ceil((dayWorkTime / 8) * 100) / 100)); // 실업급여 일 수급액
 	if (realDayPay > highLimit) realDayPay = highLimit;
 	if (realDayPay < lowLimit) realDayPay = lowLimit;
 	const realMonthPay = realDayPay * 30; // 실업급여 월 수급액
