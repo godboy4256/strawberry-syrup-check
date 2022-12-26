@@ -18,8 +18,9 @@ export default function standardRoute(fastify: FastifyInstance, options: any, do
 		const retiredDayArray = req.body.retiredDay.split("-");
 
 		// 1. 기본 조건 확인
-		const employmentDate = Math.floor(mainData.retiredDay.diff(mainData.enterDay, "day", true));
+		const employmentDate = Math.floor(mainData.retiredDay.diff(mainData.enterDay, "day", true) + 1);
 		const checkResult = checkBasicRequirements(mainData, employmentDate);
+		console.log("1. ", employmentDate, checkResult);
 		if (!checkResult.succ) return { checkResult };
 
 		// 2. 급여 산정
@@ -27,18 +28,22 @@ export default function standardRoute(fastify: FastifyInstance, options: any, do
 			retiredDayArray[0] === "2023"
 				? calLeastPayInfo(mainData.retiredDay, retiredDayArray, mainData.salary, 8, true)
 				: calLeastPayInfo(mainData.retiredDay, retiredDayArray, mainData.salary, 8);
+		console.log("2. ", dayAvgPay, realDayPay, realMonthPay);
 
 		// 3. 소정급여일수 산정
 		const joinYears = Math.floor(employmentDate / 365);
 		const receiveDay = getReceiveDay(joinYears);
+		console.log("3. ", joinYears, receiveDay);
 
 		// 4. 피보험단위기간 산정
 		const tempLimitDay = mainData.retiredDay.subtract(18, "month");
 		const limitDay = mainData.enterDay.isSameOrAfter(tempLimitDay) ? mainData.enterDay : tempLimitDay;
 		const workingDays = calWorkingDay(limitDay, mainData.retiredDay); // 피보험단위기간
+		console.log("4. ", tempLimitDay.format("YYYY-MM-DD"), limitDay.format("YYYY-MM-DD"), workingDays);
 
 		// 5. 수급 인정/ 불인정에 따라 결과 리턴
 		const leastRequireWorkingDay = 180; // 실업급여를 받기위한 최소 피보험기간
+		console.log("5. ", workingDays < leastRequireWorkingDay);
 		if (workingDays < leastRequireWorkingDay)
 			return getFailResult(
 				mainData.retired,
