@@ -91,6 +91,7 @@ export default function detailRoute(fastify: FastifyInstance, options: any, done
 				realMonthPay,
 				leastRequireWorkingDay,
 				receiveDay,
+				dayAvgPay,
 				true
 			);
 
@@ -101,6 +102,7 @@ export default function detailRoute(fastify: FastifyInstance, options: any, done
 				succ: true,
 				retired: req.body.retired,
 				amountCost: realDayPay * receiveDay,
+				dayAvgPay,
 				realDayPay,
 				receiveDay,
 				realMonthPay,
@@ -113,6 +115,7 @@ export default function detailRoute(fastify: FastifyInstance, options: any, done
 				succ: true,
 				retired: req.body.retired,
 				amountCost: realDayPay * receiveDay,
+				dayAvgPay,
 				realDayPay,
 				receiveDay,
 				realMonthPay,
@@ -166,6 +169,8 @@ export default function detailRoute(fastify: FastifyInstance, options: any, done
 			const result = {
 				succ: false,
 				retired: req.body.retired,
+				dayAvgPay,
+				realDayPay,
 				workingMonths,
 				requireMonths: 0,
 			};
@@ -189,9 +194,11 @@ export default function detailRoute(fastify: FastifyInstance, options: any, done
 				succ: true,
 				retired: req.body.retired,
 				amountCost: realDayPay * receiveDay,
+				dayAvgPay,
 				realDayPay,
 				receiveDay,
 				realMonthPay,
+				workingMonths,
 				severancePay: employmentDate >= 365 ? Math.ceil((dayAvgPay * 30 * employmentDate) / 365) : 0,
 				employmentDate,
 				workDayForMulti,
@@ -201,9 +208,11 @@ export default function detailRoute(fastify: FastifyInstance, options: any, done
 				succ: true,
 				retired: req.body.retired,
 				amountCost: realDayPay * receiveDay,
+				dayAvgPay,
 				realDayPay,
 				receiveDay,
 				realMonthPay,
+				workingMonths,
 				severancePay: employmentDate >= 365 ? Math.ceil((dayAvgPay * 30 * employmentDate) / 365) : 0,
 				employmentDate,
 				needDay: requireWorkingYear * 365 - employmentDate, // 예술인에 맞게 변경필요 피보험 단위기간 관련
@@ -220,36 +229,41 @@ export default function detailRoute(fastify: FastifyInstance, options: any, done
 			return { succ: false, mesg: dayjs(req.body.hasWork[1]).add(14, "day").format("YYYY-MM-DD") };
 		}
 
+		// 2. 급여(일수령액, 월수령액) 계산
 		const lastWorkDay = dayjs(req.body.lastWorkDay);
+		const sumOneYearWorkDay = req.body.isSimple
+			? lastWorkDay.diff(lastWorkDay.subtract(1, "year"), "day")
+			: req.body.sumOneYearWorkDay;
+		const { dayAvgPay, realDayPay, realMonthPay } = calArtPay(
+			req.body.sumOneYearPay,
+			sumOneYearWorkDay,
+			req.body.isSpecial
+		);
 
-		// 2. 수급 인정/불인정 판단 => 결과만 입력 계산기능 필요
+		// 3. 수급 인정/불인정 판단 => 결과만 입력 계산기능 필요
 		const isPermit = req.body.isSimple
 			? artShortCheckPermit(req.body.sumWorkDay, req.body.isSpecial)
 			: artShortCheckPermit(req.body.sumTwoYearWorkDay, req.body.isSpecial);
 
-		// 3. 수급 불인정 시 불인정 메세지 리턴
+		// 4. 수급 불인정 시 불인정 메세지 리턴
 		if (!isPermit[0])
 			return {
 				succ: false,
 				retired: req.body.retired,
+				dayAvgPay,
+				realDayPay,
 				workingMonths: isPermit[1],
 				requireMonths: isPermit[2],
 			};
 
-		////////////////////////////////////////////////////////////////// 새로 작성중
-		// 4. 전체 피보험단위기간 계산
-		////////////////////////////////////////////////////////////////// 새로 작성중
+		//////////////////////////////////////////////////////////////////
+		// 5. 전체 피보험단위기간 계산
+		//////////////////////////////////////////////////////////////////
 
-		// 5. 피보험기간 년수 계산
+		// 6. 피보험기간 년수 계산
 		const workingYear = Math.floor(req.body.sumWorkDay / 12);
-		// 6. 소정급여일수 계산
+		// 7. 소정급여일수 계산
 		const receiveDay = getReceiveDay(workingYear, req.body.age, req.body.disabled);
-
-		// 7. 급여(일수령액, 월수령액) 계산
-		const sumOneYearWorkDay = req.body.isSimple
-			? lastWorkDay.diff(lastWorkDay.subtract(1, "year"), "day")
-			: req.body.sumOneYearWorkDay;
-		const { realDayPay, realMonthPay } = calArtPay(req.body.sumOneYearPay, sumOneYearWorkDay, req.body.isSpecial);
 
 		const [requireWorkingYear, nextReceiveDay] = getNextReceiveDay(workingYear, req.body.age, req.body.disabled);
 
@@ -272,9 +286,11 @@ export default function detailRoute(fastify: FastifyInstance, options: any, done
 				succ: true,
 				retired: req.body.retired,
 				amountCost: realDayPay * receiveDay,
+				dayAvgPay,
 				realDayPay,
 				receiveDay,
 				realMonthPay,
+				workingMonths: req.body.sumWorkDay,
 				workDayForMulti,
 			};
 		}
@@ -282,9 +298,11 @@ export default function detailRoute(fastify: FastifyInstance, options: any, done
 			succ: true,
 			retired: req.body.retired,
 			amountCost: realDayPay * receiveDay,
+			dayAvgPay,
 			realDayPay,
 			receiveDay,
 			realMonthPay,
+			workingMonths: req.body.sumWorkDay,
 			needMonth: Math.floor((requireWorkingYear * 12 - req.body.sumWorkDay) * 10) / 10,
 			nextAmountCost: nextReceiveDay * realDayPay,
 			morePay: nextReceiveDay * realDayPay - realDayPay * receiveDay,
@@ -332,14 +350,22 @@ export default function detailRoute(fastify: FastifyInstance, options: any, done
 		} else {
 			isPermit = dayJobCheckPermit(limitPermitDay, req.body.sumWorkDay, true);
 		}
-		if (!isPermit[0])
-			return { succ: false, retired: mainData.retired, workingDays: isPermit[1], requireDays: isPermit[2] };
 
 		// 4. 급여 산정
-		const { realDayPay, realMonthPay } =
+		const { dayAvgPay, realDayPay, realMonthPay } =
 			mainData.lastWorkDay.get("year") === 2023
 				? calDayJobPay(req.body.dayAvgPay, req.body.dayWorkTime, true)
 				: calDayJobPay(req.body.dayAvgPay, req.body.dayWorkTime);
+
+		if (!isPermit[0])
+			return {
+				succ: false,
+				retired: mainData.retired,
+				workingDays: isPermit[1],
+				requireDays: isPermit[2],
+				realDayPay,
+				dayAvgPay,
+			};
 
 		// 5. 소정급여일수 산정
 		const joinYear = Math.floor(req.body.sumWorkDay / 365);
@@ -352,8 +378,10 @@ export default function detailRoute(fastify: FastifyInstance, options: any, done
 			return {
 				succ: true,
 				amountCost: realDayPay * receiveDay,
+				dayAvgPay,
 				realDayPay,
 				realMonthPay,
+				workingDays: req.body.sumWorkDay,
 				severancePay:
 					req.body.sumWorkDay >= 365 ? Math.ceil((req.body.dayAvgPay * 30 * req.body.sumWorkDay) / 365) : 0,
 			};
@@ -361,9 +389,11 @@ export default function detailRoute(fastify: FastifyInstance, options: any, done
 		return {
 			succ: true,
 			amountCost: realDayPay * receiveDay,
+			dayAvgPay,
 			realDayPay,
 			receiveDay,
 			realMonthPay,
+			workingDays: req.body.sumWorkDay,
 			severancePay:
 				req.body.sumWorkDay >= 365 ? Math.ceil((req.body.dayAvgPay * 30 * req.body.sumWorkDay) / 365) : 0,
 			needDay: requireWorkingYear * 365 - req.body.sumWorkDay,

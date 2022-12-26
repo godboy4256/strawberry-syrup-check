@@ -322,3 +322,5 @@ export function checkJobCate(enterDay: Dayjs, jobCate: number) {
 	if (jobCate >= 15) return enterDay.isSameOrAfter(checkOne) ? enterDay : checkTwo;
 	return enterDay.isSameOrAfter(checkOne) ? enterDay : checkThree;
 }
+
+// export function calLimitDay

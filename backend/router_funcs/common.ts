@@ -58,6 +58,7 @@ export function getFailResult(
 	realMonthPay: number,
 	leastRequireWorkingDay: number,
 	receiveDay: number,
+	dayAvgPay: number,
 	isDetail: boolean = false
 ) {
 	if (retired || isDetail) {
@@ -76,6 +77,7 @@ export function getFailResult(
 		requireDays: leastRequireWorkingDay - workingDays, // 부족 근무일수
 		availableDay, // 피보험기간이 180일이 되는 날
 		amountCost: realDayPay * receiveDay, // 총 수급액: 실업급여 일 수급액 * 소정급여일수
+		dayAvgPay,
 		realDayPay, // 일 수급액
 		receiveDays: receiveDay, // 소정급여일수는 항상 120일로 최소단위 적용
 		realMonthPay, // 월 수급액
@@ -125,3 +127,6 @@ export function calDday(retiredDay: Date, needDay: number) {
 
 	return `${retiredDay.getFullYear()}-${retiredDay.getMonth() + 1}-${retiredDay.getDate()}`;
 }
+
+const retiredDay = dayjs("2022-11-12");
+const limitDay = retiredDay.subtract(18, "month");
