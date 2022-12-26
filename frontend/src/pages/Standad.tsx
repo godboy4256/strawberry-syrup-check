@@ -42,7 +42,7 @@ const _BasicCalComp = () => {
     <div className="full_height_layout_cal">
       <Header
         title={handler.GetPageVal("retired") ? "퇴직자" : "퇴직예정자"}
-        leftLink="/"
+        leftLink="/main"
         leftType="BACK"
       />
       <div className="public_side_padding">

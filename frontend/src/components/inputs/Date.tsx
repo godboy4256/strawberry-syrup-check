@@ -88,7 +88,7 @@ class DateHandler extends InputHandler {
   };
 
   Days_Option_Generater = (year: number, month: number) => {
-    const days_arr = new Array(new Date(year, month, 1).getDay()).fill("");
+    const days_arr = new Array(new Date(year, month - 1, 1).getDay()).fill("");
     const days_count = new Date(year, month, 0).getDate();
     for (let i = 0; i < days_count; i++) {
       days_arr.push(String(i + 1));

@@ -11,7 +11,6 @@ import { Link } from "react-router-dom";
 import Header from "../components/layout/Header";
 import { useState, useEffect, SetStateAction, Dispatch } from "react";
 import "../styles/mainpage.css";
-import Loading from "../components/common/Loading";
 
 interface MainPagesHandler {
   setSlideComment: Dispatch<SetStateAction<number>> | undefined;
@@ -70,7 +69,7 @@ const MainPage = () => {
   };
   return (
     <>
-      <Header title="딸기시럽" leftType="LOGO" leftLink="/" />
+      <Header title="딸기시럽" leftType="LOGO" leftLink="/main" />
       <div id="main_page_container" className="full_height_layout">
         <div>
           <SlideGuideDirection />

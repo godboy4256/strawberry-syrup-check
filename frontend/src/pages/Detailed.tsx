@@ -512,7 +512,7 @@ export const DetailCalComp = ({
 }) => {
   return (
     <div id={`${workCate !== 6 ? "detail_comp_container" : ""}`}>
-      <Header title="정보입력" leftLink="/" leftType="BACK" />
+      <Header title="정보입력" leftLink="/main" leftType="BACK" />
       <div className={`${workCate !== 6 ? "public_side_padding" : ""}`}>
         {workCate !== 6 && (
           <>

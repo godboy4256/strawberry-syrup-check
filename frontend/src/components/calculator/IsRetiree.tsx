@@ -13,7 +13,7 @@ const CalIsRetiree = ({ handler }: { handler: any }) => {
   };
   return (
     <div className="full_height_layout_cal">
-      <Header title="퇴직자 vs 퇴직예정자" leftLink="/" leftType="BACK" />
+      <Header title="퇴직자 vs 퇴직예정자" leftLink="/main" leftType="BACK" />
       <div id="retiree_container">
         <div id="retiree_main">
           <div id="strobarry_character">

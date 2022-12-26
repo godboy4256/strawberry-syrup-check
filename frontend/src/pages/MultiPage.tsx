@@ -6,8 +6,7 @@ import {
   useState,
 } from "react";
 import CalContainer from "../components/calculator/CalContainer";
-import CalIsRetiree from "../components/calculator/IsRetiree";
-import { WorkCatePopup } from "../components/calculator/WorkTypes";
+import WorkTypes, { WorkCatePopup } from "../components/calculator/WorkTypes";
 import { ClosePopup } from "../components/common/Popup";
 import Button from "../components/inputs/Button";
 import Header from "../components/layout/Header";
@@ -124,9 +123,8 @@ const MultiCalPage = () => {
   return (
     <CalContainer type="복수형" GetValue={handler.GetPageVal}>
       <>
-        <Header title="정보 입력" leftLink="/" leftType="BACK" />
-        {compState === 1 && <CalIsRetiree handler={handler} />}
-        {compState === 2 && (
+        <Header title="정보 입력" leftLink="/main" leftType="BACK" />
+        {compState === 1 && (
           <>
             <div className="full_height_layout_cal">
               <div id="multi_top_container">
@@ -148,6 +146,7 @@ const MultiCalPage = () => {
             </div>
           </>
         )}
+        {compState === 2 && <WorkTypes handler={handler} />}
         {compState === 3 && (
           <DetailCalComp
             handler={handler}

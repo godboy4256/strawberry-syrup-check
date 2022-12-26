@@ -218,7 +218,7 @@ export const ResultComp = ({
 }) => {
   return (
     <>
-      <Header title="계산 결과" leftLink="/" leftType="BACK" />
+      <Header title="계산 결과" leftLink="/main" leftType="BACK" />
       {cal_type === 0 &&
         // 정규직
         (result_data.succ ? (
