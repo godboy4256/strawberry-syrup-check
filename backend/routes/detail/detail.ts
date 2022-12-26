@@ -244,7 +244,7 @@ export default function detailRoute(fastify: FastifyInstance, options: any, done
 			sumOneYearWorkDay,
 			req.body.isSpecial
 		);
-		console.log("2. ", lastWorkDay, sumOneYearWorkDay);
+		console.log("2. ", lastWorkDay.format("YYYY-MM-DD"), sumOneYearWorkDay);
 		console.log(dayAvgPay, realDayPay, realMonthPay);
 
 		// 3. 수급 인정/불인정 판단 => 결과만 입력 계산기능 필요
@@ -423,6 +423,7 @@ export default function detailRoute(fastify: FastifyInstance, options: any, done
 			retiredDay: dayjs(req.body.retiredDay),
 		};
 		const retiredDayArr = req.body.retiredDay.split("-").map(Number);
+		console.log(mainData);
 
 		// 기본 조건 확인
 		const employmentDate = Math.floor(mainData.retiredDay.diff(mainData.enterDay, "day", true) + 1);
@@ -527,8 +528,10 @@ export default function detailRoute(fastify: FastifyInstance, options: any, done
 		// 5. 급여 산정(기초일액, 일수령액, 월수령액)
 		const dayAvgPay = Math.floor(sumPay / workingDays); // 기초일액
 		let realDayPay = Math.floor(dayAvgPay * 0.6);
-		if (realDayPay < 60240) realDayPay = 60240;
-		if (realDayPay > 66000) realDayPay = 66000;
+		// if (req.body.isMany) {
+		// 	if (realDayPay < 60240) realDayPay = 60240;
+		// 	if (realDayPay > 66000) realDayPay = 66000;
+		// }
 		const realMonthPay = realDayPay * 30;
 		console.log("5. ", realDayPay, realMonthPay);
 
