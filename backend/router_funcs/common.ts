@@ -84,7 +84,7 @@ export function getFailResult(
 	};
 }
 
-export function getReceiveDay(workingYears: number, age: number = 0, disabled: boolean = false) {
+export function getReceiveDay(workingYears: number, age: number = 15, disabled: boolean = false) {
 	if (age >= 50 || disabled) {
 		if (workingYears < 1) return 120;
 		if (workingYears >= 1 && workingYears < 3) return 180;
