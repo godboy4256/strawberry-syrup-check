@@ -526,8 +526,8 @@ export default function detailRoute(fastify: FastifyInstance, options: any, done
 		console.log("4. ", sumPay);
 
 		// 5. 급여 산정(기초일액, 일수령액, 월수령액)
-		const dayAvgPay = Math.floor(sumPay / workingDays); // 기초일액
-		let realDayPay = Math.floor(dayAvgPay * 0.6);
+		const dayAvgPay = Math.ceil(sumPay / workingDays); // 기초일액
+		let realDayPay = Math.ceil(dayAvgPay * 0.6);
 		// if (req.body.isMany) {
 		// 	if (realDayPay < 60240) realDayPay = 60240;
 		// 	if (realDayPay > 66000) realDayPay = 66000;
