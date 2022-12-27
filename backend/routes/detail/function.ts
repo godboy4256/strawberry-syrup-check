@@ -238,7 +238,7 @@ export function calVeryshortPay(salary: number[], sumLastThreeMonthDays: number,
 	const dayAvgPay = Math.ceil(sumSalary / sumLastThreeMonthDays);
 	const highLimit = Math.floor(66000 * (dayWorkTime / 8));
 	const lowLimit = Math.floor(60120 * (dayWorkTime / 8));
-	let realDayPay = Math.ceil(dayAvgPay * 0.6) * Math.ceil(dayWorkTime / 8); // 급여 계산식 확인, 하한액  60120원, 상한액 66000
+	let realDayPay = Math.ceil(dayAvgPay * 0.6 * (dayWorkTime / 8)); // 급여 계산식 확인, 하한액  60120원, 상한액 66000
 	if (realDayPay > highLimit) realDayPay = highLimit;
 	if (realDayPay < lowLimit) realDayPay = lowLimit;
 	const realMonthPay = realDayPay * 30;

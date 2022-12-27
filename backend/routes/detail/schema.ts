@@ -58,7 +58,7 @@ export type TveryShortInput = {
 	enterDay: Dayjs;
 	retiredDay: Dayjs;
 	weekDay: number[]; // 주의
-	dayWorkTime: number;
+	weekWorkTime: number;
 	salary: number[];
 	isEnd: boolean;
 	limitDay: string;
@@ -139,11 +139,13 @@ const veryShortBodyProp = {
 	enterDay: DefineParamInfo.enterDay,
 	retiredDay: DefineParamInfo.retiredDay,
 	weekDay: DefineParamInfo.weekDay, // 주의
-	dayWorkTime: DefineParamInfo.weekWorkTime,
+	weekWorkTime: { type: "number" },
 	salary: DefineParamInfo.salary,
 	isEnd: { type: "boolean" },
 	limitDay: { type: "string" },
 };
+
+// dayWorkTime: DefineParamInfo.weekWorkTime,
 
 const employerBodyProp = {
 	enterDay: DefineParamInfo.enterDay,
@@ -153,6 +155,7 @@ const employerBodyProp = {
 	},
 	isEnd: { type: "boolean" },
 	limitDay: { type: "string" },
+	isMany: { type: "boolean" }, // 복수형 여부
 };
 
 const employerBodyExamples = [

@@ -244,7 +244,7 @@ export default function detailRoute(fastify: FastifyInstance, options: any, done
 			sumOneYearWorkDay,
 			req.body.isSpecial
 		);
-		console.log("2. ", lastWorkDay, sumOneYearWorkDay);
+		console.log("2. ", lastWorkDay.format("YYYY-MM-DD"), sumOneYearWorkDay);
 		console.log(dayAvgPay, realDayPay, realMonthPay);
 
 		// 3. 수급 인정/불인정 판단 => 결과만 입력 계산기능 필요
@@ -423,11 +423,17 @@ export default function detailRoute(fastify: FastifyInstance, options: any, done
 			retiredDay: dayjs(req.body.retiredDay),
 		};
 		const retiredDayArr = req.body.retiredDay.split("-").map(Number);
+		console.log(mainData);
 
 		// 기본 조건 확인
 		const employmentDate = Math.floor(mainData.retiredDay.diff(mainData.enterDay, "day", true) + 1);
 		const checkResult = checkBasicRequirements(mainData, employmentDate);
 		if (!checkResult.succ) return { checkResult };
+
+		// 초단 시간 추가 조건 확인
+		if (mainData.weekDay.length > 2) return { succ: false, mesg: "주 근로일수 2일을 초과할 수 없습니다." };
+		if (mainData.weekWorkTime >= 15)
+			return { succ: false, mesg: "주 근무시간이 15시간이상이라면 초단시간으로 인정받을 수 없습니다." };
 
 		// 24개월 내에 피보험 단위 기간
 		const limitDay = mainData.retiredDay.subtract(24, "month");
@@ -455,11 +461,8 @@ export default function detailRoute(fastify: FastifyInstance, options: any, done
 		console.log("5. ", sumLastThreeMonthDays);
 
 		// 급여 산정
-		const { realDayPay, realMonthPay } = calVeryshortPay(
-			mainData.salary,
-			sumLastThreeMonthDays,
-			mainData.dayWorkTime
-		);
+		const dayWorkTime = Math.floor((mainData.weekWorkTime / mainData.weekDay.length) * 10) * 10;
+		const { realDayPay, realMonthPay } = calVeryshortPay(mainData.salary, sumLastThreeMonthDays, dayWorkTime);
 		console.log("6. ", realDayPay, realMonthPay);
 
 		// 소정급여일수 산정
@@ -525,10 +528,12 @@ export default function detailRoute(fastify: FastifyInstance, options: any, done
 		console.log("4. ", sumPay);
 
 		// 5. 급여 산정(기초일액, 일수령액, 월수령액)
-		const dayAvgPay = Math.floor(sumPay / workingDays); // 기초일액
-		let realDayPay = Math.floor(dayAvgPay * 0.6);
-		if (realDayPay < 60240) realDayPay = 60240;
-		if (realDayPay > 66000) realDayPay = 66000;
+		const dayAvgPay = Math.ceil(sumPay / workingDays); // 기초일액
+		let realDayPay = Math.ceil(dayAvgPay * 0.6);
+		// if (req.body.isMany) {
+		// 	if (realDayPay < 60240) realDayPay = 60240;
+		// 	if (realDayPay > 66000) realDayPay = 66000;
+		// }
 		const realMonthPay = realDayPay * 30;
 		console.log("5. ", realDayPay, realMonthPay);
 
