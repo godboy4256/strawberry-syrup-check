@@ -149,6 +149,7 @@ export const DefineParamInfo = {
 		items: {
 			type: "number",
 		},
+		maxItems: 7,
 	},
 	dayWorkTime: {
 		type: "number",

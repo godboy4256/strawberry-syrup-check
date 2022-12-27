@@ -430,6 +430,11 @@ export default function detailRoute(fastify: FastifyInstance, options: any, done
 		const checkResult = checkBasicRequirements(mainData, employmentDate);
 		if (!checkResult.succ) return { checkResult };
 
+		// 초단 시간 추가 조건 확인
+		if (mainData.weekDay.length > 2) return { succ: false, mesg: "주 근로일수 2일을 초과할 수 없습니다." };
+		if (mainData.weekWorkTime >= 15)
+			return { succ: false, mesg: "주 근무시간이 15시간이상이라면 초단시간으로 인정받을 수 없습니다." };
+
 		// 24개월 내에 피보험 단위 기간
 		const limitDay = mainData.retiredDay.subtract(24, "month");
 		const permitWorkDay = mainData.enterDay.isSameOrAfter(limitDay)
@@ -456,11 +461,8 @@ export default function detailRoute(fastify: FastifyInstance, options: any, done
 		console.log("5. ", sumLastThreeMonthDays);
 
 		// 급여 산정
-		const { realDayPay, realMonthPay } = calVeryshortPay(
-			mainData.salary,
-			sumLastThreeMonthDays,
-			mainData.dayWorkTime
-		);
+		const dayWorkTime = Math.floor((mainData.weekWorkTime / mainData.weekDay.length) * 10) * 10;
+		const { realDayPay, realMonthPay } = calVeryshortPay(mainData.salary, sumLastThreeMonthDays, dayWorkTime);
 		console.log("6. ", realDayPay, realMonthPay);
 
 		// 소정급여일수 산정
