@@ -38,6 +38,7 @@ import {
 	makeEmployerJoinInfo,
 	calEmployerSumPay,
 	checkJobCate,
+	getNextEmployerReceiveDay,
 } from "./function";
 
 dayjs.extend(isSameOrAfter);
@@ -121,10 +122,11 @@ export default function detailRoute(fastify: FastifyInstance, options: any, done
 				realMonthPay,
 				severancePay: employmentDate >= 1 ? Math.ceil(dayAvgPay * 30 * (employmentDate / 365)) : 0,
 				workingDays,
-				needDay: calDday(
+				needDay: requireWorkingYear * 365 - employmentDate,
+				availableDay: calDday(
 					new Date(mainData.retiredDay.format("YYYY-MM-DD")),
 					requireWorkingYear * 365 - workingDays
-				)[1],
+				),
 				nextAmountCost: nextReceiveDay * realDayPay,
 				morePay: nextReceiveDay * realDayPay - receiveDay * realDayPay,
 				workDayForMulti, // 복수형에서만 사용
@@ -413,6 +415,7 @@ export default function detailRoute(fastify: FastifyInstance, options: any, done
 				req.body.sumWorkDay >= 365 ? Math.ceil(req.body.dayAvgPay * 30 * (req.body.sumWorkDay / 365)) : 0,
 			needDay: requireWorkingYear * 365 - req.body.sumWorkDay,
 			nextAmountCost: nextReceiveDay * realDayPay,
+			morePay: nextReceiveDay * realDayPay - receiveDay * realDayPay,
 		};
 	});
 
@@ -500,6 +503,7 @@ export default function detailRoute(fastify: FastifyInstance, options: any, done
 			realMonthPay,
 			needDay: requireWorkingYear * 365 - allWorkDay,
 			nextAmountCost: nextReceiveDay * realDayPay,
+			morePay: nextReceiveDay * realDayPay - receiveDay * realDayPay,
 			workDayForMulti,
 		};
 	});
@@ -552,7 +556,20 @@ export default function detailRoute(fastify: FastifyInstance, options: any, done
 		}
 		console.log("7. ", workDayForMulti);
 
+		const [requireWorkingYear, nextReceiveDay] = getNextEmployerReceiveDay(workYear);
+
 		// 8. 결과 리턴, 퇴직금, 다음 단계 없음
+		if (nextReceiveDay === 0)
+			return {
+				succ: true,
+				retired: req.body.retired,
+				amountCost: realDayPay * receiveDay,
+				realDayPay,
+				receiveDay,
+				realMonthPay,
+				workingDays,
+				workDayForMulti,
+			};
 		return {
 			succ: true,
 			retired: req.body.retired,
@@ -561,6 +578,9 @@ export default function detailRoute(fastify: FastifyInstance, options: any, done
 			receiveDay,
 			realMonthPay,
 			workingDays,
+			needDay: requireWorkingYear * 365 - workingDays,
+			nextAmountCost: nextReceiveDay * realDayPay,
+			morePay: nextReceiveDay * realDayPay - receiveDay * realDayPay,
 			workDayForMulti,
 		};
 	});
