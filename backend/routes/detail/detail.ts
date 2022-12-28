@@ -445,15 +445,9 @@ export default function detailRoute(fastify: FastifyInstance, options: any, done
 			: calVeryShortWorkDay(limitDay, mainData.retiredDay, mainData.weekDay);
 		console.log("2. ", limitDay.format("YYYY-MM-DD"), permitWorkDay);
 
-		// 수급 인정/ 불인정 판단
-		const isPermit = permitWorkDay >= 180 ? [true] : [false, permitWorkDay, 180 - permitWorkDay];
-		console.log("3. ", isPermit);
-		if (!isPermit[0])
-			return { succ: false, retired: mainData.retired, workingDays: isPermit[1], requireDays: isPermit[2] };
-
 		// 전체 피보험 단위 기간
 		const allWorkDay = calVeryShortWorkDay(mainData.enterDay, mainData.retiredDay, req.body.weekDay);
-		console.log("4. ", allWorkDay);
+		console.log("3. ", allWorkDay);
 
 		// 퇴사일 전 3개월 총일수
 		let sumLastThreeMonthDays = 0;
@@ -461,12 +455,29 @@ export default function detailRoute(fastify: FastifyInstance, options: any, done
 			const month = mainData.retiredDay.subtract(i, "month").month() + 1; // 이게 정상 작동한다면 calLeastPayInfo의 수정이 필요함
 			sumLastThreeMonthDays += new Date(retiredDayArr[0], month, 0).getDate();
 		}
-		console.log("5. ", sumLastThreeMonthDays);
+		console.log("4. ", sumLastThreeMonthDays);
 
 		// 급여 산정
 		const dayWorkTime = Math.floor((mainData.weekWorkTime / mainData.weekDay.length) * 10) * 10;
-		const { realDayPay, realMonthPay } = calVeryshortPay(mainData.salary, sumLastThreeMonthDays, dayWorkTime);
-		console.log("6. ", realDayPay, realMonthPay);
+		const { dayAvgPay, realDayPay, realMonthPay } = calVeryshortPay(
+			mainData.salary,
+			sumLastThreeMonthDays,
+			dayWorkTime
+		);
+		console.log("5. ", realDayPay, realMonthPay);
+
+		// 수급 인정/ 불인정 판단
+		const isPermit = permitWorkDay >= 180 ? [true] : [false, permitWorkDay, 180 - permitWorkDay];
+		console.log("6. ", isPermit);
+		if (!isPermit[0])
+			return {
+				succ: false,
+				retired: mainData.retired,
+				workingDays: isPermit[1],
+				requireDays: isPermit[2],
+				realDayPay,
+				dayAvgPay,
+			};
 
 		// 소정급여일수 산정
 		const workingYears = Math.floor(allWorkDay / 365);
@@ -534,10 +545,10 @@ export default function detailRoute(fastify: FastifyInstance, options: any, done
 		// 5. 급여 산정(기초일액, 일수령액, 월수령액)
 		const dayAvgPay = Math.ceil(sumPay / workingDays); // 기초일액
 		let realDayPay = Math.ceil(dayAvgPay * 0.6);
-		// if (req.body.isMany) {
-		// 	if (realDayPay < 60240) realDayPay = 60240;
-		// 	if (realDayPay > 66000) realDayPay = 66000;
-		// }
+		if (req.body.isMany) {
+			if (realDayPay < 60240) realDayPay = 60240;
+			if (realDayPay > 66000) realDayPay = 66000;
+		}
 		const realMonthPay = realDayPay * 30;
 		console.log("5. ", realDayPay, realMonthPay);
 
