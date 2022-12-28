@@ -1,12 +1,19 @@
+#multi_container {
+  min-height: calc(100vh - 177px);
+}
+
 #multi_top_container {
   padding: 0 15px;
 }
 #multi_top_container > div {
   width: 100%;
-  height: 140px;
+  min-height: 140px;
+  padding: 30px;
   border-radius: 4px;
   background-color: #ffe3e2;
   border: 1px solid #d13b30;
+  display: flex;
+  flex-wrap: wrap;
 }
 #multi_company_list {
   padding-top: 15px;
@@ -74,4 +81,27 @@
 #company_add_btn .add_mark span:last-of-type {
   width: 12px;
   height: 2px;
+}
+
+.multi_top_emoticon {
+  width: 30%;
+  margin-right: 5%;
+  margin-bottom: 20px;
+}
+.multi_top_emoticon:nth-child(3n) {
+  margin-right: 0%;
+}
+.multi_mainselect_card {
+  border: 1px solid #ff6559;
+  border-radius: 2px;
+  padding: 13px 20px;
+  margin-bottom: 15px;
+  display: flex;
+  justify-content: space-between;
+}
+#multi_select_container {
+  text-align: center;
+}
+#multi_select_container > div:first-child {
+  margin-bottom: 15px;
 }

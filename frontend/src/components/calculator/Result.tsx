@@ -213,12 +213,26 @@ export const ResultComp = ({
   cal_type,
   result_data,
 }: {
-  cal_type: 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | "basic";
+  cal_type: 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | "basic" | "multi";
   result_data: any;
 }) => {
   return (
     <>
       <Header title="계산 결과" leftLink="/main" leftType="BACK" />
+      {cal_type === "multi" &&
+        // 정규직
+        (result_data.succ ? (
+          <_SupplyResult
+            result_data={result_data}
+            emoticon={EMTDetailFullTimeSupply}
+          />
+        ) : (
+          <_UnSupplyResult
+            emoticon={EMTDetailFullTimeUnSupply}
+            unit="day"
+            result_data={result_data}
+          />
+        ))}
       {cal_type === 0 &&
         // 정규직
         (result_data.succ ? (
