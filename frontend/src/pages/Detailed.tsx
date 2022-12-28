@@ -574,13 +574,16 @@ const DetailCalPage = () => {
               <DetailCalComp
                 handler={handler}
                 workCate={handler.GetPageVal("workCate")}
-                clickCallBack={handler.Action_Cal_Result}
+                clickCallBack={async () => {
+                  const result_data = await handler.Action_Cal_Result();
+                  handler.SetPageVal("result", result_data);
+                }}
               />
             )}
             {compState === 4 && (
               <ResultComp
                 cal_type={handler.GetPageVal("workCate")}
-                result_data={handler.result}
+                result_data={handler.GetPageVal("result")}
               />
             )}
           </>
