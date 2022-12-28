@@ -191,6 +191,9 @@ const _DetailCal01 = ({ handler }: { handler: any }) => {
 };
 
 const _DetailCal02 = ({ handler }: { handler: any }) => {
+  useEffect(() => {
+    handler.SetPageVal("input", "개별 입력");
+  }, []);
   return (
     <>
       <Check
@@ -301,7 +304,9 @@ const _DetailCal02 = ({ handler }: { handler: any }) => {
   );
 };
 const _DetailCal03 = ({ handler }: { handler: any }) => {
-  console.log(handler.GetPageVal("workCate"));
+  useEffect(() => {
+    handler.SetPageVal("input", "개별 입력");
+  }, []);
   return (
     <_Belong_Form_Tab
       callBack={handler.SetPageVal}

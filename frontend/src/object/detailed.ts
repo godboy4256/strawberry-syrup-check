@@ -150,7 +150,7 @@ class DetailedHandler extends InputHandler {
     }
     return answer;
   };
-  public Action_Cal_Result = async () => {
+  public Action_Cal_Result = () => {
     const weekDay =
       this._Data.weekDay &&
       Object.values(this._Data.weekDay).map((el) => {
@@ -219,6 +219,12 @@ class DetailedHandler extends InputHandler {
             age: isNaN(Number(getAge(new Date(String(this._Data.age))).age))
               ? null
               : getAge(new Date(String(this._Data.age))).age,
+            limitDay: new Date(
+              new Date(this._Data.retiredDay).setMonth(
+                new Date().getMonth() - 18
+              )
+            ),
+            isEnd: this._Data.cal_state ? true : false,
           }
         : this._Data.workCate === 2 // 일용직
         ? {
@@ -255,6 +261,14 @@ class DetailedHandler extends InputHandler {
             dayAvgPay: this._Data.workRecord
               ? this.sumDayJobWorkingDay(this._Data.workRecord)[1]
               : this._Data.dayAvgPay,
+            limitDay: new Date(
+              new Date(
+                this._Data.retiredDay
+                  ? this._Data.retiredDay
+                  : this._Data.lastWorkDay
+              ).setMonth(new Date().getMonth() - 18)
+            ),
+            isEnd: this._Data.cal_state ? true : false,
           }
         : this._Data.workCate === 3 // 예술인
         ? this._Data.is_short === "단기예술인"
@@ -304,8 +318,12 @@ class DetailedHandler extends InputHandler {
                   ? this._Data.isOverTen
                   : false,
               hasWork: [false, "2022-10-22"],
-              isEnd: true,
-              limitDay: "2022-12-21",
+              limitDay: new Date(
+                new Date(this._Data.retiredDay).setMonth(
+                  new Date().getMonth() - 24
+                )
+              ),
+              isEnd: this._Data.cal_state ? true : false,
             }
           : {
               ...this._Data,
@@ -329,7 +347,13 @@ class DetailedHandler extends InputHandler {
                 : `${GetDateArr(null)[0]}-${GetDateArr(null)[1]}-${
                     GetDateArr(null)[2]
                   }`,
-              jobCate: 1, // 특고와 예술인은 같은 was path를 사용하기 때문에 임의로 아무 숫자를 준다.
+              jobCate: 1,
+              limitDay: new Date(
+                new Date(this._Data.retiredDay).setMonth(
+                  new Date().getMonth() - 24
+                )
+              ),
+              isEnd: this._Data.cal_state ? true : false,
             }
         : this._Data.workCate === 4 // 특고
         ? this._Data.is_short === "단기특고"
@@ -393,6 +417,12 @@ class DetailedHandler extends InputHandler {
                 : `${GetDateArr(null)[0]}-${GetDateArr(null)[1]}-${
                     GetDateArr(null)[2]
                   }`,
+              limitDay: new Date(
+                new Date(this._Data.retiredDay).setMonth(
+                  new Date().getMonth() - 24
+                )
+              ),
+              isEnd: this._Data.cal_state ? true : false,
             }
         : this._Data.workCate === 5 // 초단 시간
         ? {
@@ -426,6 +456,12 @@ class DetailedHandler extends InputHandler {
               : null,
             time: this._Data.time ? this._Data.time : null,
             week: this._Data.week ? this._Data.week : null,
+            limitDay: new Date(
+              new Date(this._Data.retiredDay).setMonth(
+                new Date().getMonth() - 24
+              )
+            ),
+            isEnd: this._Data.cal_state ? true : false,
           }
         : this._Data.workCate === 6 // 자영업자
         ? {
@@ -450,6 +486,12 @@ class DetailedHandler extends InputHandler {
                     )
                   : null
                 : null,
+            limitDay: new Date(
+              new Date(this._Data.retiredDay).setMonth(
+                new Date().getMonth() - 24
+              )
+            ),
+            isEnd: this._Data.cal_state ? true : false,
           }
         : {};
     const validCheckType =
@@ -475,14 +517,18 @@ class DetailedHandler extends InputHandler {
     delete to_server.week;
     delete to_server.time;
 
-    this.result = await sendToServer(url, to_server);
     if (this._Data.workCate === 3 || this._Data.workCate === 4) {
       this.result["is_short"] = this._Data.is_short;
     }
-    this.setCompState && this.setCompState(5);
-    setTimeout(() => {
-      this.setCompState && this.setCompState(4);
-    }, 2000);
+    if (this._Data.cal_state !== "multi") {
+      this.setCompState && this.setCompState(5);
+      setTimeout(() => {
+        this.setCompState && this.setCompState(4);
+      }, 2000);
+      this.SetPageVal("result", this.result);
+    }
+
+    return sendToServer(url, to_server);
   };
 }
 
