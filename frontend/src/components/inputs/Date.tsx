@@ -436,7 +436,7 @@ const _IndiviualInput = ({
         className={total ? "total" : ""}
         placeholder="근로일수"
         onChange={(e: ChangeEvent<HTMLInputElement>) =>
-          onChangeInput("day", e.currentTarget.value)
+          onChangeInput(pay ? "three_mbp" : "day", e.currentTarget.value)
         }
       />
       {pay && (
@@ -456,11 +456,14 @@ export const DateInputIndividual = ({
   handler,
   lastWorkDay,
   type,
+  year,
 }: {
   handler: any;
   lastWorkDay: Date;
   type: number;
+  year: number | string;
 }) => {
+  console.log(String(year), String(GetDateArr(lastWorkDay)[0]));
   const [direction, setDirection] = useState(1);
   const lastMonth = GetDateArr(lastWorkDay)[1];
   const month_arr = Month_Calculator(lastMonth, "before", 12);
@@ -590,7 +593,7 @@ export const DateInputIndividual = ({
         </>
       ) : (
         type === 2 && (
-          <div className="date_indiviual_container">
+          <div>
             {direction === 1 ? (
               <>
                 <button
@@ -601,25 +604,53 @@ export const DateInputIndividual = ({
                 </button>
                 <div className="date_indiviual_page">
                   <div>
-                    <div className="indiviual_input_header total">
+                    <div
+                      className={`indiviual_input_header ${
+                        String(GetDateArr(lastWorkDay)[0]) === String(year)
+                          ? "total"
+                          : ""
+                      }`}
+                    >
                       {month_arr_splice[3]}월
                     </div>
                     <_IndiviualInput
-                      total={true}
+                      total={
+                        String(GetDateArr(lastWorkDay)[0]) === String(year)
+                          ? true
+                          : false
+                      }
                       callBack={handler.SetPageVal}
                       params={`${month_arr_splice[3]}`}
-                      pay={true}
+                      pay={
+                        String(GetDateArr(lastWorkDay)[0]) === String(year)
+                          ? true
+                          : false
+                      }
                     />
                   </div>
                   <div>
-                    <div className="indiviual_input_header total">
+                    <div
+                      className={`indiviual_input_header ${
+                        String(GetDateArr(lastWorkDay)[0]) === String(year)
+                          ? "total"
+                          : ""
+                      }`}
+                    >
                       {month_arr_splice[2]}월
                     </div>
                     <_IndiviualInput
-                      total={true}
+                      total={
+                        String(GetDateArr(lastWorkDay)[0]) === String(year)
+                          ? true
+                          : false
+                      }
                       callBack={handler.SetPageVal}
                       params={`${month_arr_splice[2]}`}
-                      pay={true}
+                      pay={
+                        String(GetDateArr(lastWorkDay)[0]) === String(year)
+                          ? true
+                          : false
+                      }
                     />
                   </div>
                   <div className="unset_indiviual_input">
@@ -627,14 +658,18 @@ export const DateInputIndividual = ({
                       {month_arr_splice[1]}월
                     </div>
                     <div className="unset_box">UnSet</div>
-                    <div className="unset_box">UnSet</div>
+                    {String(GetDateArr(lastWorkDay)[0]) === String(year) && (
+                      <div className="unset_box">UnSet</div>
+                    )}
                   </div>
                   <div className="unset_indiviual_input">
                     <div className="indiviual_input_header">
                       {month_arr_splice[0]}월
                     </div>
                     <div className="unset_box">UnSet</div>
-                    <div className="unset_box">UnSet</div>
+                    {String(GetDateArr(lastWorkDay)[0]) === String(year) && (
+                      <div className="unset_box">UnSet</div>
+                    )}
                   </div>
                 </div>
               </>
@@ -675,14 +710,24 @@ export const DateInputIndividual = ({
                     />
                   </div>
                   <div>
-                    <div className="indiviual_input_header total">
+                    <div
+                      className={`indiviual_input_header ${
+                        String(GetDateArr(lastWorkDay)[0]) === String(year)
+                          ? "total"
+                          : ""
+                      }`}
+                    >
                       {month_arr_splice[4]} 월
                     </div>
                     <_IndiviualInput
                       total={true}
                       callBack={handler.SetPageVal}
-                      params={`${month_arr_splice[2]}`}
-                      pay={true}
+                      params={`${month_arr_splice[4]}`}
+                      pay={
+                        String(GetDateArr(lastWorkDay)[0]) === String(year)
+                          ? true
+                          : false
+                      }
                     />
                   </div>
                 </div>

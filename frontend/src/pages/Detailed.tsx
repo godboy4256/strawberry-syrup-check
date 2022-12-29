@@ -44,6 +44,7 @@ const IndividualInput = ({
         type={handler.GetPageVal("workCate")}
         handler={handler2}
         lastWorkDay={handler.GetPageVal("lastWorkDay")}
+        year={year}
       />,
       "confirm",
       () => {

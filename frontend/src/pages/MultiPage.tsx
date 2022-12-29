@@ -80,8 +80,10 @@ class MultiCalHandler extends DetailedHandler {
       }
     });
     this.SetPageVal("companys_list", select_company);
-    if (to_server_unit.succ) {
+    if (to_server_unit.hasOwnProperty("succ")) {
       this.setCompState && this.setCompState(1);
+    } else {
+      return;
     }
   };
 }
