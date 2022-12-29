@@ -21,11 +21,21 @@ export default function multiRoute(fastify: FastifyInstance, options: any, done:
 		const mainEnterDay = dayjs(mainData.enterDay);
 		const mainRetiredDay = dayjs(mainData.retiredDay);
 		const joinDays = mainRetiredDay.diff(mainEnterDay, "day"); // 재직일수 퇴직금 계산용
+		console.log(mainData, addDatas);
 
 		// 1. 기본 조건 확인
 		console.log("start" + 1);
 		const checkResult = checkBasicRequirements(mainData);
 		if (!checkResult.succ) return { checkResult };
+
+		/////////////////////////////////////////////////////////// 자영업자 관련 조건 확인
+		if (mainData.workCate === 8) {
+			let check = false;
+			const a = addDatas.filter((el, idx, arr) => el.workCate === 8);
+			console.log(a);
+		}
+
+		///////////////////////////////////////////////////////////
 
 		// 2. 마지막 직장의 입사일과 전직장의 이직일 사이 기간이 3년을 초과하는 지 확인 & 다음 근로 정보가 3년을 초과하는 경우 가장 최근 근로 정보만 이용해서 계산
 		console.log("start" + 2);
@@ -51,18 +61,6 @@ export default function multiRoute(fastify: FastifyInstance, options: any, done:
 		console.log("start" + 5);
 		if (permitAddCandidates.length !== 0 && permitAddCandidates[permitAddCandidates.length - 1].isIrregular)
 			return { succ: false, mesg: "isIrregular" };
-
-		/////////////////////////////////////////////////////////// 자영업자 관련 조건 확인
-		// if (mainData.workCate === 8) {
-		// 	let check = false;
-		// 	const select = mainData.workCate; // 자영업을 선택하는 경우
-		// 	permitAddCandidates.map((el, idx, arr) => {
-		// 		if (el.workCate === 4 || el.workCate === 5 || el.workCate === 6) {
-		// 		}
-		// 		return check;
-		// 	});
-		// }
-		///////////////////////////////////////////////////////////
 
 		// 6. 이중취득 여부 확인
 		console.log("start" + 6);
