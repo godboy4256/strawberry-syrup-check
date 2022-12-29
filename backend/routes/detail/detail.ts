@@ -38,6 +38,7 @@ import {
 	makeEmployerJoinInfo,
 	calEmployerSumPay,
 	checkJobCate,
+	getNextEmployerReceiveDay,
 } from "./function";
 
 dayjs.extend(isSameOrAfter);
@@ -121,10 +122,11 @@ export default function detailRoute(fastify: FastifyInstance, options: any, done
 				realMonthPay,
 				severancePay: employmentDate >= 1 ? Math.ceil(dayAvgPay * 30 * (employmentDate / 365)) : 0,
 				workingDays,
-				needDay: calDday(
+				needDay: requireWorkingYear * 365 - employmentDate,
+				availableDay: calDday(
 					new Date(mainData.retiredDay.format("YYYY-MM-DD")),
 					requireWorkingYear * 365 - workingDays
-				)[1],
+				),
 				nextAmountCost: nextReceiveDay * realDayPay,
 				morePay: nextReceiveDay * realDayPay - receiveDay * realDayPay,
 				workDayForMulti, // 복수형에서만 사용
@@ -413,6 +415,7 @@ export default function detailRoute(fastify: FastifyInstance, options: any, done
 				req.body.sumWorkDay >= 365 ? Math.ceil(req.body.dayAvgPay * 30 * (req.body.sumWorkDay / 365)) : 0,
 			needDay: requireWorkingYear * 365 - req.body.sumWorkDay,
 			nextAmountCost: nextReceiveDay * realDayPay,
+			morePay: nextReceiveDay * realDayPay - receiveDay * realDayPay,
 		};
 	});
 
@@ -442,15 +445,9 @@ export default function detailRoute(fastify: FastifyInstance, options: any, done
 			: calVeryShortWorkDay(limitDay, mainData.retiredDay, mainData.weekDay);
 		console.log("2. ", limitDay.format("YYYY-MM-DD"), permitWorkDay);
 
-		// 수급 인정/ 불인정 판단
-		const isPermit = permitWorkDay >= 180 ? [true] : [false, permitWorkDay, 180 - permitWorkDay];
-		console.log("3. ", isPermit);
-		if (!isPermit[0])
-			return { succ: false, retired: mainData.retired, workingDays: isPermit[1], requireDays: isPermit[2] };
-
 		// 전체 피보험 단위 기간
 		const allWorkDay = calVeryShortWorkDay(mainData.enterDay, mainData.retiredDay, req.body.weekDay);
-		console.log("4. ", allWorkDay);
+		console.log("3. ", allWorkDay);
 
 		// 퇴사일 전 3개월 총일수
 		let sumLastThreeMonthDays = 0;
@@ -458,12 +455,29 @@ export default function detailRoute(fastify: FastifyInstance, options: any, done
 			const month = mainData.retiredDay.subtract(i, "month").month() + 1; // 이게 정상 작동한다면 calLeastPayInfo의 수정이 필요함
 			sumLastThreeMonthDays += new Date(retiredDayArr[0], month, 0).getDate();
 		}
-		console.log("5. ", sumLastThreeMonthDays);
+		console.log("4. ", sumLastThreeMonthDays);
 
 		// 급여 산정
 		const dayWorkTime = Math.floor((mainData.weekWorkTime / mainData.weekDay.length) * 10) * 10;
-		const { realDayPay, realMonthPay } = calVeryshortPay(mainData.salary, sumLastThreeMonthDays, dayWorkTime);
-		console.log("6. ", realDayPay, realMonthPay);
+		const { dayAvgPay, realDayPay, realMonthPay } = calVeryshortPay(
+			mainData.salary,
+			sumLastThreeMonthDays,
+			dayWorkTime
+		);
+		console.log("5. ", realDayPay, realMonthPay);
+
+		// 수급 인정/ 불인정 판단
+		const isPermit = permitWorkDay >= 180 ? [true] : [false, permitWorkDay, 180 - permitWorkDay];
+		console.log("6. ", isPermit);
+		if (!isPermit[0])
+			return {
+				succ: false,
+				retired: mainData.retired,
+				workingDays: isPermit[1],
+				requireDays: isPermit[2],
+				realDayPay,
+				dayAvgPay,
+			};
 
 		// 소정급여일수 산정
 		const workingYears = Math.floor(allWorkDay / 365);
@@ -500,6 +514,7 @@ export default function detailRoute(fastify: FastifyInstance, options: any, done
 			realMonthPay,
 			needDay: requireWorkingYear * 365 - allWorkDay,
 			nextAmountCost: nextReceiveDay * realDayPay,
+			morePay: nextReceiveDay * realDayPay - receiveDay * realDayPay,
 			workDayForMulti,
 		};
 	});
@@ -530,10 +545,10 @@ export default function detailRoute(fastify: FastifyInstance, options: any, done
 		// 5. 급여 산정(기초일액, 일수령액, 월수령액)
 		const dayAvgPay = Math.ceil(sumPay / workingDays); // 기초일액
 		let realDayPay = Math.ceil(dayAvgPay * 0.6);
-		// if (req.body.isMany) {
-		// 	if (realDayPay < 60240) realDayPay = 60240;
-		// 	if (realDayPay > 66000) realDayPay = 66000;
-		// }
+		if (req.body.isMany) {
+			if (realDayPay < 60240) realDayPay = 60240;
+			if (realDayPay > 66000) realDayPay = 66000;
+		}
 		const realMonthPay = realDayPay * 30;
 		console.log("5. ", realDayPay, realMonthPay);
 
@@ -552,7 +567,20 @@ export default function detailRoute(fastify: FastifyInstance, options: any, done
 		}
 		console.log("7. ", workDayForMulti);
 
+		const [requireWorkingYear, nextReceiveDay] = getNextEmployerReceiveDay(workYear);
+
 		// 8. 결과 리턴, 퇴직금, 다음 단계 없음
+		if (nextReceiveDay === 0)
+			return {
+				succ: true,
+				retired: req.body.retired,
+				amountCost: realDayPay * receiveDay,
+				realDayPay,
+				receiveDay,
+				realMonthPay,
+				workingDays,
+				workDayForMulti,
+			};
 		return {
 			succ: true,
 			retired: req.body.retired,
@@ -561,6 +589,9 @@ export default function detailRoute(fastify: FastifyInstance, options: any, done
 			receiveDay,
 			realMonthPay,
 			workingDays,
+			needDay: requireWorkingYear * 365 - workingDays,
+			nextAmountCost: nextReceiveDay * realDayPay,
+			morePay: nextReceiveDay * realDayPay - receiveDay * realDayPay,
 			workDayForMulti,
 		};
 	});

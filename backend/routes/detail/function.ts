@@ -178,6 +178,12 @@ export function getEmployerReceiveDay(workYear: number) {
 	if (workYear >= 5 && workYear < 10) return 180;
 	return 210;
 }
+export function getNextEmployerReceiveDay(workYear: number) {
+	if (workYear >= 1 && workYear < 3) return [3, 150];
+	if (workYear >= 3 && workYear < 5) return [5, 180];
+	if (workYear >= 5 && workYear < 10) return [10, 210];
+	return [0, 0];
+}
 
 export const calVeryShortWorkDay = (limmitDay: dayjs.Dayjs, retiredDay: dayjs.Dayjs, weekDay: number[]) => {
 	const diffToLimit = Math.floor(Math.floor(limmitDay.diff("1951-01-01", "day", true)) / 7); // 입사일 - 1951.1.1.
