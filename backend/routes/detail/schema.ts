@@ -163,6 +163,9 @@ const employerBodyExamples = [
 		enterDay: "2020-01-01",
 		retiredDay: "2022-10-01",
 		insuranceGrade: { 2022: 1, 2021: 2, 2020: 1 },
+		isEnd: false,
+		limitDay: "2020-10-01",
+		isMany: false,
 	},
 ];
 
@@ -257,7 +260,7 @@ export const employerSchema = {
 		tags: ["detail"],
 		body: {
 			type: "object",
-			required: ["enterDay", "retiredDay", "insuranceGrade"],
+			required: ["enterDay", "retiredDay", "insuranceGrade", "isEnd", "limitDay", "isMany"],
 			properties: employerBodyProp,
 			examples: employerBodyExamples,
 		},
