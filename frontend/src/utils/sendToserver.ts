@@ -1,5 +1,5 @@
 const DEV_URL = "http://localhost:8080";
-const PROD_URL = "https://moneysylove.com/";
+const PROD_URL = "https://moneysylove.com";
 
 const requestFunc = async (path: string | boolean, body: any) => {
   const from_server = await fetch(DEV_URL + path, {
