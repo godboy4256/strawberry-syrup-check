@@ -16,7 +16,7 @@ dayjs.extend(isSameOrAfter);
 export default function multiRoute(fastify: FastifyInstance, options: any, done: any) {
 	fastify.post("/", multiSchema, (req: any, res: FastifyReply) => {
 		const mainData: TmainData = req.body.mainData;
-		const addDatas: TaddData[] = req.body.addData;
+		let addDatas: TaddData[] = req.body.addData;
 		const leastRequireWorkingDay = requiredWorkingDay[mainData.workCate]; // 근로 형태에 맞는 기한 가져오기
 		const mainEnterDay = dayjs(mainData.enterDay);
 		const mainRetiredDay = dayjs(mainData.retiredDay);
@@ -28,18 +28,22 @@ export default function multiRoute(fastify: FastifyInstance, options: any, done:
 		const checkResult = checkBasicRequirements(mainData);
 		if (!checkResult.succ) return { checkResult };
 
-		/////////////////////////////////////////////////////////// 자영업자 관련 조건 확인
+		/////////////////////////////////////////////////////////// 자영업자 관련 조건 확인 필터
+		let tempAddDatas: TaddData[] = [];
 		if (mainData.workCate === 8) {
-			let check = false;
-			const a = addDatas.filter((el, idx, arr) => el.workCate === 8);
-			console.log(a);
+			tempAddDatas = addDatas.filter((el) => el.workCate === 8 || el.workCate === 2 || el.workCate === 3);
 		}
-
+		if (mainData.workCate !== 2 && mainData.workCate !== 3 && mainData.workCate !== 8) {
+			tempAddDatas = addDatas.filter((el) => el.workCate !== 8);
+		}
+		addDatas = tempAddDatas;
+		console.log(tempAddDatas);
+		console.log(addDatas);
 		///////////////////////////////////////////////////////////
 
 		// 2. 마지막 직장의 입사일과 전직장의 이직일 사이 기간이 3년을 초과하는 지 확인 & 다음 근로 정보가 3년을 초과하는 경우 가장 최근 근로 정보만 이용해서 계산
 		console.log("start" + 2);
-		const secondRetiredDay = dayjs(addDatas[0].retiredDay);
+		const secondRetiredDay = dayjs(addDatas[0].retiredDay); // 에러 처리 필요
 		const diffMainToSecond = Math.floor(mainEnterDay.diff(secondRetiredDay, "day", true));
 		if (diffMainToSecond > 1095) {
 			res.statusCode = 204;
