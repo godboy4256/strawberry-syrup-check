@@ -44,7 +44,7 @@ import {
 dayjs.extend(isSameOrAfter);
 
 export default function detailRoute(fastify: FastifyInstance, options: any, done: any) {
-	fastify.post(detailPath.standard, standardSchema, async (req: any, res) => {
+	fastify.post(detailPath.standard, standardSchema, (req: any, res) => {
 		const mainData: TstandardInput = {
 			...req.body,
 			enterDay: dayjs(req.body.enterDay),
