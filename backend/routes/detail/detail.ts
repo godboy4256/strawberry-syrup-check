@@ -39,6 +39,7 @@ import {
 	calEmployerSumPay,
 	checkJobCate,
 	getNextEmployerReceiveDay,
+	calSumOneYearWorkDay,
 } from "./function";
 
 dayjs.extend(isSameOrAfter);
@@ -238,9 +239,10 @@ export default function detailRoute(fastify: FastifyInstance, options: any, done
 
 		// 2. 급여(일수령액, 월수령액) 계산
 		const lastWorkDay = dayjs(req.body.lastWorkDay);
-		const sumOneYearWorkDay = req.body.isSimple
-			? lastWorkDay.diff(lastWorkDay.subtract(1, "year"), "day")
-			: req.body.sumOneYearWorkDay;
+		const sumOneYearWorkDay = calSumOneYearWorkDay(lastWorkDay);
+		// const sumOneYearWorkDay = req.body.isSimple
+		// ? lastWorkDay.diff(lastWorkDay.subtract(1, "year"), "day")
+		// : req.body.sumOneYearWorkDay;
 		const { dayAvgPay, realDayPay, realMonthPay } = calArtPay(
 			req.body.sumOneYearPay,
 			sumOneYearWorkDay,
