@@ -100,7 +100,7 @@ const shortArtBodyProp = {
 	retired: DefineParamInfo.retired, // 퇴직여부
 	workCate: DefineParamInfo.workCate, // 근로형태
 	retireReason: DefineParamInfo.retireReason, // 퇴직사유
-	enterDay: DefineParamInfo.enterDay,
+	// enterDay: DefineParamInfo.enterDay,
 	age: { type: "number" },
 	disabled: DefineParamInfo.disabled, // 장애여부
 	lastWorkDay: DefineParamInfo.lastWorkDay, // 마지막 근무일
