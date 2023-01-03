@@ -8,7 +8,7 @@ import { standardSchema, TmainData } from "./schema";
 import { checkBasicRequirements, calWorkingDay } from "./function";
 
 export default function standardRoute(fastify: FastifyInstance, options: any, done: any) {
-	fastify.post(standardPath.standard, standardSchema, async (req: any, res) => {
+	fastify.post(standardPath.standard, standardSchema, (req: any, res) => {
 		const mainData: TmainData = {
 			retired: req.body.retired,
 			enterDay: dayjs(req.body.enterDay),
