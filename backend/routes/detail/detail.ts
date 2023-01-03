@@ -54,7 +54,7 @@ export default function detailRoute(fastify: FastifyInstance, options: any, done
 		const retiredDayArray = req.body.retiredDay.split("-");
 
 		// 1. 기본 조건 확인
-		const employmentDate = Math.floor(mainData.retiredDay.diff(mainData.enterDay, "day", true));
+		const employmentDate = Math.floor(mainData.retiredDay.diff(mainData.enterDay, "day", true) + 1);
 		const checkResult = checkBasicRequirements(mainData, employmentDate);
 		if (!checkResult.succ) return { checkResult };
 
@@ -108,7 +108,7 @@ export default function detailRoute(fastify: FastifyInstance, options: any, done
 				realDayPay,
 				receiveDay,
 				realMonthPay,
-				severancePay: employmentDate >= 1 ? Math.ceil(dayAvgPay * 30 * (employmentDate / 365)) : 0,
+				severancePay: employmentDate >= 365 ? Math.ceil(dayAvgPay * (employmentDate / 365) * 30) : 0,
 				workingDays,
 				workDayForMulti, // 복수형에서만 사용
 			};
@@ -121,7 +121,7 @@ export default function detailRoute(fastify: FastifyInstance, options: any, done
 				realDayPay,
 				receiveDay,
 				realMonthPay,
-				severancePay: employmentDate >= 1 ? Math.ceil(dayAvgPay * 30 * (employmentDate / 365)) : 0,
+				severancePay: employmentDate >= 365 ? Math.ceil(dayAvgPay * (employmentDate / 365) * 30) : 0,
 				workingDays,
 				needDay: requireWorkingYear * 365 - employmentDate,
 				availableDay: calDday(
@@ -400,7 +400,7 @@ export default function detailRoute(fastify: FastifyInstance, options: any, done
 				realMonthPay,
 				workingDays: req.body.sumWorkDay,
 				severancePay:
-					req.body.sumWorkDay >= 365 ? Math.ceil(req.body.dayAvgPay * 30 * (req.body.sumWorkDay / 365)) : 0,
+					req.body.sumWorkDay >= 365 ? Math.ceil(req.body.dayAvgPay * (req.body.sumWorkDay / 365) * 30) : 0,
 			};
 
 		return {
@@ -412,7 +412,7 @@ export default function detailRoute(fastify: FastifyInstance, options: any, done
 			realMonthPay,
 			workingDays: req.body.sumWorkDay,
 			severancePay:
-				req.body.sumWorkDay >= 365 ? Math.ceil(req.body.dayAvgPay * 30 * (req.body.sumWorkDay / 365)) : 0,
+				req.body.sumWorkDay >= 365 ? Math.ceil(req.body.dayAvgPay * (req.body.sumWorkDay / 365) * 30) : 0,
 			needDay: requireWorkingYear * 365 - req.body.sumWorkDay,
 			nextAmountCost: nextReceiveDay * realDayPay,
 			morePay: nextReceiveDay * realDayPay - receiveDay * realDayPay,

@@ -63,7 +63,7 @@ export default function standardRoute(fastify: FastifyInstance, options: any, do
 			realDayPay, // 일 수급액
 			receiveDay, // 소정 급여일수
 			realMonthPay, // 월 수급액
-			severancePay: employmentDate >= 365 ? Math.ceil((dayAvgPay * 30 * workingDays) / 365) : 0,
+			severancePay: employmentDate >= 365 ? Math.ceil(dayAvgPay * (employmentDate / 365) * 30) : 0,
 		};
 	});
 
