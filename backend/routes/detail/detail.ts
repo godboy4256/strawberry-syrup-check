@@ -39,12 +39,13 @@ import {
 	calEmployerSumPay,
 	checkJobCate,
 	getNextEmployerReceiveDay,
+	calSumOneYearWorkDay,
 } from "./function";
 
 dayjs.extend(isSameOrAfter);
 
 export default function detailRoute(fastify: FastifyInstance, options: any, done: any) {
-	fastify.post(detailPath.standard, standardSchema, async (req: any, res) => {
+	fastify.post(detailPath.standard, standardSchema, (req: any, res) => {
 		const mainData: TstandardInput = {
 			...req.body,
 			enterDay: dayjs(req.body.enterDay),
@@ -238,9 +239,10 @@ export default function detailRoute(fastify: FastifyInstance, options: any, done
 
 		// 2. 급여(일수령액, 월수령액) 계산
 		const lastWorkDay = dayjs(req.body.lastWorkDay);
-		const sumOneYearWorkDay = req.body.isSimple
-			? lastWorkDay.diff(lastWorkDay.subtract(1, "year"), "day")
-			: req.body.sumOneYearWorkDay;
+		const sumOneYearWorkDay = calSumOneYearWorkDay(lastWorkDay);
+		// const sumOneYearWorkDay = req.body.isSimple
+		// ? lastWorkDay.diff(lastWorkDay.subtract(1, "year"), "day")
+		// : req.body.sumOneYearWorkDay;
 		const { dayAvgPay, realDayPay, realMonthPay } = calArtPay(
 			req.body.sumOneYearPay,
 			sumOneYearWorkDay,
@@ -252,7 +254,7 @@ export default function detailRoute(fastify: FastifyInstance, options: any, done
 		// 3. 수급 인정/불인정 판단 => 결과만 입력 계산기능 필요
 		const isPermit = req.body.isSimple
 			? artShortCheckPermit(req.body.sumWorkDay, req.body.isSpecial)
-			: artShortCheckPermit(req.body.sumTwoYearWorkDay, req.body.isSpecial);
+			: artShortCheckPermit(req.body.sumTwoYearWorkDay, req.body.isSpecial); // null 체크 필요
 		console.log("3. ", isPermit);
 
 		// 4. 수급 불인정 시 불인정 메세지 리턴

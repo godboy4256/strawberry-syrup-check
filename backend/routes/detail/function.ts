@@ -329,4 +329,10 @@ export function checkJobCate(enterDay: Dayjs, jobCate: number) {
 	return enterDay.isSameOrAfter(checkOne) ? enterDay : checkThree;
 }
 
-// export function calLimitDay
+export function calSumOneYearWorkDay(lastWorkDay: Dayjs) {
+	let result = 0;
+	for (let i = 0; i < 12; i++) {
+		result += lastWorkDay.subtract(i, "month").daysInMonth();
+	}
+	return result;
+}
