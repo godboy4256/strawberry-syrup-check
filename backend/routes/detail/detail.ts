@@ -155,9 +155,10 @@ export default function detailRoute(fastify: FastifyInstance, options: any, done
 		}
 
 		// 3. 급여 산정
+		const sumOneYearWorkDay = calSumOneYearWorkDay(mainData.retiredDay);
 		const { dayAvgPay, realDayPay, realMonthPay } = calArtPay(
 			req.body.sumTwelveMonthSalary,
-			employmentDate,
+			sumOneYearWorkDay,
 			req.body.isSpecial
 		);
 		console.log("3. ", dayAvgPay, realDayPay, realMonthPay);
@@ -240,9 +241,6 @@ export default function detailRoute(fastify: FastifyInstance, options: any, done
 		// 2. 급여(일수령액, 월수령액) 계산
 		const lastWorkDay = dayjs(req.body.lastWorkDay);
 		const sumOneYearWorkDay = calSumOneYearWorkDay(lastWorkDay);
-		// const sumOneYearWorkDay = req.body.isSimple
-		// ? lastWorkDay.diff(lastWorkDay.subtract(1, "year"), "day")
-		// : req.body.sumOneYearWorkDay;
 		const { dayAvgPay, realDayPay, realMonthPay } = calArtPay(
 			req.body.sumOneYearPay,
 			sumOneYearWorkDay,
