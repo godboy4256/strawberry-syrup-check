@@ -105,8 +105,8 @@ const shortArtBodyProp = {
 	disabled: DefineParamInfo.disabled, // 장애여부
 	lastWorkDay: DefineParamInfo.lastWorkDay, // 마지막 근무일
 	sumOneYearPay: { type: "number", minimum: 0 }, // 퇴직 전 12개월 급여 총액
-	sumOneYearWorkDay: { type: "number", minimum: 0 },
-	sumTwoYearWorkDay: { type: "number", minimum: 0 },
+	// sumOneYearWorkDay: { type: "number", minimum: 0 },
+	sumTwoYearWorkDay: { type: ["number", "null"], minimum: 0 },
 	sumWorkDay: { type: "number", minimum: 0 }, // 마지막 근무일
 	isSpecial: { type: "boolean" },
 	isSimple: { type: "boolean" },

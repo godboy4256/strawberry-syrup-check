@@ -254,7 +254,7 @@ export default function detailRoute(fastify: FastifyInstance, options: any, done
 		// 3. 수급 인정/불인정 판단 => 결과만 입력 계산기능 필요
 		const isPermit = req.body.isSimple
 			? artShortCheckPermit(req.body.sumWorkDay, req.body.isSpecial)
-			: artShortCheckPermit(req.body.sumTwoYearWorkDay, req.body.isSpecial);
+			: artShortCheckPermit(req.body.sumTwoYearWorkDay, req.body.isSpecial); // null 체크 필요
 		console.log("3. ", isPermit);
 
 		// 4. 수급 불인정 시 불인정 메세지 리턴
