@@ -11,7 +11,6 @@ const PopUpHandler: any = {
   title: undefined,
   popup_type: undefined,
 };
-
 const PopUpGlobal = () => {
   const [content, setContent] = useState<ReactElement | string | boolean>();
   PopUpHandler.create_func = setContent;

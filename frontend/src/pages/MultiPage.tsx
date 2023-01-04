@@ -24,6 +24,7 @@ import { getAge } from "../utils/date";
 import { sendToServer } from "../utils/sendToserver";
 import { ResultComp } from "../components/calculator/Result";
 import Loading from "../components/common/Loading";
+import { calRecording } from "../utils/calrecord";
 
 interface Company {
   id: number;
@@ -160,6 +161,7 @@ const _MultiMainDataSelect = () => {
             handler.setCompState && handler.setCompState(4);
           }, 2000);
           handler.SetPageVal("result", result);
+          calRecording(result, "복수형");
         }}
       />
     </div>
