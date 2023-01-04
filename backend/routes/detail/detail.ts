@@ -458,7 +458,7 @@ export default function detailRoute(fastify: FastifyInstance, options: any, done
 		console.log("4. ", sumLastThreeMonthDays);
 
 		// 급여 산정
-		const dayWorkTime = Math.floor((mainData.weekWorkTime / mainData.weekDay.length) * 10) * 10;
+		const dayWorkTime = Math.floor((mainData.weekWorkTime / mainData.weekDay.length) * 10) / 10;
 		const { dayAvgPay, realDayPay, realMonthPay } = calVeryshortPay(
 			mainData.salary,
 			sumLastThreeMonthDays,
