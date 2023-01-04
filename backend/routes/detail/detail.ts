@@ -176,6 +176,7 @@ export default function detailRoute(fastify: FastifyInstance, options: any, done
 		if (!isPermit) {
 			const result = {
 				succ: false,
+				errorCode: 2,
 				retired: req.body.retired,
 				dayAvgPay,
 				realDayPay,
@@ -235,7 +236,7 @@ export default function detailRoute(fastify: FastifyInstance, options: any, done
 		// 1. 추가 근로 정보에서 단기 예술인/특고 추가 조건 확인
 		console.log("1. ", req.body.isOverTen, req.body.hasWork[0]);
 		if (req.body.isOverTen && req.body.hasWork[0]) {
-			return { succ: false, mesg: dayjs(req.body.hasWork[1]).add(14, "day").format("YYYY-MM-DD") };
+			return { succ: false, errorCode: 5, mesg: dayjs(req.body.hasWork[1]).add(14, "day").format("YYYY-MM-DD") };
 		}
 
 		// 2. 급여(일수령액, 월수령액) 계산
@@ -259,6 +260,7 @@ export default function detailRoute(fastify: FastifyInstance, options: any, done
 		if (!isPermit[0])
 			return {
 				succ: false,
+				errorCode: 2,
 				retired: req.body.retired,
 				dayAvgPay,
 				realDayPay,
@@ -331,16 +333,22 @@ export default function detailRoute(fastify: FastifyInstance, options: any, done
 		// 1. 신청일이 이직일로 부터 1년 초과 확인
 		const now = dayjs(new Date());
 		if (Math.floor(now.diff(mainData.lastWorkDay, "day", true)) > 365)
-			return { succ: false, mesg: DefinedParamErrorMesg.expire };
+			return { succ: false, errorCode: 0, mesg: DefinedParamErrorMesg.expire };
 
 		// 2. 추가 조건 확인 (건설직 여부 기준)
 		if (req.body.isSpecial) {
 			if (req.body.isOverTen && req.body.hasWork[0])
-				return { succ: false, mesg: dayjs(req.body.hasWork[1]).add(14, "day").format("YYYY-MM-DD") };
-		} else {
-			if (req.body.isOverTen)
-				return { succ: false, mesg: "신청일 이전 1달 간 근로일수가 10일 미만이어야 합니다." };
+				return {
+					succ: false,
+					errorCode: 5,
+					mesg: dayjs(req.body.hasWork[1]).add(14, "day").format("YYYY-MM-DD"),
+				};
 		}
+
+		// else {
+		// 	if (req.body.isOverTen)
+		// 		return { succ: false, mesg: "신청일 이전 1달 간 근로일수가 10일 미만이어야 합니다." };
+		// }
 
 		const limitPermitDay = mainData.lastWorkDay.subtract(18, "month").format("YYYY-MM-DD").split("-").map(Number);
 
@@ -351,7 +359,7 @@ export default function detailRoute(fastify: FastifyInstance, options: any, done
 			const overDatePool = dayjs(new Date(req.body.workRecord[0].year, req.body.workRecord[0].months[0].month, 0))
 				.subtract(1, "month")
 				.isSameOrAfter(mainData.lastWorkDay);
-			if (overDatePool) return { succ: false, mesg: "입력한 근무일이 마지막 근무일 이 후 입니다." };
+			if (overDatePool) return { succ: false, errorCode: 1, mesg: "입력한 근무일이 마지막 근무일 이 후 입니다." };
 
 			sortedData = req.body.workRecord.sort((a: any, b: any) => {
 				if (a.year < b.year) return 1;
@@ -375,6 +383,7 @@ export default function detailRoute(fastify: FastifyInstance, options: any, done
 		if (!isPermit[0])
 			return {
 				succ: false,
+				errorCode: 2,
 				retired: mainData.retired,
 				workingDays: isPermit[1],
 				requireDays: isPermit[2],
@@ -434,9 +443,14 @@ export default function detailRoute(fastify: FastifyInstance, options: any, done
 		if (!checkResult.succ) return { checkResult };
 
 		// 초단 시간 추가 조건 확인
-		if (mainData.weekDay.length > 2) return { succ: false, mesg: "주 근로일수 2일을 초과할 수 없습니다." };
+		if (mainData.weekDay.length > 2)
+			return { succ: false, errorCode: 6, mesg: "주 근로일수 2일을 초과할 수 없습니다." };
 		if (mainData.weekWorkTime >= 15)
-			return { succ: false, mesg: "주 근무시간이 15시간이상이라면 초단시간으로 인정받을 수 없습니다." };
+			return {
+				succ: false,
+				errorCode: 7,
+				mesg: "주 근무시간이 15시간이상이라면 초단시간으로 인정받을 수 없습니다.",
+			};
 
 		// 24개월 내에 피보험 단위 기간
 		const limitDay = mainData.retiredDay.subtract(24, "month");
@@ -472,6 +486,7 @@ export default function detailRoute(fastify: FastifyInstance, options: any, done
 		if (!isPermit[0])
 			return {
 				succ: false,
+				errorCode: 2,
 				retired: mainData.retired,
 				workingDays: isPermit[1],
 				requireDays: isPermit[2],
@@ -529,7 +544,7 @@ export default function detailRoute(fastify: FastifyInstance, options: any, done
 		// 1. 자영업자로서 최소 1년간 고용보험에 보험료를 납부해야함
 		const workingDays = Math.floor(retiredDay.diff(enterDay, "day", true)) + 1;
 		console.log("1. ", workingDays);
-		if (workingDays < 365) return { succ: false, workingDays, requireDays: 365 - workingDays };
+		if (workingDays < 365) return { succ: false, errorCode: 8, workingDays, requireDays: 365 - workingDays };
 
 		// 2.  몇 년 몇 월에 가입했는 지 배열로 작성
 		const workList = makeEmployerJoinInfo(enterDay, retiredDay);

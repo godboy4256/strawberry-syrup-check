@@ -64,6 +64,7 @@ export function getFailResult(
 	if (retired || isDetail) {
 		return {
 			succ: false, // 수급 인정 여부
+			errorCode: 2,
 			retired: retired, // 퇴직자/퇴직예정자
 			workingDays, // 현 근무일수
 			requireDays: leastRequireWorkingDay - workingDays, // 부족 근무일수
@@ -72,6 +73,7 @@ export function getFailResult(
 	const availableDay = calDday(new Date(retiredDay.format("YYYY-MM-DD")), leastRequireWorkingDay - workingDays);
 	return {
 		succ: false,
+		errorCode: 2,
 		retired: retired,
 		workingDays, // 현 근무일수
 		requireDays: leastRequireWorkingDay - workingDays, // 부족 근무일수

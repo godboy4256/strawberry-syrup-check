@@ -7,10 +7,10 @@ export const checkBasicRequirements = (mainData: TmainData, employmentDate: numb
 	// 1. 신청일이 이직일로 부터 1년 초과 확인
 	const now = dayjs(new Date());
 	if (Math.floor(now.diff(mainData.retiredDay, "day", true)) > 365)
-		return { succ: false, mesg: DefinedParamErrorMesg.expire };
+		return { succ: false, errorCode: 0, mesg: DefinedParamErrorMesg.expire };
 
 	// 2.퇴사일이 입사일보다 빠른지 확인
-	if (employmentDate < 0) return { succ: false, mesg: DefinedParamErrorMesg.ealryRetire };
+	if (employmentDate < 0) return { succ: false, errorCode: 1, mesg: DefinedParamErrorMesg.ealryRetire };
 
 	return { succ: true };
 };
