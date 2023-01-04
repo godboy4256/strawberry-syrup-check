@@ -10,12 +10,12 @@ export default function leastPayRoute(fastify: FastifyInstance, options: any, do
 			const workTime = workHour + workMin;
 			const workDay = req.body.workDay;
 			const leastTimePay = 9620;
+			const pay = req.body.pay < leastTimePay ? leastTimePay : req.body.pay;
 
-			const commonPay = Math.ceil(workTime * workDay * 4.345 * leastTimePay);
-			const isAddPay = Math.ceil(workHour * workMin) > 15;
-			const result = isAddPay
-				? commonPay + Math.ceil(((workTime * workDay) / 40) * 8 * leastTimePay * 4.345)
-				: commonPay;
+			const commonPay = Math.ceil((Math.ceil(workTime * workDay * 4.345 * 100) / 10) * pay);
+			const addPay = Math.ceil((Math.ceil(((workTime * workDay) / 40) * 8 * 4.345 * 100) / 10) * pay);
+			const isAddPay = workTime * workDay > 15;
+			const result = isAddPay ? commonPay + addPay : commonPay;
 
 			return result;
 		} catch (err) {
