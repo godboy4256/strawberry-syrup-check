@@ -35,6 +35,24 @@ export type TartInput = {
 	limitDay: string;
 };
 
+export type TartShortInput = {
+	retired: boolean;
+	workCate: number;
+	retireReason: number;
+	age: number;
+	disabled: boolean;
+	lastWorkDay: string;
+	sumOneYearPay: number;
+	sumTwoYearWorkDay?: number;
+	sumWorkDay: number;
+	isSpecial: boolean;
+	isSimple: boolean;
+	isOverTen: boolean;
+	hasWork: [boolean, string];
+	isEnd: boolean;
+	limitDay: string;
+};
+
 export type TdayJobInput = {
 	retired: boolean;
 	workCate: number;
