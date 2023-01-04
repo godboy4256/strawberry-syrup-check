@@ -1,4 +1,5 @@
 import { Dispatch, SetStateAction } from "react";
+import { calRecording } from "../utils/calrecord";
 import { getAge, GetDateArr } from "../utils/date";
 import { sendToServer } from "../utils/sendToserver";
 import { CheckValiDation } from "../utils/validate";
@@ -516,8 +517,6 @@ class DetailedHandler extends InputHandler {
             isMany: this._Data.cal_state ? true : false,
           }
         : {};
-
-    console.log("여기", this._Data.workCate);
     const validCheckType =
       this._Data.workCate === 0 || this._Data.workCate === 1
         ? "detail_standad"
@@ -549,7 +548,6 @@ class DetailedHandler extends InputHandler {
       setTimeout(() => {
         this.setCompState && this.setCompState(4);
       }, 2000);
-      this.SetPageVal("result", this.result);
     }
 
     return sendToServer(url, to_server);

@@ -9,11 +9,12 @@ import { GetDateArr } from "../utils/date";
 import Header from "../components/layout/Header";
 import IMGBasicCuriousEmoticon from "../assets/image/emoticon/basic_curious.svg";
 import IMGBasicEngryEmoticon from "../assets/image/emoticon/basic_angry.svg";
-import "./../styles/basic.css";
 import { ResultComp } from "../components/calculator/Result";
 import CalContainer from "../components/calculator/CalContainer";
 import Loading from "../components/common/Loading";
 import { CheckValiDation } from "../utils/validate";
+import "./../styles/basic.css";
+import { calRecording } from "../utils/calrecord";
 
 class BasicCalHandler extends InputHandler {
   public result: {} = {};
@@ -30,6 +31,7 @@ class BasicCalHandler extends InputHandler {
     if (!CheckValiDation("standad", to_server)) return;
     this.setCompState && this.setCompState(4);
     this.result = await sendToServer("/standard", to_server);
+    calRecording(this.result, "기본형");
     setTimeout(() => {
       this.setCompState && this.setCompState(3);
     }, 2000);

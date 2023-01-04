@@ -20,6 +20,7 @@ import { ResultComp } from "../components/calculator/Result";
 import CalContainer from "../components/calculator/CalContainer";
 import Loading from "../components/common/Loading";
 import "./../styles/detail.css";
+import { calRecording } from "../utils/calrecord";
 
 class IndividualInputClass extends InputHandler {
   public _Data: any = {};
@@ -576,7 +577,42 @@ const DetailCalPage = () => {
                 handler={handler}
                 workCate={handler.GetPageVal("workCate")}
                 clickCallBack={async () => {
+                  /** 근료형태
+                   * 0: 정규직
+                   * 1: 기간제
+                   * 2: 예술인
+                   * 3: 특고
+                   * 4: 단기 예술인
+                   * 5: 단기 특고
+                   * 6: 일용직
+                   * 7: 초단시간
+                   * 8: 자영업
+                   */
+
                   const result_data = await handler.Action_Cal_Result();
+                  calRecording(
+                    result_data,
+                    "상세형",
+                    handler.GetPageVal("workCate") === 0
+                      ? "정규직"
+                      : handler.GetPageVal("workCate") === 1
+                      ? "기간제"
+                      : handler.GetPageVal("workCate") === 2
+                      ? "예술인"
+                      : handler.GetPageVal("workCate") === 3
+                      ? "특고"
+                      : handler.GetPageVal("workCate") === 4
+                      ? "단기 예술인"
+                      : handler.GetPageVal("workCate") === 5
+                      ? "단기 특고"
+                      : handler.GetPageVal("workCate") === 6
+                      ? "일용직"
+                      : handler.GetPageVal("workCate") === 7
+                      ? "초단시간"
+                      : handler.GetPageVal("workCate") === 8
+                      ? "자영업"
+                      : ""
+                  );
                   handler.SetPageVal("result", result_data);
                 }}
               />

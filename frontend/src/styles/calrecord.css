@@ -1,0 +1,71 @@
+#cal_record_container {
+  margin-top: 50px;
+  height: calc(100vh - 120px);
+  padding-bottom: 22px;
+}
+#cal_record_container.cal_reslut_arr {
+  min-height: calc(100vh - 120px);
+  height: auto;
+  padding-top: 10px;
+}
+.nop_cal_guide1 {
+  height: 75%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: rgba(0, 0, 0, 0.4);
+}
+.nop_cal_guide2 {
+  padding: 15px 20px;
+  height: 25%;
+  display: flex;
+  white-space: nowrap;
+  flex-direction: column;
+  justify-content: center;
+  border: 1px solid rgba(0, 0, 0, 0.2);
+  text-align: center;
+}
+.nop_cal_guide2 span {
+  color: #2b66d8;
+}
+#nop_cal_record {
+  height: 100%;
+}
+.cal_record_card {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  border: 1px solid #ff6559;
+  padding: 10px 12.5px;
+  margin-bottom: 10px;
+}
+.cal_record_card > div {
+  line-height: 1.5;
+  margin-bottom: 10px;
+  display: flex;
+  justify-content: space-between;
+}
+.cal_record_card > div:last-child {
+}
+.cal_record_card .receive_card {
+  border: 1px solid #ff6559;
+  padding: 6px 0;
+  text-align: center;
+  display: block;
+}
+.cal_record_card .cal_record_cardtitle {
+  background-color: #ff6559;
+  padding: 10px 0;
+  display: block;
+  text-align: center;
+}
+.cal_reacor_btncontainer {
+  display: flex;
+  justify-content: space-between;
+}
+.cal_reacor_btncontainer button {
+  padding: 8px 24px;
+}
+.cal_reacor_btncontainer .normal_sub {
+  color: #ff6559;
+}
