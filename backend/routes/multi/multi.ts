@@ -121,6 +121,7 @@ export default function multiRoute(fastify: FastifyInstance, options: any, done:
 		return {
 			succ: true,
 			amountCost: mainData.realDayPay * receiveDay,
+			workingDays,
 			realDayPay: mainData.realDayPay,
 			receiveDay,
 			realMonthPay: mainData.realDayPay * 30,
