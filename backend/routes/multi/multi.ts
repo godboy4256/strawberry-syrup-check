@@ -1,5 +1,5 @@
 import { FastifyInstance, FastifyReply, FastifyRequest } from "fastify";
-import dayjs from "dayjs";
+import dayjs, { Dayjs } from "dayjs";
 import isSameOrAfter from "dayjs/plugin/isSameOrAfter";
 
 import { getReceiveDay } from "../../router_funcs/common";
@@ -43,7 +43,12 @@ export default function multiRoute(fastify: FastifyInstance, options: any, done:
 
 		// 2. 마지막 직장의 입사일과 전직장의 이직일 사이 기간이 3년을 초과하는 지 확인 & 다음 근로 정보가 3년을 초과하는 경우 가장 최근 근로 정보만 이용해서 계산
 		console.log("start" + 2);
-		const secondRetiredDay = dayjs(addDatas[0].retiredDay); // 에러 처리 필요
+		let secondRetiredDay: Dayjs;
+		if (addDatas.length === 0) {
+			res.statusCode = 204;
+			return { succ: true };
+		}
+		secondRetiredDay = dayjs(addDatas[0].retiredDay);
 		const diffMainToSecond = Math.floor(mainEnterDay.diff(secondRetiredDay, "day", true));
 		if (diffMainToSecond > 1095) {
 			res.statusCode = 204;
@@ -64,7 +69,7 @@ export default function multiRoute(fastify: FastifyInstance, options: any, done:
 		// 5. 마지막 근로형태가 불규칙이라면 수급 불인정 메세지 리턴
 		console.log("start" + 5);
 		if (permitAddCandidates.length !== 0 && permitAddCandidates[permitAddCandidates.length - 1].isIrregular)
-			return { succ: false, mesg: "isIrregular" };
+			return { succ: false, errorCode: 9, mesg: "isIrregular" };
 
 		// 6. 이중취득 여부 확인
 		console.log("start" + 6);
@@ -91,8 +96,18 @@ export default function multiRoute(fastify: FastifyInstance, options: any, done:
 		console.log(isPermit, leastRequireWorkingDay);
 		if (!isPermit[0]) {
 			if (isDuplicateAcquisition)
-				return { succ: false, requireDays: isPermit[1], mesg: "근로자로 requireDays만큼 더 일해야 한다." };
-			return { succ: false, permitWorkingDays: isPermit[1], requireDays: leastRequireWorkingDay - isPermit[1] };
+				return {
+					succ: false,
+					errorCode: 10,
+					requireDays: isPermit[1],
+					mesg: "근로자로 requireDays만큼 더 일해야 한다.",
+				};
+			return {
+				succ: false,
+				errorCode: 2,
+				permitWorkingDays: isPermit[1],
+				requireDays: leastRequireWorkingDay - isPermit[1],
+			};
 		}
 
 		// 9. 전체 피보험기간을 산정하기위한 합산 가능 유형 필터링
@@ -121,6 +136,7 @@ export default function multiRoute(fastify: FastifyInstance, options: any, done:
 		return {
 			succ: true,
 			amountCost: mainData.realDayPay * receiveDay,
+			workingDays,
 			realDayPay: mainData.realDayPay,
 			receiveDay,
 			realMonthPay: mainData.realDayPay * 30,
