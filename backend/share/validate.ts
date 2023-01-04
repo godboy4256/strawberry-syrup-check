@@ -153,7 +153,7 @@ export const DefineParamInfo = {
 	},
 	dayWorkTime: {
 		type: "number",
-		minimum: 3,
+		minimum: 4,
 		maximum: 8,
 	},
 	isShort: {

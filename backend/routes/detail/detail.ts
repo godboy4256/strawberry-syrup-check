@@ -61,8 +61,8 @@ export default function detailRoute(fastify: FastifyInstance, options: any, done
 		// 2. 급여 산정
 		const { dayAvgPay, realDayPay, realMonthPay } =
 			retiredDayArray[0] === "2023"
-				? calLeastPayInfo(mainData.retiredDay, retiredDayArray, mainData.salary, 8, true)
-				: calLeastPayInfo(mainData.retiredDay, retiredDayArray, mainData.salary, 8);
+				? calLeastPayInfo(mainData.retiredDay, retiredDayArray, mainData.salary, mainData.dayWorkTime, true)
+				: calLeastPayInfo(mainData.retiredDay, retiredDayArray, mainData.salary, mainData.dayWorkTime);
 
 		// 3. 소정급여일수 산정
 		const joinYears = Math.floor(employmentDate / 365);
