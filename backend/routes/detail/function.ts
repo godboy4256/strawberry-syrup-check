@@ -209,16 +209,6 @@ export const checkBasicRequirements = (mainData: any, employmentDate: number) =>
 	// 2.퇴사일이 입사일보다 빠른지 확인
 	if (employmentDate <= 0) return { succ: false, errorCode: 1, mesg: DefinedParamErrorMesg.ealryRetire };
 
-	// 3. mainData의 근로형태가 예술인 특고인경우 예술인 또는 특고로 3개월 이상 근무해야한다.
-	if (mainData.workCate === 2 || mainData.workCate === 3) {
-		if (mainData.workingDays < 90)
-			return { succ: false, errorCode: 3, mesg: "예술인/특고로 3개월 이상 근무해야합니다" };
-	}
-	if (mainData.workCate === 4 || mainData.workCate === 5) {
-		if (mainData.workingDays < 3)
-			return { succ: false, errorCode: 4, mesg: "단기 예술인/특고로 3개월 이상 근무해야합니다" };
-	}
-
 	return { succ: true };
 };
 

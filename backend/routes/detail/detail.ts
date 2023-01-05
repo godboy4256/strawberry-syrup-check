@@ -20,6 +20,7 @@ import {
 	shortArtSchema,
 	standardSchema,
 	TartInput,
+	TartShortInput,
 	TdayJobInput,
 	TstandardInput,
 	TveryShortInput,
@@ -148,6 +149,9 @@ export default function detailRoute(fastify: FastifyInstance, options: any, done
 		console.log("1. ", employmentDate, checkResult);
 		if (!checkResult.succ) return { checkResult };
 
+		// 추가 조건확인
+		if (employmentDate < 90) return { succ: false, errorCode: 3, mesg: "예술인/특고로 3개월 이상 근무해야합니다." };
+
 		// 2. 특고 피보험자격취득일 조정
 		if (mainData.workCate === 3) {
 			console.log("2. Modify enterDay!!!");
@@ -233,11 +237,21 @@ export default function detailRoute(fastify: FastifyInstance, options: any, done
 	});
 
 	fastify.post(detailPath.shortArt, shortArtSchema, (req: any, res) => {
+		const mainData: TartShortInput = { ...req.body };
 		// 1. 추가 근로 정보에서 단기 예술인/특고 추가 조건 확인
 		console.log("1. ", req.body.isOverTen, req.body.hasWork[0]);
 		if (req.body.isOverTen && req.body.hasWork[0]) {
 			return { succ: false, errorCode: 5, mesg: dayjs(req.body.hasWork[1]).add(14, "day").format("YYYY-MM-DD") };
 		}
+
+		// 신청일이 이직일로 부터 1년 초과 확인
+		const now = dayjs();
+		if (Math.floor(now.diff(mainData.lastWorkDay, "day", true)) > 365)
+			return { succ: false, errorCode: 0, mesg: DefinedParamErrorMesg.expire };
+
+		// 단기 예술인/특고로 3개월 이상 근무해야한다.
+		if (mainData.sumWorkDay < 3)
+			return { succ: false, errorCode: 4, mesg: "단기 예술인/특고로 3개월 이상 근무해야합니다." };
 
 		// 2. 급여(일수령액, 월수령액) 계산
 		const lastWorkDay = dayjs(req.body.lastWorkDay);
