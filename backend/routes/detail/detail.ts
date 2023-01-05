@@ -362,31 +362,27 @@ export default function detailRoute(fastify: FastifyInstance, options: any, done
 				};
 		}
 
-		// else {
-		// 	if (req.body.isOverTen)
-		// 		return { succ: false, mesg: "신청일 이전 1달 간 근로일수가 10일 미만이어야 합니다." };
-		// }
-
 		const limitPermitDay = mainData.lastWorkDay.subtract(18, "month").format("YYYY-MM-DD").split("-").map(Number);
 
-		// 3. 피보험단위기간 산정
-		let isPermit: (number | boolean)[];
-		let sortedData: any[];
-		if (req.body.hasOwnProperty("workRecord")) {
-			const overDatePool = dayjs(new Date(req.body.workRecord[0].year, req.body.workRecord[0].months[0].month, 0))
-				.subtract(1, "month")
-				.isSameOrAfter(mainData.lastWorkDay);
-			if (overDatePool) return { succ: false, errorCode: 1, mesg: "입력한 근무일이 마지막 근무일 이 후 입니다." };
+		// // 3. 피보험단위기간 산정
+		// let isPermit: (number | boolean)[];
+		// let sortedData: any[];
+		// if (req.body.hasOwnProperty("workRecord")) {
+		// 	const overDatePool = dayjs(new Date(req.body.workRecord[0].year, req.body.workRecord[0].months[0].month, 0))
+		// 		.subtract(1, "month")
+		// 		.isSameOrAfter(mainData.lastWorkDay);
+		// 	if (overDatePool) return { succ: false, errorCode: 1, mesg: "입력한 근무일이 마지막 근무일 이 후 입니다." };
 
-			sortedData = req.body.workRecord.sort((a: any, b: any) => {
-				if (a.year < b.year) return 1;
-				if (a.year > b.year) return -1;
-				return 0;
-			});
-			isPermit = dayJobCheckPermit(limitPermitDay, sortedData);
-		} else {
-			isPermit = dayJobCheckPermit(limitPermitDay, req.body.sumWorkDay, true);
-		}
+		// 	sortedData = req.body.workRecord.sort((a: any, b: any) => {
+		// 		if (a.year < b.year) return 1;
+		// 		if (a.year > b.year) return -1;
+		// 		return 0;
+		// 	});
+		// 	isPermit = dayJobCheckPermit(limitPermitDay, sortedData);
+		// } else {
+		// 	isPermit = dayJobCheckPermit(limitPermitDay, req.body.sumWorkDay, true);
+		// }
+		const isPermit = dayJobCheckPermit(limitPermitDay, req.body.sumWorkDay, true);
 		console.log("3. ", isPermit);
 
 		// 4. 급여 산정
