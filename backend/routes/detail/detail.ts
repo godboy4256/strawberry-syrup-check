@@ -248,7 +248,7 @@ export default function detailRoute(fastify: FastifyInstance, options: any, done
 		}
 
 		// 신청일이 이직일로 부터 1년 초과 확인
-		const now = dayjs();
+		const now = mainData.isSimple ? dayjs() : dayjs(mainData.enrollDay);
 		if (Math.floor(now.diff(mainData.lastWorkDay, "day", true)) > 365)
 			return { succ: false, errorCode: 0, mesg: DefinedParamErrorMesg.expire };
 
@@ -348,7 +348,7 @@ export default function detailRoute(fastify: FastifyInstance, options: any, done
 		};
 
 		// 1. 신청일이 이직일로 부터 1년 초과 확인
-		const now = dayjs(new Date());
+		const now = mainData.isSimple ? dayjs(new Date()) : dayjs(mainData.enrollDay);
 		if (Math.floor(now.diff(mainData.lastWorkDay, "day", true)) > 365)
 			return { succ: false, errorCode: 0, mesg: DefinedParamErrorMesg.expire };
 
