@@ -174,9 +174,14 @@ export default function detailRoute(fastify: FastifyInstance, options: any, done
 
 		// 5. 피보험단위기간 산정
 		// 일반 예술인, 특고는 12개월 급여를 입력한 순간 이직일 이전 24개월 동안 9개월, 12개월 이상의 피보험단위기간을 만족한다.
-		const workingMonths = mainData.retiredDay.diff(mainData.enterDay, "month");
 		const isPermit =
-			mainData.workCate === 3 ? (workingMonths >= 12 ? true : false) : workingMonths >= 9 ? true : false;
+			mainData.workCate === 3
+				? employmentDate >= 12 * 30
+					? true
+					: false
+				: employmentDate >= 9 * 30
+				? true
+				: false;
 		if (!isPermit) {
 			const result = {
 				succ: false,
@@ -184,10 +189,10 @@ export default function detailRoute(fastify: FastifyInstance, options: any, done
 				retired: req.body.retired,
 				dayAvgPay,
 				realDayPay,
-				workingMonths,
+				workingDays: employmentDate,
 				requireMonths: 0,
 			};
-			result.requireMonths = mainData.workCate === 3 ? 12 - workingMonths : 9 - workingMonths;
+			result.requireMonths = mainData.workCate === 3 ? 12 * 30 - employmentDate : 9 * 30 - employmentDate;
 			return result;
 		}
 
@@ -211,9 +216,8 @@ export default function detailRoute(fastify: FastifyInstance, options: any, done
 				realDayPay,
 				receiveDay,
 				realMonthPay,
-				workingMonths,
+				workingDays: employmentDate,
 				severancePay: employmentDate >= 365 ? Math.ceil(dayAvgPay * 30 * (employmentDate / 365)) : 0,
-				employmentDate,
 				workDayForMulti,
 			};
 		} else {
@@ -225,9 +229,8 @@ export default function detailRoute(fastify: FastifyInstance, options: any, done
 				realDayPay,
 				receiveDay,
 				realMonthPay,
-				workingMonths,
+				workingDays: employmentDate,
 				severancePay: employmentDate >= 365 ? Math.ceil(dayAvgPay * 30 * (employmentDate / 365)) : 0,
-				employmentDate,
 				needDay: requireWorkingYear * 365 - employmentDate, // 예술인에 맞게 변경필요 피보험 단위기간 관련
 				nextAmountCost: nextReceiveDay * realDayPay,
 				morePay: nextReceiveDay * realDayPay - receiveDay * realDayPay,
