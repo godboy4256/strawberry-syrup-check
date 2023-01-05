@@ -42,6 +42,7 @@ export type TartShortInput = {
 	age: number;
 	disabled: boolean;
 	lastWorkDay: string;
+	enrollDay?: string;
 	sumOneYearPay: number;
 	sumTwoYearWorkDay?: number;
 	sumWorkDay: number;
@@ -61,10 +62,12 @@ export type TdayJobInput = {
 	disabled: boolean;
 	isSpecial: boolean;
 	lastWorkDay: Dayjs;
+	enrollDay?: string;
 	dayWorkTime: number;
 	workRecord?: object[];
 	dayAvgPay: number;
 	sumWorkDay: number;
+	isSimple: boolean;
 	isOverTen: boolean;
 	hasWork: [boolean, string];
 };
@@ -122,9 +125,10 @@ const shortArtBodyProp = {
 	age: { type: "number" },
 	disabled: DefineParamInfo.disabled, // 장애여부
 	lastWorkDay: DefineParamInfo.lastWorkDay, // 마지막 근무일
+	enrollDay: { type: "string" },
 	sumOneYearPay: { type: "number", minimum: 0 }, // 퇴직 전 12개월 급여 총액
 	// sumOneYearWorkDay: { type: "number", minimum: 0 },
-	sumTwoYearWorkDay: { type: ["number", "null"], minimum: 0 },
+	sumTwoYearWorkDay: { type: "number", minimum: 0 },
 	sumWorkDay: { type: "number", minimum: 0 }, // 마지막 근무일
 	isSpecial: { type: "boolean" },
 	isSimple: { type: "boolean" },
@@ -142,8 +146,10 @@ const dayJobBodyProp = {
 	disabled: DefineParamInfo.disabled, // 장애여부
 	isSpecial: { type: "boolean" }, // 건설직 여부
 	lastWorkDay: DefineParamInfo.lastWorkDay, // 마지막 근무일
+	enrollDay: { type: "string" }, // 신청 예정일
 	dayWorkTime: DefineParamInfo.dayWorkTime, // 소정 근로시간
-	workRecord: DefineParamInfo.workRecord,
+	// workRecord: DefineParamInfo.workRecord,
+	isSimple: { typd: "boolean" },
 	dayAvgPay: { type: "number", minimum: 0 },
 	sumWorkDay: { type: "number", minimum: 0 },
 	isOverTen: { type: "boolean" },
