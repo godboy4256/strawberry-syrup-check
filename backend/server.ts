@@ -21,13 +21,8 @@ const server = fastify({
 });
 
 server.register(cors, {
-	// origin: [
-	// 	"https://moneysylove.com",
-	// 	"https://moneysylove.du.r.appspot.com",
-	// 	"http://localhost:8080",
-	// 	"http://localhost:3000",
-	// ],
-	origin: "https://moneysylove.com",
+	origin: ["https://www.moneysylove.com", "https://www.moneysylove.du.r.appspot.com"],
+	// origin: true,
 	methods: ["GET", "POST"],
 	credentials: true,
 });
@@ -56,7 +51,7 @@ function serverStart() {
 			console.error('ERROR AT "Listen"', err);
 			process.exit(1);
 		}
-		// console.log(`Server is Listening on ${addr}`);
+		console.log(`Server is Listening on ${addr}`);
 	});
 }
 
