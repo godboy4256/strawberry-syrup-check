@@ -149,7 +149,7 @@ const dayJobBodyProp = {
 	enrollDay: { type: "string" }, // 신청 예정일
 	dayWorkTime: DefineParamInfo.dayWorkTime, // 소정 근로시간
 	// workRecord: DefineParamInfo.workRecord,
-	isSimple: { typd: "boolean" },
+	isSimple: { type: "boolean" },
 	dayAvgPay: { type: "number", minimum: 0 },
 	sumWorkDay: { type: "number", minimum: 0 },
 	isOverTen: { type: "boolean" },
