@@ -6,7 +6,6 @@ import EMTDetailFullTimeSupply from "../../assets/image/emoticon/detail_fulltime
 import EMTDetailContractSupply from "../../assets/image/emoticon/detail_contract_supply.svg";
 import EMTDetailVeryShortsSupply from "../../assets/image/emoticon/detail_veryshort_supply.svg";
 import EMTBasicSupplyRetiree from "../../assets/image/emoticon/standad_retiree_supply.svg";
-
 import EMTDetailArtsUnSupply from "../../assets/image/emoticon/detail_arts_unsupply.svg";
 import EMTDetailSpecialsUnSupply from "../../assets/image/emoticon/detail_specials_unsupply.svg";
 import EMTDetailDayJobUnSupply from "../../assets/image/emoticon/detail_dayjob_unsupply.svg";
@@ -14,8 +13,6 @@ import EMTDetailEmployUnSupply from "../../assets/image/emoticon/detail_employ_u
 import EMTDetailFullTimeUnSupply from "../../assets/image/emoticon/detail_fulltime_unsupply.svg";
 import EMTDetailContractUnSupply from "../../assets/image/emoticon/detail_contract_unsupply.svg";
 import EMTDetailVeryShortsUnSupply from "../../assets/image/emoticon/detail_veryshort_unsupply.svg";
-
-import EMTBasicUnSupplyUnRetiree from "../../assets/image/emoticon/standad_unretiree_unsupply.svg";
 import EMTBasicUnSupplyRetiree from "../../assets/image/emoticon/standad_retiree_unsupply.svg";
 import HelpLink from "../common/HelpLink";
 import Button from "../inputs/Button";
@@ -367,7 +364,7 @@ export const ResultComp = ({
         ))}
       <div id="result_button_container">
         {cal_type !== "basic" && (
-          <Link to="/main">
+          <Link to="/multi">
             <Button
               text={result_data.succ ? "N달 더 일하면?" : "복수형 계산기로"}
               type="popup_cancel"

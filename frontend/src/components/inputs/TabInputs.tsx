@@ -74,7 +74,6 @@ const TabInputs = ({
               if (valueDay("retiredDay")) {
                 setSalaryTab("three_month");
               } else {
-                console.log(valueDay("retiredDay"));
                 CreatePopup(undefined, "퇴사일을 선택해주세요.", "only_check");
               }
             }}
