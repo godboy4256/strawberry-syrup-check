@@ -243,11 +243,13 @@ class DetailedHandler extends InputHandler {
             workCate: 6,
             retireReason:
               this._Data.cal_state === "multi" ? 1 : this._Data.retireReason,
+            enrollDay: this._Data.planToDo,
             dayWorkTime: this._Data.dayWorkTime
               ? Number(this._Data.dayWorkTime.split("시간")[0])
               : null,
             lastWorkDay: this._Data.lastWorkDay,
             isSpecial: this._Data.isSpecial ? this._Data.isSpecial : false,
+            isSimple: this._Data.input === "개별 입력" ? true : false,
             age: isNaN(Number(getAge(new Date(String(this._Data.age))).age))
               ? null
               : getAge(new Date(String(this._Data.age))).age,
@@ -297,6 +299,7 @@ class DetailedHandler extends InputHandler {
                   : this._Data.disabled === "비장애인"
                   ? false
                   : null,
+              enrollDay: this._Data.planToDo,
               sumWorkDay:
                 this._Data.input === "결과만 입력"
                   ? this._Data.employ_month + this._Data.employ_year * 12
@@ -378,6 +381,7 @@ class DetailedHandler extends InputHandler {
               retireReason:
                 this._Data.cal_state === "multi" ? 1 : this._Data.retireReason,
               lastWorkDay: this._Data.lastWorkDay,
+              enrollDay: this._Data.planToDo,
               isSpecial: true,
               age: isNaN(Number(getAge(new Date(String(this._Data.age))).age))
                 ? null

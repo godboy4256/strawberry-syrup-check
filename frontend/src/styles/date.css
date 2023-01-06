@@ -179,6 +179,10 @@
   top: 50%;
   transform: translateY(-50%);
 }
+.date_indiviual_prev.dp_state_off,
+.date_indiviual_next.dp_state_off {
+  display: none;
+}
 .date_indiviual_prev {
   left: 15px;
 }
@@ -199,6 +203,17 @@
 #date_indiviual_dayjob {
   overflow: hidden;
 }
+#date_indiviual_dayjob > div {
+  display: flex;
+  position: relative;
+  align-items: center;
+}
+
+#date_indiviual_container_short,
+#date_indiviual_dayjob {
+  overflow: hidden;
+}
+#date_indiviual_container_short > div,
 #date_indiviual_dayjob > div {
   display: flex;
   position: relative;
