@@ -273,7 +273,7 @@ export const veryShortSchema = {
 		tags: ["detail"],
 		body: {
 			type: "object",
-			required: ["retired", "age", "disabled", "enterDay", "retiredDay", "weekDay", "dayWorkTime", "salary"],
+			required: ["retired", "age", "disabled", "enterDay", "retiredDay", "weekDay", "weekWorkTime", "salary"],
 			properties: veryShortBodyProp,
 		},
 	},
