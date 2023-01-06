@@ -3,6 +3,7 @@ import {
   Dispatch,
   SetStateAction,
   useEffect,
+  useRef,
   useState,
 } from "react";
 import IMGDate from "../../assets/image/date_icon.svg";
@@ -16,8 +17,8 @@ import {
   Month_Calculator,
   Year_Option_Generater,
 } from "../../utils/date";
-import "../../styles/date.css";
 import { ClosePopup, CreatePopup } from "../common/Popup";
+import "../../styles/date.css";
 
 const currentDate = GetDateArr(null);
 
@@ -104,6 +105,7 @@ class DateHandler extends InputHandler {
     const viewDate = `${this._Data.year ? this._Data.year : currentDate[0]}-${
       this._Data.month ? this._Data.month : currentDate[1]
     }-${this._Data.day ? this._Data.day : currentDate[2]}`;
+    console.log(viewDate);
     if (params === "isOverTen") {
       callBack &&
         callBack(params, this.plan_todo_data.length >= 10 ? true : false);
@@ -116,6 +118,10 @@ class DateHandler extends InputHandler {
               : prev;
           }),
         ]);
+      setValueState &&
+        setValueState(
+          this.plan_todo_data.length >= 10 ? "10일 이상 근무" : "10일 이하 근무"
+        );
     } else {
       callBack && callBack(params, viewDate);
       setValueState && setValueState(viewDate);
@@ -126,9 +132,13 @@ class DateHandler extends InputHandler {
 const _DaysComp = ({
   handler,
   planToDo,
+  planToDoYear,
+  planToDoMonth,
 }: {
   handler: any;
   planToDo: string;
+  planToDoYear: string;
+  planToDoMonth: string;
 }) => {
   const [selectedDate, setSelectedDate] = useState<any>(
     planToDo ? [] : currentDate[2]
@@ -154,7 +164,10 @@ const _DaysComp = ({
                   delete_arr.splice(delete_num, 1);
                   setSelectedDate(delete_arr);
                 }
-                setSelectedDate([...selectedDate, el]);
+                setSelectedDate([
+                  ...selectedDate,
+                  `${planToDoYear}-${planToDoMonth}-${el}`,
+                ]);
                 handler.plan_todo_data = selectedDate.map((el: string) => {
                   return `${planToDo[0]}-${planToDo[1]}-${el}`;
                 });
@@ -166,13 +179,17 @@ const _DaysComp = ({
             }}
             className={`fs_16 ${
               Number(el) === selectedDate ||
-              (Array.isArray(selectedDate) && selectedDate.includes(el))
+              (Array.isArray(selectedDate) &&
+                selectedDate.includes(`${planToDoYear}-${planToDoMonth}-${el}`))
                 ? "select"
                 : ""
             }`}
           >
             {Number(el) === selectedDate ||
-            (Array.isArray(selectedDate) && selectedDate.includes(el)) ? (
+            (Array.isArray(selectedDate) &&
+              selectedDate.includes(
+                `${planToDoYear}-${planToDoMonth}-${el}`
+              )) ? (
               <div className="select_box fs_16">{el}</div>
             ) : (
               el
@@ -305,7 +322,12 @@ const _DatePopUp = ({
         <div>금</div>
         <div>토</div>
       </div>
-      <_DaysComp handler={handler} planToDo={planTodo} />
+      <_DaysComp
+        handler={handler}
+        planToDo={planTodo}
+        planToDoYear={planToDoYear}
+        planToDoMonth={planToDoMonth}
+      />
     </div>
   );
 };
@@ -463,11 +485,15 @@ export const DateInputIndividual = ({
   type: number;
   year: number | string;
 }) => {
-  console.log(String(year), String(GetDateArr(lastWorkDay)[0]));
   const [direction, setDirection] = useState(1);
+  const refIndividualPage = useRef<HTMLInputElement>(null);
   const lastMonth = GetDateArr(lastWorkDay)[1];
   const month_arr = Month_Calculator(lastMonth, "before", 12);
   const month_arr_splice = month_arr.splice(-2).concat(month_arr);
+  let locationPage = 0;
+  useEffect(() => {
+    handler._Data = {};
+  }, []);
   return (
     <div className="date_indiviual_container">
       {type === 3 || type === 4 ? (
@@ -593,204 +619,196 @@ export const DateInputIndividual = ({
         </>
       ) : (
         type === 2 && (
-          <div>
-            {direction === 1 ? (
-              <>
-                <button
-                  className="date_indiviual_prev"
-                  onClick={() => setDirection(2)}
-                >
-                  <img src={IMGPrev} alt="prev button" />
-                </button>
-                <div className="date_indiviual_page">
-                  <div>
-                    <div
-                      className={`indiviual_input_header ${
-                        String(GetDateArr(lastWorkDay)[0]) === String(year)
-                          ? "total"
-                          : ""
-                      }`}
-                    >
-                      {month_arr_splice[3]}월
-                    </div>
-                    <_IndiviualInput
-                      total={
-                        String(GetDateArr(lastWorkDay)[0]) === String(year)
-                          ? true
-                          : false
-                      }
-                      callBack={handler.SetPageVal}
-                      params={`${month_arr_splice[3]}`}
-                      pay={
-                        String(GetDateArr(lastWorkDay)[0]) === String(year)
-                          ? true
-                          : false
-                      }
-                    />
-                  </div>
-                  <div>
-                    <div
-                      className={`indiviual_input_header ${
-                        String(GetDateArr(lastWorkDay)[0]) === String(year)
-                          ? "total"
-                          : ""
-                      }`}
-                    >
-                      {month_arr_splice[2]}월
-                    </div>
-                    <_IndiviualInput
-                      total={
-                        String(GetDateArr(lastWorkDay)[0]) === String(year)
-                          ? true
-                          : false
-                      }
-                      callBack={handler.SetPageVal}
-                      params={`${month_arr_splice[2]}`}
-                      pay={
-                        String(GetDateArr(lastWorkDay)[0]) === String(year)
-                          ? true
-                          : false
-                      }
-                    />
-                  </div>
-                  <div className="unset_indiviual_input">
-                    <div className="indiviual_input_header">
-                      {month_arr_splice[1]}월
-                    </div>
-                    <div className="unset_box">UnSet</div>
-                    {String(GetDateArr(lastWorkDay)[0]) === String(year) && (
-                      <div className="unset_box">UnSet</div>
-                    )}
-                  </div>
-                  <div className="unset_indiviual_input">
-                    <div className="indiviual_input_header">
-                      {month_arr_splice[0]}월
-                    </div>
-                    <div className="unset_box">UnSet</div>
-                    {String(GetDateArr(lastWorkDay)[0]) === String(year) && (
-                      <div className="unset_box">UnSet</div>
-                    )}
-                  </div>
-                </div>
-              </>
-            ) : direction === 2 ? (
-              <>
-                <button
-                  className="date_indiviual_next"
-                  onClick={() => setDirection(1)}
-                >
-                  <img src={IMGNext} alt="next button" />
-                </button>
-                <div className="date_indiviual_page">
-                  <div>
-                    <div className="indiviual_input_header">
-                      {month_arr_splice[7]} 월
-                    </div>
-                    <_IndiviualInput
-                      callBack={handler.SetPageVal}
-                      params={`${month_arr_splice[7]}`}
-                    />
-                  </div>
-                  <div>
-                    <div className="indiviual_input_header">
-                      {month_arr_splice[6]} 월
-                    </div>
-                    <_IndiviualInput
-                      callBack={handler.SetPageVal}
-                      params={`${month_arr_splice[6]}`}
-                    />
-                  </div>
-                  <div>
-                    <div className="indiviual_input_header">
-                      {month_arr_splice[5]} 월
-                    </div>
-                    <_IndiviualInput
-                      callBack={handler.SetPageVal}
-                      params={`${month_arr_splice[5]}`}
-                    />
-                  </div>
-                  <div>
-                    <div
-                      className={`indiviual_input_header ${
-                        String(GetDateArr(lastWorkDay)[0]) === String(year)
-                          ? "total"
-                          : ""
-                      }`}
-                    >
-                      {month_arr_splice[4]} 월
-                    </div>
-                    <_IndiviualInput
-                      total={true}
-                      callBack={handler.SetPageVal}
-                      params={`${month_arr_splice[4]}`}
-                      pay={
-                        String(GetDateArr(lastWorkDay)[0]) === String(year)
-                          ? true
-                          : false
-                      }
-                    />
-                  </div>
-                </div>
-                <button
-                  className="date_indiviual_prev"
-                  onClick={() => setDirection(3)}
-                >
-                  <img src={IMGPrev} alt="prev button" />
-                </button>
-              </>
-            ) : (
-              direction === 3 && (
-                <>
-                  <div className="date_indiviual_page">
-                    <div>
-                      <div className="indiviual_input_header">
-                        {month_arr_splice[11]} 월
-                      </div>
-                      <_IndiviualInput
-                        callBack={handler.SetPageVal}
-                        params={`${month_arr_splice[11]}`}
-                      />
-                    </div>
-                    <div>
-                      <div className="indiviual_input_header">
-                        {month_arr_splice[10]} 월
-                      </div>
-                      <_IndiviualInput
-                        callBack={handler.SetPageVal}
-                        params={`${month_arr_splice[10]}`}
-                      />
-                    </div>
-                    <div>
-                      <div className="indiviual_input_header">
-                        {month_arr_splice[9]} 월
-                      </div>
-                      <_IndiviualInput
-                        callBack={handler.SetPageVal}
-                        params={`${month_arr_splice[9]}`}
-                      />
-                    </div>
-                    <div>
-                      <div className="indiviual_input_header">
-                        {month_arr_splice[8]} 월
-                      </div>
-                      <_IndiviualInput
-                        callBack={handler.SetPageVal}
-                        params={`${month_arr_splice[8]}`}
-                      />
-                    </div>
-                  </div>
-                  <button
-                    className="date_indiviual_next"
-                    onClick={() => setDirection(2)}
+          <div id="date_indiviual_dayjob">
+            <div ref={refIndividualPage}>
+              <div className="date_indiviual_page">
+                <div>
+                  <div
+                    className={`indiviual_input_header ${
+                      String(GetDateArr(lastWorkDay)[0]) === String(year)
+                        ? "total"
+                        : ""
+                    }`}
                   >
-                    <img src={IMGNext} alt="next button" />
-                  </button>
-                </>
-              )
-            )}
+                    {month_arr_splice[3]}월
+                  </div>
+                  <_IndiviualInput
+                    total={
+                      String(GetDateArr(lastWorkDay)[0]) === String(year)
+                        ? true
+                        : false
+                    }
+                    callBack={handler.SetPageVal}
+                    params={`${month_arr_splice[3]}`}
+                    pay={
+                      String(GetDateArr(lastWorkDay)[0]) === String(year)
+                        ? true
+                        : false
+                    }
+                  />
+                </div>
+                <div>
+                  <div
+                    className={`indiviual_input_header ${
+                      String(GetDateArr(lastWorkDay)[0]) === String(year)
+                        ? "total"
+                        : ""
+                    }`}
+                  >
+                    {month_arr_splice[2]}월
+                  </div>
+                  <_IndiviualInput
+                    total={
+                      String(GetDateArr(lastWorkDay)[0]) === String(year)
+                        ? true
+                        : false
+                    }
+                    callBack={handler.SetPageVal}
+                    params={`${month_arr_splice[2]}`}
+                    pay={
+                      String(GetDateArr(lastWorkDay)[0]) === String(year)
+                        ? true
+                        : false
+                    }
+                  />
+                </div>
+                <div className="unset_indiviual_input">
+                  <div className="indiviual_input_header">
+                    {month_arr_splice[1]}월
+                  </div>
+                  <div className="unset_box">UnSet</div>
+                  {String(GetDateArr(lastWorkDay)[0]) === String(year) && (
+                    <div className="unset_box">UnSet</div>
+                  )}
+                </div>
+                <div className="unset_indiviual_input">
+                  <div className="indiviual_input_header">
+                    {month_arr_splice[0]}월
+                  </div>
+                  <div className="unset_box">UnSet</div>
+                  {String(GetDateArr(lastWorkDay)[0]) === String(year) && (
+                    <div className="unset_box">UnSet</div>
+                  )}
+                </div>
+              </div>
+              <div className="date_indiviual_page">
+                <div>
+                  <div className="indiviual_input_header">
+                    {month_arr_splice[7]} 월
+                  </div>
+                  <_IndiviualInput
+                    callBack={handler.SetPageVal}
+                    params={`${month_arr_splice[7]}`}
+                  />
+                </div>
+                <div>
+                  <div className="indiviual_input_header">
+                    {month_arr_splice[6]} 월
+                  </div>
+                  <_IndiviualInput
+                    callBack={handler.SetPageVal}
+                    params={`${month_arr_splice[6]}`}
+                  />
+                </div>
+                <div>
+                  <div className="indiviual_input_header">
+                    {month_arr_splice[5]} 월
+                  </div>
+                  <_IndiviualInput
+                    callBack={handler.SetPageVal}
+                    params={`${month_arr_splice[5]}`}
+                  />
+                </div>
+                <div>
+                  <div
+                    className={`indiviual_input_header ${
+                      String(GetDateArr(lastWorkDay)[0]) === String(year)
+                        ? "total"
+                        : ""
+                    }`}
+                  >
+                    {month_arr_splice[4]} 월
+                  </div>
+                  <_IndiviualInput
+                    total={
+                      String(GetDateArr(lastWorkDay)[0]) === String(year)
+                        ? true
+                        : false
+                    }
+                    callBack={handler.SetPageVal}
+                    params={`${month_arr_splice[4]}`}
+                    pay={
+                      String(GetDateArr(lastWorkDay)[0]) === String(year)
+                        ? true
+                        : false
+                    }
+                  />
+                </div>
+              </div>
+              <div className="date_indiviual_page">
+                <div>
+                  <div className="indiviual_input_header">
+                    {month_arr_splice[11]} 월
+                  </div>
+                  <_IndiviualInput
+                    callBack={handler.SetPageVal}
+                    params={`${month_arr_splice[11]}`}
+                  />
+                </div>
+                <div>
+                  <div className="indiviual_input_header">
+                    {month_arr_splice[10]} 월
+                  </div>
+                  <_IndiviualInput
+                    callBack={handler.SetPageVal}
+                    params={`${month_arr_splice[10]}`}
+                  />
+                </div>
+                <div>
+                  <div className="indiviual_input_header">
+                    {month_arr_splice[9]} 월
+                  </div>
+                  <_IndiviualInput
+                    callBack={handler.SetPageVal}
+                    params={`${month_arr_splice[9]}`}
+                  />
+                </div>
+                <div>
+                  <div className="indiviual_input_header">
+                    {month_arr_splice[8]} 월
+                  </div>
+                  <_IndiviualInput
+                    callBack={handler.SetPageVal}
+                    params={`${month_arr_splice[8]}`}
+                  />
+                </div>
+              </div>
+            </div>
           </div>
         )
       )}
+      <button
+        className="date_indiviual_prev"
+        onClick={() => {
+          if (locationPage >= 200) return;
+          const currentRef: any = refIndividualPage.current;
+          locationPage += 100;
+          currentRef.style.left = `-${locationPage}%`;
+        }}
+      >
+        <img src={IMGPrev} alt="prev button" />
+      </button>
+      <button
+        className="date_indiviual_next"
+        onClick={() => {
+          if (locationPage <= 0) return;
+          const currentRef: any = refIndividualPage.current;
+          locationPage -= 100;
+          currentRef.style.left = `-${locationPage}%`;
+        }}
+      >
+        <img src={IMGNext} alt="next button" />
+      </button>
     </div>
   );
 };

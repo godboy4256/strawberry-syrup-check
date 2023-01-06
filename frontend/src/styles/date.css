@@ -76,6 +76,7 @@
   height: 40px;
   line-height: 40px;
   text-align: center;
+  cursor: pointer;
 }
 .date_input_container .date_input_dates > div:nth-child(7n) {
   color: rgba(45, 91, 255, 1);
@@ -127,6 +128,10 @@
 }
 .date_indiviual_page {
   width: 100%;
+  flex: none;
+  border-left: 1px solid #ccc;
+  border-right: 1px solid #ccc;
+  border-bottom: 1px solid #ccc;
 }
 .date_indiviual_page.type_2 {
   display: flex;
@@ -152,7 +157,7 @@
   border-right: none;
 }
 .date_indiviual_container {
-  min-width: 340px;
+  width: 340px;
   padding: 30px 45px;
 }
 .indiviual_input_header {
@@ -190,5 +195,12 @@
 }
 .unset_box:last-child {
   border-top: 1px solid rgba(0, 0, 0, 0.2);
-  border-bottom: 1px solid rgba(0, 0, 0, 0.2);
+}
+#date_indiviual_dayjob {
+  overflow: hidden;
+}
+#date_indiviual_dayjob > div {
+  display: flex;
+  position: relative;
+  align-items: center;
 }

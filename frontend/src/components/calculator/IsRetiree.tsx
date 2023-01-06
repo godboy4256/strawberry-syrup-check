@@ -1,16 +1,14 @@
 import Button from "../inputs/Button";
-import { Link } from "react-router-dom";
 import IMGBasicEmoticon from "../../assets/image/new/basic.svg";
-import IMGHelpIcon from "../../assets/image/new/help_icon.svg";
 import Header from "../layout/Header";
 import HelpLink from "../common/HelpLink";
 import "../../styles/retiree.css";
-
 const CalIsRetiree = ({ handler }: { handler: any }) => {
   const onClickIsRetiree = (isRetiree: boolean) => {
     handler.SetPageVal("retired", isRetiree);
     handler.setCompState(2);
   };
+
   return (
     <div className="full_height_layout_cal">
       <Header title="퇴직자 vs 퇴직예정자" leftLink="/main" leftType="BACK" />

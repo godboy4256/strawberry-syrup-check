@@ -82,6 +82,10 @@
   border-bottom: none;
   border-right: none;
 }
+.lndividual_input_container > div.select {
+  border: 1px solid #ff493a;
+  color: #ff493a;
+}
 #detail_comp_container {
   padding-bottom: 75px;
 }
