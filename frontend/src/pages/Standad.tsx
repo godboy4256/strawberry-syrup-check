@@ -46,6 +46,7 @@ const _BasicCalComp = () => {
         title={handler.GetPageVal("retired") ? "퇴직자" : "퇴직예정자"}
         leftLink="/main"
         leftType="BACK"
+        leftFunc={() => handler.setCompState && handler.setCompState(1)}
       />
       <div className="public_side_padding">
         <div id="strobarry_character">
@@ -101,7 +102,13 @@ const BasicCalPage = () => {
             {compState === 1 && <IsRetiree handler={handler} />}
             {compState === 2 && <_BasicCalComp />}
             {compState === 3 && (
-              <ResultComp cal_type="basic" result_data={handler.result} />
+              <ResultComp
+                cal_type="basic"
+                result_data={handler.result}
+                back_func={() =>
+                  handler.setCompState && handler.setCompState(2)
+                }
+              />
             )}
           </>
         </CalContainer>

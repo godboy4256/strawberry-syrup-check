@@ -343,6 +343,9 @@ const MultiCalPage = () => {
               <ResultComp
                 cal_type="multi"
                 result_data={handler.GetPageVal("result")}
+                back_func={() =>
+                  handler.setCompState && handler.setCompState(3)
+                }
               />
             )}
           </>

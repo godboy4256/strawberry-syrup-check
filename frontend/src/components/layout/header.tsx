@@ -8,11 +8,13 @@ import "../../styles/header.css";
 const Header = ({
   title,
   leftType,
+  leftFunc,
   leftLink,
 }: {
   title?: string;
   leftType?: "BACK" | "LOGO";
-  leftLink: string;
+  leftFunc?: () => void;
+  leftLink?: string;
 }) => {
   const [onMenu, setOnMenu] = useState(false);
   const onClickMenu = () => {
@@ -24,13 +26,23 @@ const Header = ({
         id="header_container"
         className={`bg_color_white ${onMenu ? "active" : ""} `}
       >
-        <Link to={leftLink}>
-          <img
-            id="header_left_contents"
-            src={leftType === "LOGO" ? IMGLogo : IMGBack}
-            alt="Go Back Button"
-          />
-        </Link>
+        {leftFunc ? (
+          <div onClick={leftFunc}>
+            <img
+              id="header_left_contents"
+              src={leftType === "LOGO" ? IMGLogo : IMGBack}
+              alt="Go Back Button"
+            />
+          </div>
+        ) : (
+          <Link to={leftLink ? leftLink : "/"}>
+            <img
+              id="header_left_contents"
+              src={leftType === "LOGO" ? IMGLogo : IMGBack}
+              alt="Go Back Button"
+            />
+          </Link>
+        )}
         <h1 className="font_color_main font_family_bold">
           {onMenu ? "메뉴" : title}
         </h1>

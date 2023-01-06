@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
+import { CreatePopup } from "../components/common/Popup";
 import Button from "../components/inputs/Button";
 import Header from "../components/layout/Header";
 import "../styles/calrecord.css";
@@ -74,8 +75,21 @@ const PrevCal = () => {
                     </div>
                   </>
                 ) : (
-                  <div className="font_family_bold">
-                    사유 : <div>근무일수 부족</div>
+                  <div
+                    onClick={() => {
+                      CreatePopup(
+                        "불인정 사유",
+                        el.disReason,
+                        "only_check",
+                        undefined,
+                        undefined,
+                        "확인"
+                      );
+                    }}
+                    className="dis_reason_container"
+                  >
+                    <div className="font_family_bold lh_27">사유 : </div>
+                    <div className="lh_27">{el.disReason}</div>
                   </div>
                 )}
                 <div className="receive_card font_color_main font_family_bold">

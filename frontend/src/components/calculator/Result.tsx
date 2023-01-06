@@ -213,14 +213,20 @@ const _UnSupplyResult = ({
 export const ResultComp = ({
   cal_type,
   result_data,
+  back_func,
 }: {
   cal_type: 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | "basic" | "multi";
   result_data: any;
+  back_func: () => void;
 }) => {
-  console.log("결과", result_data);
   return (
     <>
-      <Header title="계산 결과" leftLink="/main" leftType="BACK" />
+      <Header
+        title="계산 결과"
+        leftLink="/main"
+        leftType="BACK"
+        leftFunc={back_func}
+      />
       {cal_type === "multi" &&
         // 복수형
         (result_data.succ ? (

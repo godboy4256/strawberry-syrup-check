@@ -45,8 +45,6 @@
   display: flex;
   justify-content: space-between;
 }
-.cal_record_card > div:last-child {
-}
 .cal_record_card .receive_card {
   border: 1px solid #ff6559;
   padding: 6px 0;
@@ -68,4 +66,17 @@
 }
 .cal_reacor_btncontainer .normal_sub {
   color: #ff6559;
+}
+.dis_reason_container {
+  display: flex;
+}
+.dis_reason_container div:last-child {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  width: 70%;
+  max-height: 54px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  text-align: right;
 }

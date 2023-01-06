@@ -38,47 +38,64 @@ const IndividualInput = ({
   description: string[];
 }) => {
   const current_year_list = Year_Option_Generater(10);
+  const [selectYears, setSelectYears] = useState<string[]>([]);
   const onClickPopUpDate = (year: string) => {
-    CreatePopup(
-      `${String(year)}년`,
-      <DateInputIndividual
-        type={handler.GetPageVal("workCate")}
-        handler={handler2}
-        lastWorkDay={handler.GetPageVal("lastWorkDay")}
-        year={year}
-      />,
-      "confirm",
-      () => {
-        const months = Object.keys(handler2._Data).map((el) => {
-          return handler2._Data[el];
-        });
-        handler2._Data_arr.push({
-          year: Number(year),
-          months,
-        });
-        handler.SetPageVal("workRecord", handler2._Data_arr);
-        handler.SetPageVal(
-          "sumWorkDay",
-          handler.sumDayJobWorkingDay(handler2._Data_arr)[0]
-        );
-        handler.SetPageVal(
-          "dayAvgPay",
-          handler.sumDayJobWorkingDay(handler2._Data_arr)[1]
-        );
-        ClosePopup();
-      }
-    );
+    if (!handler.GetPageVal("lastWorkDay")) {
+      CreatePopup(undefined, "마지막 근무일을 선택해주세요", "only_check");
+    } else {
+      CreatePopup(
+        `${String(year)}년`,
+        <DateInputIndividual
+          type={handler.GetPageVal("workCate")}
+          handler={handler2}
+          lastWorkDay={handler.GetPageVal("lastWorkDay")}
+          year={year}
+        />,
+        "confirm",
+        () => {
+          const months = Object.keys(handler2._Data).map((el) => {
+            return handler2._Data[el];
+          });
+          if (selectYears.includes(year)) {
+            handler2._Data_arr = handler2._Data_arr.filter((el: any) => {
+              return String(el.year) !== year;
+            });
+          }
+          handler2._Data_arr.push({
+            year: Number(year),
+            months,
+          });
+          handler.SetPageVal("workRecord", handler2._Data_arr);
+          handler.SetPageVal(
+            "sumWorkDay",
+            handler.sumDayJobWorkingDay(handler2._Data_arr)[0]
+          );
+          handler.SetPageVal(
+            "dayAvgPay",
+            handler.sumDayJobWorkingDay(handler2._Data_arr)[1]
+          );
+          setSelectYears(
+            handler2._Data_arr.map((el: any) => {
+              return String(el.year);
+            })
+          );
+          ClosePopup();
+        }
+      );
+    }
   };
   return (
     <>
       <label className="fs_16 write_label">{label}</label>
       <div className="lndividual_input_container flex_box">
-        {current_year_list.map((el) => {
+        {current_year_list.map((el: string) => {
           return (
             <div
               onClick={() => onClickPopUpDate(el)}
               key={String(Date.now()) + el}
-              className="fs_16 pd_810"
+              className={`fs_16 pd_810 ${
+                selectYears.includes(el) ? "select" : ""
+              }`}
             >
               {el}
             </div>
@@ -308,6 +325,10 @@ const _DetailCal02 = ({ handler }: { handler: any }) => {
 const _DetailCal03 = ({ handler }: { handler: any }) => {
   useEffect(() => {
     handler.SetPageVal("input", "개별 입력");
+    handler.SetPageVal(
+      "is_short",
+      handler.GetPageVal("workCate") === 3 ? "예술인" : "특고"
+    );
   }, []);
   return (
     <_Belong_Form_Tab
@@ -519,7 +540,16 @@ export const DetailCalComp = ({
 }) => {
   return (
     <div id={`${workCate !== 6 ? "detail_comp_container" : ""}`}>
-      <Header title="정보입력" leftLink="/main" leftType="BACK" />
+      <Header
+        title="정보입력"
+        leftLink="/main"
+        leftType="BACK"
+        leftFunc={() =>
+          handler.setCompState(
+            handler.GetPageVal("cal_state") === "multi" ? 1 : 2
+          )
+        }
+      />
       <div className={`${workCate !== 6 ? "public_side_padding" : ""}`}>
         {workCate !== 6 && (
           <>
@@ -577,19 +607,8 @@ const DetailCalPage = () => {
                 handler={handler}
                 workCate={handler.GetPageVal("workCate")}
                 clickCallBack={async () => {
-                  /** 근료형태
-                   * 0: 정규직
-                   * 1: 기간제
-                   * 2: 예술인
-                   * 3: 특고
-                   * 4: 단기 예술인
-                   * 5: 단기 특고
-                   * 6: 일용직
-                   * 7: 초단시간
-                   * 8: 자영업
-                   */
-
                   const result_data = await handler.Action_Cal_Result();
+                  console.log(handler.GetPageVal("workCate"));
                   calRecording(
                     result_data,
                     "상세형",
@@ -598,13 +617,9 @@ const DetailCalPage = () => {
                       : handler.GetPageVal("workCate") === 1
                       ? "기간제"
                       : handler.GetPageVal("workCate") === 2
-                      ? "예술인"
-                      : handler.GetPageVal("workCate") === 3
-                      ? "특고"
+                      ? handler.GetPageVal("is_short")
                       : handler.GetPageVal("workCate") === 4
-                      ? "단기 예술인"
-                      : handler.GetPageVal("workCate") === 5
-                      ? "단기 특고"
+                      ? handler.GetPageVal("is_short")
                       : handler.GetPageVal("workCate") === 6
                       ? "일용직"
                       : handler.GetPageVal("workCate") === 7
@@ -621,6 +636,7 @@ const DetailCalPage = () => {
               <ResultComp
                 cal_type={handler.GetPageVal("workCate")}
                 result_data={handler.GetPageVal("result")}
+                back_func={() => handler.setCompState(3)}
               />
             )}
           </>

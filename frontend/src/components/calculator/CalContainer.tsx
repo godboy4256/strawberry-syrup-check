@@ -10,8 +10,11 @@ const CalContainer = ({
   type: string;
   GetValue?: CallableFunction;
 }) => {
-  const isRetiree =
-    GetValue && GetValue("isRetiree") ? "> 퇴직자" : "> 퇴직예정자 ";
+  console.log(GetValue && GetValue("isRetiree"));
+  // const isRetiree =
+  //   GetValue && GetValue("isRetiree") ? "> 퇴직자" : "> 퇴직예정자 ";
+  // const isRetiree = GetValue("isRetiree");
+  // GetValue("isRetiree") ? "> 퇴직자" : "> 퇴직예정자 ";
   const workCate =
     GetValue &&
     (GetValue("workCate") === 0
@@ -32,7 +35,13 @@ const CalContainer = ({
   return (
     <div id="cal_container" className="header_top_space">
       <div id="cal_current_guide" className="pd_810 fs_14">
-        {`${type} ${isRetiree} ${workCate}`}
+        {`${type} ${
+          GetValue && GetValue("retired") !== undefined
+            ? GetValue("retired")
+              ? "> 퇴직자"
+              : "> 퇴직예정자"
+            : ""
+        } ${workCate}`}
       </div>
       {children}
     </div>
