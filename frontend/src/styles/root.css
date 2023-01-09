@@ -21,6 +21,9 @@
 .font_color_white {
   color: white;
 }
+.font_color_point {
+  color: #000aff;
+}
 .un_value_font_color {
   color: rgba(0, 0, 0, 0.2);
 }
@@ -122,6 +125,7 @@
 .help_link span {
   color: #0089ed;
 }
+
 #reset_button {
   display: flex;
   align-items: center;
@@ -152,4 +156,8 @@
 }
 .br_l {
   border-left: 1px solid #ccc;
+}
+
+.txt_ct {
+  text-align: center;
 }
