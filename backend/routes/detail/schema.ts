@@ -16,6 +16,7 @@ export type TstandardInput = {
 
 	isEnd: boolean;
 	limitDay: string;
+	isMany: boolean;
 };
 
 export type TartInput = {
@@ -33,6 +34,7 @@ export type TartInput = {
 
 	isEnd: boolean;
 	limitDay: string;
+	isMany: boolean;
 };
 
 export type TartShortInput = {
@@ -52,6 +54,7 @@ export type TartShortInput = {
 	hasWork: [boolean, string];
 	isEnd: boolean;
 	limitDay: string;
+	isMany: boolean;
 };
 
 export type TdayJobInput = {
@@ -70,6 +73,7 @@ export type TdayJobInput = {
 	isSimple: boolean;
 	isOverTen: boolean;
 	hasWork: [boolean, string];
+	isMany: boolean;
 };
 
 export type TveryShortInput = {
@@ -83,6 +87,7 @@ export type TveryShortInput = {
 	salary: number[];
 	isEnd: boolean;
 	limitDay: string;
+	isMany: boolean;
 };
 
 const standardBodyProp = {
