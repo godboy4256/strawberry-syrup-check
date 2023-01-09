@@ -5,6 +5,7 @@ import MultiCalPage from "./pages/MultiPage";
 import CalRecord from "./pages/CalRecord";
 import BasicCalPage from "./pages/Standad";
 import "./styles/root.css";
+import HelpPage from "./pages/HelpPage";
 
 function App() {
   return (
@@ -14,6 +15,7 @@ function App() {
       <Route path="/detailed" element={<DetailCalPage />} />
       <Route path="/multi" element={<MultiCalPage />} />
       <Route path="/calrecord" element={<CalRecord />} />
+      <Route path="/help/*" element={<HelpPage />} />
     </Routes>
   );
 }

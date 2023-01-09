@@ -22,7 +22,7 @@ const SideMenu = () => {
       <Link to="/" className="font_family_bold">
         서식자료실
       </Link>
-      <Link to="/" className="font_family_bold">
+      <Link to="/help/1" className="font_family_bold">
         도움말
       </Link>
       <Link to="/calrecord" className="font_family_bold">
