@@ -431,6 +431,7 @@ export default function detailRoute(fastify: FastifyInstance, options: any, done
 				amountCost: realDayPay * receiveDay,
 				dayAvgPay,
 				realDayPay,
+				receiveDay,
 				realMonthPay,
 				workingDays: req.body.sumWorkDay,
 				severancePay:
