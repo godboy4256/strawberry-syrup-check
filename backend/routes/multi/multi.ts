@@ -9,7 +9,7 @@ import { getEmployerReceiveDay } from "../detail/function";
 import { multiSchema, TaddData, TmainData } from "./schema";
 import { getDuplicateAcquisitionInfo, makeAddCadiates } from "./function/checkDuplicationAcquisition";
 import { commonCasePermitCheck, doubleCasePermitCheck, mergeWorkingDays } from "./function/permitCheck";
-import { checkBasicRequirements } from "./function/checkBasicRequirements";
+import { checkMultiBasicRequirements } from "./function/checkBasicRequirements";
 
 dayjs.extend(isSameOrAfter);
 
@@ -25,7 +25,7 @@ export default function multiRoute(fastify: FastifyInstance, options: any, done:
 
 		// 1. 기본 조건 확인
 		console.log("start" + 1);
-		const checkResult = checkBasicRequirements(mainData);
+		const checkResult = checkMultiBasicRequirements(mainData);
 		if (!checkResult.succ) return { checkResult };
 
 		/////////////////////////////////////////////////////////// 자영업자 관련 조건 확인 필터

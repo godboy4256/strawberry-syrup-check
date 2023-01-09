@@ -247,7 +247,7 @@ export const shortArtSchema = {
 		tags: ["detail"],
 		body: {
 			type: "object",
-			required: ["age", "disabled", "lastWorkDay", "hasWork"],
+			required: ["age", "disabled", "lastWorkDay", "hasWork", "isSimple"],
 			properties: shortArtBodyProp,
 		},
 	},
