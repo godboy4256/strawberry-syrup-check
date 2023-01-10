@@ -73,17 +73,17 @@ export function sumArtShortPay(limitDay: number[], sortedData: any[]) {
 	// artShortCheckPermit 과 다르게 12개월 임
 	let sumOneYearPay = 0;
 	let sumOneYearWorkDay = 0;
-	sortedData.map((v: { year: number; months: any[] }) => {
+	sortedData.forEach((v: { year: number; months: any[] }) => {
 		if (v.year >= limitDay[0]) {
 			if (v.year == limitDay[0]) {
-				v.months.map((v: { month: number; workDay: number; pay: number }) => {
+				v.months.forEach((v: { month: number; workDay: number; pay: number }) => {
 					if (v.month >= limitDay[1]) {
 						sumOneYearPay += v.pay;
 						sumOneYearWorkDay += v.workDay;
 					}
 				});
 			} else {
-				v.months.map((v: { month: number; workDay: number; pay: number }) => {
+				v.months.forEach((v: { month: number; workDay: number; pay: number }) => {
 					sumOneYearPay += v.pay;
 					sumOneYearWorkDay += v.workDay;
 				});
@@ -101,8 +101,8 @@ export function calArtShortWorkingMonth(workRecord: any[], isSimple: boolean = f
 		return workingMonth;
 	}
 
-	workRecord.map((v) => {
-		v.months.map((v: { month: number; workDay: number; pay: number }) => {
+	workRecord.forEach((v) => {
+		v.months.forEach((v: { month: number; workDay: number; pay: number }) => {
 			if (v.workDay >= 11) {
 				workingMonth++;
 			} else {
@@ -119,16 +119,16 @@ export function dayJobCheckPermit(limitDay: number[], workRecord: any, isSimple:
 	if (isSimple) {
 		return workRecord >= 180 ? [true] : [false, workRecord, 180 - workRecord];
 	} else {
-		workRecord.map((v: { year: number; months: any[] }) => {
+		workRecord.forEach((v: { year: number; months: any[] }) => {
 			if (v.year >= limitDay[0]) {
 				if (v.year === limitDay[0]) {
-					v.months.map((v: { month: number; workDay: number }) => {
+					v.months.forEach((v: { month: number; workDay: number }) => {
 						if (v.month >= limitDay[1]) {
 							sumWorkDay += v.workDay;
 						}
 					});
 				} else {
-					v.months.map((v: { month: number; workDay: number }) => {
+					v.months.forEach((v: { month: number; workDay: number }) => {
 						sumWorkDay += v.workDay;
 					});
 				}
@@ -147,8 +147,8 @@ export function sumDayJobWorkingDay(workRecord: any[], isSimple: boolean = false
 		return 1;
 		// sumJoinMonth = workRecord[0] * 12 + workRecord[1];
 	} else {
-		workRecord.map((v: { year: number; months: any[] }) => {
-			v.months.map((v: { month: number; workDay: number }) => {
+		workRecord.forEach((v: { year: number; months: any[] }) => {
+			v.months.forEach((v: { month: number; workDay: number }) => {
 				sumWorkDay += v.workDay;
 			});
 		});
@@ -283,7 +283,7 @@ export function calEmployerSumPay(
 	insuranceGrade: any
 ) {
 	let sumPay = 0;
-	workList.map((workElement, idx) => {
+	workList.forEach((workElement, idx) => {
 		const grade: 1 | 2 | 3 | 4 | 5 | 6 | 7 = insuranceGrade[workElement[0]];
 
 		if (idx === 0) {

@@ -42,7 +42,7 @@ export const getDuplicateAcquisitionInfo = (mainData: TmainData, permitAddCandid
 		const artWorkCates = [2, 4];
 		const specialWorkCates = [3, 5];
 
-		permitAddCandidates.map((permitAddCandidate) => {
+		permitAddCandidates.forEach((permitAddCandidate) => {
 			if (artWorkCates.includes(permitAddCandidate.workCate)) {
 				artWorkCount.count++;
 				artWorkCount.permitMonths += permitAddCandidate.permitDays;
