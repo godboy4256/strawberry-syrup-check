@@ -1,0 +1,80 @@
+#helppage_container {
+  margin-top: 50px;
+  padding-bottom: 70px;
+  min-height: calc(100vh - 80px);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  position: relative;
+}
+.help_main_title {
+  padding: 35px 0 15px;
+  text-align: center;
+  font-size: 21px;
+}
+.help_box {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  border: 1px solid rgba(0, 0, 0, 0.4);
+  border-radius: 2px;
+  padding: 10px;
+  line-height: 21px;
+  margin-bottom: 15px;
+}
+.help_title {
+  text-align: center;
+  padding-bottom: 10px;
+}
+.help_guide_list li {
+  list-style: disc;
+  margin-left: 20px;
+}
+.info_table_help {
+  border: 1px solid #000;
+  border-right: none;
+  border-bottom: none;
+  table-layout: auto;
+}
+.info_table_help * {
+  font-size: 12px;
+}
+.info_table_list:nth-child(1) {
+  width: 11%;
+}
+.info_table_list:nth-child(2) {
+  width: 16%;
+}
+.info_table_list:nth-child(3) {
+  width: 15%;
+}
+.info_table_list:last-child {
+  width: 58%;
+}
+.info_table_list.last_childe_w {
+  width: 89%;
+}
+.info_table_list {
+  text-align: center;
+  font-size: 12px;
+  padding: 10px 0;
+  border-right: 1px solid #000;
+  border-bottom: 1px solid #000;
+}
+.help_appli {
+  padding-top: 20px;
+  margin-left: auto;
+  font-family: NanumSrRegular;
+}
+.table_bg_color1 {
+  background-color: #bfc0bf;
+}
+.table_bg_color2 {
+  background-color: #dcdcdc;
+}
+.table_bg_color3 {
+  background-color: #fff056;
+}
+.table_bg_color4 {
+  background-color: #89fb4e;
+}

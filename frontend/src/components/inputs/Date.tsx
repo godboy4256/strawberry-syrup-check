@@ -1,6 +1,7 @@
 import {
   ChangeEvent,
   Dispatch,
+  MouseEvent,
   SetStateAction,
   useEffect,
   useRef,
@@ -447,6 +448,8 @@ const _IndiviualInput = ({
   total?: boolean;
   pay?: boolean;
 }) => {
+  const [value, setValue] = useState<string>("");
+  const [value2, setValue2] = useState<string>("");
   const indiviual_export_data: any = { month: Number(params) };
   const onChangeInput = (params_in: string, value: any) => {
     indiviual_export_data[params_in] = Number(value);
@@ -455,19 +458,39 @@ const _IndiviualInput = ({
   return (
     <div className="indiviual_input_container fs_14">
       <input
-        className={total ? "total" : ""}
+        maxLength={2}
+        className={`${total ? "total" : ""} font_color_main`}
         placeholder="근로일수"
-        onChange={(e: ChangeEvent<HTMLInputElement>) =>
-          onChangeInput(pay ? "three_mbp" : "day", e.currentTarget.value)
-        }
+        onChange={(e: ChangeEvent<HTMLInputElement>) => {
+          // let protoNum = Number(e.currentTarget.value.split(",").join(""));
+          // let toStringNum = String(Number(protoNum).toLocaleString());
+          // if (isNaN(protoNum) || toStringNum.length > 2) {
+          //   return;
+          // } else {
+          //   callBack &&
+          //     callBack(Array.isArray(params) ? params[0] : params, protoNum);
+          //   setValue2(toStringNum);
+          // }
+          onChangeInput(pay ? "three_mbp" : "day", e.currentTarget.value);
+        }}
       />
       {pay && (
         <input
-          className={total ? "total" : ""}
+          className={`${total ? "total" : ""} font_color_main`}
           placeholder="월 임금총액"
-          onChange={(e: ChangeEvent<HTMLInputElement>) =>
-            onChangeInput("pay", e.currentTarget.value)
-          }
+          onChange={(e: ChangeEvent<HTMLInputElement>) => {
+            // console.log(e.currentTarget.value.split(",").join(""));
+            // let protoNum = Number(e.currentTarget.value.split(",").join(""));
+            // let toStringNum = String(Number(protoNum).toLocaleString());
+            // if (isNaN(protoNum) || toStringNum.length > 11) {
+            //   return;
+            // } else {
+            //   callBack &&
+            //     callBack(Array.isArray(params) ? params[0] : params, protoNum);
+            //   setValue(toStringNum);
+            // }
+            onChangeInput("pay", e.currentTarget.value);
+          }}
         />
       )}
     </div>
@@ -485,7 +508,6 @@ export const DateInputIndividual = ({
   type: number;
   year: number | string;
 }) => {
-  const [direction, setDirection] = useState(1);
   const refIndividualPage = useRef<HTMLInputElement>(null);
   const lastMonth = GetDateArr(lastWorkDay)[1];
   const month_arr = Month_Calculator(lastMonth, "before", 12);
@@ -497,8 +519,8 @@ export const DateInputIndividual = ({
   return (
     <div className="date_indiviual_container">
       {type === 3 || type === 4 ? (
-        <>
-          {direction === 1 ? (
+        <div id="date_indiviual_container_short">
+          <div ref={refIndividualPage}>
             <div className="date_indiviual_page type_2">
               <div className="br_r">
                 <div className="indiviual_input_header">1 월</div>
@@ -548,75 +570,59 @@ export const DateInputIndividual = ({
                   pay={true}
                 />
               </div>
-              <button
-                className="date_indiviual_next"
-                onClick={() => setDirection(2)}
-              >
-                <img src={IMGNext} alt="e button" />
-              </button>
             </div>
-          ) : (
-            direction === 2 && (
-              <div className="date_indiviual_page type_2">
-                <button
-                  className="date_indiviual_prev"
-                  onClick={() => setDirection(1)}
-                >
-                  <img src={IMGPrev} alt="prev button" />
-                </button>
-
-                <div className="br_r">
-                  <div className="indiviual_input_header">7 월</div>
-                  <_IndiviualInput
-                    callBack={handler.SetPageVal}
-                    params="7"
-                    pay={true}
-                  />
-                </div>
-                <div>
-                  <div className="indiviual_input_header">8 월</div>
-                  <_IndiviualInput
-                    callBack={handler.SetPageVal}
-                    params="8"
-                    pay={true}
-                  />
-                </div>
-                <div className="br_r">
-                  <div className="indiviual_input_header">9 월</div>
-                  <_IndiviualInput
-                    callBack={handler.SetPageVal}
-                    params="9"
-                    pay={true}
-                  />
-                </div>
-                <div>
-                  <div className="indiviual_input_header">10 월</div>
-                  <_IndiviualInput
-                    callBack={handler.SetPageVal}
-                    params="10"
-                    pay={true}
-                  />
-                </div>
-                <div className="br_r">
-                  <div className="indiviual_input_header">11 월</div>
-                  <_IndiviualInput
-                    callBack={handler.SetPageVal}
-                    params="11"
-                    pay={true}
-                  />
-                </div>
-                <div>
-                  <div className="indiviual_input_header">12 월</div>
-                  <_IndiviualInput
-                    callBack={handler.SetPageVal}
-                    params="12"
-                    pay={true}
-                  />
-                </div>
+            <div className="date_indiviual_page type_2">
+              <div className="br_r">
+                <div className="indiviual_input_header">7 월</div>
+                <_IndiviualInput
+                  callBack={handler.SetPageVal}
+                  params="7"
+                  pay={true}
+                />
               </div>
-            )
-          )}
-        </>
+              <div>
+                <div className="indiviual_input_header">8 월</div>
+                <_IndiviualInput
+                  callBack={handler.SetPageVal}
+                  params="8"
+                  pay={true}
+                />
+              </div>
+              <div className="br_r">
+                <div className="indiviual_input_header">9 월</div>
+                <_IndiviualInput
+                  callBack={handler.SetPageVal}
+                  params="9"
+                  pay={true}
+                />
+              </div>
+              <div>
+                <div className="indiviual_input_header">10 월</div>
+                <_IndiviualInput
+                  callBack={handler.SetPageVal}
+                  params="10"
+                  pay={true}
+                />
+              </div>
+              <div className="br_r">
+                <div className="indiviual_input_header">11 월</div>
+                <_IndiviualInput
+                  callBack={handler.SetPageVal}
+                  params="11"
+                  pay={true}
+                />
+              </div>
+              <div>
+                <div className="indiviual_input_header">12 월</div>
+                <_IndiviualInput
+                  callBack={handler.SetPageVal}
+                  params="12"
+                  pay={true}
+                />
+              </div>
+            </div>
+          </div>
+        </div>
       ) : (
         type === 2 && (
           <div id="date_indiviual_dayjob">
@@ -790,6 +796,7 @@ export const DateInputIndividual = ({
       <button
         className="date_indiviual_prev"
         onClick={() => {
+          if (type === 3 || type === 4) if (locationPage >= 100) return;
           if (locationPage >= 200) return;
           const currentRef: any = refIndividualPage.current;
           locationPage += 100;
@@ -801,7 +808,8 @@ export const DateInputIndividual = ({
       <button
         className="date_indiviual_next"
         onClick={() => {
-          if (locationPage <= 0) return;
+          if (type === 2) return;
+          if (type === 3 || type === 4) if (locationPage <= 0) return;
           const currentRef: any = refIndividualPage.current;
           locationPage -= 100;
           currentRef.style.left = `-${locationPage}%`;

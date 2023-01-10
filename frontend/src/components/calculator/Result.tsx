@@ -6,7 +6,6 @@ import EMTDetailFullTimeSupply from "../../assets/image/emoticon/detail_fulltime
 import EMTDetailContractSupply from "../../assets/image/emoticon/detail_contract_supply.svg";
 import EMTDetailVeryShortsSupply from "../../assets/image/emoticon/detail_veryshort_supply.svg";
 import EMTBasicSupplyRetiree from "../../assets/image/emoticon/standad_retiree_supply.svg";
-
 import EMTDetailArtsUnSupply from "../../assets/image/emoticon/detail_arts_unsupply.svg";
 import EMTDetailSpecialsUnSupply from "../../assets/image/emoticon/detail_specials_unsupply.svg";
 import EMTDetailDayJobUnSupply from "../../assets/image/emoticon/detail_dayjob_unsupply.svg";
@@ -14,8 +13,6 @@ import EMTDetailEmployUnSupply from "../../assets/image/emoticon/detail_employ_u
 import EMTDetailFullTimeUnSupply from "../../assets/image/emoticon/detail_fulltime_unsupply.svg";
 import EMTDetailContractUnSupply from "../../assets/image/emoticon/detail_contract_unsupply.svg";
 import EMTDetailVeryShortsUnSupply from "../../assets/image/emoticon/detail_veryshort_unsupply.svg";
-
-import EMTBasicUnSupplyUnRetiree from "../../assets/image/emoticon/standad_unretiree_unsupply.svg";
 import EMTBasicUnSupplyRetiree from "../../assets/image/emoticon/standad_retiree_unsupply.svg";
 import HelpLink from "../common/HelpLink";
 import Button from "../inputs/Button";
@@ -101,13 +98,7 @@ const _SupplyResult = ({
         <span className="font_color_main fs_14">이전 계산 내역</span>
         에서 확인하실 수 있습니다.
       </div>
-      {help && (
-        <HelpLink
-          text="일용직도 퇴직금을 받을 수 있다?"
-          link="/"
-          direction="r"
-        />
-      )}
+      {help && <HelpLink text={help[1]} link={help[0]} direction="r" />}
       <div id="result_guide_comment02">
         <div className="fs_10">
           계약 내용 등 구체적인 사정에 따라 결과가 달라질 수 있습니다.
@@ -126,7 +117,7 @@ const _UnSupplyResult = ({
   result_data,
   average_guide,
   helps = ["피보험단위기간이란 무엇인가요?", "근무일수가 부족하다면?"],
-  helps_to = ["/", "/"],
+  helps_to = ["/help/2", "/help/1"],
   twoweek_guide = false,
 }: {
   emoticon: string;
@@ -137,7 +128,6 @@ const _UnSupplyResult = ({
   helps_to?: string[];
   twoweek_guide?: boolean;
 }) => {
-  console.log("결과", result_data);
   return (
     <div id="result_container">
       <img id="result_emoticon" src={emoticon} alt="Result Emoticon" />
@@ -289,7 +279,7 @@ export const ResultComp = ({
           <_SupplyResult
             result_data={result_data}
             emoticon={EMTDetailDayJobSupply}
-            help={["", "일용직도 퇴직금을 받을 수 있다?"]}
+            help={["/help/7", "일용직도 퇴직금을 받을 수 있다?"]}
           />
         ) : (
           <_UnSupplyResult
@@ -316,7 +306,9 @@ export const ResultComp = ({
                 ? ["단기예술인 실업급여의 계산방법이 궁금하신가요?"]
                 : ["저는 여러 건을 합치면 월 평균 기준이 되는데요?"]
             }
-            helps_to={result_data.is_short === "단기 예술인" ? ["/"] : ["/"]}
+            helps_to={
+              result_data.is_short === "단기 예술인" ? ["/help/6"] : ["/help/8"]
+            }
             average_guide={
               result_data.is_short !== "단기 예술인" ? "50만원" : ""
             }
@@ -333,6 +325,14 @@ export const ResultComp = ({
           <_UnSupplyResult
             emoticon={EMTDetailSpecialsUnSupply}
             unit="month"
+            helps={
+              result_data.is_short === "단기특고"
+                ? ["저는 여러 건을 합치면 월 평균 기준이 되는데요?"]
+                : undefined
+            }
+            helps_to={
+              result_data.is_short === "단기특고" ? ["/help/9"] : undefined
+            }
             result_data={result_data}
           />
         ))}
@@ -367,7 +367,7 @@ export const ResultComp = ({
         ))}
       <div id="result_button_container">
         {cal_type !== "basic" && (
-          <Link to="/main">
+          <Link to="/multi">
             <Button
               text={result_data.succ ? "N달 더 일하면?" : "복수형 계산기로"}
               type="popup_cancel"

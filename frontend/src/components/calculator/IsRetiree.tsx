@@ -32,7 +32,7 @@ const CalIsRetiree = ({ handler }: { handler: any }) => {
         </div>
         <HelpLink
           text="퇴직사유 알아보기"
-          link="/"
+          link="/help/3"
           direction="l"
           className="pd_810"
         />
