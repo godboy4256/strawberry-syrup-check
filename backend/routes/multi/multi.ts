@@ -13,12 +13,12 @@ import { checkMultiBasicRequirements } from "./function/checkBasicRequirements";
 
 dayjs.extend(isSameOrAfter);
 
-type employerMultiRequest = FastifyRequest<{
-	Body: { mainData: TmainData; addDatas: TaddData[] };
+type multiRequest = FastifyRequest<{
+	Body: { mainData: TmainData; addData: TaddData[] };
 }>;
 
 export default function multiRoute(fastify: FastifyInstance, options: any, done: any) {
-	fastify.post("/", multiSchema, (req: any, res: FastifyReply) => {
+	fastify.post("/", multiSchema, (req: multiRequest, res: FastifyReply) => {
 		const mainData: TmainData = req.body.mainData;
 		let addDatas: TaddData[] = req.body.addData;
 		const leastRequireWorkingDay = requiredWorkingDay[mainData.workCate]; // 근로 형태에 맞는 기한 가져오기
@@ -149,8 +149,8 @@ export default function multiRoute(fastify: FastifyInstance, options: any, done:
 	});
 
 	// 구직급여 신청 근로형태가 자영업자인 경우 이  api를 사용한다.
-	fastify.post("/employer", {}, (req: employerMultiRequest, res: FastifyReply) => {
-		const { mainData, addDatas } = req.body;
+	fastify.post("/employer", {}, (req: multiRequest, res: FastifyReply) => {
+		const { mainData, addData } = req.body;
 		const mainEnterDay = dayjs(mainData.enterDay);
 		const mainRetiredDay = dayjs(mainData.retiredDay);
 		const leastRequireWorkingDay = requiredWorkingDay[mainData.workCate];
@@ -161,7 +161,7 @@ export default function multiRoute(fastify: FastifyInstance, options: any, done:
 		if (!checkResult.succ) return { checkResult };
 
 		// 2. 자영업자 관련 조건 확인 필터
-		const filteredAddDatas = addDatas.filter((el) => el.workCate === 8 || el.workCate === 2 || el.workCate === 3);
+		const filteredAddDatas = addData.filter((el) => el.workCate === 8 || el.workCate === 2 || el.workCate === 3);
 		if (filteredAddDatas.length === 0) {
 			res.statusCode = 204;
 			return { succ: true };
