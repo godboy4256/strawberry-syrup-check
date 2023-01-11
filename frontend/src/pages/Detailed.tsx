@@ -487,13 +487,6 @@ const _DetailCal04 = ({ handler }: { handler: any }) => {
         callBack={handler.SetPageVal}
         params="time"
       />
-      <NumberUpDown
-        label="근무일수"
-        label_unit="주"
-        unit="일"
-        callBack={handler.SetPageVal}
-        params="week"
-      />
       <TabInputs
         label="월 급여"
         type="salary"

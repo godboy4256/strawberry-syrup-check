@@ -173,6 +173,16 @@
 .indiviual_input_header.total {
   padding: 4px 10px;
 }
+.indiviual_input_header.unset_nop {
+  background-color: #c5c5c5;
+  color: #a3a3a3;
+  border-bottom: 1px solid #ccc;
+}
+.indiviual_input_header.unset_header {
+  background-color: #c5c5c5;
+  color: #a3a3a3;
+  border-bottom: 1px solid #ccc;
+}
 .date_indiviual_prev,
 .date_indiviual_next {
   position: absolute;
@@ -191,6 +201,15 @@
 }
 .unset_indiviual_input > .indiviual_input_header {
   background-color: rgba(0, 0, 0, 0.2);
+}
+.unset_box_short {
+  padding: 11px 10px;
+  line-height: 21px;
+  font-size: 0;
+  border-bottom: 1px solid #ccc;
+}
+.unset_box_short:last-child {
+  border-bottom: none;
 }
 .unset_box {
   padding: 4px 10px;

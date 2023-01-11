@@ -16,15 +16,19 @@ class DetailedHandler extends InputHandler {
     undefined;
 
   public sumWorkDay = (workRecord: any) => {
-    let result = 0;
+    let result = 0,
+      notOverTen = 0;
     workRecord.map((el: any) => {
       return el.months.map((el: any) => {
-        if (el.day > 10) {
+        if (el.day >= 11) {
           result += 1;
+        } else {
+          notOverTen += el.day;
         }
       });
     });
-    return result;
+    console.log(Math.ceil(((notOverTen / 22) * 10) / 10));
+    return result + Math.ceil(((notOverTen / 22) * 10) / 10);
   };
 
   public sumOneYearResult = (
@@ -69,7 +73,6 @@ class DetailedHandler extends InputHandler {
         })
       );
     });
-
     paysArr.forEach((el: any) => {
       return el.forEach((el: any) => {
         if (type === "day") {
@@ -309,14 +312,7 @@ class DetailedHandler extends InputHandler {
                     this._Data.lastWorkDay,
                     "two_year"
                   )
-                : 100000,
-              sumOneYearWorkDay: this._Data.workRecord
-                ? this.sumOneYearResult(
-                    this._Data.workRecord,
-                    this._Data.lastWorkDay,
-                    "day"
-                  )
-                : 100000,
+                : null,
               sumOneYearPay:
                 this._Data.input === "결과만 입력"
                   ? this._Data.sumOneYearPay
@@ -340,6 +336,7 @@ class DetailedHandler extends InputHandler {
                 )
               ),
               isEnd: this._Data.cal_state ? true : false,
+              isSimple: this._Data.input === "개별 입력" ? true : false,
             }
           : {
               ...this._Data,
@@ -397,14 +394,7 @@ class DetailedHandler extends InputHandler {
                     this._Data.lastWorkDay,
                     "two_year"
                   )
-                : 100000,
-              sumOneYearWorkDay: this._Data.workRecord
-                ? this.sumOneYearResult(
-                    this._Data.workRecord,
-                    this._Data.lastWorkDay,
-                    "day"
-                  )
-                : 100000,
+                : null,
               sumOneYearPay:
                 this._Data.input === "결과만 입력"
                   ? this._Data.sumOneYearPay
@@ -417,6 +407,7 @@ class DetailedHandler extends InputHandler {
                   : null,
               isOverTen: this._Data.isOverTen ? this._Data.isOverTen : false,
               hasWork: [false, "2022-10-22"],
+              isSimple: this._Data.input === "개별 입력" ? true : false,
             }
           : {
               ...this._Data,
@@ -450,7 +441,7 @@ class DetailedHandler extends InputHandler {
             }
         : this._Data.workCate === 5 // 초단 시간
         ? {
-            workCate: 7,
+            // workCate: 7,
             retired: this._Data.retired,
             enterDay: this._Data.enterDay ? this._Data.enterDay : null,
             retireReason:
@@ -465,10 +456,6 @@ class DetailedHandler extends InputHandler {
                 : this._Data.disabled === "비장애인"
                 ? false
                 : null,
-            dayWorkTime:
-              this._Data["time"] && this._Data["week"]
-                ? Math.floor(this._Data["time"] / this._Data["week"])
-                : null,
             retiredDay: this._Data.retired
               ? this._Data.retiredDay
               : `${GetDateArr(null)[0]}-${GetDateArr(null)[1]}-${
@@ -479,14 +466,13 @@ class DetailedHandler extends InputHandler {
                 ? this._Data.salary
                 : [this._Data.salary]
               : null,
-            time: this._Data.time ? this._Data.time : null,
-            week: this._Data.week ? this._Data.week : null,
-            limitDay: new Date(
-              new Date(this._Data.retiredDay).setMonth(
-                new Date().getMonth() - 24
-              )
-            ),
-            isEnd: this._Data.cal_state ? true : false,
+            weekWorkTime: this._Data.time ? this._Data.time : null,
+            // limitDay: new Date(
+            //   new Date(this._Data.retiredDay).setMonth(
+            //     new Date().getMonth() - 24
+            //   )
+            // ),
+            // isEnd: this._Data.cal_state ? true : false,
           }
         : this._Data.workCate === 6 // 자영업자
         ? {

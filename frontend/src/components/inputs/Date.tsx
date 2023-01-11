@@ -442,11 +442,13 @@ const _IndiviualInput = ({
   params,
   total,
   pay = false,
+  isDayJob,
 }: {
   callBack: CallableFunction;
   params: string;
   total?: boolean;
   pay?: boolean;
+  isDayJob?: boolean;
 }) => {
   const [value, setValue] = useState<string>("");
   const [value2, setValue2] = useState<string>("");
@@ -462,16 +464,10 @@ const _IndiviualInput = ({
         className={`${total ? "total" : ""} font_color_main`}
         placeholder="근로일수"
         onChange={(e: ChangeEvent<HTMLInputElement>) => {
-          // let protoNum = Number(e.currentTarget.value.split(",").join(""));
-          // let toStringNum = String(Number(protoNum).toLocaleString());
-          // if (isNaN(protoNum) || toStringNum.length > 2) {
-          //   return;
-          // } else {
-          //   callBack &&
-          //     callBack(Array.isArray(params) ? params[0] : params, protoNum);
-          //   setValue2(toStringNum);
-          // }
-          onChangeInput(pay ? "three_mbp" : "day", e.currentTarget.value);
+          onChangeInput(
+            !isDayJob && pay ? "three_mbp" : "day",
+            e.currentTarget.value
+          );
         }}
       />
       {pay && (
@@ -479,16 +475,6 @@ const _IndiviualInput = ({
           className={`${total ? "total" : ""} font_color_main`}
           placeholder="월 임금총액"
           onChange={(e: ChangeEvent<HTMLInputElement>) => {
-            // console.log(e.currentTarget.value.split(",").join(""));
-            // let protoNum = Number(e.currentTarget.value.split(",").join(""));
-            // let toStringNum = String(Number(protoNum).toLocaleString());
-            // if (isNaN(protoNum) || toStringNum.length > 11) {
-            //   return;
-            // } else {
-            //   callBack &&
-            //     callBack(Array.isArray(params) ? params[0] : params, protoNum);
-            //   setValue(toStringNum);
-            // }
             onChangeInput("pay", e.currentTarget.value);
           }}
         />
@@ -508,14 +494,29 @@ export const DateInputIndividual = ({
   type: number;
   year: number | string;
 }) => {
-  const refIndividualPage = useRef<HTMLInputElement>(null);
+  const refIndividualPage: any = useRef<HTMLInputElement>(null);
+  const refPrev: any = useRef<HTMLInputElement>(null);
+  const refNext: any = useRef<HTMLInputElement>(null);
+
   const lastMonth = GetDateArr(lastWorkDay)[1];
   const month_arr = Month_Calculator(lastMonth, "before", 12);
-  const month_arr_splice = month_arr.splice(-2).concat(month_arr);
+  const month_arr_three = [month_arr[0], month_arr[1], month_arr[2]];
+
   let locationPage = 0;
+  let lastYear = String(GetDateArr(lastWorkDay)[0]);
+  const oneMonthYear = lastMonth === 1 ? String(Number(lastYear) - 1) : null;
+
   useEffect(() => {
     handler._Data = {};
+    if (lastMonth === 1 && oneMonthYear) {
+      lastYear = oneMonthYear;
+      console.log(lastYear === year);
+      console.log(1, lastYear);
+      console.log(2, oneMonthYear);
+      console.log(month_arr_three);
+    }
   }, []);
+
   return (
     <div className="date_indiviual_container">
       {type === 3 || type === 4 ? (
@@ -523,102 +524,378 @@ export const DateInputIndividual = ({
           <div ref={refIndividualPage}>
             <div className="date_indiviual_page type_2">
               <div className="br_r">
-                <div className="indiviual_input_header">1 월</div>
-                <_IndiviualInput
-                  callBack={handler.SetPageVal}
-                  params="1"
-                  pay={true}
-                />
+                <div
+                  className={`indiviual_input_header ${
+                    lastYear === year && lastMonth < 1 ? "unset_nop" : ""
+                  }`}
+                >
+                  1 월
+                </div>
+                {lastYear === year ? (
+                  lastMonth < 1 ? (
+                    <>
+                      <div className="unset_box_short">unset</div>
+                      <div className="unset_box_short">unset</div>
+                    </>
+                  ) : (
+                    <_IndiviualInput
+                      callBack={handler.SetPageVal}
+                      params="1"
+                      pay={true}
+                      isDayJob={true}
+                    />
+                  )
+                ) : (
+                  <_IndiviualInput
+                    callBack={handler.SetPageVal}
+                    params="1"
+                    pay={true}
+                    isDayJob={true}
+                  />
+                )}
               </div>
               <div>
-                <div className="indiviual_input_header">2 월</div>
-                <_IndiviualInput
-                  callBack={handler.SetPageVal}
-                  params="2"
-                  pay={true}
-                />
+                <div
+                  className={`indiviual_input_header ${
+                    lastYear === year && lastMonth < 2 ? "unset_nop" : ""
+                  }`}
+                >
+                  2 월
+                </div>
+                {lastYear === year ? (
+                  lastMonth < 2 ? (
+                    <>
+                      <div className="unset_box_short">unset</div>
+                      <div className="unset_box_short">unset</div>
+                    </>
+                  ) : (
+                    <_IndiviualInput
+                      callBack={handler.SetPageVal}
+                      params="2"
+                      pay={true}
+                      isDayJob={true}
+                    />
+                  )
+                ) : (
+                  <_IndiviualInput
+                    callBack={handler.SetPageVal}
+                    params="2"
+                    pay={true}
+                    isDayJob={true}
+                  />
+                )}
               </div>
               <div className="br_r">
-                <div className="indiviual_input_header">3 월</div>
-                <_IndiviualInput
-                  callBack={handler.SetPageVal}
-                  params="3"
-                  pay={true}
-                />
+                <div
+                  className={`indiviual_input_header ${
+                    lastYear === year && lastMonth < 3 ? "unset_nop" : ""
+                  }`}
+                >
+                  3 월
+                </div>
+                {lastYear === year ? (
+                  lastMonth < 3 ? (
+                    <>
+                      <div className="unset_box_short">unset</div>
+                      <div className="unset_box_short">unset</div>
+                    </>
+                  ) : (
+                    <_IndiviualInput
+                      callBack={handler.SetPageVal}
+                      params="3"
+                      pay={true}
+                      isDayJob={true}
+                    />
+                  )
+                ) : (
+                  <_IndiviualInput
+                    callBack={handler.SetPageVal}
+                    params="3"
+                    pay={true}
+                    isDayJob={true}
+                  />
+                )}
               </div>
               <div>
-                <div className="indiviual_input_header">4 월</div>
-                <_IndiviualInput
-                  callBack={handler.SetPageVal}
-                  params="4"
-                  pay={true}
-                />
+                <div
+                  className={`indiviual_input_header ${
+                    lastYear === year && lastMonth < 4 ? "unset_nop" : ""
+                  }`}
+                >
+                  4 월
+                </div>
+                {lastYear === year ? (
+                  lastMonth < 4 ? (
+                    <>
+                      <div className="unset_box_short">unset</div>
+                      <div className="unset_box_short">unset</div>
+                    </>
+                  ) : (
+                    <_IndiviualInput
+                      callBack={handler.SetPageVal}
+                      params="4"
+                      pay={true}
+                      isDayJob={true}
+                    />
+                  )
+                ) : (
+                  <_IndiviualInput
+                    callBack={handler.SetPageVal}
+                    params="4"
+                    pay={true}
+                    isDayJob={true}
+                  />
+                )}
               </div>
               <div className="br_r">
-                <div className="indiviual_input_header">5 월</div>
-                <_IndiviualInput
-                  callBack={handler.SetPageVal}
-                  params="5"
-                  pay={true}
-                />
+                <div
+                  className={`indiviual_input_header ${
+                    lastYear === year && lastMonth < 5 ? "unset_nop" : ""
+                  }`}
+                >
+                  5 월
+                </div>
+                {lastYear === year ? (
+                  lastMonth < 5 ? (
+                    <>
+                      <div className="unset_box_short">unset</div>
+                      <div className="unset_box_short">unset</div>
+                    </>
+                  ) : (
+                    <_IndiviualInput
+                      callBack={handler.SetPageVal}
+                      params="5"
+                      pay={true}
+                      isDayJob={true}
+                    />
+                  )
+                ) : (
+                  <_IndiviualInput
+                    callBack={handler.SetPageVal}
+                    params="5"
+                    pay={true}
+                    isDayJob={true}
+                  />
+                )}
               </div>
               <div>
-                <div className="indiviual_input_header">6 월</div>
-                <_IndiviualInput
-                  callBack={handler.SetPageVal}
-                  params="6"
-                  pay={true}
-                />
+                <div
+                  className={`indiviual_input_header ${
+                    lastYear === year && lastMonth < 6 ? "unset_nop" : ""
+                  }`}
+                >
+                  6 월
+                </div>
+                {lastYear === year ? (
+                  lastMonth < 6 ? (
+                    <>
+                      <div className="unset_box_short">unset</div>
+                      <div className="unset_box_short">unset</div>
+                    </>
+                  ) : (
+                    <_IndiviualInput
+                      callBack={handler.SetPageVal}
+                      params="6"
+                      pay={true}
+                      isDayJob={true}
+                    />
+                  )
+                ) : (
+                  <_IndiviualInput
+                    callBack={handler.SetPageVal}
+                    params="6"
+                    pay={true}
+                    isDayJob={true}
+                  />
+                )}
               </div>
             </div>
             <div className="date_indiviual_page type_2">
               <div className="br_r">
-                <div className="indiviual_input_header">7 월</div>
-                <_IndiviualInput
-                  callBack={handler.SetPageVal}
-                  params="7"
-                  pay={true}
-                />
+                <div
+                  className={`indiviual_input_header ${
+                    lastYear === year && lastMonth < 7 ? "unset_nop" : ""
+                  }`}
+                >
+                  7 월
+                </div>
+                {lastYear === year ? (
+                  lastMonth < 7 ? (
+                    <>
+                      <div className="unset_box_short">unset</div>
+                      <div className="unset_box_short">unset</div>
+                    </>
+                  ) : (
+                    <_IndiviualInput
+                      callBack={handler.SetPageVal}
+                      params="7"
+                      pay={true}
+                      isDayJob={true}
+                    />
+                  )
+                ) : (
+                  <_IndiviualInput
+                    callBack={handler.SetPageVal}
+                    params="7"
+                    pay={true}
+                    isDayJob={true}
+                  />
+                )}
               </div>
               <div>
-                <div className="indiviual_input_header">8 월</div>
-                <_IndiviualInput
-                  callBack={handler.SetPageVal}
-                  params="8"
-                  pay={true}
-                />
+                <div
+                  className={`indiviual_input_header ${
+                    lastYear === year && lastMonth < 8 ? "unset_nop" : ""
+                  }`}
+                >
+                  8 월
+                </div>
+                {lastYear === year ? (
+                  lastMonth < 8 ? (
+                    <>
+                      <div className="unset_box_short">unset</div>
+                      <div className="unset_box_short">unset</div>
+                    </>
+                  ) : (
+                    <_IndiviualInput
+                      callBack={handler.SetPageVal}
+                      params="8"
+                      pay={true}
+                      isDayJob={true}
+                    />
+                  )
+                ) : (
+                  <_IndiviualInput
+                    callBack={handler.SetPageVal}
+                    params="8"
+                    pay={true}
+                    isDayJob={true}
+                  />
+                )}
               </div>
               <div className="br_r">
-                <div className="indiviual_input_header">9 월</div>
-                <_IndiviualInput
-                  callBack={handler.SetPageVal}
-                  params="9"
-                  pay={true}
-                />
+                <div
+                  className={`indiviual_input_header ${
+                    lastYear === year && lastMonth < 9 ? "unset_nop" : ""
+                  }`}
+                >
+                  9 월
+                </div>
+                {lastYear === year ? (
+                  lastMonth < 9 ? (
+                    <>
+                      <div className="unset_box_short">unset</div>
+                      <div className="unset_box_short">unset</div>
+                    </>
+                  ) : (
+                    <_IndiviualInput
+                      callBack={handler.SetPageVal}
+                      params="9"
+                      pay={true}
+                      isDayJob={true}
+                    />
+                  )
+                ) : (
+                  <_IndiviualInput
+                    callBack={handler.SetPageVal}
+                    params="9"
+                    pay={true}
+                    isDayJob={true}
+                  />
+                )}
               </div>
               <div>
-                <div className="indiviual_input_header">10 월</div>
-                <_IndiviualInput
-                  callBack={handler.SetPageVal}
-                  params="10"
-                  pay={true}
-                />
+                <div
+                  className={`indiviual_input_header ${
+                    lastYear === year && lastMonth < 10 ? "unset_nop" : ""
+                  }`}
+                >
+                  10 월
+                </div>
+                {lastYear === year ? (
+                  lastMonth < 10 ? (
+                    <>
+                      <div className="unset_box_short">Unset</div>
+                      <div className="unset_box_short">Unset</div>
+                    </>
+                  ) : (
+                    <_IndiviualInput
+                      callBack={handler.SetPageVal}
+                      params="10"
+                      pay={true}
+                      isDayJob={true}
+                    />
+                  )
+                ) : (
+                  <_IndiviualInput
+                    callBack={handler.SetPageVal}
+                    params="10"
+                    pay={true}
+                    isDayJob={true}
+                  />
+                )}
               </div>
               <div className="br_r">
-                <div className="indiviual_input_header">11 월</div>
-                <_IndiviualInput
-                  callBack={handler.SetPageVal}
-                  params="11"
-                  pay={true}
-                />
+                <div
+                  className={`indiviual_input_header ${
+                    lastYear === year && lastMonth < 11 ? "unset_nop" : ""
+                  }`}
+                >
+                  11 월
+                </div>
+                {lastYear === year ? (
+                  lastMonth < 11 ? (
+                    <>
+                      <div className="unset_box_short">Unset</div>
+                      <div className="unset_box_short">Unset</div>
+                    </>
+                  ) : (
+                    <_IndiviualInput
+                      callBack={handler.SetPageVal}
+                      params="11"
+                      pay={true}
+                      isDayJob={true}
+                    />
+                  )
+                ) : (
+                  <_IndiviualInput
+                    callBack={handler.SetPageVal}
+                    params="11"
+                    pay={true}
+                    isDayJob={true}
+                  />
+                )}
               </div>
               <div>
-                <div className="indiviual_input_header">12 월</div>
-                <_IndiviualInput
-                  callBack={handler.SetPageVal}
-                  params="12"
-                  pay={true}
-                />
+                <div
+                  className={`indiviual_input_header ${
+                    lastYear === year && lastMonth < 12 ? "unset_nop" : ""
+                  }`}
+                >
+                  12 월
+                </div>
+                {lastYear === year ? (
+                  lastMonth < 12 ? (
+                    <>
+                      <div className="unset_box_short">unset</div>
+                      <div className="unset_box_short">unset</div>
+                    </>
+                  ) : (
+                    <_IndiviualInput
+                      callBack={handler.SetPageVal}
+                      params="12"
+                      pay={true}
+                      isDayJob={true}
+                    />
+                  )
+                ) : (
+                  <_IndiviualInput
+                    callBack={handler.SetPageVal}
+                    params="12"
+                    pay={true}
+                    isDayJob={true}
+                  />
+                )}
               </div>
             </div>
           </div>
@@ -631,162 +908,624 @@ export const DateInputIndividual = ({
                 <div>
                   <div
                     className={`indiviual_input_header ${
-                      String(GetDateArr(lastWorkDay)[0]) === String(year)
+                      lastYear === year && lastMonth < 1
+                        ? "unset_header"
+                        : lastYear === year && month_arr_three.includes(1)
                         ? "total"
                         : ""
                     }`}
                   >
-                    {month_arr_splice[3]}월
+                    1 월
                   </div>
-                  <_IndiviualInput
-                    total={
-                      String(GetDateArr(lastWorkDay)[0]) === String(year)
-                        ? true
-                        : false
-                    }
-                    callBack={handler.SetPageVal}
-                    params={`${month_arr_splice[3]}`}
-                    pay={
-                      String(GetDateArr(lastWorkDay)[0]) === String(year)
-                        ? true
-                        : false
-                    }
-                  />
+                  {lastYear === year ? (
+                    lastMonth < 1 ? (
+                      <>
+                        <div className="unset_box">unset</div>
+                        <div className="unset_box">unset</div>
+                      </>
+                    ) : (
+                      <_IndiviualInput
+                        total={
+                          lastYear === year && month_arr_three.includes(1)
+                            ? true
+                            : false
+                        }
+                        callBack={handler.SetPageVal}
+                        params={"1"}
+                        pay={
+                          lastYear === year && month_arr_three.includes(1)
+                            ? true
+                            : false
+                        }
+                      />
+                    )
+                  ) : (
+                    <_IndiviualInput
+                      total={
+                        lastYear === year && month_arr_three.includes(1)
+                          ? true
+                          : false
+                      }
+                      callBack={handler.SetPageVal}
+                      params={"1"}
+                      pay={
+                        lastYear === year && month_arr_three.includes(1)
+                          ? true
+                          : false
+                      }
+                    />
+                  )}
                 </div>
                 <div>
                   <div
                     className={`indiviual_input_header ${
-                      String(GetDateArr(lastWorkDay)[0]) === String(year)
+                      lastYear === year && lastMonth < 2
+                        ? "unset_header"
+                        : lastYear === year && month_arr_three.includes(2)
                         ? "total"
                         : ""
                     }`}
                   >
-                    {month_arr_splice[2]}월
+                    2 월
                   </div>
-                  <_IndiviualInput
-                    total={
-                      String(GetDateArr(lastWorkDay)[0]) === String(year)
-                        ? true
-                        : false
-                    }
-                    callBack={handler.SetPageVal}
-                    params={`${month_arr_splice[2]}`}
-                    pay={
-                      String(GetDateArr(lastWorkDay)[0]) === String(year)
-                        ? true
-                        : false
-                    }
-                  />
-                </div>
-                <div className="unset_indiviual_input">
-                  <div className="indiviual_input_header">
-                    {month_arr_splice[1]}월
-                  </div>
-                  <div className="unset_box">UnSet</div>
-                  {String(GetDateArr(lastWorkDay)[0]) === String(year) && (
-                    <div className="unset_box">UnSet</div>
+                  {lastYear === year ? (
+                    lastMonth < 2 ? (
+                      <>
+                        <div className="unset_box">unset</div>
+                        <div className="unset_box">unset</div>
+                      </>
+                    ) : (
+                      <_IndiviualInput
+                        total={
+                          lastYear === year && month_arr_three.includes(2)
+                            ? true
+                            : false
+                        }
+                        callBack={handler.SetPageVal}
+                        params={"2"}
+                        pay={
+                          lastYear === year && month_arr_three.includes(2)
+                            ? true
+                            : false
+                        }
+                      />
+                    )
+                  ) : (
+                    <_IndiviualInput
+                      total={
+                        lastYear === year && month_arr_three.includes(2)
+                          ? true
+                          : false
+                      }
+                      callBack={handler.SetPageVal}
+                      params={"2"}
+                      pay={
+                        lastYear === year && month_arr_three.includes(2)
+                          ? true
+                          : false
+                      }
+                    />
                   )}
                 </div>
-                <div className="unset_indiviual_input">
-                  <div className="indiviual_input_header">
-                    {month_arr_splice[0]}월
+                <div>
+                  <div
+                    className={`indiviual_input_header ${
+                      lastYear === year && lastMonth < 3
+                        ? "unset_header"
+                        : lastYear === year && month_arr_three.includes(3)
+                        ? "total"
+                        : ""
+                    }`}
+                  >
+                    3 월
                   </div>
-                  <div className="unset_box">UnSet</div>
-                  {String(GetDateArr(lastWorkDay)[0]) === String(year) && (
-                    <div className="unset_box">UnSet</div>
+                  {lastYear === year ? (
+                    lastMonth < 3 ? (
+                      <>
+                        <div className="unset_box">unset</div>
+                        <div className="unset_box">unset</div>
+                      </>
+                    ) : (
+                      <_IndiviualInput
+                        total={
+                          lastYear === year && month_arr_three.includes(3)
+                            ? true
+                            : false
+                        }
+                        callBack={handler.SetPageVal}
+                        params={"3"}
+                        pay={
+                          lastYear === year && month_arr_three.includes(3)
+                            ? true
+                            : false
+                        }
+                      />
+                    )
+                  ) : (
+                    <_IndiviualInput
+                      total={
+                        lastYear === year && month_arr_three.includes(3)
+                          ? true
+                          : false
+                      }
+                      callBack={handler.SetPageVal}
+                      params={"3"}
+                      pay={
+                        lastYear === year && month_arr_three.includes(3)
+                          ? true
+                          : false
+                      }
+                    />
+                  )}
+                </div>
+                <div>
+                  <div
+                    className={`indiviual_input_header ${
+                      lastYear === year && lastMonth < 4
+                        ? "unset_header"
+                        : lastYear === year && month_arr_three.includes(4)
+                        ? "total"
+                        : ""
+                    }`}
+                  >
+                    4 월
+                  </div>
+                  {lastYear === year ? (
+                    lastMonth < 4 ? (
+                      <>
+                        <div className="unset_box">unset</div>
+                        <div className="unset_box">unset</div>
+                      </>
+                    ) : (
+                      <_IndiviualInput
+                        total={
+                          lastYear === year && month_arr_three.includes(4)
+                            ? true
+                            : false
+                        }
+                        callBack={handler.SetPageVal}
+                        params={"4"}
+                        pay={
+                          lastYear === year && month_arr_three.includes(4)
+                            ? true
+                            : false
+                        }
+                      />
+                    )
+                  ) : (
+                    <_IndiviualInput
+                      total={
+                        lastYear === year && month_arr_three.includes(4)
+                          ? true
+                          : false
+                      }
+                      callBack={handler.SetPageVal}
+                      params={"4"}
+                      pay={
+                        lastYear === year && month_arr_three.includes(4)
+                          ? true
+                          : false
+                      }
+                    />
                   )}
                 </div>
               </div>
               <div className="date_indiviual_page">
                 <div>
-                  <div className="indiviual_input_header">
-                    {month_arr_splice[7]} 월
-                  </div>
-                  <_IndiviualInput
-                    callBack={handler.SetPageVal}
-                    params={`${month_arr_splice[7]}`}
-                  />
-                </div>
-                <div>
-                  <div className="indiviual_input_header">
-                    {month_arr_splice[6]} 월
-                  </div>
-                  <_IndiviualInput
-                    callBack={handler.SetPageVal}
-                    params={`${month_arr_splice[6]}`}
-                  />
-                </div>
-                <div>
-                  <div className="indiviual_input_header">
-                    {month_arr_splice[5]} 월
-                  </div>
-                  <_IndiviualInput
-                    callBack={handler.SetPageVal}
-                    params={`${month_arr_splice[5]}`}
-                  />
-                </div>
-                <div>
                   <div
                     className={`indiviual_input_header ${
-                      String(GetDateArr(lastWorkDay)[0]) === String(year)
+                      lastYear === year && lastMonth < 5
+                        ? "unset_header"
+                        : lastYear === year && month_arr_three.includes(5)
                         ? "total"
                         : ""
                     }`}
                   >
-                    {month_arr_splice[4]} 월
+                    5 월
                   </div>
-                  <_IndiviualInput
-                    total={
-                      String(GetDateArr(lastWorkDay)[0]) === String(year)
-                        ? true
-                        : false
-                    }
-                    callBack={handler.SetPageVal}
-                    params={`${month_arr_splice[4]}`}
-                    pay={
-                      String(GetDateArr(lastWorkDay)[0]) === String(year)
-                        ? true
-                        : false
-                    }
-                  />
+                  {lastYear === year ? (
+                    lastMonth < 5 ? (
+                      <>
+                        <div className="unset_box">unset</div>
+                        <div className="unset_box">unset</div>
+                      </>
+                    ) : (
+                      <_IndiviualInput
+                        total={
+                          lastYear === year && month_arr_three.includes(5)
+                            ? true
+                            : false
+                        }
+                        callBack={handler.SetPageVal}
+                        params={"5"}
+                        pay={
+                          lastYear === year && month_arr_three.includes(5)
+                            ? true
+                            : false
+                        }
+                      />
+                    )
+                  ) : (
+                    <_IndiviualInput
+                      total={
+                        lastYear === year && month_arr_three.includes(5)
+                          ? true
+                          : false
+                      }
+                      callBack={handler.SetPageVal}
+                      params={"5"}
+                      pay={
+                        lastYear === year && month_arr_three.includes(5)
+                          ? true
+                          : false
+                      }
+                    />
+                  )}
+                </div>
+                <div>
+                  <div
+                    className={`indiviual_input_header ${
+                      lastYear === year && lastMonth < 6
+                        ? "unset_header"
+                        : lastYear === year && month_arr_three.includes(6)
+                        ? "total"
+                        : ""
+                    }`}
+                  >
+                    6 월
+                  </div>
+                  {lastYear === year ? (
+                    lastMonth < 6 ? (
+                      <>
+                        <div className="unset_box">unset</div>
+                        <div className="unset_box">unset</div>
+                      </>
+                    ) : (
+                      <_IndiviualInput
+                        total={
+                          lastYear === year && month_arr_three.includes(6)
+                            ? true
+                            : false
+                        }
+                        callBack={handler.SetPageVal}
+                        params={"6"}
+                        pay={
+                          lastYear === year && month_arr_three.includes(6)
+                            ? true
+                            : false
+                        }
+                      />
+                    )
+                  ) : (
+                    <_IndiviualInput
+                      total={
+                        lastYear === year && month_arr_three.includes(6)
+                          ? true
+                          : false
+                      }
+                      callBack={handler.SetPageVal}
+                      params={"6"}
+                      pay={
+                        lastYear === year && month_arr_three.includes(6)
+                          ? true
+                          : false
+                      }
+                    />
+                  )}
+                </div>
+                <div>
+                  <div
+                    className={`indiviual_input_header ${
+                      lastYear === year && lastMonth < 7
+                        ? "unset_header"
+                        : lastYear === year && month_arr_three.includes(7)
+                        ? "total"
+                        : ""
+                    }`}
+                  >
+                    7 월
+                  </div>
+                  {lastYear === year ? (
+                    lastMonth < 7 ? (
+                      <>
+                        <div className="unset_box">unset</div>
+                        <div className="unset_box">unset</div>
+                      </>
+                    ) : (
+                      <_IndiviualInput
+                        total={
+                          lastYear === year && month_arr_three.includes(7)
+                            ? true
+                            : false
+                        }
+                        callBack={handler.SetPageVal}
+                        params={"7"}
+                        pay={
+                          lastYear === year && month_arr_three.includes(7)
+                            ? true
+                            : false
+                        }
+                      />
+                    )
+                  ) : (
+                    <_IndiviualInput
+                      total={
+                        lastYear === year && month_arr_three.includes(7)
+                          ? true
+                          : false
+                      }
+                      callBack={handler.SetPageVal}
+                      params={"7"}
+                      pay={
+                        lastYear === year && month_arr_three.includes(7)
+                          ? true
+                          : false
+                      }
+                    />
+                  )}
+                </div>
+                <div>
+                  <div
+                    className={`indiviual_input_header ${
+                      lastYear === year && lastMonth < 8
+                        ? "unset_header"
+                        : lastYear === year && month_arr_three.includes(8)
+                        ? "total"
+                        : ""
+                    }`}
+                  >
+                    8 월
+                  </div>
+                  {lastYear === year ? (
+                    lastMonth < 8 ? (
+                      <>
+                        <div className="unset_box">unset</div>
+                        <div className="unset_box">unset</div>
+                      </>
+                    ) : (
+                      <_IndiviualInput
+                        total={
+                          lastYear === year && month_arr_three.includes(8)
+                            ? true
+                            : false
+                        }
+                        callBack={handler.SetPageVal}
+                        params={"8"}
+                        pay={
+                          lastYear === year && month_arr_three.includes(8)
+                            ? true
+                            : false
+                        }
+                      />
+                    )
+                  ) : (
+                    <_IndiviualInput
+                      total={
+                        lastYear === year && month_arr_three.includes(8)
+                          ? true
+                          : false
+                      }
+                      callBack={handler.SetPageVal}
+                      params={"8"}
+                      pay={
+                        lastYear === year && month_arr_three.includes(8)
+                          ? true
+                          : false
+                      }
+                    />
+                  )}
                 </div>
               </div>
               <div className="date_indiviual_page">
                 <div>
-                  <div className="indiviual_input_header">
-                    {month_arr_splice[11]} 월
+                  <div
+                    className={`indiviual_input_header ${
+                      lastYear === year && lastMonth < 9
+                        ? "unset_header"
+                        : lastYear === year && month_arr_three.includes(9)
+                        ? "total"
+                        : ""
+                    }`}
+                  >
+                    9 월
                   </div>
-                  <_IndiviualInput
-                    callBack={handler.SetPageVal}
-                    params={`${month_arr_splice[11]}`}
-                  />
+                  {lastYear === year ? (
+                    lastMonth < 9 ? (
+                      <>
+                        <div className="unset_box">unset</div>
+                        <div className="unset_box">unset</div>
+                      </>
+                    ) : (
+                      <_IndiviualInput
+                        total={
+                          lastYear === year && month_arr_three.includes(9)
+                            ? true
+                            : false
+                        }
+                        callBack={handler.SetPageVal}
+                        params={"9"}
+                        pay={
+                          lastYear === year && month_arr_three.includes(9)
+                            ? true
+                            : false
+                        }
+                      />
+                    )
+                  ) : (
+                    <_IndiviualInput
+                      total={
+                        lastYear === year && month_arr_three.includes(9)
+                          ? true
+                          : false
+                      }
+                      callBack={handler.SetPageVal}
+                      params={"9"}
+                      pay={
+                        lastYear === year && month_arr_three.includes(9)
+                          ? true
+                          : false
+                      }
+                    />
+                  )}
                 </div>
                 <div>
-                  <div className="indiviual_input_header">
-                    {month_arr_splice[10]} 월
+                  <div
+                    className={`indiviual_input_header ${
+                      lastYear === year && lastMonth < 10
+                        ? "unset_header"
+                        : lastYear === year && month_arr_three.includes(10)
+                        ? "total"
+                        : ""
+                    }`}
+                  >
+                    10 월
                   </div>
-                  <_IndiviualInput
-                    callBack={handler.SetPageVal}
-                    params={`${month_arr_splice[10]}`}
-                  />
+                  {lastYear === year ? (
+                    lastMonth < 10 ? (
+                      <>
+                        <div className="unset_box">unset</div>
+                        <div className="unset_box">unset</div>
+                      </>
+                    ) : (
+                      <_IndiviualInput
+                        total={
+                          lastYear === year && month_arr_three.includes(10)
+                            ? true
+                            : false
+                        }
+                        callBack={handler.SetPageVal}
+                        params={"10"}
+                        pay={
+                          lastYear === year && month_arr_three.includes(10)
+                            ? true
+                            : false
+                        }
+                      />
+                    )
+                  ) : (
+                    <_IndiviualInput
+                      total={
+                        (lastYear === year && month_arr_three.includes(10)) ||
+                        oneMonthYear === year
+                          ? true
+                          : false
+                      }
+                      callBack={handler.SetPageVal}
+                      params={"10"}
+                      pay={
+                        (lastYear === year && month_arr_three.includes(10)) ||
+                        oneMonthYear === year
+                          ? true
+                          : false
+                      }
+                    />
+                  )}
                 </div>
                 <div>
-                  <div className="indiviual_input_header">
-                    {month_arr_splice[9]} 월
+                  <div
+                    className={`indiviual_input_header ${
+                      lastYear === year && lastMonth < 11
+                        ? "unset_header"
+                        : lastYear === year && month_arr_three.includes(11)
+                        ? "total"
+                        : ""
+                    }`}
+                  >
+                    11 월
                   </div>
-                  <_IndiviualInput
-                    callBack={handler.SetPageVal}
-                    params={`${month_arr_splice[9]}`}
-                  />
+                  {lastYear === year ? (
+                    lastMonth < 11 ? (
+                      <>
+                        <div className="unset_box">unset</div>
+                        <div className="unset_box">unset</div>
+                      </>
+                    ) : (
+                      <_IndiviualInput
+                        total={
+                          lastYear === year && month_arr_three.includes(11)
+                            ? true
+                            : false
+                        }
+                        callBack={handler.SetPageVal}
+                        params={"11"}
+                        pay={
+                          lastYear === year && month_arr_three.includes(11)
+                            ? true
+                            : false
+                        }
+                      />
+                    )
+                  ) : (
+                    <_IndiviualInput
+                      total={
+                        (lastYear === year && month_arr_three.includes(11)) ||
+                        oneMonthYear === year
+                          ? true
+                          : false
+                      }
+                      callBack={handler.SetPageVal}
+                      params={"11"}
+                      pay={
+                        (lastYear === year && month_arr_three.includes(11)) ||
+                        oneMonthYear === year
+                          ? true
+                          : false
+                      }
+                    />
+                  )}
                 </div>
                 <div>
-                  <div className="indiviual_input_header">
-                    {month_arr_splice[8]} 월
+                  <div
+                    className={`indiviual_input_header ${
+                      lastYear === year && lastMonth < 12
+                        ? "unset_header"
+                        : lastYear === year && month_arr_three.includes(12)
+                        ? "total"
+                        : ""
+                    }`}
+                  >
+                    12 월
                   </div>
-                  <_IndiviualInput
-                    callBack={handler.SetPageVal}
-                    params={`${month_arr_splice[8]}`}
-                  />
+                  {lastYear === year ? (
+                    lastMonth < 12 ? (
+                      <>
+                        <div className="unset_box">unset</div>
+                        <div className="unset_box">unset</div>
+                      </>
+                    ) : (
+                      <_IndiviualInput
+                        total={
+                          lastYear === year && month_arr_three.includes(12)
+                            ? true
+                            : false
+                        }
+                        callBack={handler.SetPageVal}
+                        params={"12"}
+                        pay={
+                          lastYear === year && month_arr_three.includes(12)
+                            ? true
+                            : false
+                        }
+                      />
+                    )
+                  ) : (
+                    <_IndiviualInput
+                      total={
+                        (lastYear === year && month_arr_three.includes(12)) ||
+                        oneMonthYear === year
+                          ? true
+                          : false
+                      }
+                      callBack={handler.SetPageVal}
+                      params={"12"}
+                      pay={
+                        (lastYear === year && month_arr_three.includes(12)) ||
+                        oneMonthYear === year
+                          ? true
+                          : false
+                      }
+                    />
+                  )}
                 </div>
               </div>
             </div>
@@ -794,28 +1533,40 @@ export const DateInputIndividual = ({
         )
       )}
       <button
+        ref={refNext}
         className="date_indiviual_prev"
         onClick={() => {
-          if (type === 3 || type === 4) if (locationPage >= 100) return;
-          if (locationPage >= 200) return;
-          const currentRef: any = refIndividualPage.current;
-          locationPage += 100;
-          currentRef.style.left = `-${locationPage}%`;
-        }}
-      >
-        <img src={IMGPrev} alt="prev button" />
-      </button>
-      <button
-        className="date_indiviual_next"
-        onClick={() => {
-          if (type === 2) return;
-          if (type === 3 || type === 4) if (locationPage <= 0) return;
+          if (type === 2) {
+            if (locationPage <= 0) {
+              return;
+            }
+          }
+          if (type === 3 || type === 4) {
+            if (locationPage <= 0) return;
+          }
           const currentRef: any = refIndividualPage.current;
           locationPage -= 100;
           currentRef.style.left = `-${locationPage}%`;
         }}
       >
-        <img src={IMGNext} alt="next button" />
+        <img src={IMGPrev} alt="next button" />
+      </button>
+      <button
+        ref={refPrev}
+        className="date_indiviual_next"
+        onClick={() => {
+          if (type === 3 || type === 4) {
+            if (locationPage >= 100) return;
+          }
+          if (locationPage >= 200) {
+            return;
+          }
+          const currentRef: any = refIndividualPage.current;
+          locationPage += 100;
+          currentRef.style.left = `-${locationPage}%`;
+        }}
+      >
+        <img src={IMGNext} alt="prev button" />
       </button>
     </div>
   );
