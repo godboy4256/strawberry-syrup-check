@@ -13,5 +13,8 @@
   "bugs": {
     "url": "https://github.com/LawyLand/moneysylove/issues"
   },
-  "homepage": "https://github.com/LawyLand/moneysylove#readme"
+  "homepage": "https://github.com/LawyLand/moneysylove#readme",
+  "dependencies": {
+    "react-select": "^5.7.0"
+  }
 }

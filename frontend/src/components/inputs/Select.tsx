@@ -3,6 +3,7 @@ import IMGSelect from "../../assets/image/select_icon.svg";
 import IMGNormalSelect from "../../assets/image/new/select_icon_normal.svg";
 import "../../styles/select.css";
 import { ClosePopup, CreatePopup } from "../common/Popup";
+import Select from "react-select/dist/declarations/src/Select";
 
 const PopupSelect = ({
   options,
@@ -99,7 +100,6 @@ const SelectInput = ({
       "취소"
     );
   };
-
   return (
     <>
       {type === "popup" ? (

@@ -106,22 +106,25 @@ class DateHandler extends InputHandler {
     const viewDate = `${this._Data.year ? this._Data.year : currentDate[0]}-${
       this._Data.month ? this._Data.month : currentDate[1]
     }-${this._Data.day ? this._Data.day : currentDate[2]}`;
-    console.log(viewDate);
     if (params === "isOverTen") {
       callBack &&
-        callBack(params, this.plan_todo_data.length >= 10 ? true : false);
+        callBack(params, this._Data.plan_todo_data.length >= 10 ? true : false);
       callBack &&
         callBack("hasWork", [
-          this.plan_todo_data.length >= 14 ? true : false,
-          this.plan_todo_data.reduce((prev, curr) => {
-            return new Date(prev).getTime() <= new Date(curr).getTime()
-              ? curr
-              : prev;
-          }),
+          this._Data.plan_todo_data.length >= 14 ? true : false,
+          this._Data.plan_todo_data.length > 0
+            ? this._Data.plan_todo_data?.reduce((prev: any, curr: any) => {
+                return new Date(prev).getTime() <= new Date(curr).getTime()
+                  ? curr
+                  : prev;
+              })
+            : this._Data.plan_todo_data,
         ]);
       setValueState &&
         setValueState(
-          this.plan_todo_data.length >= 10 ? "10일 이상 근무" : "10일 이하 근무"
+          this._Data.plan_todo_data.length >= 10
+            ? "10일 이상 근무"
+            : "10일 이하 근무"
         );
     } else {
       callBack && callBack(params, viewDate);
@@ -157,6 +160,7 @@ const _DaysComp = ({
           <div
             key={String(el + Date.now()) + idx}
             onClick={() => {
+              console.log(`${planToDoYear}-${planToDoMonth}-${el}`);
               if (!el) return;
               if (planToDo) {
                 if (selectedDate.includes(el)) {
@@ -165,13 +169,14 @@ const _DaysComp = ({
                   delete_arr.splice(delete_num, 1);
                   setSelectedDate(delete_arr);
                 }
-                setSelectedDate([
-                  ...selectedDate,
-                  `${planToDoYear}-${planToDoMonth}-${el}`,
-                ]);
-                handler.plan_todo_data = selectedDate.map((el: string) => {
-                  return `${planToDo[0]}-${planToDo[1]}-${el}`;
-                });
+                selectedDate.push(`${planToDoYear}-${planToDoMonth}-${el}`);
+                setSelectedDate([...selectedDate]);
+                handler.SetPageVal(
+                  "plan_todo_data",
+                  selectedDate.map((el: string) => {
+                    return el;
+                  })
+                );
               } else {
                 setSelectedDate(Number(el));
                 handler.setDay(Number(el));
@@ -450,8 +455,6 @@ const _IndiviualInput = ({
   pay?: boolean;
   isDayJob?: boolean;
 }) => {
-  const [value, setValue] = useState<string>("");
-  const [value2, setValue2] = useState<string>("");
   const indiviual_export_data: any = { month: Number(params) };
   const onChangeInput = (params_in: string, value: any) => {
     indiviual_export_data[params_in] = Number(value);
@@ -510,10 +513,6 @@ export const DateInputIndividual = ({
     handler._Data = {};
     if (lastMonth === 1 && oneMonthYear) {
       lastYear = oneMonthYear;
-      console.log(lastYear === year);
-      console.log(1, lastYear);
-      console.log(2, oneMonthYear);
-      console.log(month_arr_three);
     }
   }, []);
 
