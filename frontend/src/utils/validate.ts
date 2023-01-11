@@ -28,13 +28,7 @@ const null_check_list: any = {
     "jobCate",
     "sumTwelveMonthSalary",
   ],
-  detail_shorts: [
-    "age",
-    "disabled",
-    "lastWorkDay",
-    "sumOneYearPay",
-    "sumOneYearWorkDay",
-  ],
+  detail_shorts: ["age", "disabled", "lastWorkDay", "sumOneYearPay"],
   detail_veryshorts: [
     "age",
     "disabled",
@@ -42,8 +36,7 @@ const null_check_list: any = {
     "retiredDay",
     "salary",
     "weekDay",
-    "week",
-    "time",
+    "weekWorkTime",
   ],
   detail_employ: ["insuranceGrade", "enterDay", "retiredDay"],
 };
@@ -86,8 +79,6 @@ const valid_null_check_message: any = {
     disable: "장애여부를 선택해주세요.",
     sumOneYearPay:
       "퇴직 전 12개월 급여 총액( 개별 입력탭 선택시에는 개별 입력란 )을 입력해주세요.",
-    sumOneYearWorkDay:
-      "고용 보험 총 기간( 개별 입력탭 선택시에는 개별 입력란, 결과만 입력 탭 선택시 년과 개월 모두 입력 )을 입력해주세요.",
   },
   detail_veryshorts: {
     enterDay: "입사일을 선택해주세요.",
@@ -96,8 +87,7 @@ const valid_null_check_message: any = {
     disabled: "장애여부를 선택해주세요.",
     salary: "월 급여를 기입해주세요.",
     weekDay: "근무 요일을 선택해주세요.",
-    time: "주 근무 시간을 선택해주세요.",
-    week: "주 근무 일수를 선택해주세요.",
+    weekWorkTime: "주 근무 시간을 선택해주세요.",
   },
   detail_employ: {
     enterDay: "고용 보험 가입일을 선택해주세요.",
