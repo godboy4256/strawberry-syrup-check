@@ -215,13 +215,6 @@ const _DetailCal02 = ({ handler }: { handler: any }) => {
   }, []);
   return (
     <>
-      <Check
-        type="is_true_type"
-        options={["건설일용직에 해당합니다."]}
-        label="특수"
-        params="isSpecial"
-        callBack={handler.SetPageVal}
-      />
       <_Belong_Form_Tab
         label="근로 정보"
         params="input"

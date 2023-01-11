@@ -27,7 +27,6 @@ class DetailedHandler extends InputHandler {
         }
       });
     });
-    console.log(Math.ceil(((notOverTen / 22) * 10) / 10));
     return result + Math.ceil(((notOverTen / 22) * 10) / 10);
   };
 
@@ -36,7 +35,8 @@ class DetailedHandler extends InputHandler {
     lastWorkDate: any,
     type: "day" | "pay" | "two_year"
   ) => {
-    let result = 0;
+    let result = 0,
+      notOverTen = 0;
     const lastWorkYear = new Date(lastWorkDate).getFullYear();
     const lastWorkMonth = new Date(lastWorkDate).getMonth() + 1;
     const workMonthArr1 = [];
@@ -82,12 +82,14 @@ class DetailedHandler extends InputHandler {
         } else if (type === "two_year") {
           if (el.day > 10) {
             result += 1;
+          } else {
+            notOverTen += el.day;
           }
         }
       });
     });
 
-    return result;
+    return result + Math.ceil(((notOverTen / 22) * 10) / 10);
   };
   public insuranceGrade = (retiredDay: Date, enterDay: Date) => {
     const retiredDayYear: any = GetDateArr(retiredDay)[0];
@@ -240,7 +242,7 @@ class DetailedHandler extends InputHandler {
           }
         : this._Data.workCate === 2 // 일용직
         ? {
-            hasWork: [false, "hasWork"],
+            hasWork: this._Data.hasWork ? this._Data.hasWork : null,
             retired: this._Data.retired,
             workCate: 6,
             retireReason:
@@ -289,6 +291,7 @@ class DetailedHandler extends InputHandler {
           ? {
               retired: this._Data.retired,
               workCate: 4,
+              hasWork: this._Data.hasWork ? this._Data.hasWork : null,
               retireReason:
                 this._Data.cal_state === "multi" ? 1 : this._Data.retireReason,
               lastWorkDay: this._Data.lastWorkDay,
@@ -329,7 +332,6 @@ class DetailedHandler extends InputHandler {
                   : this._Data.isOverTen === true
                   ? this._Data.isOverTen
                   : false,
-              hasWork: [false, "2022-10-22"],
               limitDay: new Date(
                 new Date(this._Data.retiredDay).setMonth(
                   new Date().getMonth() - 24
@@ -406,7 +408,7 @@ class DetailedHandler extends InputHandler {
                     )
                   : null,
               isOverTen: this._Data.isOverTen ? this._Data.isOverTen : false,
-              hasWork: [false, "2022-10-22"],
+              hasWork: this._Data.hasWork ? this._Data.hasWork : null,
               isSimple: this._Data.input === "개별 입력" ? true : false,
             }
           : {
