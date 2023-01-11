@@ -2,7 +2,7 @@ import dayjs from "dayjs";
 import { DefinedParamErrorMesg } from "../../../share/validate";
 import { TmainData } from "../schema";
 
-export const checkBasicRequirements = (mainData: TmainData) => {
+export const checkMultiBasicRequirements = (mainData: TmainData) => {
 	const mainRetiredDay = dayjs(mainData.retiredDay);
 
 	// 1. 신청일이 이직일로 부터 1년 초과 확인

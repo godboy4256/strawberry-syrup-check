@@ -168,7 +168,7 @@ const veryShortBodyProp = {
 	enterDay: DefineParamInfo.enterDay,
 	retiredDay: DefineParamInfo.retiredDay,
 	weekDay: DefineParamInfo.weekDay, // 주의
-	weekWorkTime: { type: "number" },
+	weekWorkTime: { type: "number", minimum: 1, maximum: 14 },
 	salary: DefineParamInfo.salary,
 	isEnd: { type: "boolean" },
 	limitDay: { type: "string" },
@@ -247,7 +247,7 @@ export const shortArtSchema = {
 		tags: ["detail"],
 		body: {
 			type: "object",
-			required: ["age", "disabled", "lastWorkDay", "hasWork"],
+			required: ["age", "disabled", "lastWorkDay", "hasWork", "isSimple"],
 			properties: shortArtBodyProp,
 		},
 	},

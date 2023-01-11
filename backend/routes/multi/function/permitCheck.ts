@@ -42,7 +42,7 @@ export const commonCasePermitCheck = (permitAddCandidates: TaddData[], mainData:
 export const mergeWorkingDays = (mainData: TmainData, addDatas: (TmainData | TaddData)[]) => {
 	let workingDays = dayjs(mainData.retiredDay).diff(mainData.enterDay, "day");
 
-	addDatas.map((addData, idx, addDatas) => {
+	addDatas.forEach((addData, idx, addDatas) => {
 		addData.enterDay = dayjs(addData.enterDay);
 		addData.retiredDay = dayjs(addData.retiredDay);
 
