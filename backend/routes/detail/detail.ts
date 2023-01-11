@@ -372,6 +372,12 @@ export default function detailRoute(fastify: FastifyInstance, options: any, done
 					errorCode: 5,
 					mesg: dayjs(req.body.hasWork[1]).add(14, "day").format("YYYY-MM-DD"),
 				};
+		} else {
+			if (req.body.isOverTen)
+				return {
+					succ: false,
+					errorCode: 5,
+				};
 		}
 
 		// // 3. 피보험단위기간 산정
