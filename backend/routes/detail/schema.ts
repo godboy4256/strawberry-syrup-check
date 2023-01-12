@@ -51,7 +51,7 @@ export type TartShortInput = {
 	isSpecial: boolean;
 	isSimple: boolean;
 	isOverTen: boolean;
-	hasWork: [boolean, string];
+	hasWork: boolean;
 	isEnd: boolean;
 	limitDay: string;
 	isMany: boolean;
@@ -72,7 +72,7 @@ export type TdayJobInput = {
 	sumWorkDay: number;
 	isSimple: boolean;
 	isOverTen: boolean;
-	hasWork: [boolean, string];
+	hasWork: boolean;
 	isMany: boolean;
 };
 
@@ -138,7 +138,7 @@ const shortArtBodyProp = {
 	isSpecial: { type: "boolean" },
 	isSimple: { type: "boolean" },
 	isOverTen: { type: "boolean" },
-	hasWork: { type: "array" },
+	hasWork: { type: "boolean" },
 	isEnd: { type: "boolean" },
 	limitDay: { type: "string" },
 };
@@ -158,7 +158,7 @@ const dayJobBodyProp = {
 	dayAvgPay: { type: "number", minimum: 0 },
 	sumWorkDay: { type: "number", minimum: 0 },
 	isOverTen: { type: "boolean" },
-	hasWork: { type: "array" },
+	hasWork: { type: "boolean" },
 };
 
 const veryShortBodyProp = {
