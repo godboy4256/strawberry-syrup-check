@@ -12,6 +12,7 @@ export const swaggerConfig: FastifyDynamicSwaggerOptions = {
 			{ name: "standard", description: "기본형 계산기" },
 			{ name: "detail", description: "상세형 계산기" },
 			{ name: "multi", description: "복수형 계산기" },
+			{ name: "leastPay", description: "최저 월급 계산기" },
 		],
 	},
 	uiConfig: {
