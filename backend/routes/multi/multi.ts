@@ -149,7 +149,7 @@ export default function multiRoute(fastify: FastifyInstance, options: any, done:
 	});
 
 	// 구직급여 신청 근로형태가 자영업자인 경우 이  api를 사용한다.
-	fastify.post("/employer", {}, (req: multiRequest, res: FastifyReply) => {
+	fastify.post("/employer", multiSchema, (req: multiRequest, res: FastifyReply) => {
 		const { mainData, addData } = req.body;
 		const mainEnterDay = dayjs(mainData.enterDay);
 		const mainRetiredDay = dayjs(mainData.retiredDay);
