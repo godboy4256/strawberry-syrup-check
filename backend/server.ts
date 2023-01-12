@@ -22,7 +22,7 @@ const server = fastify({
 
 server.register(cors, {
 	// origin: ["https://www.moneysylove.com", "https://www.moneysylove.du.r.appspot.com"],
-	origin: ["http://localhost:8080", "http://localhost:3000"],
+	origin: ["http://localhost:8080/", "http://localhost:3000/"],
 	methods: ["GET", "POST"],
 	credentials: true,
 });
