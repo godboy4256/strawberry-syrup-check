@@ -22,16 +22,14 @@ export type TstandardInput = {
 export type TartInput = {
 	retired: boolean;
 	workCate: number;
-	jobCate: number;
+	jobCate?: number;
 	retireReason: number;
 	age: number;
 	disabled: boolean;
 	enterDay: Dayjs;
 	retiredDay: Dayjs;
 	sumTwelveMonthSalary: number[];
-
 	isSpecial: boolean;
-
 	isEnd: boolean;
 	limitDay: string;
 	isMany: boolean;
@@ -101,7 +99,6 @@ const standardBodyProp = {
 	weekDay: DefineParamInfo.weekDay, // 주의
 	dayWorkTime: DefineParamInfo.dayWorkTime,
 	salary: DefineParamInfo.salary,
-	//////////////////////////////////////////////////////////////////////
 	isEnd: { type: "boolean" }, // 복수형 여부
 	limitDay: { type: "string" },
 };
@@ -116,7 +113,6 @@ const artBodyProp = {
 	enterDay: DefineParamInfo.enterDay,
 	retiredDay: DefineParamInfo.retiredDay,
 	sumTwelveMonthSalary: DefineParamInfo.salary,
-	// workRecord: { type: "array", items: { type: "string" } }, // ["2020-02-01", "2021-10-12"]
 	isSpecial: { type: "boolean" },
 	isEnd: { type: "boolean" },
 	limitDay: { type: "string" },
@@ -126,13 +122,11 @@ const shortArtBodyProp = {
 	retired: DefineParamInfo.retired, // 퇴직여부
 	workCate: DefineParamInfo.workCate, // 근로형태
 	retireReason: DefineParamInfo.retireReason, // 퇴직사유
-	// enterDay: DefineParamInfo.enterDay,
 	age: { type: "number" },
 	disabled: DefineParamInfo.disabled, // 장애여부
 	lastWorkDay: DefineParamInfo.lastWorkDay, // 마지막 근무일
 	enrollDay: { type: "string" },
 	sumOneYearPay: { type: "number", minimum: 0 }, // 퇴직 전 12개월 급여 총액
-	// sumOneYearWorkDay: { type: "number", minimum: 0 },
 	sumTwoYearWorkDay: { type: "number", minimum: 0 },
 	sumWorkDay: { type: "number", minimum: 0 }, // 마지막 근무일
 	isSpecial: { type: "boolean" },
@@ -153,7 +147,6 @@ const dayJobBodyProp = {
 	lastWorkDay: DefineParamInfo.lastWorkDay, // 마지막 근무일
 	enrollDay: { type: "string" }, // 신청 예정일
 	dayWorkTime: DefineParamInfo.dayWorkTime, // 소정 근로시간
-	// workRecord: DefineParamInfo.workRecord,
 	isSimple: { type: "boolean" },
 	dayAvgPay: { type: "number", minimum: 0 },
 	sumWorkDay: { type: "number", minimum: 0 },
@@ -173,8 +166,6 @@ const veryShortBodyProp = {
 	isEnd: { type: "boolean" },
 	limitDay: { type: "string" },
 };
-
-// dayWorkTime: DefineParamInfo.weekWorkTime,
 
 const employerBodyProp = {
 	enterDay: DefineParamInfo.enterDay,
@@ -228,7 +219,6 @@ export const artSchema = {
 			required: [
 				"retired",
 				"workCate",
-				"jobCate",
 				"retireReason",
 				"age",
 				"disabled",
