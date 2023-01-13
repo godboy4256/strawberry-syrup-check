@@ -46,8 +46,8 @@ class MultiCalHandler extends DetailedHandler {
       id: this.GetPageVal("select_multi"),
       input: this.GetPageVal("input")
         ? this.GetPageVal("input") === "개별 입력"
-          ? true
-          : false
+          ? false
+          : true
         : false,
       retiredDay: this.GetPageVal("retiredDay"),
       enterDay: this.GetPageVal("enterDay"),

@@ -35,16 +35,6 @@
   flex: none;
 }
 
-.select_custom#normal.active {
-  border: 1px solid rgba(255, 101, 89, 1);
-}
-.select_custom#normal.active select {
-  color: rgba(255, 101, 89, 1);
-}
-.select_custom#normal.active .select_icon {
-  background-color: rgba(255, 101, 89, 1);
-}
-
 .select_popup {
   background-color: rgba(255, 227, 226, 1);
   padding: 30px 25px;
@@ -85,4 +75,88 @@
 }
 .popup_select_container div {
   line-height: 24px;
+}
+
+.custom_select {
+  position: relative;
+}
+.custom_options {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  width: 100%;
+  background-color: rgba(234, 91, 80, 1);
+  max-height: 250px;
+  overflow: auto;
+  border-bottom-left-radius: 5px;
+  border-bottom-right-radius: 5px;
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+  z-index: 100000;
+}
+.custom_options > div {
+  cursor: pointer;
+}
+.custom_options > div:hover {
+  background-color: #d35248;
+}
+
+.custom_options::-webkit-scrollbar {
+  display: none;
+}
+
+.custom_select.date_normal_style {
+  border: 1px solid black;
+  padding: 3px 9px;
+  border-radius: 5px;
+  margin: 0 5px;
+  display: flex;
+  z-index: 10000;
+  width: 90px;
+  justify-content: space-between;
+}
+.custom_select.date_normal_style > div {
+  line-height: 24px;
+}
+.custom_select.normal_style .custom_options > div,
+.custom_select.date_normal_style .custom_options > div {
+  line-height: 24px;
+  padding: 10px 0;
+  color: white;
+  text-align: center;
+}
+.custom_select.normal_style {
+  border: 1px solid rgba(0, 0, 0, 0.2);
+  width: 100%;
+  display: flex;
+  border-radius: 5px;
+  justify-content: space-between;
+  align-items: center;
+  text-align: center;
+}
+
+.custom_select.normal_style .icon_cover .custom_select_icon {
+  width: 18px;
+}
+.custom_select.normal_style .custom_select_title {
+  width: calc(100% - 38px);
+  font-size: 14px;
+  color: rgba(0, 0, 0, 0.2);
+}
+.custom_select.normal_style .icon_cover {
+  background-color: rgba(0, 0, 0, 0.2);
+  height: 38px;
+  width: 38px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.custom_select.normal_style.active {
+  border-color: #ff6559;
+}
+.custom_select.normal_style.active .custom_select_title {
+  color: #ff6559;
+}
+.custom_select.normal_style.active .icon_cover {
+  background-color: #ff6559;
 }

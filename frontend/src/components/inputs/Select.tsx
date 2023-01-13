@@ -1,8 +1,57 @@
 import { ChangeEvent, MouseEvent, ReactElement, useState } from "react";
 import IMGSelect from "../../assets/image/select_icon.svg";
 import IMGNormalSelect from "../../assets/image/new/select_icon_normal.svg";
-import "../../styles/select.css";
 import { ClosePopup, CreatePopup } from "../common/Popup";
+import "../../styles/select.css";
+
+const _CustomSelect = ({
+  options,
+  option_func,
+  select_ment = "선택해 주세요.",
+  className,
+  select_icon,
+}: {
+  options: string[] | number[];
+  option_func: (el: string | number, e: MouseEvent<HTMLDivElement>) => void;
+  select_ment?: string | number;
+  className?: string;
+  select_icon?: string;
+}) => {
+  const [onSelect, setOnSelect] = useState(false);
+  const [select, setSelect] = useState<string | number>("");
+  return (
+    <div
+      className={`custom_select ${className ? className : ""}`}
+      onClick={() => setOnSelect((prev) => !prev)}
+      onBlur={() => setOnSelect(false)}
+    >
+      <div className="custom_select_title">{select ? select : select_ment}</div>
+      <div className="custom_options">
+        {onSelect &&
+          options.map((el) => {
+            return (
+              <div
+                key={String(Date.now()) + el}
+                onClick={(e: MouseEvent<HTMLDivElement>) => {
+                  option_func(el, e);
+                  setSelect(el);
+                }}
+              >
+                {el}
+              </div>
+            );
+          })}
+      </div>
+      <div className="icon_cover">
+        <img
+          src={select_icon}
+          className="custom_select_icon"
+          alt="custom select icon"
+        />
+      </div>
+    </div>
+  );
+};
 
 const PopupSelect = ({
   options,
@@ -106,60 +155,31 @@ const SelectInput = ({
           {popup_focus_template}
         </div>
       ) : type === "date_normal" ? (
-        <div id={type} className="select_custom">
-          <select
-            onChange={(e: ChangeEvent<HTMLSelectElement>) => {
-              callBack && callBack(params, e.currentTarget.value);
-            }}
-            defaultValue={selected}
-          >
-            {options.map((el: string | number, idx: number) => {
-              return (
-                <option key={idx + Date.now()} value={el}>
-                  {el}
-                </option>
-              );
-            })}
-          </select>
-          <img src={IMGSelect} alt="Select Icon" />
-        </div>
+        <>
+          <_CustomSelect
+            options={options}
+            option_func={(el: string | number) =>
+              callBack && callBack(params, el)
+            }
+            select_ment={options[0]}
+            select_icon={IMGSelect}
+            className="date_normal_style"
+          />
+        </>
       ) : (
         type === "normal" && (
           <>
             {label && <label className="fs_16 write_label">{label}</label>}
-            <div id={type} className="select_custom">
-              <select
-                className="fs_14"
-                onChange={(e: ChangeEvent<HTMLSelectElement>) => {
-                  e.currentTarget.parentElement &&
-                    e.currentTarget.parentElement.classList.add("active");
-                  callBack &&
-                    callBack(
-                      params,
-                      value_type === "string"
-                        ? e.currentTarget.value
-                        : Number(e.currentTarget.value)
-                    );
-                }}
-                defaultValue={selected}
-              >
-                {options.map((el: string | number, idx: number) => {
-                  return (
-                    <option
-                      id={String(idx)}
-                      className="fs_14"
-                      key={idx + Date.now()}
-                      value={value_type === "string" ? el : idx}
-                    >
-                      {el}
-                    </option>
-                  );
-                })}
-              </select>
-              <div className="select_icon">
-                <img src={IMGNormalSelect} alt="Select Icon" />
-              </div>
-            </div>
+            <_CustomSelect
+              options={options}
+              option_func={(el: string | number, e: any) => {
+                e.target.parentNode.parentNode.classList.add("active");
+                callBack && callBack(params, el);
+              }}
+              select_ment={options[0]}
+              select_icon={IMGNormalSelect}
+              className="normal_style"
+            />
           </>
         )
       )}
