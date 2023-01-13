@@ -37,6 +37,11 @@ const IndividualInput = ({
   label?: string;
   description: string[];
 }) => {
+  useEffect(() => {
+    console.log("등장");
+    handler2._Data_arr = [];
+  }, []);
+
   const current_year_list = Year_Option_Generater(10);
   const [selectYears, setSelectYears] = useState<string[]>([]);
   const onClickPopUpDate = (year: string) => {
@@ -66,14 +71,6 @@ const IndividualInput = ({
             months,
           });
           handler.SetPageVal("workRecord", handler2._Data_arr);
-          handler.SetPageVal(
-            "sumWorkDay",
-            handler.sumDayJobWorkingDay(handler2._Data_arr)[0]
-          );
-          handler.SetPageVal(
-            "dayAvgPay",
-            handler.sumDayJobWorkingDay(handler2._Data_arr)[1]
-          );
           setSelectYears(
             handler2._Data_arr.map((el: any) => {
               return String(el.year);
