@@ -247,11 +247,6 @@ export default function detailRoute(fastify: FastifyInstance, options: any, done
 
 	fastify.post(detailPath.shortArt, shortArtSchema, (req: any, res) => {
 		const mainData: TartShortInput = { ...req.body };
-		// 1. 추가 근로 정보에서 단기 예술인/특고 추가 조건 확인
-		console.log("1. ", mainData.isOverTen, mainData.hasWork[0]);
-		if (mainData.isOverTen && mainData.hasWork[0]) {
-			return { succ: false, errorCode: 5, mesg: dayjs(mainData.hasWork[1]).add(14, "day").format("YYYY-MM-DD") };
-		}
 
 		// 신청일이 이직일로 부터 1년 초과 확인
 		const now = mainData.isSimple ? dayjs() : dayjs(mainData.enrollDay);
@@ -289,6 +284,11 @@ export default function detailRoute(fastify: FastifyInstance, options: any, done
 			mainData.sumWorkDay,
 			mainData.isSpecial
 		);
+
+		// 1. 추가 근로 정보에서 단기 예술인/특고 추가 조건 확인
+		console.log("1. ", mainData.isOverTen, mainData.hasWork);
+		if (mainData.isOverTen && mainData.hasWork)
+			return { succ: false, errorCode: 5, workingMonths: isPermit[1], requireMonths: isPermit[2] };
 
 		///////////////////////////////////////////////////////////////
 		// 8. 복수형에서 사용하기위한 workDayForMulti 계산
@@ -374,43 +374,8 @@ export default function detailRoute(fastify: FastifyInstance, options: any, done
 		if (Math.floor(now.diff(mainData.lastWorkDay, "day", true)) > 365)
 			return { succ: false, errorCode: 0, mesg: DefinedParamErrorMesg.expire };
 
-		// 2. 추가 조건 확인 (건설직 여부 기준)
-		console.log("2. ", mainData.isSpecial, mainData.isOverTen, mainData.hasWork);
-		if (mainData.isSpecial) {
-			if (mainData.isOverTen && mainData.hasWork[0])
-				return {
-					succ: false,
-					errorCode: 5,
-					mesg: dayjs(mainData.hasWork[1]).add(14, "day").format("YYYY-MM-DD"),
-				};
-		} else {
-			if (mainData.isOverTen)
-				return {
-					succ: false,
-					errorCode: 5,
-				};
-		}
-
 		// // 3. 피보험단위기간 산정
 		const limitPermitDay = mainData.lastWorkDay.subtract(18, "month").format("YYYY-MM-DD").split("-").map(Number);
-
-		// let isPermit: (number | boolean)[];
-		// let sortedData: any[];
-		// if (mainData.hasOwnProperty("workRecord")) {
-		// 	const overDatePool = dayjs(new Date(mainData.workRecord[0].year, mainData.workRecord[0].months[0].month, 0))
-		// 		.subtract(1, "month")
-		// 		.isSameOrAfter(mainData.lastWorkDay);
-		// 	if (overDatePool) return { succ: false, errorCode: 1, mesg: "입력한 근무일이 마지막 근무일 이 후 입니다." };
-
-		// 	sortedData = mainData.workRecord.sort((a: any, b: any) => {
-		// 		if (a.year < b.year) return 1;
-		// 		if (a.year > b.year) return -1;
-		// 		return 0;
-		// 	});
-		// 	isPermit = dayJobCheckPermit(limitPermitDay, sortedData);
-		// } else {
-		// 	isPermit = dayJobCheckPermit(limitPermitDay, mainData.sumWorkDay, true);
-		// }
 		const isPermit = dayJobCheckPermit(limitPermitDay, mainData.sumWorkDay, true);
 		console.log("3. ", isPermit, limitPermitDay);
 
@@ -421,6 +386,27 @@ export default function detailRoute(fastify: FastifyInstance, options: any, done
 				: calDayJobPay(mainData.dayAvgPay, mainData.dayWorkTime);
 
 		console.log("4. ", dayAvgPay, realDayPay, realMonthPay);
+
+		// 2. 추가 조건 확인 (건설직 여부 기준)
+		console.log("2. ", mainData.isSpecial, mainData.isOverTen, mainData.hasWork);
+		if (mainData.isSpecial) {
+			if (mainData.isOverTen && mainData.hasWork)
+				return {
+					succ: false,
+					errorCode: 5,
+					workingDays: isPermit[1],
+					requireDays: isPermit[2],
+				};
+		} else {
+			// 1개월 내 근로일 수 10일 미만
+			if (mainData.isOverTen)
+				return {
+					succ: false,
+					errorCode: 11,
+					workingDays: isPermit[1],
+					requireDays: isPermit[2],
+				};
+		}
 
 		if (!isPermit[0])
 			return {
