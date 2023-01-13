@@ -88,6 +88,7 @@
 }
 #detail_comp_container {
   padding-bottom: 75px;
+  min-height: calc(100vh - 137px);
 }
 #detail_container_employ {
   min-height: calc(100vh - 141px);

@@ -14,83 +14,6 @@ class DetailedHandler extends InputHandler {
     undefined;
   public setIsValueSelect03: Dispatch<SetStateAction<number>> | undefined =
     undefined;
-
-  public sumWorkDay = (workRecord: any) => {
-    let result = 0,
-      notOverTen = 0;
-    workRecord.map((el: any) => {
-      return el.months.map((el: any) => {
-        if (el.day >= 11) {
-          result += 1;
-        } else {
-          notOverTen += el.day;
-        }
-      });
-    });
-    return result + Math.ceil(((notOverTen / 22) * 10) / 10);
-  };
-
-  public sumOneYearResult = (
-    workRecord: any,
-    lastWorkDate: any,
-    type: "day" | "pay" | "two_year"
-  ) => {
-    let result = 0,
-      notOverTen = 0;
-    const lastWorkYear = new Date(lastWorkDate).getFullYear();
-    const lastWorkMonth = new Date(lastWorkDate).getMonth() + 1;
-    const workMonthArr1 = [];
-    const workMonthArr2 = [];
-    const workMonthArr3 = [];
-    const paysArr: any = [];
-    const forLoopCount = type === "two_year" ? 24 : 12;
-    const newWorkRecord: any = {};
-    for (let i = 0; i < forLoopCount; i++) {
-      if (lastWorkMonth - i < 1) {
-        if (lastWorkMonth + 12 - i < 1) {
-          workMonthArr3.push(lastWorkMonth - i + 24);
-          newWorkRecord[lastWorkYear - 2] = workMonthArr3;
-        } else {
-          workMonthArr2.push(lastWorkMonth + 12 - i);
-          newWorkRecord[lastWorkYear - 1] = workMonthArr2;
-        }
-      } else {
-        workMonthArr1.push(lastWorkMonth - i);
-        newWorkRecord[lastWorkYear] = workMonthArr1;
-      }
-    }
-
-    const filterYear = workRecord.filter((el: any, idx: number) => {
-      return Object.keys(newWorkRecord).includes(String(el.year));
-    });
-
-    filterYear.forEach((el: any, idx: number) => {
-      paysArr.push(
-        el.months.filter((el: any) => {
-          return newWorkRecord[Object.keys(newWorkRecord)[idx]].includes(
-            el.month
-          );
-        })
-      );
-    });
-    paysArr.forEach((el: any) => {
-      return el.forEach((el: any) => {
-        if (type === "day") {
-          result += el.day;
-        } else if (type === "pay") {
-          result += el.pay;
-        } else if (type === "two_year") {
-          if (el.day > 10) {
-            result += 1;
-          } else {
-            notOverTen += el.day;
-          }
-        }
-      });
-    });
-
-    return result + Math.ceil(((notOverTen / 22) * 10) / 10);
-  };
   public insuranceGrade = (retiredDay: Date, enterDay: Date) => {
     const retiredDayYear: any = GetDateArr(retiredDay)[0];
     const enterDayYear: any = GetDateArr(enterDay)[0];
@@ -104,6 +27,52 @@ class DetailedHandler extends InputHandler {
           : this._Data["year0"].split("등급")[0];
       });
     return answer;
+  };
+  public sumCal = (
+    type: "pay" | "sumWorkDay" | "twoYear",
+    workRecord: {
+      year: number;
+      months: { month: number; pay: number; day: number }[];
+    }[]
+  ) => {
+    let answer = 0,
+      notOverTen = 0;
+    if (type === "pay") {
+      workRecord.forEach((year) => {
+        year.months.forEach((el) => {
+          answer += el.pay;
+        });
+      });
+      return answer;
+    }
+    if (type === "sumWorkDay") {
+      workRecord.forEach((year) => {
+        year.months.forEach((el) => {
+          if (el.day >= 11) {
+            answer += 1;
+          } else {
+            notOverTen += el.day;
+          }
+        });
+      });
+      return answer + Math.ceil((notOverTen / 22) * 10) / 10;
+    }
+    if (type === "twoYear") {
+      workRecord.forEach((year, idx) => {
+        if (idx === 2) {
+          return;
+        } else {
+          year.months.forEach((el) => {
+            if (el.day >= 11) {
+              answer += 1;
+            } else {
+              notOverTen += el.day;
+            }
+          });
+        }
+      });
+      return answer + Math.ceil((notOverTen / 22) * 10) / 10;
+    }
   };
 
   public emeploymentInsuranceTotal = (workRecord: any) => {
@@ -253,7 +222,7 @@ class DetailedHandler extends InputHandler {
               : null,
             lastWorkDay: this._Data.lastWorkDay,
             isSpecial: this._Data.isSpecial ? this._Data.isSpecial : false,
-            isSimple: this._Data.input === "개별 입력" ? true : false,
+            isSimple: this._Data.input === "개별 입력" ? false : true,
             age: isNaN(Number(getAge(new Date(String(this._Data.age))).age))
               ? null
               : getAge(new Date(String(this._Data.age))).age,
@@ -291,6 +260,7 @@ class DetailedHandler extends InputHandler {
           ? {
               retired: this._Data.retired,
               workCate: 4,
+              isSpecial: true,
               hasWork: this._Data.hasWork ? this._Data.hasWork : null,
               retireReason:
                 this._Data.cal_state === "multi" ? 1 : this._Data.retireReason,
@@ -308,23 +278,15 @@ class DetailedHandler extends InputHandler {
               sumWorkDay:
                 this._Data.input === "결과만 입력"
                   ? this._Data.employ_month + this._Data.employ_year * 12
-                  : this.sumWorkDay(this._Data.workRecord),
+                  : this.sumCal("sumWorkDay", this._Data.workRecord),
               sumTwoYearWorkDay: this._Data.workRecord
-                ? this.sumOneYearResult(
-                    this._Data.workRecord,
-                    this._Data.lastWorkDay,
-                    "two_year"
-                  )
+                ? this.sumCal("twoYear", this._Data.workRecord)
                 : null,
               sumOneYearPay:
                 this._Data.input === "결과만 입력"
                   ? this._Data.sumOneYearPay
                   : this._Data.workRecord
-                  ? this.sumOneYearResult(
-                      this._Data.workRecord,
-                      this._Data.lastWorkDay,
-                      "pay"
-                    )
+                  ? this.sumCal("pay", this._Data.workRecord)
                   : null,
               isOverTen:
                 this._Data.isOverTen === undefined
@@ -338,7 +300,7 @@ class DetailedHandler extends InputHandler {
                 )
               ),
               isEnd: this._Data.cal_state ? true : false,
-              isSimple: this._Data.input === "개별 입력" ? true : false,
+              isSimple: this._Data.input === "개별 입력" ? false : true,
             }
           : {
               ...this._Data,
@@ -389,27 +351,19 @@ class DetailedHandler extends InputHandler {
               sumWorkDay:
                 this._Data.input === "결과만 입력"
                   ? this._Data.employ_month + this._Data.employ_year * 12
-                  : this.sumWorkDay(this._Data.workRecord),
+                  : this.sumCal("sumWorkDay", this._Data.workRecord),
               sumTwoYearWorkDay: this._Data.workRecord
-                ? this.sumOneYearResult(
-                    this._Data.workRecord,
-                    this._Data.lastWorkDay,
-                    "two_year"
-                  )
+                ? this.sumCal("twoYear", this._Data.workRecord)
                 : null,
               sumOneYearPay:
                 this._Data.input === "결과만 입력"
                   ? this._Data.sumOneYearPay
                   : this._Data.workRecord
-                  ? this.sumOneYearResult(
-                      this._Data.workRecord,
-                      this._Data.lastWorkDay,
-                      "pay"
-                    )
+                  ? this.sumCal("pay", this._Data.workRecord)
                   : null,
               isOverTen: this._Data.isOverTen ? this._Data.isOverTen : false,
               hasWork: this._Data.hasWork ? this._Data.hasWork : null,
-              isSimple: this._Data.input === "개별 입력" ? true : false,
+              isSimple: this._Data.input === "개별 입력" ? false : true,
             }
           : {
               ...this._Data,

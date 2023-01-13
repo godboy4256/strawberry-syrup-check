@@ -106,20 +106,31 @@ class DateHandler extends InputHandler {
     const viewDate = `${this._Data.year ? this._Data.year : currentDate[0]}-${
       this._Data.month ? this._Data.month : currentDate[1]
     }-${this._Data.day ? this._Data.day : currentDate[2]}`;
+    const mostWorkRecentDay =
+      this._Data.plan_todo_data && this._Data.plan_todo_data.length > 0
+        ? this._Data.plan_todo_data?.reduce((prev: any, curr: any) => {
+            return new Date(prev).getTime() <= new Date(curr).getTime()
+              ? curr
+              : prev;
+          })
+        : this._Data.plan_todo_data;
+    console.log("zhzh", new Date(viewDate), new Date(mostWorkRecentDay));
     if (params === "isOverTen") {
       callBack &&
         callBack(params, this._Data.plan_todo_data.length >= 10 ? true : false);
       callBack &&
-        callBack("hasWork", [
-          this._Data.plan_todo_data.length >= 14 ? true : false,
-          this._Data.plan_todo_data.length > 0
-            ? this._Data.plan_todo_data?.reduce((prev: any, curr: any) => {
-                return new Date(prev).getTime() <= new Date(curr).getTime()
-                  ? curr
-                  : prev;
-              })
-            : this._Data.plan_todo_data,
-        ]);
+        callBack(
+          "hasWork",
+          Math.ceil(
+            Math.abs(
+              new Date(viewDate).getTime() -
+                new Date(mostWorkRecentDay).getTime()
+            ) /
+              (1000 * 3600 * 24)
+          ) <= 14
+            ? true
+            : false
+        );
       setValueState &&
         setValueState(
           this._Data.plan_todo_data.length >= 10
@@ -250,6 +261,7 @@ const _DatePopUp = ({
           id="date_prev_btn"
           className={planToDo ? (planToDoButton ? "acitve" : "") : ""}
           onClick={() => {
+            console.log(2);
             if (planToDo) {
               setState(true);
               if (planToDoMonth === 1) {
@@ -263,9 +275,9 @@ const _DatePopUp = ({
               });
             }
             handler.SelectDatePrevClick();
-            handler.setDays(
-              handler.Days_Option_Generater(planToDoYear, planToDoMonth)
-            );
+            // handler.setDays(
+            //   handler.Days_Option_Generater(planToDoYear, planToDoMonth)
+            // );
           }}
         >
           <img src={IMGRedDirection} alt="Date Prev Button" />
@@ -298,6 +310,7 @@ const _DatePopUp = ({
           id="date_next_btn"
           className={planToDo ? (!planToDoButton ? "acitve" : "") : ""}
           onClick={() => {
+            console.log(1);
             if (planToDo) {
               setState(false);
               if (planToDoMonth === 12) {
@@ -311,9 +324,9 @@ const _DatePopUp = ({
               });
             }
             handler.SelectDateNextClick();
-            handler.setDays(
-              handler.Days_Option_Generater(planToDoYear, planToDoMonth)
-            );
+            // handler.setDays(
+            //   handler.Days_Option_Generater(planToDoYear, planToDoMonth)
+            // );
           }}
         >
           <img src={IMGRedDirection} alt="Date Next Button" />
