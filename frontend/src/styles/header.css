@@ -13,6 +13,7 @@
   transform: translateX(-50%);
   z-index: 1001;
 }
+#header_container div,
 #header_container a {
   line-height: 0;
 }

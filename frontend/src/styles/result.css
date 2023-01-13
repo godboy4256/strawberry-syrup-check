@@ -131,3 +131,33 @@
   border: 1px solid #ccc;
   padding: 10px;
 }
+#result_top_header.next_result {
+  margin: 5px 0;
+}
+#next_need_day {
+  margin-top: 5px;
+  line-height: 21px;
+}
+#next_result_amount {
+  text-align: right;
+  margin-top: 5px;
+  line-height: 21px;
+}
+#next_more_pay {
+  text-align: right;
+  margin-top: 5px;
+  line-height: 21px;
+}
+#next_more_pay {
+  border: 1px solid rgba(255, 101, 89, 1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 24px;
+  padding: 10px 15px;
+  margin: 25px 0;
+}
+#next_more_pay span {
+  display: block;
+  margin-right: 5px;
+}
