@@ -114,7 +114,6 @@ class DateHandler extends InputHandler {
               : prev;
           })
         : this._Data.plan_todo_data;
-    console.log("zhzh", new Date(viewDate), new Date(mostWorkRecentDay));
     if (params === "isOverTen") {
       callBack &&
         callBack(params, this._Data.plan_todo_data.length >= 10 ? true : false);
@@ -460,7 +459,6 @@ const _IndiviualInput = ({
   params,
   total,
   pay = false,
-  isDayJob,
 }: {
   callBack: CallableFunction;
   params: string;
@@ -468,7 +466,7 @@ const _IndiviualInput = ({
   pay?: boolean;
   isDayJob?: boolean;
 }) => {
-  const indiviual_export_data: any = { month: Number(params) };
+  let indiviual_export_data: any = { month: Number(params) };
   const onChangeInput = (params_in: string, value: any) => {
     indiviual_export_data[params_in] = Number(value);
     callBack(params, indiviual_export_data);
@@ -480,10 +478,7 @@ const _IndiviualInput = ({
         className={`${total ? "total" : ""} font_color_main`}
         placeholder="근로일수"
         onChange={(e: ChangeEvent<HTMLInputElement>) => {
-          onChangeInput(
-            !isDayJob && pay ? "three_mbp" : "day",
-            e.currentTarget.value
-          );
+          onChangeInput("day", e.currentTarget.value);
         }}
       />
       {pay && (
@@ -523,7 +518,6 @@ export const DateInputIndividual = ({
   const oneMonthYear = lastMonth === 1 ? String(Number(lastYear) - 1) : null;
 
   useEffect(() => {
-    handler._Data = {};
     if (lastMonth === 1 && oneMonthYear) {
       lastYear = oneMonthYear;
     }

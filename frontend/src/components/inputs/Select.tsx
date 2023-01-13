@@ -12,7 +12,11 @@ const _CustomSelect = ({
   select_icon,
 }: {
   options: string[] | number[];
-  option_func: (el: string | number, e: MouseEvent<HTMLDivElement>) => void;
+  option_func: (
+    el: string | number,
+    e: MouseEvent<HTMLDivElement>,
+    idx: number
+  ) => void;
   select_ment?: string | number;
   className?: string;
   select_icon?: string;
@@ -28,12 +32,12 @@ const _CustomSelect = ({
       <div className="custom_select_title">{select ? select : select_ment}</div>
       <div className="custom_options">
         {onSelect &&
-          options.map((el) => {
+          options.map((el, idx: number) => {
             return (
               <div
                 key={String(Date.now()) + el}
                 onClick={(e: MouseEvent<HTMLDivElement>) => {
-                  option_func(el, e);
+                  option_func(el, e, idx);
                   setSelect(el);
                 }}
               >
@@ -112,7 +116,7 @@ const SelectInput = ({
   check_popup?: string[];
   value_type?: "number" | "string";
 }) => {
-  const onClickOnOptionList = (e: MouseEvent<HTMLDivElement>) => {
+  const onClickOnOptionList = () => {
     CreatePopup(
       label,
       <PopupSelect
@@ -172,9 +176,19 @@ const SelectInput = ({
             {label && <label className="fs_16 write_label">{label}</label>}
             <_CustomSelect
               options={options}
-              option_func={(el: string | number, e: any) => {
-                e.target.parentNode.parentNode.classList.add("active");
-                callBack && callBack(params, el);
+              option_func={(
+                el: string | number,
+                e: MouseEvent<HTMLDivElement>,
+                idx?: number
+              ) => {
+                e?.currentTarget?.parentElement?.parentElement?.classList?.add(
+                  "active"
+                );
+                if (value_type === "number") {
+                  callBack && options && callBack(params, idx);
+                } else {
+                  callBack && callBack(params, el);
+                }
               }}
               select_ment={options[0]}
               select_icon={IMGNormalSelect}
