@@ -28,11 +28,35 @@ class DetailedHandler extends InputHandler {
       });
     return answer;
   };
-  public sumCal = (
-    type: "pay" | "sumWorkDay" | "twoYear",
+
+  public getDayAvgPay = (
     workRecord: {
       year: number;
-      months: { month: number; pay: number; day: number }[];
+      months: {
+        month: number;
+        three_mbp?: number;
+        pay?: number;
+        day?: number;
+      }[];
+    }[]
+  ) => {
+    let pays = 0,
+      days = 0;
+    workRecord.forEach((el) => {
+      el.months.forEach((years) => {
+        if (years.pay && years.pay !== 0) {
+          pays += years.pay;
+          days += new Date(el.year, years.month, 0).getDate();
+        }
+      });
+    });
+    return Math.ceil(pays / days);
+  };
+  public sumCal = (
+    type: "pay" | "sumWorkDay" | "twoYear" | "sumWorkDayAll",
+    workRecord: {
+      year: number;
+      months: { month: number; pay: number; day: number; three_mbp?: number }[];
     }[]
   ) => {
     let answer = 0,
@@ -73,6 +97,14 @@ class DetailedHandler extends InputHandler {
       });
       return answer + Math.ceil((notOverTen / 22) * 10) / 10;
     }
+    if (type === "sumWorkDayAll") {
+      workRecord.forEach((el) => {
+        el.months.forEach((years) => {
+          answer += years?.day;
+        });
+      });
+      return answer;
+    }
   };
 
   public emeploymentInsuranceTotal = (workRecord: any) => {
@@ -95,35 +127,6 @@ class DetailedHandler extends InputHandler {
     }
   };
 
-  public sumDayJobWorkingDay: (workRecord: any, isSimple?: any) => any = (
-    workRecord: any[],
-    isSimple: boolean = false
-  ) => {
-    let sumWorkDay = 0;
-    let sumPay = 0;
-    let sumThreeMbp = 0;
-    let dayAvgPay;
-    if (isSimple) {
-      return 1;
-    } else {
-      workRecord.map((v: { year: number; months: any[] }) => {
-        v.months.map(
-          (v: {
-            month: number;
-            day: number;
-            pay: number;
-            three_mbp: number;
-          }) => {
-            sumWorkDay += v.day ? v.day : 0;
-            sumPay += v.pay ? v.pay : 0;
-            sumThreeMbp += v.three_mbp ? v.three_mbp : 0;
-          }
-        );
-      });
-      dayAvgPay = Math.ceil(sumPay / sumThreeMbp);
-    }
-    return [sumWorkDay, dayAvgPay];
-  };
   public getSumOneYearPay = (arr: any) => {
     let answer: number = 0;
     for (let i = 0; i < arr.length; i++) {
@@ -211,7 +214,7 @@ class DetailedHandler extends InputHandler {
           }
         : this._Data.workCate === 2 // 일용직
         ? {
-            hasWork: this._Data.hasWork ? this._Data.hasWork : null,
+            hasWork: this._Data.hasWork,
             retired: this._Data.retired,
             workCate: 6,
             retireReason:
@@ -241,10 +244,10 @@ class DetailedHandler extends InputHandler {
                 ? this._Data.isOverTen
                 : false,
             sumWorkDay: this._Data.workRecord
-              ? this.sumDayJobWorkingDay(this._Data.workRecord)[0]
+              ? this.sumCal("sumWorkDayAll", this._Data.workRecord)
               : this._Data.sumWorkDay,
             dayAvgPay: this._Data.workRecord
-              ? this.sumDayJobWorkingDay(this._Data.workRecord)[1]
+              ? this.getDayAvgPay(this._Data.workRecord)
               : this._Data.dayAvgPay,
             limitDay: new Date(
               new Date(
@@ -260,8 +263,8 @@ class DetailedHandler extends InputHandler {
           ? {
               retired: this._Data.retired,
               workCate: 4,
-              isSpecial: true,
-              hasWork: this._Data.hasWork ? this._Data.hasWork : null,
+              isSpecial: false,
+              hasWork: this._Data.hasWork,
               retireReason:
                 this._Data.cal_state === "multi" ? 1 : this._Data.retireReason,
               lastWorkDay: this._Data.lastWorkDay,
@@ -362,7 +365,7 @@ class DetailedHandler extends InputHandler {
                   ? this.sumCal("pay", this._Data.workRecord)
                   : null,
               isOverTen: this._Data.isOverTen ? this._Data.isOverTen : false,
-              hasWork: this._Data.hasWork ? this._Data.hasWork : null,
+              hasWork: this._Data.hasWork,
               isSimple: this._Data.input === "개별 입력" ? false : true,
             }
           : {
@@ -462,6 +465,7 @@ class DetailedHandler extends InputHandler {
             isMany: this._Data.cal_state ? true : false,
           }
         : {};
+    console.log("헤이헤이", this._Data.workRecord);
     const validCheckType =
       this._Data.workCate === 0 || this._Data.workCate === 1
         ? "detail_standad"
