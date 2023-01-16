@@ -2,14 +2,7 @@ import dayjs from "dayjs";
 import { FastifyInstance } from "fastify";
 import isSameOrAfter from "dayjs/plugin/isSameOrAfter";
 
-import {
-	calDday,
-	calLeastPayInfo,
-	getDateVal,
-	getFailResult,
-	getNextReceiveDay,
-	getReceiveDay,
-} from "../../router_funcs/common";
+import { calDday, calLeastPayInfo, getFailResult, getNextReceiveDay, getReceiveDay } from "../../router_funcs/common";
 import { DefinedParamErrorMesg } from "../../share/validate";
 import { detailPath } from "../../share/pathList";
 
@@ -54,10 +47,12 @@ export default function detailRoute(fastify: FastifyInstance, options: any, done
 		};
 		const retiredDayArray = req.body.retiredDay.split("-");
 
-		// 1. 기본 조건 확인
+		// // 1. 기본 조건 확인
 		const employmentDate = Math.floor(mainData.retiredDay.diff(mainData.enterDay, "day", true) + 1);
-		const checkResult = checkBasicRequirements(mainData, employmentDate);
-		if (!checkResult.succ) return { checkResult };
+		if (!mainData.isMany) {
+			const checkResult = checkBasicRequirements(mainData, employmentDate);
+			if (!checkResult.succ) return { checkResult };
+		}
 
 		// 2. 급여 산정
 		const { dayAvgPay, realDayPay, realMonthPay } =
@@ -149,14 +144,13 @@ export default function detailRoute(fastify: FastifyInstance, options: any, done
 			mainData.enterDay = checkJobCate(mainData.enterDay, mainData.jobCate);
 		}
 
-		// 2. 기본 조건 확인
+		// 2. 기본 조건 확인 & 복수형이 아니면 추가 조건확인
 		const employmentDate = Math.floor(mainData.retiredDay.diff(mainData.enterDay, "day", true) + 1); // 예술인은 유/무급 휴일 개념이 없으며 가입기간 전체를 피보험 단위기간으로 취급한다.
-		const checkResult = checkBasicRequirements(mainData, employmentDate);
-		console.log("1. ", employmentDate, checkResult);
-		if (!checkResult.succ) return { checkResult };
-
-		// 복수형이 아니면 추가 조건확인
 		if (!mainData.isMany) {
+			const checkResult = checkBasicRequirements(mainData, employmentDate);
+			console.log("1. ", employmentDate, checkResult);
+			if (!checkResult.succ) return { checkResult };
+
 			if (employmentDate < 90)
 				return { succ: false, errorCode: 3, mesg: "예술인/특고로 3개월 이상 근무해야합니다." };
 		}
@@ -249,16 +243,18 @@ export default function detailRoute(fastify: FastifyInstance, options: any, done
 		const mainData: TartShortInput = { ...req.body };
 
 		// 신청일이 이직일로 부터 1년 초과 확인
-		const now = mainData.isSimple ? dayjs() : dayjs(mainData.enrollDay);
-		console.log("2. ", now, Math.floor(now.diff(mainData.lastWorkDay, "day", true)) > 365);
-		if (Math.floor(now.diff(mainData.lastWorkDay, "day", true)) > 365)
-			return { succ: false, errorCode: 0, mesg: DefinedParamErrorMesg.expire };
-
-		// 단기 예술인/특고로 3개월 이상 근무해야한다.
-		console.log("3. ", mainData.isMany, mainData.sumWorkDay);
 		if (!mainData.isMany) {
-			if (mainData.sumWorkDay < 3)
-				return { succ: false, errorCode: 4, mesg: "단기 예술인/특고로 3개월 이상 근무해야합니다." };
+			const now = mainData.isSimple ? dayjs() : dayjs(mainData.enrollDay);
+			console.log("2. ", now, Math.floor(now.diff(mainData.lastWorkDay, "day", true)) > 365);
+			if (Math.floor(now.diff(mainData.lastWorkDay, "day", true)) > 365)
+				return { succ: false, errorCode: 0, mesg: DefinedParamErrorMesg.expire };
+
+			// 단기 예술인/특고로 3개월 이상 근무해야한다.
+			console.log("3. ", mainData.isMany, mainData.sumWorkDay);
+			if (!mainData.isMany) {
+				if (mainData.sumWorkDay < 3)
+					return { succ: false, errorCode: 4, mesg: "단기 예술인/특고로 3개월 이상 근무해야합니다." };
+			}
 		}
 
 		// 2. 급여(일수령액, 월수령액) 계산
@@ -369,10 +365,12 @@ export default function detailRoute(fastify: FastifyInstance, options: any, done
 		};
 
 		// 1. 신청일이 이직일로 부터 1년 초과 확인
-		const now = mainData.isSimple ? dayjs(new Date()) : dayjs(mainData.enrollDay);
-		console.log("1. ", now.format("YYYY-MM-DD"), Math.floor(now.diff(mainData.lastWorkDay, "day", true)) > 365);
-		if (Math.floor(now.diff(mainData.lastWorkDay, "day", true)) > 365)
-			return { succ: false, errorCode: 0, mesg: DefinedParamErrorMesg.expire };
+		if (mainData.isMany) {
+			const now = mainData.isSimple ? dayjs(new Date()) : dayjs(mainData.enrollDay);
+			console.log("1. ", now.format("YYYY-MM-DD"), Math.floor(now.diff(mainData.lastWorkDay, "day", true)) > 365);
+			if (Math.floor(now.diff(mainData.lastWorkDay, "day", true)) > 365)
+				return { succ: false, errorCode: 0, mesg: DefinedParamErrorMesg.expire };
+		}
 
 		// // 3. 피보험단위기간 산정
 		const limitPermitDay = mainData.lastWorkDay.subtract(18, "month").format("YYYY-MM-DD").split("-").map(Number);
@@ -468,8 +466,10 @@ export default function detailRoute(fastify: FastifyInstance, options: any, done
 
 		// 기본 조건 확인
 		const employmentDate = Math.floor(mainData.retiredDay.diff(mainData.enterDay, "day", true) + 1);
-		const checkResult = checkBasicRequirements(mainData, employmentDate);
-		if (!checkResult.succ) return { checkResult };
+		if (mainData.isMany) {
+			const checkResult = checkBasicRequirements(mainData, employmentDate);
+			if (!checkResult.succ) return { checkResult };
+		}
 
 		// 초단 시간 추가 조건 확인
 		if (mainData.weekDay.length > 2)
