@@ -68,6 +68,8 @@ export function getFailResult(
 			retired: retired, // 퇴직자/퇴직예정자
 			workingDays, // 현 근무일수
 			requireDays: leastRequireWorkingDay - workingDays, // 부족 근무일수
+			realDayPay,
+			dayAvgPay,
 		};
 	}
 	const availableDay = calDday(new Date(retiredDay.format("YYYY-MM-DD")), leastRequireWorkingDay - workingDays);
