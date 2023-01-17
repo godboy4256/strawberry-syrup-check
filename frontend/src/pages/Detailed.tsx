@@ -38,7 +38,6 @@ const IndividualInput = ({
   description: string[];
 }) => {
   useEffect(() => {
-    console.log("등장");
     handler2._Data_arr = [];
   }, []);
 

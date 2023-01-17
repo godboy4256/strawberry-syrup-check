@@ -19,6 +19,7 @@ import Button from "../inputs/Button";
 import Header from "../layout/Header";
 import "../../styles/result.css";
 import { Link } from "react-router-dom";
+import { useState } from "react";
 
 const _SupplyResult = ({
   emoticon,
@@ -105,6 +106,63 @@ const _SupplyResult = ({
         </div>
         <div className="fs_10">
           정확한 결과를 확인하시기 위해서는 관할 고용센터로 문의하시기 바랍니다.
+        </div>
+      </div>
+    </div>
+  );
+};
+
+const _NextSupplyResult = ({
+  emoticon,
+  morePay,
+  amountCost,
+  needDay,
+  nextAmountCost,
+}: {
+  emoticon: string;
+  morePay: number;
+  amountCost: number;
+  needDay: number;
+  nextAmountCost: number;
+}) => {
+  return (
+    <div id="result_container">
+      <img id="result_emoticon" src={emoticon} alt="Result Emoticon" />
+      <h3 className="lh_27 fs_18 font_family_bold">조금만 더 힘내요!</h3>
+      <div id="next_need_day" className="fs_14">
+        {needDay}일만 더 일하면
+      </div>
+      <div id="result_top" className="next_result">
+        <div
+          id="result_top_header"
+          className="bg_color_main font_color_white next_result"
+        >
+          총 수령액 :
+          <span className="fs_25 font_color_white font_family_bold">
+            {nextAmountCost?.toLocaleString()}
+          </span>
+          원
+        </div>
+        <div id="next_result_amount" className="fs_14">
+          현 실업급여 총액 : {amountCost?.toLocaleString()} 원
+        </div>
+        <div id="next_more_pay" className="font_family_bold">
+          <span className="font_color_main">{morePay?.toLocaleString()} </span>
+          원 더 받으실 수 있습니다.
+        </div>
+        <HelpLink
+          text="혹시 이전에 다니던 직장이 있으신가요??"
+          link="/"
+          direction="l"
+        />
+        <div id="result_guide_comment02">
+          <div className="fs_10">
+            계약 내용 등 구체적인 사정에 따라 결과가 달라질 수 있습니다.
+          </div>
+          <div className="fs_10">
+            정확한 결과를 확인하시기 위해서는 관할 고용센터로 문의하시기
+            바랍니다.
+          </div>
         </div>
       </div>
     </div>
@@ -209,6 +267,7 @@ export const ResultComp = ({
   result_data: any;
   back_func: () => void;
 }) => {
+  const [next, setNext] = useState(false);
   return (
     <>
       <Header
@@ -217,164 +276,186 @@ export const ResultComp = ({
         leftType="BACK"
         leftFunc={back_func}
       />
-      {cal_type === "multi" &&
-        // 복수형
-        (result_data.succ ? (
-          <_SupplyResult
-            result_data={result_data}
-            emoticon={EMTDetailFullTimeSupply}
-          />
-        ) : (
-          <_UnSupplyResult
-            emoticon={EMTDetailFullTimeUnSupply}
-            unit="day"
-            result_data={result_data}
-          />
-        ))}
-      {cal_type === 0 &&
-        // 정규직
-        (result_data.succ ? (
-          <_SupplyResult
-            result_data={result_data}
-            emoticon={EMTDetailFullTimeSupply}
-          />
-        ) : (
-          <_UnSupplyResult
-            emoticon={EMTDetailFullTimeUnSupply}
-            unit="day"
-            result_data={result_data}
-          />
-        ))}
-      {cal_type === 1 &&
-        // 기간제
-        (result_data.succ ? (
-          <_SupplyResult
-            result_data={result_data}
-            emoticon={EMTDetailContractSupply}
-          />
-        ) : (
-          <_UnSupplyResult
-            emoticon={EMTDetailContractUnSupply}
-            unit="day"
-            result_data={result_data}
-          />
-        ))}
-      {cal_type === "basic" &&
-        // 기본형
-        (result_data.succ ? (
-          <_SupplyResult
-            result_data={result_data}
-            emoticon={EMTBasicSupplyRetiree}
-          />
-        ) : (
-          <_UnSupplyResult
-            emoticon={EMTBasicUnSupplyRetiree}
-            unit="day"
-            result_data={result_data}
-          />
-        ))}
-      {cal_type === 2 &&
-        // 일용직
-        (result_data.succ ? (
-          <_SupplyResult
-            result_data={result_data}
-            emoticon={EMTDetailDayJobSupply}
-            help={["/help/7", "일용직도 퇴직금을 받을 수 있다?"]}
-          />
-        ) : (
-          <_UnSupplyResult
-            emoticon={EMTDetailDayJobUnSupply}
-            unit="day"
-            result_data={result_data}
-            average_guide="신청일 이전 1달 간 근로일수가 10일 미만이어야 합니다."
-          />
-        ))}
-      {cal_type === 3 &&
-        // 예술인 ,단기 예술인
-        (result_data.succ ? (
-          <_SupplyResult
-            result_data={result_data}
-            emoticon={EMTDetailArtsSupply}
-          />
-        ) : (
-          <_UnSupplyResult
-            emoticon={EMTDetailArtsUnSupply}
-            unit="month"
-            result_data={result_data}
-            helps={
-              result_data.is_short === "단기 예술인"
-                ? ["단기예술인 실업급여의 계산방법이 궁금하신가요?"]
-                : ["저는 여러 건을 합치면 월 평균 기준이 되는데요?"]
-            }
-            helps_to={
-              result_data.is_short === "단기 예술인" ? ["/help/6"] : ["/help/8"]
-            }
-            average_guide={
-              result_data.is_short !== "단기 예술인" ? "50만원" : ""
-            }
-          />
-        ))}
-      {cal_type === 4 &&
-        // 특고 ,단기 특고
-        (result_data.succ ? (
-          <_SupplyResult
-            result_data={result_data}
-            emoticon={EMTDetailSpecialsSupply}
-          />
-        ) : (
-          <_UnSupplyResult
-            emoticon={EMTDetailSpecialsUnSupply}
-            unit="month"
-            helps={
-              result_data.is_short === "단기특고"
-                ? ["저는 여러 건을 합치면 월 평균 기준이 되는데요?"]
-                : undefined
-            }
-            helps_to={
-              result_data.is_short === "단기특고" ? ["/help/9"] : undefined
-            }
-            result_data={result_data}
-          />
-        ))}
-      {cal_type === 5 &&
-        // 초단 시간
-        (result_data.succ ? (
-          <_SupplyResult
-            result_data={result_data}
-            emoticon={EMTDetailVeryShortsSupply}
-          />
-        ) : (
-          <_UnSupplyResult
-            emoticon={EMTDetailVeryShortsUnSupply}
-            unit="day"
-            result_data={result_data}
-          />
-        ))}
-      {cal_type === 6 &&
-        // 자영업
-        (result_data.succ ? (
-          <_SupplyResult
-            result_data={result_data}
-            emoticon={EMTDetailEmploySupply}
-            guide_card={true}
-          />
-        ) : (
-          <_UnSupplyResult
-            emoticon={EMTDetailEmployUnSupply}
-            unit="day"
-            result_data={result_data}
-          />
-        ))}
+      {next ? (
+        <_NextSupplyResult
+          emoticon={EMTDetailFullTimeSupply}
+          morePay={result_data.morePay}
+          amountCost={result_data.amountCost}
+          needDay={result_data.needDay}
+          nextAmountCost={result_data.nextAmountCost}
+        />
+      ) : (
+        <>
+          {cal_type === "multi" &&
+            // 복수형
+            (result_data.succ ? (
+              <_SupplyResult
+                result_data={result_data}
+                emoticon={EMTDetailFullTimeSupply}
+              />
+            ) : (
+              <_UnSupplyResult
+                emoticon={EMTDetailFullTimeUnSupply}
+                unit="day"
+                result_data={result_data}
+              />
+            ))}
+          {cal_type === 0 &&
+            // 정규직
+            (result_data.succ ? (
+              <_SupplyResult
+                result_data={result_data}
+                emoticon={EMTDetailFullTimeSupply}
+              />
+            ) : (
+              <_UnSupplyResult
+                emoticon={EMTDetailFullTimeUnSupply}
+                unit="day"
+                result_data={result_data}
+              />
+            ))}
+          {cal_type === 1 &&
+            // 기간제
+            (result_data.succ ? (
+              <_SupplyResult
+                result_data={result_data}
+                emoticon={EMTDetailContractSupply}
+              />
+            ) : (
+              <_UnSupplyResult
+                emoticon={EMTDetailContractUnSupply}
+                unit="day"
+                result_data={result_data}
+              />
+            ))}
+          {cal_type === "basic" &&
+            // 기본형
+            (result_data.succ ? (
+              <_SupplyResult
+                result_data={result_data}
+                emoticon={EMTBasicSupplyRetiree}
+              />
+            ) : (
+              <_UnSupplyResult
+                emoticon={EMTBasicUnSupplyRetiree}
+                unit="day"
+                result_data={result_data}
+              />
+            ))}
+          {cal_type === 2 &&
+            // 일용직
+            (result_data.succ ? (
+              <_SupplyResult
+                result_data={result_data}
+                emoticon={EMTDetailDayJobSupply}
+                help={["/help/7", "일용직도 퇴직금을 받을 수 있다?"]}
+              />
+            ) : (
+              <_UnSupplyResult
+                emoticon={EMTDetailDayJobUnSupply}
+                unit="day"
+                result_data={result_data}
+                average_guide="신청일 이전 1달 간 근로일수가 10일 미만이어야 합니다."
+              />
+            ))}
+          {cal_type === 3 &&
+            // 예술인 ,단기 예술인
+            (result_data.succ ? (
+              <_SupplyResult
+                result_data={result_data}
+                emoticon={EMTDetailArtsSupply}
+              />
+            ) : (
+              <_UnSupplyResult
+                emoticon={EMTDetailArtsUnSupply}
+                unit="month"
+                result_data={result_data}
+                helps={
+                  result_data.is_short === "단기 예술인"
+                    ? ["단기예술인 실업급여의 계산방법이 궁금하신가요?"]
+                    : ["저는 여러 건을 합치면 월 평균 기준이 되는데요?"]
+                }
+                helps_to={
+                  result_data.is_short === "단기 예술인"
+                    ? ["/help/6"]
+                    : ["/help/8"]
+                }
+                average_guide={
+                  result_data.is_short !== "단기 예술인" ? "50만원" : ""
+                }
+              />
+            ))}
+          {cal_type === 4 &&
+            // 특고 ,단기 특고
+            (result_data.succ ? (
+              <_SupplyResult
+                result_data={result_data}
+                emoticon={EMTDetailSpecialsSupply}
+              />
+            ) : (
+              <_UnSupplyResult
+                emoticon={EMTDetailSpecialsUnSupply}
+                unit="month"
+                helps={
+                  result_data.is_short === "단기특고"
+                    ? ["저는 여러 건을 합치면 월 평균 기준이 되는데요?"]
+                    : undefined
+                }
+                helps_to={
+                  result_data.is_short === "단기특고" ? ["/help/9"] : undefined
+                }
+                result_data={result_data}
+              />
+            ))}
+          {cal_type === 5 &&
+            // 초단 시간
+            (result_data.succ ? (
+              <_SupplyResult
+                result_data={result_data}
+                emoticon={EMTDetailVeryShortsSupply}
+              />
+            ) : (
+              <_UnSupplyResult
+                emoticon={EMTDetailVeryShortsUnSupply}
+                unit="day"
+                result_data={result_data}
+              />
+            ))}
+          {cal_type === 6 &&
+            // 자영업
+            (result_data.succ ? (
+              <_SupplyResult
+                result_data={result_data}
+                emoticon={EMTDetailEmploySupply}
+                guide_card={true}
+              />
+            ) : (
+              <_UnSupplyResult
+                emoticon={EMTDetailEmployUnSupply}
+                unit="day"
+                result_data={result_data}
+              />
+            ))}
+        </>
+      )}
       <div id="result_button_container">
-        {cal_type !== "basic" && (
-          <Link to="/multi">
+        {cal_type !== "basic" &&
+          !next &&
+          (result_data.succ ? (
             <Button
-              text={result_data.succ ? "N달 더 일하면?" : "복수형 계산기로"}
+              text={"N달 더 일하면?"}
               type="popup_cancel"
-              click_func={() => {}}
+              click_func={() => setNext(true)}
             />
-          </Link>
-        )}
+          ) : (
+            <Link to="/multi">
+              <Button
+                text={"복수형 계산기로"}
+                type="popup_cancel"
+                click_func={() => {}}
+              />
+            </Link>
+          ))}
         <Link to="/main">
           <Button text="홈으로" type="popup_ok" click_func={() => {}} />
         </Link>
