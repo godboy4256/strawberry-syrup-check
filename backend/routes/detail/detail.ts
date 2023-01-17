@@ -213,7 +213,6 @@ export default function detailRoute(fastify: FastifyInstance, options: any, done
 				receiveDay,
 				realMonthPay,
 				workingDays: employmentDate,
-				severancePay: employmentDate >= 365 ? Math.ceil(dayAvgPay * 30 * (employmentDate / 365)) : 0,
 				workDayForMulti,
 			};
 		} else {
@@ -226,7 +225,6 @@ export default function detailRoute(fastify: FastifyInstance, options: any, done
 				receiveDay,
 				realMonthPay,
 				workingDays: employmentDate,
-				severancePay: employmentDate >= 365 ? Math.ceil(dayAvgPay * 30 * (employmentDate / 365)) : 0,
 				needDay: requireWorkingYear * 365 - employmentDate, // 예술인에 맞게 변경필요 피보험 단위기간 관련
 				nextAmountCost: nextReceiveDay * realDayPay,
 				morePay: nextReceiveDay * realDayPay - receiveDay * realDayPay,
@@ -428,8 +426,6 @@ export default function detailRoute(fastify: FastifyInstance, options: any, done
 				receiveDay,
 				realMonthPay,
 				workingDays: mainData.sumWorkDay,
-				severancePay:
-					mainData.sumWorkDay >= 365 ? Math.ceil(mainData.dayAvgPay * (mainData.sumWorkDay / 365) * 30) : 0,
 			};
 
 		return {
@@ -440,8 +436,6 @@ export default function detailRoute(fastify: FastifyInstance, options: any, done
 			receiveDay,
 			realMonthPay,
 			workingDays: mainData.sumWorkDay,
-			severancePay:
-				mainData.sumWorkDay >= 365 ? Math.ceil(mainData.dayAvgPay * (mainData.sumWorkDay / 365) * 30) : 0,
 			needDay: requireWorkingYear * 365 - mainData.sumWorkDay,
 			nextAmountCost: nextReceiveDay * realDayPay,
 			morePay: nextReceiveDay * realDayPay - receiveDay * realDayPay,
