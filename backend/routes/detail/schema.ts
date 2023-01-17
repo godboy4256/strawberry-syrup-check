@@ -9,12 +9,9 @@ export type TstandardInput = {
 	disabled: boolean;
 	enterDay: Dayjs;
 	retiredDay: Dayjs;
-
 	weekDay: number[];
 	dayWorkTime: number;
 	salary: number[];
-
-	isEnd: boolean;
 	limitDay: string;
 	isMany: boolean;
 };
@@ -30,7 +27,6 @@ export type TartInput = {
 	retiredDay: Dayjs;
 	sumTwelveMonthSalary: number[];
 	isSpecial: boolean;
-	isEnd: boolean;
 	limitDay: string;
 	isMany: boolean;
 };
@@ -50,7 +46,6 @@ export type TartShortInput = {
 	isSimple: boolean;
 	isOverTen: boolean;
 	hasWork: boolean;
-	isEnd: boolean;
 	limitDay: string;
 	isMany: boolean;
 };
@@ -71,6 +66,7 @@ export type TdayJobInput = {
 	isSimple: boolean;
 	isOverTen: boolean;
 	hasWork: boolean;
+	limitDay: string;
 	isMany: boolean;
 };
 
@@ -83,7 +79,6 @@ export type TveryShortInput = {
 	weekDay: number[]; // 주의
 	weekWorkTime: number;
 	salary: number[];
-	isEnd: boolean;
 	limitDay: string;
 	isMany: boolean;
 };
@@ -99,7 +94,6 @@ const standardBodyProp = {
 	weekDay: DefineParamInfo.weekDay, // 주의
 	dayWorkTime: DefineParamInfo.dayWorkTime,
 	salary: DefineParamInfo.salary,
-	isEnd: { type: "boolean" }, // 복수형 여부
 	limitDay: { type: "string" },
 };
 
@@ -114,8 +108,8 @@ const artBodyProp = {
 	retiredDay: DefineParamInfo.retiredDay,
 	sumTwelveMonthSalary: DefineParamInfo.salary,
 	isSpecial: { type: "boolean" },
-	isEnd: { type: "boolean" },
 	limitDay: { type: "string" },
+	isMany: { type: "boolean" },
 };
 
 const shortArtBodyProp = {
@@ -133,8 +127,8 @@ const shortArtBodyProp = {
 	isSimple: { type: "boolean" },
 	isOverTen: { type: "boolean" },
 	hasWork: { type: "boolean" },
-	isEnd: { type: "boolean" },
 	limitDay: { type: "string" },
+	isMany: { type: "boolean" },
 };
 
 const dayJobBodyProp = {
@@ -152,6 +146,8 @@ const dayJobBodyProp = {
 	sumWorkDay: { type: "number", minimum: 0 },
 	isOverTen: { type: "boolean" },
 	hasWork: { type: "boolean" },
+	limitDay: { type: "string" },
+	isMany: { type: "boolean" },
 };
 
 const veryShortBodyProp = {
@@ -163,8 +159,8 @@ const veryShortBodyProp = {
 	weekDay: DefineParamInfo.weekDay, // 주의
 	weekWorkTime: { type: "number", minimum: 1, maximum: 14 },
 	salary: DefineParamInfo.salary,
-	isEnd: { type: "boolean" },
 	limitDay: { type: "string" },
+	isMany: { type: "boolean" },
 };
 
 const employerBodyProp = {
@@ -173,7 +169,6 @@ const employerBodyProp = {
 	insuranceGrade: {
 		type: "object",
 	},
-	isEnd: { type: "boolean" },
 	limitDay: { type: "string" },
 	isMany: { type: "boolean" }, // 복수형 여부
 };
@@ -205,6 +200,7 @@ export const standardSchema = {
 				"weekDay",
 				"dayWorkTime",
 				"salary",
+				"limitDay",
 			],
 			properties: standardBodyProp,
 		},
@@ -226,6 +222,7 @@ export const artSchema = {
 				"retiredDay",
 				"sumTwelveMonthSalary",
 				"isSpecial",
+				"limitDay",
 			],
 			properties: artBodyProp,
 		},
@@ -237,7 +234,7 @@ export const shortArtSchema = {
 		tags: ["detail"],
 		body: {
 			type: "object",
-			required: ["age", "disabled", "lastWorkDay", "hasWork", "isSimple"],
+			required: ["age", "disabled", "lastWorkDay", "hasWork", "isSimple", "limitDay"],
 			properties: shortArtBodyProp,
 		},
 	},
@@ -257,6 +254,7 @@ export const dayJobSchema = {
 				"sumWorkDay",
 				"isOverTen",
 				"hasWork",
+				"limitDay",
 			],
 			properties: dayJobBodyProp,
 		},
@@ -268,7 +266,17 @@ export const veryShortSchema = {
 		tags: ["detail"],
 		body: {
 			type: "object",
-			required: ["retired", "age", "disabled", "enterDay", "retiredDay", "weekDay", "weekWorkTime", "salary"],
+			required: [
+				"retired",
+				"age",
+				"disabled",
+				"enterDay",
+				"retiredDay",
+				"weekDay",
+				"weekWorkTime",
+				"salary",
+				"limitDay",
+			],
 			properties: veryShortBodyProp,
 		},
 	},
@@ -279,7 +287,7 @@ export const employerSchema = {
 		tags: ["detail"],
 		body: {
 			type: "object",
-			required: ["enterDay", "retiredDay", "insuranceGrade", "isEnd", "limitDay", "isMany"],
+			required: ["enterDay", "retiredDay", "insuranceGrade", "limitDay", "isMany"],
 			properties: employerBodyProp,
 			examples: employerBodyExamples,
 		},

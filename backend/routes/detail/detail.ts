@@ -70,13 +70,11 @@ export default function detailRoute(fastify: FastifyInstance, options: any, done
 		const workingDays = calDetailWorkingDay(limitDay, mainData.retiredDay, mainData.weekDay);
 
 		// 5. 복수형에 사용되는 마지막 직장인 경우 workDawyForMulti 계산
-		let workDayForMulti = 0; // 이 과정은 중복 가입된 상황을 고려하지 않는다.
-		if (req.body.isEnd) {
-			const limitDayForMulti = dayjs(req.body.limitDay); // 마지막 직장 퇴사일로 부터 필요한 개월 수(18 또는 24) 전
-			workDayForMulti = mainData.enterDay.isSameOrAfter(limitDayForMulti, "day")
-				? workingDays
-				: calDetailWorkingDay(limitDayForMulti, mainData.retiredDay, mainData.weekDay);
-		}
+		// 이 과정은 중복 가입된 상황을 고려하지 않는다.
+		const limitDayForMulti = dayjs(req.body.limitDay); // 마지막 직장 퇴사일로 부터 필요한 개월 수(18 또는 24) 전
+		const workDayForMulti = mainData.enterDay.isSameOrAfter(limitDayForMulti, "day")
+			? workingDays
+			: calDetailWorkingDay(limitDayForMulti, mainData.retiredDay, mainData.weekDay);
 
 		// 6. 수급 인정 / 불인정에 따라 결과 리턴
 		const leastRequireWorkingDay = 180;
@@ -181,13 +179,11 @@ export default function detailRoute(fastify: FastifyInstance, options: any, done
 				: false;
 
 		// 6. 복수형에 사용되는 마지막 직장인 경우 workDawyForMulti 계산
-		let workDayForMulti = 0; // 이 과정은 중복 가입된 상황을 고려하지 않는다.
-		if (mainData.isEnd) {
-			const limitDay = dayjs(mainData.limitDay); // 마지막 직장 퇴사일로 부터 필요한 개월 수(18 또는 24) 전
-			workDayForMulti = mainData.enterDay.isSameOrAfter(limitDay, "day")
-				? employmentDate
-				: Math.floor(mainData.retiredDay.diff(limitDay, "day", true) + 1);
-		}
+		// 이 과정은 중복 가입된 상황을 고려하지 않는다.
+		const limitDay = dayjs(mainData.limitDay); // 마지막 직장 퇴사일로 부터 필요한 개월 수(18 또는 24) 전
+		const workDayForMulti = mainData.enterDay.isSameOrAfter(limitDay, "day")
+			? employmentDate
+			: Math.floor(mainData.retiredDay.diff(limitDay, "day", true) + 1);
 
 		// 수급 불인정
 		if (!isPermit) {
@@ -217,7 +213,6 @@ export default function detailRoute(fastify: FastifyInstance, options: any, done
 				receiveDay,
 				realMonthPay,
 				workingDays: employmentDate,
-				severancePay: employmentDate >= 365 ? Math.ceil(dayAvgPay * 30 * (employmentDate / 365)) : 0,
 				workDayForMulti,
 			};
 		} else {
@@ -230,7 +225,6 @@ export default function detailRoute(fastify: FastifyInstance, options: any, done
 				receiveDay,
 				realMonthPay,
 				workingDays: employmentDate,
-				severancePay: employmentDate >= 365 ? Math.ceil(dayAvgPay * 30 * (employmentDate / 365)) : 0,
 				needDay: requireWorkingYear * 365 - employmentDate, // 예술인에 맞게 변경필요 피보험 단위기간 관련
 				nextAmountCost: nextReceiveDay * realDayPay,
 				morePay: nextReceiveDay * realDayPay - receiveDay * realDayPay,
@@ -288,16 +282,13 @@ export default function detailRoute(fastify: FastifyInstance, options: any, done
 
 		///////////////////////////////////////////////////////////////
 		// 8. 복수형에서 사용하기위한 workDayForMulti 계산
-		let workDayForMulti = 0;
-		if (mainData.isEnd) {
-			const limitDay = dayjs(mainData.limitDay);
-			const enterDay = dayjs(new Date());
+		const limitDay = dayjs(mainData.limitDay);
+		const enterDay = dayjs(new Date());
 
-			workDayForMulti = enterDay.isSameOrAfter(limitDay, "day")
-				? lastWorkDay.diff(enterDay, "day")
-				: lastWorkDay.diff(limitDay, "day");
-		}
-		console.log("6. ", mainData.isEnd, workDayForMulti);
+		const workDayForMulti = enterDay.isSameOrAfter(limitDay, "day")
+			? lastWorkDay.diff(enterDay, "day")
+			: lastWorkDay.diff(limitDay, "day");
+		console.log("6. ", workDayForMulti);
 		///////////////////////////////////////////////////////////////
 
 		// 4. 수급 불인정 시 불인정 메세지 리턴
@@ -435,8 +426,6 @@ export default function detailRoute(fastify: FastifyInstance, options: any, done
 				receiveDay,
 				realMonthPay,
 				workingDays: mainData.sumWorkDay,
-				severancePay:
-					mainData.sumWorkDay >= 365 ? Math.ceil(mainData.dayAvgPay * (mainData.sumWorkDay / 365) * 30) : 0,
 			};
 
 		return {
@@ -447,8 +436,6 @@ export default function detailRoute(fastify: FastifyInstance, options: any, done
 			receiveDay,
 			realMonthPay,
 			workingDays: mainData.sumWorkDay,
-			severancePay:
-				mainData.sumWorkDay >= 365 ? Math.ceil(mainData.dayAvgPay * (mainData.sumWorkDay / 365) * 30) : 0,
 			needDay: requireWorkingYear * 365 - mainData.sumWorkDay,
 			nextAmountCost: nextReceiveDay * realDayPay,
 			morePay: nextReceiveDay * realDayPay - receiveDay * realDayPay,
@@ -482,7 +469,8 @@ export default function detailRoute(fastify: FastifyInstance, options: any, done
 			};
 
 		// 24개월 내에 피보험 단위 기간
-		const limitDay = mainData.retiredDay.subtract(24, "month");
+		// const limitDay = mainData.retiredDay.subtract(24, "month");
+		const limitDay = dayjs(req.body.limitDay);
 		const permitWorkDay = mainData.enterDay.isSameOrAfter(limitDay)
 			? calVeryShortWorkDay(mainData.enterDay, mainData.retiredDay, mainData.weekDay)
 			: calVeryShortWorkDay(limitDay, mainData.retiredDay, mainData.weekDay);
@@ -512,13 +500,10 @@ export default function detailRoute(fastify: FastifyInstance, options: any, done
 		console.log("5. ", realDayPay, realMonthPay);
 
 		//
-		let workDayForMulti = 0;
-		if (req.body.isEnd) {
-			const limitDay = dayjs(req.body.limitDay);
-			workDayForMulti = mainData.enterDay.isSameOrAfter(limitDay, "day")
-				? workingDays
-				: calVeryShortWorkDay(limitDay, mainData.retiredDay, req.body.weekDay);
-		}
+		// const limitDay = dayjs(req.body.limitDay);
+		const workDayForMulti = mainData.enterDay.isSameOrAfter(limitDay, "day")
+			? workingDays
+			: calVeryShortWorkDay(limitDay, mainData.retiredDay, req.body.weekDay);
 		console.log("9. ", workDayForMulti);
 
 		// 수급 인정/ 불인정 판단
@@ -608,13 +593,10 @@ export default function detailRoute(fastify: FastifyInstance, options: any, done
 		console.log("6. ", workYear, receiveDay);
 
 		// 7. 복수형에 사용되는 마지막 직장인 경우 workDawyForMulti 계산
-		let workDayForMulti = 0;
-		if (req.body.isEnd) {
-			const limitDay = dayjs(req.body.limitDay);
-			workDayForMulti = enterDay.isSameOrAfter(limitDay, "day")
-				? workingDays
-				: Math.floor(retiredDay.diff(limitDay, "day", true));
-		}
+		const limitDay = dayjs(req.body.limitDay);
+		const workDayForMulti = enterDay.isSameOrAfter(limitDay, "day")
+			? workingDays
+			: Math.floor(retiredDay.diff(limitDay, "day", true));
 		console.log("7. ", workDayForMulti);
 
 		const [requireWorkingYear, nextReceiveDay] = getNextEmployerReceiveDay(workYear);
