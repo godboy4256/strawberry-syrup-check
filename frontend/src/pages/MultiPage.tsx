@@ -20,11 +20,13 @@ import EMTDetailFullTimeSupply from "../assets/image/emoticon/detail_fulltime_su
 import EMTDetailVeryShortsSupply from "../assets/image/emoticon/detail_veryshort_supply.svg";
 import { DetailCalComp } from "./Detailed";
 import "../styles/multi.css";
-import { getAge } from "../utils/date";
+import { getAge, Year_Option_Generater } from "../utils/date";
 import { sendToServer } from "../utils/sendToserver";
 import { ResultComp } from "../components/calculator/Result";
 import Loading from "../components/common/Loading";
 import { calRecording } from "../utils/calrecord";
+import CheckBoxInput from "../components/inputs/Check";
+import { DateInputNormal } from "../components/inputs/Date";
 
 interface Company {
   id: number;
@@ -52,6 +54,9 @@ class MultiCalHandler extends DetailedHandler {
       retiredDay: this.GetPageVal("retiredDay"),
       enterDay: this.GetPageVal("enterDay"),
       workCate: this.GetPageVal("workCate"),
+      // isMany: true,
+      // isEnd: true,
+      // limitDay: "",
     });
     this.SetPageVal("addData", this.to_server);
     const select_company = this.companys?.map((el) => {
@@ -151,6 +156,7 @@ const _MultiMainDataSelect = () => {
                 permitDays: el.workDayForMulti,
               };
             });
+          delete mainData.id;
           const final_to_server = {
             mainData,
             addData,
@@ -260,6 +266,21 @@ const _MultiCompanyList = () => {
             );
           })}
         </div>
+      </div>
+      <div className="public_side_padding">
+        <DateInputNormal
+          params="age"
+          label="생년월일"
+          callBack={handler.SetPageVal}
+          year={Year_Option_Generater(73)}
+        />
+        <CheckBoxInput
+          type="circle_type"
+          params="disabled"
+          callBack={handler.SetPageVal}
+          label="장애여부"
+          options={["장애인", "비장애인"]}
+        />
       </div>
       <div id="multi_company_list" className="public_side_padding">
         {companys.map((el) => {

@@ -5,7 +5,6 @@ import {
   DateInputNormal,
 } from "../components/inputs/Date";
 import Header from "../components/layout/Header";
-import Check from "../components/inputs/Check";
 import SelectInput from "../components/inputs/Select";
 import TabInputs from "../components/inputs/TabInputs";
 import DetailedHandler from "../object/detailed";
@@ -21,6 +20,7 @@ import CalContainer from "../components/calculator/CalContainer";
 import Loading from "../components/common/Loading";
 import "./../styles/detail.css";
 import { calRecording } from "../utils/calrecord";
+import CheckBoxInput from "../components/inputs/Check";
 
 class IndividualInputClass extends InputHandler {
   public _Data: any = {};
@@ -170,7 +170,7 @@ const _DetailCal01 = ({ handler }: { handler: any }) => {
           description="insurance_end_day"
         />
       )}
-      <Check
+      <CheckBoxInput
         type="box_type"
         options={["월", "화", "수", "목", "금", "토", "일"]}
         label="근무 요일"
@@ -462,7 +462,7 @@ const _DetailCal04 = ({ handler }: { handler: any }) => {
           description="enter_day"
         />
       )}
-      <Check
+      <CheckBoxInput
         type="box_type"
         options={["월", "화", "수", "목", "금", "토", "일"]}
         label="근무 요일"
@@ -533,7 +533,7 @@ export const DetailCalComp = ({
         }
       />
       <div className={`${workCate !== 6 ? "public_side_padding" : ""}`}>
-        {workCate !== 6 && (
+        {workCate !== 6 && handler.GetPageVal("cal_state") !== "multi" && (
           <>
             <DateInputNormal
               params="age"
@@ -541,7 +541,7 @@ export const DetailCalComp = ({
               callBack={handler.SetPageVal}
               year={Year_Option_Generater(73)}
             />
-            <Check
+            <CheckBoxInput
               type="circle_type"
               params="disabled"
               callBack={handler.SetPageVal}

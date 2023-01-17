@@ -186,6 +186,7 @@ class DetailedHandler extends InputHandler {
                 : [this._Data.salary]
               : null,
             weekDay,
+            isMany: this._Data.cal_state === "multi" ? true : false,
             retireReason:
               this._Data.cal_state === "multi" ? 1 : this._Data.retireReason,
             retiredDay: this._Data.retired
@@ -210,11 +211,11 @@ class DetailedHandler extends InputHandler {
                 new Date().getMonth() - 18
               )
             ),
-            isEnd: this._Data.cal_state ? true : false,
           }
         : this._Data.workCate === 2 // 일용직
         ? {
             hasWork: this._Data.hasWork,
+            isMany: this._Data.cal_state === "multi" ? true : false,
             retired: this._Data.retired,
             workCate: 6,
             retireReason:
@@ -256,12 +257,12 @@ class DetailedHandler extends InputHandler {
                   : this._Data.lastWorkDay
               ).setMonth(new Date().getMonth() - 18)
             ),
-            isEnd: this._Data.cal_state ? true : false,
           }
         : this._Data.workCate === 3 // 예술인
         ? this._Data.is_short === "단기예술인"
           ? {
               retired: this._Data.retired,
+              isMany: this._Data.cal_state === "multi" ? true : false,
               workCate: 4,
               isSpecial: false,
               hasWork: this._Data.hasWork,
@@ -302,12 +303,12 @@ class DetailedHandler extends InputHandler {
                   new Date().getMonth() - 24
                 )
               ),
-              isEnd: this._Data.cal_state ? true : false,
               isSimple: this._Data.input === "개별 입력" ? false : true,
             }
           : {
               ...this._Data,
               workCate: 2,
+              isMany: this._Data.cal_state === "multi" ? true : false,
               retireReason:
                 this._Data.cal_state === "multi" ? 1 : this._Data.retireReason,
               isSpecial: false,
@@ -334,12 +335,12 @@ class DetailedHandler extends InputHandler {
                   new Date().getMonth() - 24
                 )
               ),
-              isEnd: this._Data.cal_state ? true : false,
             }
         : this._Data.workCate === 4 // 특고
         ? this._Data.is_short === "단기특고"
           ? {
               retired: this._Data.retired,
+              isMany: this._Data.cal_state === "multi" ? true : false,
               workCate: 5,
               retireReason:
                 this._Data.cal_state === "multi" ? 1 : this._Data.retireReason,
@@ -371,6 +372,7 @@ class DetailedHandler extends InputHandler {
           : {
               ...this._Data,
               workCate: 3,
+              isMany: this._Data.cal_state === "multi" ? true : false,
               isSpecial: true,
               retireReason:
                 this._Data.cal_state === "multi" ? 1 : this._Data.retireReason,
@@ -396,12 +398,12 @@ class DetailedHandler extends InputHandler {
                   new Date().getMonth() - 24
                 )
               ),
-              isEnd: this._Data.cal_state ? true : false,
             }
         : this._Data.workCate === 5 // 초단 시간
         ? {
             // workCate: 7,
             retired: this._Data.retired,
+            isMany: this._Data.cal_state === "multi" ? true : false,
             enterDay: this._Data.enterDay ? this._Data.enterDay : null,
             retireReason:
               this._Data.cal_state === "multi" ? 1 : this._Data.retireReason,
@@ -426,12 +428,11 @@ class DetailedHandler extends InputHandler {
                 : [this._Data.salary]
               : null,
             weekWorkTime: this._Data.time ? this._Data.time : null,
-            // limitDay: new Date(
-            //   new Date(this._Data.retiredDay).setMonth(
-            //     new Date().getMonth() - 24
-            //   )
-            // ),
-            // isEnd: this._Data.cal_state ? true : false,
+            limitDay: new Date(
+              new Date(this._Data.retiredDay).setMonth(
+                new Date().getMonth() - 24
+              )
+            ),
           }
         : this._Data.workCate === 6 // 자영업자
         ? {
@@ -461,11 +462,9 @@ class DetailedHandler extends InputHandler {
                 new Date().getMonth() - 24
               )
             ),
-            isEnd: this._Data.cal_state ? true : false,
             isMany: this._Data.cal_state ? true : false,
           }
         : {};
-    console.log("헤이헤이", this._Data.workRecord);
     const validCheckType =
       this._Data.workCate === 0 || this._Data.workCate === 1
         ? "detail_standad"
