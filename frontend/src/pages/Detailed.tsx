@@ -23,7 +23,6 @@ import { calRecording } from "../utils/calrecord";
 import CheckBoxInput from "../components/inputs/Check";
 
 class IndividualInputClass extends InputHandler {
-  public _Data: any = {};
   public _Data_arr: any = [];
 }
 
@@ -33,9 +32,11 @@ const handler: any = new DetailedHandler({});
 const IndividualInput = ({
   label = "개별 입력란",
   description,
+  handler,
 }: {
   label?: string;
   description: string[];
+  handler?: any;
 }) => {
   useEffect(() => {
     handler2._Data_arr = [];
@@ -154,7 +155,7 @@ const _Belong_Form_Tab = ({
   );
 };
 
-const _DetailCal01 = ({ handler }: { handler: any }) => {
+const _DetailCalStandad = ({ handler }: { handler: any }) => {
   return (
     <>
       <DateInputNormal
@@ -205,7 +206,7 @@ const _DetailCal01 = ({ handler }: { handler: any }) => {
   );
 };
 
-const _DetailCal02 = ({ handler }: { handler: any }) => {
+const _DetailCalDayJob = ({ handler }: { handler: any }) => {
   useEffect(() => {
     handler.SetPageVal("input", "개별 입력");
   }, []);
@@ -249,6 +250,7 @@ const _DetailCal02 = ({ handler }: { handler: any }) => {
             />
             <IndividualInput
               description={["근무한 연월의 정보만 입력하시면 됩니다."]}
+              handler={handler}
             />
             <DateInputNormal
               params="isOverTen"
@@ -311,12 +313,12 @@ const _DetailCal02 = ({ handler }: { handler: any }) => {
     </>
   );
 };
-const _DetailCal03 = ({ handler }: { handler: any }) => {
+const _DetailCalArt = ({ handler }: { handler: any }) => {
   useEffect(() => {
     handler.SetPageVal("input", "개별 입력");
     handler.SetPageVal(
       "is_short",
-      handler.GetPageVal("workCate") === 3 ? "예술인" : "특고"
+      handler.GetPageVal("workCate") === 2 ? "예술인" : "특고"
     );
   }, []);
   return (
@@ -324,18 +326,18 @@ const _DetailCal03 = ({ handler }: { handler: any }) => {
       callBack={handler.SetPageVal}
       params="is_short"
       label={
-        handler.GetPageVal("workCate") === 3
+        handler.GetPageVal("workCate") === 2
           ? "예술인 / 단기예술인"
-          : handler.GetPageVal("workCate") === 4 && "특고 / 단기특고"
+          : handler.GetPageVal("workCate") === 3 && "특고 / 단기특고"
       }
       options={
-        handler.GetPageVal("workCate") === 3
+        handler.GetPageVal("workCate") === 2
           ? ["예술인", "단기예술인"]
-          : handler.GetPageVal("workCate") === 4 && ["특고", "단기특고"]
+          : handler.GetPageVal("workCate") === 3 && ["특고", "단기특고"]
       }
       form01={
         <>
-          {handler.GetPageVal("workCate") === 4 && (
+          {handler.GetPageVal("workCate") === 3 && (
             <SelectInput
               params="jobCate"
               callBack={handler.SetPageVal}
@@ -403,6 +405,7 @@ const _DetailCal03 = ({ handler }: { handler: any }) => {
               />
               <IndividualInput
                 description={["근무한 연월의 정보만 입력하시면 됩니다."]}
+                handler={handler}
               />
               <DateInputNormal
                 label="신청 예정일"
@@ -446,7 +449,7 @@ const _DetailCal03 = ({ handler }: { handler: any }) => {
     />
   );
 };
-const _DetailCal04 = ({ handler }: { handler: any }) => {
+const _DetailCalVeryShort = ({ handler }: { handler: any }) => {
   return (
     <>
       <DateInputNormal
@@ -486,7 +489,7 @@ const _DetailCal04 = ({ handler }: { handler: any }) => {
     </>
   );
 };
-const _DetailCal05 = ({ handler }: { handler: any }) => {
+const _DetailCalEmploy = ({ handler }: { handler: any }) => {
   return (
     <div id="detail_container_employ">
       <div className="public_side_padding">
@@ -551,14 +554,14 @@ export const DetailCalComp = ({
           </>
         )}
         {(workCate === 0 || workCate === 1) && (
-          <_DetailCal01 handler={handler} />
+          <_DetailCalStandad handler={handler} />
         )}
-        {(workCate === 3 || workCate === 4) && (
-          <_DetailCal03 handler={handler} />
+        {(workCate === 2 || workCate === 3) && (
+          <_DetailCalArt handler={handler} />
         )}
-        {workCate === 2 && <_DetailCal02 handler={handler} />}
-        {workCate === 5 && <_DetailCal04 handler={handler} />}
-        {workCate === 6 && <_DetailCal05 handler={handler} />}
+        {workCate === 4 && <_DetailCalDayJob handler={handler} />}
+        {workCate === 5 && <_DetailCalVeryShort handler={handler} />}
+        {workCate === 6 && <_DetailCalEmploy handler={handler} />}
         <Button
           text="계산하기"
           type="bottom"
@@ -573,7 +576,6 @@ const DetailCalPage = () => {
   const [compState, setCompState] = useState(1);
   useEffect(() => {
     handler.setCompState = setCompState;
-    handler._Data = {};
   }, []);
   return (
     <>
@@ -590,7 +592,6 @@ const DetailCalPage = () => {
                 workCate={handler.GetPageVal("workCate")}
                 clickCallBack={async () => {
                   const result_data = await handler.Action_Cal_Result();
-                  console.log(handler.GetPageVal("workCate"));
                   calRecording(
                     result_data,
                     "상세형",

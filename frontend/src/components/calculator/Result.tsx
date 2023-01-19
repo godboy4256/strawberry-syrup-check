@@ -17,9 +17,9 @@ import EMTBasicUnSupplyRetiree from "../../assets/image/emoticon/standad_retiree
 import HelpLink from "../common/HelpLink";
 import Button from "../inputs/Button";
 import Header from "../layout/Header";
-import "../../styles/result.css";
-import { Link } from "react-router-dom";
 import { useState } from "react";
+import { Link } from "react-router-dom";
+import "../../styles/result.css";
 
 const _SupplyResult = ({
   emoticon,
@@ -209,18 +209,22 @@ const _UnSupplyResult = ({
           <div className="font_color_white flex_box fs_14">
             현재 근무{unit === "day" ? "일" : "월"}수 :
             <span className="unsupply_result_value font_color_white">
-              {result_data?.workingDays
-                ? result_data?.workingDays
-                : result_data?.workingMonths}
+              {Math.ceil(
+                result_data?.workingDays
+                  ? result_data?.workingDays
+                  : result_data?.workingMonths
+              )}
             </span>
             {unit === "day" ? "일" : "달"}
           </div>
           <div className="font_color_white flex_box fs_14">
             부족한 근무{unit === "day" ? "일" : "월"}수 :{" "}
             <span className="unsupply_result_value font_color_white">
-              {result_data?.requireDays
-                ? result_data?.requireDays
-                : result_data?.requireMonths}
+              {Math.ceil(
+                result_data?.requireDays
+                  ? result_data?.requireDays
+                  : result_data?.requireMonths
+              )}
             </span>
             {unit === "day" ? "일" : "달"}
           </div>
@@ -342,23 +346,7 @@ export const ResultComp = ({
                 result_data={result_data}
               />
             ))}
-          {cal_type === 2 &&
-            // 일용직
-            (result_data.succ ? (
-              <_SupplyResult
-                result_data={result_data}
-                emoticon={EMTDetailDayJobSupply}
-                help={["/help/7", "일용직도 퇴직금을 받을 수 있다?"]}
-              />
-            ) : (
-              <_UnSupplyResult
-                emoticon={EMTDetailDayJobUnSupply}
-                unit="day"
-                result_data={result_data}
-                average_guide="신청일 이전 1달 간 근로일수가 10일 미만이어야 합니다."
-              />
-            ))}
-          {cal_type === 3 &&
+          {(cal_type === 2 || cal_type === 4) &&
             // 예술인 ,단기 예술인
             (result_data.succ ? (
               <_SupplyResult
@@ -385,7 +373,7 @@ export const ResultComp = ({
                 }
               />
             ))}
-          {cal_type === 4 &&
+          {(cal_type === 3 || cal_type === 5) &&
             // 특고 ,단기 특고
             (result_data.succ ? (
               <_SupplyResult
@@ -407,7 +395,23 @@ export const ResultComp = ({
                 result_data={result_data}
               />
             ))}
-          {cal_type === 5 &&
+          {cal_type === 6 &&
+            // 일용직
+            (result_data.succ ? (
+              <_SupplyResult
+                result_data={result_data}
+                emoticon={EMTDetailDayJobSupply}
+                help={["/help/7", "일용직도 퇴직금을 받을 수 있다?"]}
+              />
+            ) : (
+              <_UnSupplyResult
+                emoticon={EMTDetailDayJobUnSupply}
+                unit="day"
+                result_data={result_data}
+                average_guide="신청일 이전 1달 간 근로일수가 10일 미만이어야 합니다."
+              />
+            ))}
+          {cal_type === 7 &&
             // 초단 시간
             (result_data.succ ? (
               <_SupplyResult
@@ -421,7 +425,7 @@ export const ResultComp = ({
                 result_data={result_data}
               />
             ))}
-          {cal_type === 6 &&
+          {cal_type === 8 &&
             // 자영업
             (result_data.succ ? (
               <_SupplyResult
