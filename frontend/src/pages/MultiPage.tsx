@@ -54,9 +54,9 @@ class MultiCalHandler extends DetailedHandler {
       retiredDay: this.GetPageVal("retiredDay"),
       enterDay: this.GetPageVal("enterDay"),
       workCate: this.GetPageVal("workCate"),
-      // isMany: true,
-      // isEnd: true,
-      // limitDay: "",
+      sumTwoYearWorkDay: this.GetPageVal("to_server_datas").sumTwoYearWorkDay
+        ? this.GetPageVal("to_server_datas").sumTwoYearWorkDay
+        : null,
     });
     this.SetPageVal("addData", this.to_server);
     const select_company = this.companys?.map((el) => {
@@ -114,6 +114,7 @@ const _MultiMainDataSelect = () => {
                 const maindata = handler.to_server.filter((it: any) => {
                   return it.id === el.id;
                 });
+                console.log(maindata);
                 handler.SetPageVal("mainData", {
                   workCate: handler._Data.workCate,
                   isIrregular: maindata[0].input,
@@ -126,7 +127,7 @@ const _MultiMainDataSelect = () => {
                   workingDays: maindata[0].workingDays,
                   enterDay: handler._Data.enterDay,
                   retiredDay: handler._Data.retiredDay,
-                  dayAvgPay: maindata[0].dayAvgPay,
+                  dayAvgPay: maindata[0].dayAvgPay ? maindata[0].dayAvgPay : 0,
                   realDayPay: maindata[0].realDayPay,
                   id: maindata[0].id,
                 });
@@ -141,27 +142,47 @@ const _MultiMainDataSelect = () => {
         text="확인"
         click_func={async () => {
           const mainData = handler.GetPageVal("mainData");
-          const addData = handler
-            .GetPageVal("addData")
-            .filter((el: any) => {
-              return mainData.id !== el.id;
-            })
-            .map((el: any) => {
-              return {
-                workCate: el.workCate,
-                isIrregular: el.input,
-                enterDay: el.enterDay,
-                retiredDay: el.retiredDay,
-                workingDays: el.workingDays,
-                permitDays: el.workDayForMulti,
-              };
-            });
-          delete mainData.id;
+          const GetAllAddData = handler.GetPageVal("addData");
+
+          const mainMinusAddData = GetAllAddData.filter((el: any) => {
+            return mainData.id !== el.id;
+          });
+          const addData = mainMinusAddData.map((el: any) => {
+            return {
+              workCate: el.workCate,
+              isIrregular: el.input,
+              enterDay: el.enterDay,
+              retiredDay: el.retiredDay,
+              workingDays: el.workingDays ? el.workingDays : el.workingMonths,
+              permitDays: el.sumTwoYearWorkDay
+                ? el.sumTwoYearWorkDay
+                : el.workDayForMulti,
+            };
+          });
           const final_to_server = {
-            mainData,
+            mainData: {
+              age: mainData.age,
+              dayAvgPay: mainData.dayAvgPay,
+              disabled: mainData.disabled,
+              enterDay: mainData.enterDay,
+              isIrregular: mainData.isIrregular,
+              realDayPay: mainData.realDayPay,
+              retiredDay: mainData.retiredDay,
+              workCate: mainData.workCate,
+              workingDays: mainData.workingDays,
+            },
             addData,
           };
-          const result = await sendToServer("/multi", final_to_server);
+          const employData = addData.filter((el: any) => {
+            return el.workCate === 6;
+          });
+
+          const result = await sendToServer(
+            employData.length > 0 || mainData.workCate === 6
+              ? "/multi/employer"
+              : "/multi",
+            final_to_server
+          );
           handler.setCompState && handler.setCompState(5);
           setTimeout(() => {
             handler.setCompState && handler.setCompState(4);

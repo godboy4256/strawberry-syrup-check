@@ -15,6 +15,7 @@
   width: 100%;
   background-color: rgba(255, 73, 58, 1);
   color: white;
+  height: 100%;
 }
 .popup_confirm {
   padding: 9px 0;

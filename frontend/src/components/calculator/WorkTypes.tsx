@@ -1,4 +1,4 @@
-import { MouseEventHandler, useState } from "react";
+import { MouseEventHandler, useEffect, useState } from "react";
 import { ClosePopup, CreatePopup } from "../common/Popup";
 import SelectInput from "../inputs/Select";
 import Header from "../layout/Header";
@@ -8,9 +8,9 @@ import IMGWorkTypeUnSelect from "./../../assets/image/new/detail_info01_unselect
 const work_cate = [
   "정규직",
   "기간제",
-  "일용직",
   "(단기) 예술인",
   "(단기) 특고·프리랜서",
+  "일용직",
   "초단시간",
   "자영업",
 ];
@@ -99,6 +99,11 @@ export const WorkCatePopup = ({
 };
 
 const WorkTypes = ({ handler }: { handler: any }) => {
+  useEffect(() => {
+    handler._Data = {
+      retired: handler._Data.retired,
+    };
+  }, []);
   const [workRypeInfo1, setState1] = useState<"select" | "next" | "none">(
     "next"
   );

@@ -40,6 +40,9 @@ class BasicCalHandler extends InputHandler {
 const handler = new BasicCalHandler({});
 
 const _BasicCalComp = () => {
+  useEffect(() => {
+    handler._Data = {};
+  }, []);
   return (
     <div className="full_height_layout_cal">
       <Header
