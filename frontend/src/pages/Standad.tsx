@@ -13,8 +13,8 @@ import { ResultComp } from "../components/calculator/Result";
 import CalContainer from "../components/calculator/CalContainer";
 import Loading from "../components/common/Loading";
 import { CheckValiDation } from "../utils/validate";
-import "./../styles/basic.css";
 import { calRecording } from "../utils/calrecord";
+import "./../styles/basic.css";
 
 class BasicCalHandler extends InputHandler {
   public result: {} = {};
@@ -22,6 +22,7 @@ class BasicCalHandler extends InputHandler {
   public Action_Cal_Result = async () => {
     const to_server = {
       ...this._Data,
+      retired: this._Data.retired,
       retiredDay: this._Data.retired
         ? this._Data.retiredDay
         : `${GetDateArr(null)[0]}-${GetDateArr(null)[1]}-${
@@ -34,15 +35,12 @@ class BasicCalHandler extends InputHandler {
     calRecording(this.result, "기본형");
     setTimeout(() => {
       this.setCompState && this.setCompState(3);
-    }, 2000);
+    }, 1000);
   };
 }
 const handler = new BasicCalHandler({});
 
 const _BasicCalComp = () => {
-  useEffect(() => {
-    handler._Data = {};
-  }, []);
   return (
     <div className="full_height_layout_cal">
       <Header
