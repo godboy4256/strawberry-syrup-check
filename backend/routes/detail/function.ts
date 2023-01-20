@@ -316,9 +316,9 @@ export function checkJobCate(enterDay: Dayjs, jobCate: number) {
 	const checkTwo = dayjs("2022-01-01");
 	const checkThree = dayjs("2022-07-01");
 
-	if (jobCate <= 12) return enterDay.isSameOrAfter(checkOne) ? enterDay : checkOne;
-	if (jobCate >= 15) return enterDay.isSameOrAfter(checkTwo) ? enterDay : checkTwo;
-	return enterDay.isSameOrAfter(checkThree) ? enterDay : checkThree;
+	if (jobCate <= 11) return enterDay.isSameOrAfter(checkOne) ? enterDay : checkOne;
+	if (jobCate >= 14) return enterDay.isSameOrAfter(checkThree) ? enterDay : checkThree;
+	return enterDay.isSameOrAfter(checkTwo) ? enterDay : checkTwo;
 }
 
 export function calSumOneYearWorkDay(lastWorkDay: Dayjs) {
