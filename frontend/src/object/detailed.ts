@@ -2,6 +2,7 @@ import { Dispatch, SetStateAction } from "react";
 import { getAge, GetDateArr } from "../utils/date";
 import { sendToServer } from "../utils/sendToserver";
 import { CheckValiDation } from "../utils/validate";
+import { DetailPathCal } from "./common";
 import InputHandler from "./Inputs";
 
 class DetailedHandler extends InputHandler {
@@ -188,19 +189,6 @@ class DetailedHandler extends InputHandler {
         ? 8
         : this._Data.workCate;
 
-    const url =
-      workCate === 0 || workCate === 1
-        ? "/detail/standard"
-        : workCate === 2 || workCate === 3
-        ? "/detail/art"
-        : workCate === 4 || workCate === 5
-        ? "/detail/art/short"
-        : workCate === 6
-        ? "/detail/dayjob"
-        : workCate === 7
-        ? "/detail/veryShort"
-        : workCate === 8 && "/detail/employer";
-
     const to_server_common = {
       retired: this._Data.retired ? this._Data.retired : true,
       workCate: workCate,
@@ -362,10 +350,13 @@ class DetailedHandler extends InputHandler {
       this.setCompState && this.setCompState(5);
       setTimeout(() => {
         this.setCompState && this.setCompState(4);
-      }, 2000);
+      }, 1000);
     }
-    this.SetPageVal("to_server_datas", to_server_datas);
-    return sendToServer(url, { ...to_server_common, ...to_server_datas });
+    const url = DetailPathCal(workCate);
+    const to_servers = { ...to_server_common, ...to_server_datas };
+    return this._Data.cal_state !== "multi"
+      ? sendToServer(url ? url : "", to_servers)
+      : to_servers;
   };
 }
 

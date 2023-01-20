@@ -39,6 +39,7 @@ const null_check_list: any = {
     "weekWorkTime",
   ],
   detail_employ: ["insuranceGrade", "enterDay", "retiredDay"],
+  multi_one: ["age", "disabled"],
 };
 
 const valid_null_check_message: any = {
@@ -94,6 +95,10 @@ const valid_null_check_message: any = {
     retiredDay: "고용 보험 종료일을 선택해주세요.",
     insuranceGrade: "고용 보험 등급을 입력해주세요.",
   },
+  multi_one: {
+    age: "생년월일을 선택해주세요.",
+    disabled: "장애여부를 선택해주세요.",
+  },
 };
 
 const null_check_rules = (
@@ -104,7 +109,8 @@ const null_check_rules = (
     | "detail_art"
     | "detail_shorts"
     | "detail_veryshorts"
-    | "detail_employ",
+    | "detail_employ"
+    | "multi_one",
   to_server: any
 ) => {
   let answer = true;
@@ -146,7 +152,8 @@ export const CheckValiDation = (
     | "detail_art"
     | "detail_shorts"
     | "detail_veryshorts"
-    | "detail_employ",
+    | "detail_employ"
+    | "multi_one",
   to_server: any
 ) => {
   let answer = true;
@@ -192,6 +199,9 @@ export const CheckValiDation = (
     if (!null_check_rules(type, to_server)) answer = false;
     if (!retired_day_rules(to_server["retiredDay"], to_server["enterDay"]))
       answer = false;
+  }
+  if (type === "multi_one") {
+    if (!null_check_rules(type, to_server)) answer = false;
   }
 
   return answer;

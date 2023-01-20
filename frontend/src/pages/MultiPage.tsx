@@ -27,6 +27,8 @@ import Loading from "../components/common/Loading";
 import { calRecording } from "../utils/calrecord";
 import CheckBoxInput from "../components/inputs/Check";
 import { DateInputNormal } from "../components/inputs/Date";
+import { DetailPathCal } from "../object/common";
+import { CheckValiDation } from "../utils/validate";
 
 interface Company {
   id: number;
@@ -41,24 +43,16 @@ class MultiCalHandler extends DetailedHandler {
   public setCompState: Dispatch<SetStateAction<number>> | undefined = undefined;
   public companys: Company[] | undefined = undefined;
   public to_server: any = [];
+  public genericid = 0;
   public Action_cal_multi_unit = async () => {
     const to_server_unit = await this.Action_Cal_Result();
+    this.genericid++;
     this.to_server.push({
       ...to_server_unit,
-      id: this.GetPageVal("select_multi"),
-      input: this.GetPageVal("input")
-        ? this.GetPageVal("input") === "개별 입력"
-          ? false
-          : true
-        : false,
-      retiredDay: this.GetPageVal("retiredDay"),
-      enterDay: this.GetPageVal("enterDay"),
-      workCate: this.GetPageVal("workCate"),
-      sumTwoYearWorkDay: this.GetPageVal("to_server_datas").sumTwoYearWorkDay
-        ? this.GetPageVal("to_server_datas").sumTwoYearWorkDay
-        : null,
+      id: this.genericid,
     });
     this.SetPageVal("addData", this.to_server);
+    this.setCompState && this.setCompState(1);
     const select_company = this.companys?.map((el) => {
       if (el.id === this.GetPageVal("select_multi")) {
         return {
@@ -94,6 +88,8 @@ class MultiCalHandler extends DetailedHandler {
   };
 }
 
+const handler = new MultiCalHandler({});
+
 const _MultiMainDataSelect = () => {
   return (
     <div
@@ -111,26 +107,12 @@ const _MultiMainDataSelect = () => {
               type="radio"
               name="multi_main_select"
               onChange={() => {
-                const maindata = handler.to_server.filter((it: any) => {
-                  return it.id === el.id;
-                });
-                console.log(maindata);
-                handler.SetPageVal("mainData", {
-                  workCate: handler._Data.workCate,
-                  isIrregular: maindata[0].input,
-                  age: isNaN(
-                    Number(getAge(new Date(String(handler._Data.age))).age)
-                  )
-                    ? null
-                    : getAge(new Date(String(handler._Data.age))).age,
-                  disabled: handler._Data.disabled === "장애인" ? true : false,
-                  workingDays: maindata[0].workingDays,
-                  enterDay: handler._Data.enterDay,
-                  retiredDay: handler._Data.retiredDay,
-                  dayAvgPay: maindata[0].dayAvgPay ? maindata[0].dayAvgPay : 0,
-                  realDayPay: maindata[0].realDayPay,
-                  id: maindata[0].id,
-                });
+                const mainData = handler
+                  .GetPageVal("addData")
+                  .filter((el2: any) => {
+                    return el2.id === el.id;
+                  });
+                handler.SetPageVal("mainData", mainData);
               }}
             />
             {el.content}
@@ -142,51 +124,100 @@ const _MultiMainDataSelect = () => {
         text="확인"
         click_func={async () => {
           const mainData = handler.GetPageVal("mainData");
-          const GetAllAddData = handler.GetPageVal("addData");
-
-          const mainMinusAddData = GetAllAddData.filter((el: any) => {
-            return mainData.id !== el.id;
+          const addData = handler.GetPageVal("addData").filter((el: any) => {
+            return el.id !== mainData[0].id;
           });
-          const addData = mainMinusAddData.map((el: any) => {
-            return {
-              workCate: el.workCate,
-              isIrregular: el.input,
-              enterDay: el.enterDay,
-              retiredDay: el.retiredDay,
-              workingDays: el.workingDays ? el.workingDays : el.workingMonths,
-              permitDays: el.sumTwoYearWorkDay
-                ? el.sumTwoYearWorkDay
-                : el.workDayForMulti,
-            };
-          });
-          const final_to_server = {
-            mainData: {
-              age: mainData.age,
-              dayAvgPay: mainData.dayAvgPay,
-              disabled: mainData.disabled,
-              enterDay: mainData.enterDay,
-              isIrregular: mainData.isIrregular,
-              realDayPay: mainData.realDayPay,
-              retiredDay: mainData.retiredDay,
-              workCate: mainData.workCate,
-              workingDays: mainData.workingDays,
-            },
-            addData,
-          };
           const employData = addData.filter((el: any) => {
             return el.workCate === 6;
           });
+          const targetDate = new Date(
+            mainData[0].lastWorkDay
+              ? mainData[0].lastWorkDay
+              : mainData[0].retiredDay
+          );
+          const limitNum =
+            mainData[0].workCate === 0 ||
+            mainData[0].workCate === 1 ||
+            mainData[0].workCate === 6
+              ? 18
+              : 24;
+          const limitDay = new Date(
+            targetDate.getFullYear(),
+            targetDate.getMonth() - limitNum,
+            targetDate.getDate()
+          );
+
+          const addDataResultArr: any[] = [];
+          const url = DetailPathCal(mainData[0].workCate);
+          const mainDataResult = await sendToServer(url ? url : "", {
+            ...mainData[0],
+            age: Number(
+              getAge(new Date(String(handler.GetPageVal("age_multi")))).age
+            ),
+            disabled:
+              handler.GetPageVal("disabled_multi") === "장애인" ? true : false,
+          });
+
+          for (let i = 0; i < addData.length; i++) {
+            const url = DetailPathCal(addData[i].workCate);
+            const result = await sendToServer(url ? url : "", {
+              ...addData[i],
+              limitDay,
+              age: Number(
+                getAge(new Date(String(handler.GetPageVal("age_multi")))).age
+              ),
+              disabled:
+                handler.GetPageVal("disabled_multi") === "장애인"
+                  ? true
+                  : false,
+            });
+            addDataResultArr.push({
+              workCate: addData[i].workCate,
+              isIrregular: addData[i].isSimple ? addData[i].isSimple : false,
+              enterDay: addData[i].enterDay,
+              retiredDay: addData[i].retiredDay
+                ? addData[i].retiredDay
+                : addData[i].lastWorkDay,
+              workingDays: result.workingDays,
+              permitDays: result.workDayForMulti,
+            });
+          }
+
+          const multi_to_server = {
+            mainData: {
+              age: Number(
+                getAge(new Date(String(handler.GetPageVal("age_multi")))).age
+              ),
+              disabled:
+                handler.GetPageVal("disabled_multi") === "장애인"
+                  ? true
+                  : false,
+              workCate: mainData[0].workCate,
+              isIrregular: mainData[0].isSimple ? mainData[0].isSimple : false,
+              enterDay: mainData[0].enterDay,
+              retiredDay: mainData[0].retiredDay
+                ? mainData[0].retiredDay
+                : mainData[0].retiredDay,
+              workingDays: mainDataResult.workingDays
+                ? mainDataResult.workingDays
+                : mainDataResult.workingMonths,
+              dayAvgPay: mainDataResult.dayAvgPay,
+              realDayPay: mainDataResult.realDayPay,
+            },
+            addData: addDataResultArr,
+          };
 
           const result = await sendToServer(
             employData.length > 0 || mainData.workCate === 6
               ? "/multi/employer"
               : "/multi",
-            final_to_server
+            multi_to_server
           );
+
           handler.setCompState && handler.setCompState(5);
           setTimeout(() => {
             handler.setCompState && handler.setCompState(4);
-          }, 2000);
+          }, 1000);
           handler.SetPageVal("result", result);
           calRecording(result, "복수형");
         }}
@@ -194,8 +225,6 @@ const _MultiMainDataSelect = () => {
     </div>
   );
 };
-
-const handler = new MultiCalHandler({});
 
 const _MultiCalListCard = ({ company }: { company: Company }) => {
   const onClickCompanyDelete = (e: MouseEvent<HTMLDivElement>) => {
@@ -290,14 +319,14 @@ const _MultiCompanyList = () => {
       </div>
       <div className="public_side_padding">
         <DateInputNormal
-          params="age"
+          params="age_multi"
           label="생년월일"
           callBack={handler.SetPageVal}
           year={Year_Option_Generater(73)}
         />
         <CheckBoxInput
           type="circle_type"
-          params="disabled"
+          params="disabled_multi"
           callBack={handler.SetPageVal}
           label="장애여부"
           options={["장애인", "비장애인"]}
@@ -364,9 +393,17 @@ const MultiCalPage = () => {
                   <Button
                     text="계산하기"
                     type="popup_ok"
-                    click_func={() =>
-                      handler.setCompState && handler.setCompState(3)
-                    }
+                    click_func={() => {
+                      if (
+                        !CheckValiDation("multi_one", {
+                          disabled:
+                            handler.GetPageVal("disabled_multi") || null,
+                          age: handler.GetPageVal("age_multi") || null,
+                        })
+                      )
+                        return;
+                      handler.setCompState && handler.setCompState(3);
+                    }}
                   />
                 </div>
               </>
