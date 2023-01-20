@@ -1,5 +1,7 @@
 #multi_container {
   min-height: calc(100vh - 177px);
+  padding-top: 20px;
+  padding-bottom: 20px;
 }
 
 #multi_top_container {

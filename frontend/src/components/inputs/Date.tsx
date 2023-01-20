@@ -525,7 +525,7 @@ export const DateInputIndividual = ({
 
   return (
     <div className="date_indiviual_container">
-      {type === 3 || type === 4 ? (
+      {type === 2 || type === 3 ? (
         <div id="date_indiviual_container_short">
           <div ref={refIndividualPage}>
             <div className="date_indiviual_page type_2">
@@ -907,7 +907,7 @@ export const DateInputIndividual = ({
           </div>
         </div>
       ) : (
-        type === 2 && (
+        type === 4 && (
           <div id="date_indiviual_dayjob">
             <div ref={refIndividualPage}>
               <div className="date_indiviual_page">
@@ -1542,12 +1542,12 @@ export const DateInputIndividual = ({
         ref={refNext}
         className="date_indiviual_prev"
         onClick={() => {
-          if (type === 2) {
+          if (type === 4) {
             if (locationPage <= 0) {
               return;
             }
           }
-          if (type === 3 || type === 4) {
+          if (type === 2 || type === 3) {
             if (locationPage <= 0) return;
           }
           const currentRef: any = refIndividualPage.current;
@@ -1561,7 +1561,7 @@ export const DateInputIndividual = ({
         ref={refPrev}
         className="date_indiviual_next"
         onClick={() => {
-          if (type === 3 || type === 4) {
+          if (type === 2 || type === 3) {
             if (locationPage >= 100) return;
           }
           if (locationPage >= 200) {

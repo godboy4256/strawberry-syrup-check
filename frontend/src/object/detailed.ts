@@ -2,6 +2,7 @@ import { Dispatch, SetStateAction } from "react";
 import { getAge, GetDateArr } from "../utils/date";
 import { sendToServer } from "../utils/sendToserver";
 import { CheckValiDation } from "../utils/validate";
+import { DetailPathCal } from "./common";
 import InputHandler from "./Inputs";
 
 class DetailedHandler extends InputHandler {
@@ -61,10 +62,11 @@ class DetailedHandler extends InputHandler {
   ) => {
     let answer = 0,
       notOverTen = 0;
+
     if (type === "pay") {
       workRecord.forEach((year) => {
         year.months.forEach((el) => {
-          answer += el.pay;
+          if (el.pay) answer += el.pay;
         });
       });
       return answer;
@@ -163,31 +165,57 @@ class DetailedHandler extends InputHandler {
         }
       });
 
-    const url: string | boolean =
-      this._Data.workCate === 0 || this._Data.workCate === 1
-        ? "/detail/standard"
-        : this._Data.workCate === 2
-        ? "/detail/dayjob"
-        : this._Data.workCate === 3 || this._Data.workCate === 4
-        ? this._Data.is_short === "단기예술인" ||
-          this._Data.is_short === "단기특고"
-          ? "/detail/art/short"
-          : "/detail/art"
-        : this._Data.workCate === 5
-        ? "/detail/veryShort"
-        : this._Data.workCate === 6 && "/detail/employer";
-    const to_server =
-      this._Data.workCate === 0 || this._Data.workCate === 1 // 정규직 / 기간제
+    const limitDay = GetDateArr(
+      new Date(
+        new Date(
+          this._Data.retiredDay ? this._Data.retiredDay : this._Data.lastWorkDay
+        ).setMonth(
+          new Date().getMonth() -
+            (this._Data.workCate === 0 || this._Data.workCate === 1 ? 18 : 24)
+        )
+      )
+    );
+
+    const workCate =
+      this._Data.is_short === "단기예술인"
+        ? 4
+        : this._Data.is_short === "단기특고"
+        ? 5
+        : this._Data.is_short !== "단기예술인" && this._Data.workCate === 4
+        ? 6
+        : this._Data.is_short !== "단기특고" && this._Data.workCate === 5
+        ? 7
+        : this._Data.workCate === 6
+        ? 8
+        : this._Data.workCate;
+
+    const to_server_common = {
+      retired: this._Data.retired ? this._Data.retired : true,
+      workCate: workCate,
+      retireReason: this._Data.retireReason ? this._Data.retireReason : 10,
+      age: isNaN(Number(getAge(new Date(String(this._Data.age))).age))
+        ? null
+        : getAge(new Date(String(this._Data.age))).age,
+      disabled:
+        this._Data.disabled === "장애인"
+          ? true
+          : this._Data.disabled === "비장애인"
+          ? false
+          : null,
+      isMany: this._Data.cal_state === "multi" ? true : false,
+      limitDay: `${limitDay[0]}-${limitDay[1]}-${limitDay[2]}`,
+    };
+
+    const to_server_datas: any =
+      workCate === 0 || workCate === 1 // 정규직 / 기간제
         ? {
-            ...this._Data,
             salary: this._Data.salary
               ? Array.isArray(this._Data.salary)
                 ? this._Data.salary
                 : [this._Data.salary]
               : null,
             weekDay,
-            retireReason:
-              this._Data.cal_state === "multi" ? 1 : this._Data.retireReason,
+            enterDay: this._Data.enterDay ? this._Data.enterDay : null,
             retiredDay: this._Data.retired
               ? this._Data.retiredDay
               : `${GetDateArr(null)[0]}-${GetDateArr(null)[1]}-${
@@ -196,29 +224,51 @@ class DetailedHandler extends InputHandler {
             dayWorkTime: this._Data.dayWorkTime
               ? Number(this._Data.dayWorkTime.split("시간")[0])
               : null,
-            disabled:
-              this._Data.disabled === "장애인"
-                ? true
-                : this._Data.disabled === "비장애인"
-                ? false
-                : null,
-            age: isNaN(Number(getAge(new Date(String(this._Data.age))).age))
-              ? null
-              : getAge(new Date(String(this._Data.age))).age,
-            limitDay: new Date(
-              new Date(this._Data.retiredDay).setMonth(
-                new Date().getMonth() - 18
-              )
-            ),
-            isEnd: this._Data.cal_state ? true : false,
           }
-        : this._Data.workCate === 2 // 일용직
+        : workCate === 2 || workCate === 3
         ? {
-            hasWork: this._Data.hasWork,
-            retired: this._Data.retired,
-            workCate: 6,
-            retireReason:
-              this._Data.cal_state === "multi" ? 1 : this._Data.retireReason,
+            isSpecial: false,
+            enterDay: this._Data.enterDay ? this._Data.enterDay : null,
+            sumTwelveMonthSalary: this._Data.sumTwelveMonthSalary
+              ? [this._Data.sumTwelveMonthSalary]
+              : null,
+            retiredDay: this._Data.retired
+              ? this._Data.retiredDay
+              : `${GetDateArr(null)[0]}-${GetDateArr(null)[1]}-${
+                  GetDateArr(null)[2]
+                }`,
+            jobCate: this._Data.workCate === 3 ? this._Data.jobCate : null,
+          }
+        : workCate === 4 || workCate === 5
+        ? {
+            isMany: this._Data.cal_state === "multi" ? true : false,
+            isSpecial: false,
+            hasWork: this._Data.hasWork ? this._Data.hasWork : true,
+            enrollDay: this._Data.planToDo,
+            lastWorkDay: this._Data.lastWorkDay,
+            sumWorkDay:
+              this._Data.input === "결과만 입력"
+                ? this._Data.employ_month + this._Data.employ_year * 12
+                : this.sumCal("sumWorkDay", this._Data.workRecord),
+            sumTwoYearWorkDay: this._Data.workRecord
+              ? this.sumCal("twoYear", this._Data.workRecord)
+              : null,
+            sumOneYearPay:
+              this._Data.input === "개별 입력"
+                ? this.sumCal("pay", this._Data.workRecord)
+                : this._Data.sumOneYearPay,
+            isOverTen:
+              this._Data.isOverTen === undefined
+                ? null
+                : this._Data.isOverTen === true
+                ? this._Data.isOverTen
+                : false,
+            isSimple: this._Data.input === "개별 입력" ? false : true,
+            jobCate: this._Data.workCate === 3 ? 1 : null,
+          }
+        : workCate === 6 // 일용직
+        ? {
+            hasWork: this._Data.hasWork ? this._Data.hasWork : false,
             enrollDay: this._Data.planToDo,
             dayWorkTime: this._Data.dayWorkTime
               ? Number(this._Data.dayWorkTime.split("시간")[0])
@@ -226,15 +276,6 @@ class DetailedHandler extends InputHandler {
             lastWorkDay: this._Data.lastWorkDay,
             isSpecial: this._Data.isSpecial ? this._Data.isSpecial : false,
             isSimple: this._Data.input === "개별 입력" ? false : true,
-            age: isNaN(Number(getAge(new Date(String(this._Data.age))).age))
-              ? null
-              : getAge(new Date(String(this._Data.age))).age,
-            disabled:
-              this._Data.disabled === "장애인"
-                ? true
-                : this._Data.disabled === "비장애인"
-                ? false
-                : null,
             isOverTen:
               this._Data.input === "결과만 입력"
                 ? false
@@ -249,199 +290,22 @@ class DetailedHandler extends InputHandler {
             dayAvgPay: this._Data.workRecord
               ? this.getDayAvgPay(this._Data.workRecord)
               : this._Data.dayAvgPay,
-            limitDay: new Date(
-              new Date(
-                this._Data.retiredDay
-                  ? this._Data.retiredDay
-                  : this._Data.lastWorkDay
-              ).setMonth(new Date().getMonth() - 18)
-            ),
-            isEnd: this._Data.cal_state ? true : false,
           }
-        : this._Data.workCate === 3 // 예술인
-        ? this._Data.is_short === "단기예술인"
-          ? {
-              retired: this._Data.retired,
-              workCate: 4,
-              isSpecial: false,
-              hasWork: this._Data.hasWork,
-              retireReason:
-                this._Data.cal_state === "multi" ? 1 : this._Data.retireReason,
-              lastWorkDay: this._Data.lastWorkDay,
-              age: isNaN(Number(getAge(new Date(String(this._Data.age))).age))
-                ? null
-                : getAge(new Date(String(this._Data.age))).age,
-              disabled:
-                this._Data.disabled === "장애인"
-                  ? true
-                  : this._Data.disabled === "비장애인"
-                  ? false
-                  : null,
-              enrollDay: this._Data.planToDo,
-              sumWorkDay:
-                this._Data.input === "결과만 입력"
-                  ? this._Data.employ_month + this._Data.employ_year * 12
-                  : this.sumCal("sumWorkDay", this._Data.workRecord),
-              sumTwoYearWorkDay: this._Data.workRecord
-                ? this.sumCal("twoYear", this._Data.workRecord)
-                : null,
-              sumOneYearPay:
-                this._Data.input === "결과만 입력"
-                  ? this._Data.sumOneYearPay
-                  : this._Data.workRecord
-                  ? this.sumCal("pay", this._Data.workRecord)
-                  : null,
-              isOverTen:
-                this._Data.isOverTen === undefined
-                  ? null
-                  : this._Data.isOverTen === true
-                  ? this._Data.isOverTen
-                  : false,
-              limitDay: new Date(
-                new Date(this._Data.retiredDay).setMonth(
-                  new Date().getMonth() - 24
-                )
-              ),
-              isEnd: this._Data.cal_state ? true : false,
-              isSimple: this._Data.input === "개별 입력" ? false : true,
-            }
-          : {
-              ...this._Data,
-              workCate: 2,
-              retireReason:
-                this._Data.cal_state === "multi" ? 1 : this._Data.retireReason,
-              isSpecial: false,
-              age: isNaN(Number(getAge(new Date(String(this._Data.age))).age))
-                ? null
-                : getAge(new Date(String(this._Data.age))).age,
-              disabled:
-                this._Data.disabled === "장애인"
-                  ? true
-                  : this._Data.disabled === "비장애인"
-                  ? false
-                  : null,
-              sumTwelveMonthSalary: this._Data.sumTwelveMonthSalary
-                ? [this._Data.sumTwelveMonthSalary]
-                : null,
-              retiredDay: this._Data.retired
-                ? this._Data.retiredDay
-                : `${GetDateArr(null)[0]}-${GetDateArr(null)[1]}-${
-                    GetDateArr(null)[2]
-                  }`,
-              jobCate: 1,
-              limitDay: new Date(
-                new Date(this._Data.retiredDay).setMonth(
-                  new Date().getMonth() - 24
-                )
-              ),
-              isEnd: this._Data.cal_state ? true : false,
-            }
-        : this._Data.workCate === 4 // 특고
-        ? this._Data.is_short === "단기특고"
-          ? {
-              retired: this._Data.retired,
-              workCate: 5,
-              retireReason:
-                this._Data.cal_state === "multi" ? 1 : this._Data.retireReason,
-              lastWorkDay: this._Data.lastWorkDay,
-              enrollDay: this._Data.planToDo,
-              isSpecial: true,
-              age: isNaN(Number(getAge(new Date(String(this._Data.age))).age))
-                ? null
-                : getAge(new Date(String(this._Data.age))).age,
-              disabled: this._Data.disabled === "장애인" ? true : false,
-              jobCate: 1,
-              sumWorkDay:
-                this._Data.input === "결과만 입력"
-                  ? this._Data.employ_month + this._Data.employ_year * 12
-                  : this.sumCal("sumWorkDay", this._Data.workRecord),
-              sumTwoYearWorkDay: this._Data.workRecord
-                ? this.sumCal("twoYear", this._Data.workRecord)
-                : null,
-              sumOneYearPay:
-                this._Data.input === "결과만 입력"
-                  ? this._Data.sumOneYearPay
-                  : this._Data.workRecord
-                  ? this.sumCal("pay", this._Data.workRecord)
-                  : null,
-              isOverTen: this._Data.isOverTen ? this._Data.isOverTen : false,
-              hasWork: this._Data.hasWork,
-              isSimple: this._Data.input === "개별 입력" ? false : true,
-            }
-          : {
-              ...this._Data,
-              workCate: 3,
-              isSpecial: true,
-              retireReason:
-                this._Data.cal_state === "multi" ? 1 : this._Data.retireReason,
-              age: isNaN(Number(getAge(new Date(String(this._Data.age))).age))
-                ? null
-                : getAge(new Date(String(this._Data.age))).age,
-              disabled:
-                this._Data.disabled === "장애인"
-                  ? true
-                  : this._Data.disabled === "비장애인"
-                  ? false
-                  : null,
-              sumTwelveMonthSalary: this._Data.sumTwelveMonthSalary
-                ? [this._Data.sumTwelveMonthSalary]
-                : null,
-              retiredDay: this._Data.retired
-                ? this._Data.retiredDay
-                : `${GetDateArr(null)[0]}-${GetDateArr(null)[1]}-${
-                    GetDateArr(null)[2]
-                  }`,
-              limitDay: new Date(
-                new Date(this._Data.retiredDay).setMonth(
-                  new Date().getMonth() - 24
-                )
-              ),
-              isEnd: this._Data.cal_state ? true : false,
-            }
-        : this._Data.workCate === 5 // 초단 시간
+        : workCate === 7 // 초단 시간
         ? {
-            // workCate: 7,
-            retired: this._Data.retired,
-            enterDay: this._Data.enterDay ? this._Data.enterDay : null,
-            retireReason:
-              this._Data.cal_state === "multi" ? 1 : this._Data.retireReason,
-            age: isNaN(Number(getAge(new Date(String(this._Data.age))).age))
-              ? null
-              : getAge(new Date(String(this._Data.age))).age,
+            enterDay: this._Data.enterDay,
+            retiredDay: this._Data.retiredDay,
             weekDay,
-            disabled:
-              this._Data.disabled === "장애인"
-                ? true
-                : this._Data.disabled === "비장애인"
-                ? false
-                : null,
-            retiredDay: this._Data.retired
-              ? this._Data.retiredDay
-              : `${GetDateArr(null)[0]}-${GetDateArr(null)[1]}-${
-                  GetDateArr(null)[2]
-                }`,
             salary: this._Data.salary
               ? Array.isArray(this._Data.salary)
                 ? this._Data.salary
                 : [this._Data.salary]
               : null,
             weekWorkTime: this._Data.time ? this._Data.time : null,
-            // limitDay: new Date(
-            //   new Date(this._Data.retiredDay).setMonth(
-            //     new Date().getMonth() - 24
-            //   )
-            // ),
-            // isEnd: this._Data.cal_state ? true : false,
           }
-        : this._Data.workCate === 6 // 자영업자
+        : workCate === 8 // 자영업자
         ? {
-            retireReason: this._Data.retireReason
-              ? this._Data.cal_state === "multi"
-                ? 1
-                : this._Data.retireReason
-              : null,
-            retired: this._Data.retired ? this._Data.retired : null,
-            workCate: 8,
+            isEnd: true, // 서버에 없앨 것을 요청
             enterDay: this._Data.enterDay,
             retiredDay: this._Data.retiredDay,
             insuranceGrade:
@@ -456,39 +320,29 @@ class DetailedHandler extends InputHandler {
                     )
                   : null
                 : null,
-            limitDay: new Date(
-              new Date(this._Data.retiredDay).setMonth(
-                new Date().getMonth() - 24
-              )
-            ),
-            isEnd: this._Data.cal_state ? true : false,
-            isMany: this._Data.cal_state ? true : false,
           }
         : {};
-    console.log("헤이헤이", this._Data.workRecord);
-    const validCheckType =
-      this._Data.workCate === 0 || this._Data.workCate === 1
-        ? "detail_standad"
-        : this._Data.workCate === 3 || this._Data.workCate === 4
-        ? this._Data.is_short === "단기예술인" ||
-          this._Data.is_short === "단기특고"
-          ? "detail_shorts"
-          : "detail_art"
-        : this._Data.workCate === 2
-        ? "detail_dayjob"
-        : this._Data.workCate === 5
-        ? "detail_veryshorts"
-        : this._Data.workCate === 6 && "detail_employ";
+    // const validCheckType =
+    //   this._Data.workCate === 0 || this._Data.workCate === 1
+    //     ? "detail_standad"
+    //     : this._Data.workCate === 3 || this._Data.workCate === 4
+    //     ? this._Data.is_short === "단기예술인" ||
+    //       this._Data.is_short === "단기특고"
+    //       ? "detail_shorts"
+    //       : "detail_art"
+    //     : this._Data.workCate === 2
+    //     ? "detail_dayjob"
+    //     : this._Data.workCate === 5
+    //     ? "detail_veryshorts"
+    //     : this._Data.workCate === 6 && "detail_employ";
 
-    delete to_server.popup_select;
-
-    if (
-      !CheckValiDation(validCheckType ? validCheckType : "standad", to_server)
-    )
-      return;
-    delete to_server.week;
-    delete to_server.time;
-
+    // if (
+    //   !CheckValiDation(
+    //     validCheckType ? validCheckType : "standad",
+    //     to_server_datas
+    //   )
+    // )
+    //   return;
     if (this._Data.workCate === 3 || this._Data.workCate === 4) {
       this.result["is_short"] = this._Data.is_short;
     }
@@ -496,10 +350,13 @@ class DetailedHandler extends InputHandler {
       this.setCompState && this.setCompState(5);
       setTimeout(() => {
         this.setCompState && this.setCompState(4);
-      }, 2000);
+      }, 1000);
     }
-
-    return sendToServer(url, to_server);
+    const url = DetailPathCal(workCate);
+    const to_servers = { ...to_server_common, ...to_server_datas };
+    return this._Data.cal_state !== "multi"
+      ? sendToServer(url ? url : "", to_servers)
+      : to_servers;
   };
 }
 
