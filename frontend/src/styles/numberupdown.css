@@ -1,49 +1,60 @@
 .num_updowun_container {
-	width: 100%;
-	display: flex;
-	justify-content: space-between;
-	align-items: center;
-	border: 1px solid rgba(0, 0, 0, 0.2);
-	border-radius: 3px;
-	overflow: hidden;
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border: 1px solid rgba(0, 0, 0, 0.2);
+  border-radius: 3px;
+  overflow: hidden;
 }
 
 .num_updowun_container.active {
-	border-color: #ff6559;
+  border-color: #ff6559;
 }
 
 .num_updowun_container button {
-	background-color: rgba(0, 0, 0, 0.2);
-	display: flex;
-	justify-content: center;
-	align-items: center;
-	width: 39px;
-	flex: none;
-	height: 39px;
+  background-color: rgba(0, 0, 0, 0.2);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 39px;
+  flex: none;
+  height: 39px;
 }
 
 .number_up {
-	transform: rotate(180deg);
+  transform: rotate(180deg);
 }
 
 .number_up.active,
 .number_down.active {
-	background-color: #ff6559;
+  background-color: #ff6559;
 }
 
 .num_updown_unitbox {
-	width: 100%;
-	display: flex;
-	padding: 9px 13px;
+  width: 100%;
+  display: flex;
+  padding: 9px 13px;
+  align-items: center;
+  justify-content: flex-end;
 }
 
 .num_updown_unitbox > div {
-	width: 50%;
-	text-align: right;
-	color: rgba(0, 0, 0, 0.2);
-	line-height: 21px;
+  color: rgba(0, 0, 0, 0.2);
+  line-height: 21px;
+  flex: none;
+  text-align: right;
+  width: 32px;
+}
+.num_updown_unitbox > input {
+  color: rgba(0, 0, 0, 0.2);
+  flex: none;
+  text-align: right;
+}
+.num_updown_unitbox > input.active {
+  color: #ff6559;
 }
 
 .num_updown_unitbox.active > div {
-	color: #ff6559;
+  color: #ff6559;
 }

@@ -6,6 +6,7 @@ import CalRecord from "./pages/CalRecord";
 import BasicCalPage from "./pages/Standad";
 import "./styles/root.css";
 import HelpPage from "./pages/HelpPage";
+import MinimumSalary from "./pages/MinimumSalary";
 
 function App() {
   return (
@@ -14,6 +15,7 @@ function App() {
       <Route path="/standard" element={<BasicCalPage />} />
       <Route path="/detailed" element={<DetailCalPage />} />
       <Route path="/multi" element={<MultiCalPage />} />
+      <Route path="/minimum_salary" element={<MinimumSalary />} />
       <Route path="/calrecord" element={<CalRecord />} />
       <Route path="/help/*" element={<HelpPage />} />
     </Routes>

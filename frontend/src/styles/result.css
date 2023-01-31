@@ -161,3 +161,20 @@
   display: block;
   margin-right: 5px;
 }
+#least_title {
+  padding: 8px 15px;
+}
+#least_info_box {
+  border: 1px solid #ff7d73;
+  padding: 10px 15px;
+  margin-bottom: 15px;
+}
+#least_info_box div {
+  line-height: 24px;
+}
+#least_container #result_guide_comment02 {
+  margin-top: 25px;
+}
+#least_container h3 {
+  margin-bottom: 15px;
+}

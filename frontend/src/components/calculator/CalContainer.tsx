@@ -10,11 +10,6 @@ const CalContainer = ({
   type: string;
   GetValue?: CallableFunction;
 }) => {
-  console.log(GetValue && GetValue("isRetiree"));
-  // const isRetiree =
-  //   GetValue && GetValue("isRetiree") ? "> 퇴직자" : "> 퇴직예정자 ";
-  // const isRetiree = GetValue("isRetiree");
-  // GetValue("isRetiree") ? "> 퇴직자" : "> 퇴직예정자 ";
   const workCate =
     GetValue &&
     (GetValue("workCate") === 0

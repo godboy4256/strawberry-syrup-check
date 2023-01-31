@@ -11,8 +11,11 @@ const PopUpHandler: any = {
   title: undefined,
   popup_type: undefined,
 };
+
 const PopUpGlobal = () => {
-  const [content, setContent] = useState<ReactElement | string | boolean>();
+  const [content, setContent] = useState<
+    ReactElement | string | boolean | any
+  >();
   PopUpHandler.create_func = setContent;
   const onClickConfirm = () => {
     if (PopUpHandler.confirm_func) PopUpHandler.confirm_func();
@@ -97,7 +100,7 @@ const PopUpGlobal = () => {
 
 const CreatePopup = (
   title?: string,
-  content: ReactElement | string = "팝업",
+  content: ReactElement | string | any = "팝업",
   popup_type: "confirm" | "only_check" | "date" | "none" = "confirm",
   confirm_func?: () => void,
   cancel_func?: () => void,

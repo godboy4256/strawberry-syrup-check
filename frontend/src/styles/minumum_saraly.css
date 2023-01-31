@@ -1,0 +1,9 @@
+#minimum_saraly_container {
+  position: relative;
+}
+#minimum_saraly_container .num_updowun_container {
+  margin-bottom: 15px;
+}
+#minimum_saraly_title {
+  padding: 17px 15px 8px;
+}

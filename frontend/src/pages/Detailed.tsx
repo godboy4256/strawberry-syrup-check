@@ -8,7 +8,7 @@ import Header from "../components/layout/Header";
 import SelectInput from "../components/inputs/Select";
 import TabInputs from "../components/inputs/TabInputs";
 import DetailedHandler from "../object/detailed";
-import WorkTypes from "../components/calculator/WorkTypes";
+import WorkTypes, { jobCates } from "../components/calculator/WorkTypes";
 import { Year_Option_Generater } from "../utils/date";
 import { ClosePopup, CreatePopup } from "../components/common/Popup";
 import NumberInput from "../components/inputs/Pay";
@@ -21,6 +21,7 @@ import Loading from "../components/common/Loading";
 import "./../styles/detail.css";
 import { calRecording } from "../utils/calrecord";
 import CheckBoxInput from "../components/inputs/Check";
+import { DetailConfirmPopup } from "../components/calculator/confirmPopup";
 
 class IndividualInputClass extends InputHandler {
   public _Data_arr: any = [];
@@ -212,6 +213,13 @@ const _DetailCalDayJob = ({ handler }: { handler: any }) => {
   }, []);
   return (
     <>
+      <CheckBoxInput
+        type="is_true_type"
+        options={["건설일용직에 해당합니다."]}
+        label="특수"
+        params="isSpecial"
+        callBack={handler.SetPageVal}
+      />
       <_Belong_Form_Tab
         label="근로 정보"
         params="input"
@@ -345,28 +353,7 @@ const _DetailCalArt = ({ handler }: { handler: any }) => {
               type="normal"
               value_type="number"
               label="직종"
-              options={[
-                "직종을 선택해주세요.",
-                "보험설계사",
-                "신용카드 회원모집인",
-                "대출모집인",
-                "학습지 방문강사",
-                "교육교구 방문강사",
-                "택배 기사",
-                "대여제품",
-                "대여제품 방문점검원",
-                "가전제품 배송 설치기사",
-                "방문판매원",
-                "건설기계조종사",
-                "방과후학교 강사",
-                "퀵서비스 기사",
-                "대리운전 기사",
-                "IT 소프트웨어 기술자",
-                "어린이 통학버스 기사",
-                "골프장 캐디",
-                "관공통역 안내사",
-                "화물차주 (유통배송기사, 택배 지간선기사, 특정품목운송차주)",
-              ]}
+              options={jobCates}
             />
           )}
           <DateInputNormal
@@ -591,9 +578,13 @@ const DetailCalPage = () => {
                 handler={handler}
                 workCate={handler.GetPageVal("workCate")}
                 clickCallBack={async () => {
-                  const result_data = await handler.Action_Cal_Result();
+                  await handler.Action_Cal_Result(
+                    <DetailConfirmPopup
+                      confirm_data={handler.GetPageVal("confirm_popup_result")}
+                    />
+                  );
                   calRecording(
-                    result_data,
+                    handler.GetPageVal("allresult"),
                     "상세형",
                     handler.GetPageVal("workCate") === 0
                       ? "정규직"
@@ -611,14 +602,13 @@ const DetailCalPage = () => {
                       ? "자영업"
                       : ""
                   );
-                  handler.SetPageVal("result", result_data);
                 }}
               />
             )}
             {compState === 4 && (
               <ResultComp
                 cal_type={handler.GetPageVal("workCate")}
-                result_data={handler.GetPageVal("result")}
+                result_data={handler.GetPageVal("allresult")}
                 back_func={() => handler.setCompState(3)}
               />
             )}
