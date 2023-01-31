@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Link } from "react-router-dom";
 import IMGBack from "../../assets/image/new/header_back.svg";
 import IMGLogo from "../../assets/image/logo.svg";
-import SideMenu from "./FadeMenu";
+import FadeMenu from "./FadeMenu";
 import "../../styles/header.css";
 
 const Header = ({
@@ -56,7 +56,7 @@ const Header = ({
           <span className="bg_color_main"></span>
         </button>
       </header>
-      {onMenu && <SideMenu />}
+      {onMenu && <FadeMenu />}
     </>
   );
 };

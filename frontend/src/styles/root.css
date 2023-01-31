@@ -125,7 +125,6 @@
 .help_link span {
   color: #0089ed;
 }
-
 #reset_button {
   display: flex;
   align-items: center;
@@ -157,7 +156,6 @@
 .br_l {
   border-left: 1px solid #ccc;
 }
-
 .txt_ct {
   text-align: center;
 }

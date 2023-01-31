@@ -2,6 +2,7 @@ import { ClosePopup, CreatePopup } from "../components/common/Popup";
 
 const null_check_list: any = {
   standad: ["enterDay", "retiredDay", "salary"],
+  common: ["age", "disabled"],
   detail_standad: [
     "age",
     "disabled",
@@ -11,16 +12,32 @@ const null_check_list: any = {
     "dayWorkTime",
     "salary",
   ],
-  detail_dayjob: [
+  detail_dayjob1: [
     "age",
     "disabled",
     "lastWorkDay",
     "sumWorkDay",
     "dayAvgPay",
+    "enrollDay",
     "isOverTen",
     "dayWorkTime",
   ],
-  detail_art: [
+  detail_dayjob2: [
+    "age",
+    "disabled",
+    "lastWorkDay",
+    "sumWorkDay",
+    "dayAvgPay",
+    "dayWorkTime",
+  ],
+  detail_art1: [
+    "age",
+    "disabled",
+    "enterDay",
+    "retiredDay",
+    "sumTwelveMonthSalary",
+  ],
+  detail_art2: [
     "age",
     "disabled",
     "enterDay",
@@ -28,7 +45,21 @@ const null_check_list: any = {
     "jobCate",
     "sumTwelveMonthSalary",
   ],
-  detail_shorts: ["age", "disabled", "lastWorkDay", "sumOneYearPay"],
+  detail_shorts1: [
+    "age",
+    "disabled",
+    "lastWorkDay",
+    "sumOneYearPay",
+    "enrollDay",
+    "hasWork",
+  ],
+  detail_shorts2: [
+    "age",
+    "disabled",
+    "lastWorkDay",
+    "sumOneYearPay",
+    "sumWorkDay",
+  ],
   detail_veryshorts: [
     "age",
     "disabled",
@@ -39,7 +70,7 @@ const null_check_list: any = {
     "weekWorkTime",
   ],
   detail_employ: ["insuranceGrade", "enterDay", "retiredDay"],
-  multi_one: ["age", "disabled"],
+  multi_one: ["age", "disabled", "companys_list"],
 };
 
 const valid_null_check_message: any = {
@@ -57,7 +88,7 @@ const valid_null_check_message: any = {
     weekDay: "근무 요일을 선택해주세요.",
     dayWorkTime: "근무 시간을 선택해주세요.",
   },
-  detail_dayjob: {
+  detail_dayjob1: {
     age: "생년월일을 선택해주세요.",
     disabled: "장애여부를 선택해주세요.",
     lastWorkDay: "마지막 근무일을 선택해주세요.",
@@ -66,20 +97,45 @@ const valid_null_check_message: any = {
     dayAvgPay: "1일 평균임금 ( 개별입력 , 개별 입력 선택시 ) 을 입력해주세요.",
     isOverTen: "최근 근로일 정보를 선택해주세요.",
     dayWorkTime: "마지막 근무시간을 입력해주세요.",
+    enrollDay: "신청 예정일을 선택해주세요.",
   },
-  detail_art: {
+  detail_dayjob2: {
+    age: "생년월일을 선택해주세요.",
+    disabled: "장애여부를 선택해주세요.",
+    lastWorkDay: "마지막 근무일을 선택해주세요.",
+    sumWorkDay: "고용보험 총 기간을 입력해주세요.",
+    dayAvgPay: "1일 평균임금을 입력해주세요.",
+    dayWorkTime: "마지막 근무시간을 입력해주세요.",
+  },
+  detail_art1: {
     enterDay: "고용 보험 가입일을 선택해주세요.",
     retiredDay: "고용 보험 종료일을 선택해주세요.",
     age: "생년월일을 선택해주세요.",
     disabled: "장애여부를 선택해주세요.",
     sumTwelveMonthSalary: "퇴직 전 12개월 급여 총액을 입력해주세요.",
   },
-  detail_shorts: {
+  detail_art2: {
+    enterDay: "고용 보험 가입일을 선택해주세요.",
+    retiredDay: "고용 보험 종료일을 선택해주세요.",
+    age: "생년월일을 선택해주세요.",
+    disabled: "장애여부를 선택해주세요.",
+    jobCate: "직종을 선택해주세요.",
+    sumTwelveMonthSalary: "퇴직 전 12개월 급여 총액을 입력해주세요.",
+  },
+  detail_shorts1: {
     lastWorkDay: "마지막 근무일을 선택해주세요.",
     age: "생년월일을 선택해주세요.",
-    disable: "장애여부를 선택해주세요.",
-    sumOneYearPay:
-      "퇴직 전 12개월 급여 총액( 개별 입력탭 선택시에는 개별 입력란 )을 입력해주세요.",
+    disabled: "장애여부를 선택해주세요.",
+    sumOneYearPay: "개별 입력란 ( 퇴직전 12개월 근로 정보 ) 을 입력해주세요.",
+    enrollDay: "신청 예정일을 선택해주세요.",
+    hasWork: "최근 근로일 정보를 입력해주세요.",
+  },
+  detail_shorts2: {
+    lastWorkDay: "마지막 근무일을 선택해주세요.",
+    age: "생년월일을 선택해주세요.",
+    disabled: "장애여부를 선택해주세요.",
+    sumOneYearPay: "퇴직 전 12개월 급여 총액을 입력해주세요.",
+    sumWorkDay: "고용 보험 총 기간을 입력해주세요.",
   },
   detail_veryshorts: {
     enterDay: "입사일을 선택해주세요.",
@@ -98,6 +154,7 @@ const valid_null_check_message: any = {
   multi_one: {
     age: "생년월일을 선택해주세요.",
     disabled: "장애여부를 선택해주세요.",
+    companys_list: "두 개 이상의 근무 정보가 필요합니다.",
   },
 };
 
@@ -105,9 +162,12 @@ const null_check_rules = (
   type:
     | "standad"
     | "detail_standad"
-    | "detail_dayjob"
-    | "detail_art"
-    | "detail_shorts"
+    | "detail_dayjob1"
+    | "detail_dayjob2"
+    | "detail_art1"
+    | "detail_art2"
+    | "detail_shorts1"
+    | "detail_shorts2"
     | "detail_veryshorts"
     | "detail_employ"
     | "multi_one",
@@ -117,6 +177,7 @@ const null_check_rules = (
   null_check_list[type].forEach((el: string) => {
     console.log("null_check", to_server[el]);
     console.log("to_server", to_server);
+    console.log(type);
     if (to_server[el] === null || to_server[el] === undefined) {
       CreatePopup(
         undefined,
@@ -148,60 +209,85 @@ export const CheckValiDation = (
   type:
     | "standad"
     | "detail_standad"
-    | "detail_dayjob"
-    | "detail_art"
-    | "detail_shorts"
+    | "detail_dayjob1"
+    | "detail_dayjob2"
+    | "detail_art1"
+    | "detail_art2"
+    | "detail_shorts1"
+    | "detail_shorts2"
     | "detail_veryshorts"
     | "detail_employ"
     | "multi_one",
   to_server: any
 ) => {
   let answer = true;
-  console.log("type", type);
-  console.log("to_server", to_server);
   if (type === "standad") {
     if (!null_check_rules(type, to_server)) answer = false;
     if (!retired_day_rules(to_server["retiredDay"], to_server["enterDay"]))
       answer = false;
   }
-
   if (type === "detail_standad") {
     if (!null_check_rules(type, to_server)) answer = false;
     if (!retired_day_rules(to_server["retiredDay"], to_server["enterDay"]))
       answer = false;
   }
-
-  if (type === "detail_dayjob") {
+  if (type === "detail_dayjob1") {
     if (!null_check_rules(type, to_server)) answer = false;
     if (!retired_day_rules(to_server["retiredDay"], to_server["enterDay"]))
       answer = false;
   }
-
-  if (type === "detail_art") {
+  if (type === "detail_dayjob2") {
     if (!null_check_rules(type, to_server)) answer = false;
     if (!retired_day_rules(to_server["retiredDay"], to_server["enterDay"]))
       answer = false;
   }
-
+  if (type === "detail_art1") {
+    if (!null_check_rules(type, to_server)) answer = false;
+    if (!retired_day_rules(to_server["retiredDay"], to_server["enterDay"]))
+      answer = false;
+  }
+  if (type === "detail_art2") {
+    if (!null_check_rules(type, to_server)) answer = false;
+    if (!retired_day_rules(to_server["retiredDay"], to_server["enterDay"]))
+      answer = false;
+  }
   if (type === "detail_veryshorts") {
     if (!null_check_rules(type, to_server)) answer = false;
     if (!retired_day_rules(to_server["retiredDay"], to_server["enterDay"]))
       answer = false;
   }
-
   if (type === "detail_employ") {
     if (!null_check_rules(type, to_server)) answer = false;
     if (!retired_day_rules(to_server["retiredDay"], to_server["enterDay"]))
       answer = false;
   }
-
-  if (type === "detail_shorts") {
+  if (type === "detail_shorts1") {
+    if (!null_check_rules(type, to_server)) answer = false;
+    if (!retired_day_rules(to_server["retiredDay"], to_server["enterDay"]))
+      answer = false;
+  }
+  if (type === "detail_shorts2") {
     if (!null_check_rules(type, to_server)) answer = false;
     if (!retired_day_rules(to_server["retiredDay"], to_server["enterDay"]))
       answer = false;
   }
   if (type === "multi_one") {
-    if (!null_check_rules(type, to_server)) answer = false;
+    if (!null_check_rules(type, to_server)) {
+      answer = false;
+    } else {
+      const companys_list = to_server?.companys_list?.filter((el: any) => {
+        return el.emoticon;
+      });
+      if (companys_list.length < 2) {
+        CreatePopup(
+          undefined,
+          valid_null_check_message[type]["companys_list"],
+          "only_check",
+          () => ClosePopup()
+        );
+        answer = false;
+      }
+    }
   }
 
   return answer;

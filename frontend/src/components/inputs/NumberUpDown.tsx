@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { ChangeEvent, useState } from "react";
 import IMGDown from "../../assets/image/new/select_icon_normal.svg";
 import "../../styles/numberupdown.css";
 
@@ -15,23 +15,32 @@ const NumberUpDown = ({
   unit?: string;
   label_unit?: string;
 }) => {
-  const [count, setCount] = useState(0);
+  const [count, setCount] = useState<number | "">(0);
   const onClickCount = (is_updown: boolean) => {
+    if (count === "") {
+      setCount(0);
+    }
+    if (typeof count !== "number") return;
     if (is_updown) {
-      setCount((prev) => {
+      setCount((prev: number | "") => {
         if (prev === 100) return 100;
-        return prev + 1;
+        return typeof prev === "number" ? prev + 1 : "";
       });
     } else {
-      setCount((prev) => {
+      setCount((prev: number | "") => {
         if (prev === 0) return 0;
-        return prev - 1;
+        return typeof prev === "number" ? prev - 1 : "";
       });
     }
     callBack(params, count + 1);
   };
+  const onChangeInput = (e: ChangeEvent<HTMLInputElement>) => {
+    if (isNaN(Number(e.currentTarget.value))) return;
+    callBack(params, Number(e.currentTarget.value));
+    setCount(Number(e.currentTarget.value));
+  };
   return (
-    <div>
+    <>
       {label && (
         <label className="write_label fs_16">
           {label}
@@ -48,7 +57,15 @@ const NumberUpDown = ({
         <div
           className={`num_updown_unitbox fs_14 ${count !== 0 ? "active" : ""}`}
         >
-          <div className="fs_14">{count}</div>
+          <input
+            type="text"
+            onFocus={() => {
+              setCount("");
+            }}
+            onChange={onChangeInput}
+            value={count}
+            className={`fs_14 ${count !== 0 ? "active" : ""}`}
+          />
           <div className="fs_14">{unit}</div>
         </div>
         <button
@@ -58,7 +75,7 @@ const NumberUpDown = ({
           <img src={IMGDown} alt="number up" />
         </button>
       </div>
-    </div>
+    </>
   );
 };
 

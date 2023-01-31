@@ -267,11 +267,12 @@ export const ResultComp = ({
   result_data,
   back_func,
 }: {
-  cal_type: 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | "basic" | "multi";
+  cal_type: 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | "basic" | "multi" | "leastPay";
   result_data: any;
   back_func: () => void;
 }) => {
   const [next, setNext] = useState(false);
+  console.log("result_data", result_data);
   return (
     <>
       <Header
@@ -290,6 +291,72 @@ export const ResultComp = ({
         />
       ) : (
         <>
+          {cal_type === "leastPay" && (
+            // 최저 월급 계산기
+            <>
+              <div id="least_container" className="full_height_layout">
+                <h3 id="least_title" className="fs_16">
+                  최저월급계산기
+                </h3>
+                <div className="txt_ct">
+                  <img
+                    id="result_emoticon"
+                    src={EMTDetailFullTimeSupply}
+                    alt="Result Emoticon"
+                  />
+                </div>
+                <div className="public_side_padding">
+                  <h3 className="fs_18 lh_27 font_family_bold txt_ct">
+                    최저월급은 이 만큼 받아요
+                  </h3>
+                  <div id="least_info_box" className="txt_ct">
+                    <div className="fs_16 font_family_bold">주 40시간</div>
+                    <div className="fs_16 font_family_bold">주 5일</div>
+                  </div>
+                  <div
+                    id="severance_pay_box"
+                    className="bg_color_main font_color_white"
+                  >
+                    최저 월급 :
+                    <span className="fs_25  font_color_white">
+                      {result_data?.toLocaleString()}
+                    </span>
+                    원
+                  </div>
+                  <div
+                    id="severance_pay_box"
+                    className="bg_color_main font_color_white"
+                  >
+                    최저 일급 :
+                    <span className="fs_25  font_color_white">
+                      {result_data?.toLocaleString()}
+                    </span>
+                    원
+                  </div>
+                  <div
+                    id="severance_pay_box"
+                    className="bg_color_main font_color_white"
+                  >
+                    최저 시급 :
+                    <span className="fs_25  font_color_white">
+                      {result_data?.toLocaleString()}
+                    </span>
+                    원
+                  </div>
+                  <div id="result_guide_comment02">
+                    <div className="fs_10">
+                      계약 내용 등 구체적인 사정에 따라 결과가 달라질 수
+                      있습니다.
+                    </div>
+                    <div className="fs_10">
+                      정확한 결과를 확인하시기 위해서는 관할 고용센터로
+                      문의하시기 바랍니다.
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </>
+          )}
           {cal_type === "multi" &&
             // 복수형
             (result_data.succ ? (
@@ -443,23 +510,24 @@ export const ResultComp = ({
         </>
       )}
       <div id="result_button_container">
-        {cal_type !== "basic" &&
-          !next &&
-          (result_data.succ ? (
-            <Button
-              text={"N달 더 일하면?"}
-              type="popup_cancel"
-              click_func={() => setNext(true)}
-            />
-          ) : (
-            <Link to="/multi">
+        {cal_type === "leastPay" ||
+          (cal_type !== "basic" &&
+            !next &&
+            (result_data.succ ? (
               <Button
-                text={"복수형 계산기로"}
+                text={"N달 더 일하면?"}
                 type="popup_cancel"
-                click_func={() => {}}
+                click_func={() => setNext(true)}
               />
-            </Link>
-          ))}
+            ) : (
+              <Link to="/multi">
+                <Button
+                  text={"복수형 계산기로"}
+                  type="popup_cancel"
+                  click_func={() => {}}
+                />
+              </Link>
+            )))}
         <Link to="/main">
           <Button text="홈으로" type="popup_ok" click_func={() => {}} />
         </Link>

@@ -98,13 +98,9 @@ const PrevCal = () => {
                 <div className="font_family_bold">
                   대상여부 : <div className="font_color_main">{el.succ}</div>
                 </div>
-                {el.succ === "대상자" ? (
+                {el.succ === "대상자" && (
                   <div className="font_family_bold">
                     금액 : <div>{el.severancePay?.toLocaleString()}원</div>
-                  </div>
-                ) : (
-                  <div className="font_family_bold">
-                    사유 : <div>근무일수 부족</div>
                   </div>
                 )}
                 <div className="cal_reacor_btncontainer">

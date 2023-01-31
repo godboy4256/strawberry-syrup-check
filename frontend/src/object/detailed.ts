@@ -1,8 +1,10 @@
 import { Dispatch, SetStateAction } from "react";
+import { DetailConfirmPopup } from "../components/calculator/confirmPopup";
+import { ClosePopup, CreatePopup } from "../components/common/Popup";
 import { getAge, GetDateArr } from "../utils/date";
 import { sendToServer } from "../utils/sendToserver";
 import { CheckValiDation } from "../utils/validate";
-import { DetailPathCal } from "./common";
+import { DetailPathCal, getTotalWorkDaysAgo } from "./common";
 import InputHandler from "./Inputs";
 
 class DetailedHandler extends InputHandler {
@@ -62,7 +64,7 @@ class DetailedHandler extends InputHandler {
   ) => {
     let answer = 0,
       notOverTen = 0;
-
+    if (!workRecord) return;
     if (type === "pay") {
       workRecord.forEach((year) => {
         year.months.forEach((el) => {
@@ -243,12 +245,19 @@ class DetailedHandler extends InputHandler {
         ? {
             isMany: this._Data.cal_state === "multi" ? true : false,
             isSpecial: false,
-            hasWork: this._Data.hasWork ? this._Data.hasWork : true,
+            hasWork:
+              this._Data.input === "결과만 입력"
+                ? true
+                : this._Data.hasWork !== null
+                ? this._Data.hasWork
+                : null,
             enrollDay: this._Data.planToDo,
             lastWorkDay: this._Data.lastWorkDay,
             sumWorkDay:
               this._Data.input === "결과만 입력"
-                ? this._Data.employ_month + this._Data.employ_year * 12
+                ? isNaN(this._Data.employ_month + this._Data.employ_year * 12)
+                  ? null
+                  : this._Data.employ_month + this._Data.employ_year * 12
                 : this.sumCal("sumWorkDay", this._Data.workRecord),
             sumTwoYearWorkDay: this._Data.workRecord
               ? this.sumCal("twoYear", this._Data.workRecord)
@@ -268,7 +277,12 @@ class DetailedHandler extends InputHandler {
           }
         : workCate === 6 // 일용직
         ? {
-            hasWork: this._Data.hasWork ? this._Data.hasWork : false,
+            hasWork:
+              this._Data.input === "결과만 입력"
+                ? true
+                : this._Data.hasWork !== null
+                ? this._Data.hasWork
+                : null,
             enrollDay: this._Data.planToDo,
             dayWorkTime: this._Data.dayWorkTime
               ? Number(this._Data.dayWorkTime.split("시간")[0])
@@ -305,7 +319,7 @@ class DetailedHandler extends InputHandler {
           }
         : workCate === 8 // 자영업자
         ? {
-            isEnd: true, // 서버에 없앨 것을 요청
+            isEnd: true,
             enterDay: this._Data.enterDay,
             retiredDay: this._Data.retiredDay,
             insuranceGrade:
@@ -322,41 +336,103 @@ class DetailedHandler extends InputHandler {
                 : null,
           }
         : {};
-    // const validCheckType =
-    //   this._Data.workCate === 0 || this._Data.workCate === 1
-    //     ? "detail_standad"
-    //     : this._Data.workCate === 3 || this._Data.workCate === 4
-    //     ? this._Data.is_short === "단기예술인" ||
-    //       this._Data.is_short === "단기특고"
-    //       ? "detail_shorts"
-    //       : "detail_art"
-    //     : this._Data.workCate === 2
-    //     ? "detail_dayjob"
-    //     : this._Data.workCate === 5
-    //     ? "detail_veryshorts"
-    //     : this._Data.workCate === 6 && "detail_employ";
-
-    // if (
-    //   !CheckValiDation(
-    //     validCheckType ? validCheckType : "standad",
-    //     to_server_datas
-    //   )
-    // )
-    //   return;
     if (this._Data.workCate === 3 || this._Data.workCate === 4) {
       this.result["is_short"] = this._Data.is_short;
     }
-    if (this._Data.cal_state !== "multi") {
-      this.setCompState && this.setCompState(5);
-      setTimeout(() => {
-        this.setCompState && this.setCompState(4);
-      }, 1000);
+    if (
+      this._Data.input === "개별 입력" &&
+      this._Data.cal_state === "multi" &&
+      workCate === 6
+    ) {
+      this.SetPageVal(
+        "dayJobPermitDay",
+        getTotalWorkDaysAgo(this._Data.lastWorkDay, this._Data.workRecord, 18)
+      );
+    }
+    if (
+      this._Data.input === "개별 입력" &&
+      this._Data.cal_state === "multi" &&
+      (workCate === 4 || workCate === 5)
+    ) {
+      this.SetPageVal(
+        "shortsPermitDay",
+        this.sumCal("twoYear", this._Data.workRecord)
+      );
     }
     const url = DetailPathCal(workCate);
     const to_servers = { ...to_server_common, ...to_server_datas };
-    return this._Data.cal_state !== "multi"
-      ? sendToServer(url ? url : "", to_servers)
-      : to_servers;
+    let checkValidationType: any =
+      workCate === 0 || workCate === 1
+        ? "detail_standad"
+        : workCate === 2
+        ? "detail_art1"
+        : workCate === 3
+        ? "detail_art2"
+        : workCate === 4 || workCate === 5
+        ? "detail_shorts1"
+        : workCate === 6
+        ? "detail_dayjob1"
+        : workCate === 7
+        ? "detail_veryshorts"
+        : workCate === 8 && "detail_employ";
+
+    if (workCate === 4 || workCate === 5) {
+      if (this._Data.input === "결과만 입력") {
+        checkValidationType = "detail_shorts2";
+      }
+    }
+    if (workCate === 6) {
+      if (this._Data.input === "결과만 입력") {
+        checkValidationType = "detail_dayjob2";
+      }
+    }
+
+    if (this._Data.cal_state === "multi") {
+      to_servers.disabled = true;
+      to_servers.age = 25;
+    }
+
+    if (
+      !CheckValiDation(
+        checkValidationType ? checkValidationType : "detail_standad",
+        to_servers
+      )
+    )
+      return;
+
+    this.SetPageVal("confirm_popup_result", to_servers);
+    CreatePopup(
+      "입력하신 정보가 맞습니까?",
+      DetailConfirmPopup(to_servers),
+      "confirm",
+      async () => {
+        if (this._Data.cal_state === "multi") {
+          ClosePopup();
+          this.setCompState && this.setCompState(1);
+        } else {
+          const res = await sendToServer(url ? url : "", to_servers);
+          if (res.statusCode === 400 || res.mesg) {
+            CreatePopup(
+              undefined,
+              res.mesg ? res.mesg : res.message,
+              "only_check"
+            );
+          } else {
+            ClosePopup();
+            this.setCompState && this.setCompState(5);
+            setTimeout(() => {
+              this.setCompState && this.setCompState(4);
+            }, 1000);
+            this.SetPageVal("allresult", res);
+          }
+        }
+      },
+      () => {},
+      "예",
+      "아니오"
+    );
+
+    return this._Data.cal_state === "multi" ? to_servers : null;
   };
 }
 
