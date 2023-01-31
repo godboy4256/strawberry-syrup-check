@@ -40,12 +40,14 @@ const CheckBoxInput = ({
   label,
   params,
   callBack,
+  selected,
 }: {
   options: string[];
   type: "box_type" | "radio_box_type" | "circle_type" | "is_true_type";
   label?: string;
   params: string;
   callBack: CallableFunction;
+  selected?: string;
 }) => {
   checkList = [];
   return (

@@ -60,6 +60,9 @@
   margin-bottom: 15px;
   text-align: center;
 }
+#least_container #min_worktime_pay {
+  margin-bottom: 5px;
+}
 #severance_pay_box {
   padding: 8px 15px;
   line-height: 37.5px;

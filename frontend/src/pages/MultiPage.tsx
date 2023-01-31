@@ -8,7 +8,7 @@ import {
 } from "react";
 import CalContainer from "../components/calculator/CalContainer";
 import { WorkCatePopup } from "../components/calculator/WorkTypes";
-import { ClosePopup } from "../components/common/Popup";
+import { ClosePopup, CreatePopup } from "../components/common/Popup";
 import Button from "../components/inputs/Button";
 import Header from "../components/layout/Header";
 import DetailedHandler from "../object/detailed";
@@ -29,8 +29,6 @@ import CheckBoxInput from "../components/inputs/Check";
 import { DateInputNormal } from "../components/inputs/Date";
 import { DetailPathCal } from "../object/common";
 import { CheckValiDation } from "../utils/validate";
-import { DetailConfirmPopup } from "../components/calculator/confirmPopup";
-import InputHandler from "../object/Inputs";
 
 interface Company {
   id: number;
@@ -82,11 +80,6 @@ class MultiCalHandler extends DetailedHandler {
       }
     });
     this.SetPageVal("companys_list", select_company);
-    // if (to_server_unit.hasOwnProperty("succ")) {
-    //   this.setCompState && this.setCompState(1);
-    // } else {
-    //   return;
-    // }
   };
 }
 
@@ -231,12 +224,16 @@ const _MultiMainDataSelect = () => {
               : "/multi",
             multi_to_server
           );
-          handler.setCompState && handler.setCompState(5);
-          setTimeout(() => {
-            handler.setCompState && handler.setCompState(4);
-          }, 1000);
-          handler.SetPageVal("result", result);
-          calRecording(result, "복수형");
+          if (result) {
+            handler.setCompState && handler.setCompState(5);
+            setTimeout(() => {
+              handler.setCompState && handler.setCompState(4);
+            }, 1000);
+            handler.SetPageVal("result", result);
+            calRecording(result, "복수형");
+          } else {
+            CreatePopup(undefined, "잘못된 계산입니다.", "only_check");
+          }
         }}
       />
     </div>
@@ -338,6 +335,7 @@ const _MultiCompanyList = () => {
           params="age_multi"
           label="생년월일"
           callBack={handler.SetPageVal}
+          selected={""}
           year={Year_Option_Generater(73)}
         />
         <CheckBoxInput
@@ -345,6 +343,7 @@ const _MultiCompanyList = () => {
           params="disabled_multi"
           callBack={handler.SetPageVal}
           label="장애여부"
+          selected={""}
           options={["장애인", "비장애인"]}
         />
       </div>
