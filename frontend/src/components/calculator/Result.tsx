@@ -266,10 +266,14 @@ export const ResultComp = ({
   cal_type,
   result_data,
   back_func,
+  weekTime,
+  weekDay,
 }: {
   cal_type: 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | "basic" | "multi" | "leastPay";
   result_data: any;
   back_func: () => void;
+  weekTime?: number;
+  weekDay?: number;
 }) => {
   const [next, setNext] = useState(false);
   console.log("result_data", result_data);
@@ -310,8 +314,13 @@ export const ResultComp = ({
                     최저월급은 이 만큼 받아요
                   </h3>
                   <div id="least_info_box" className="txt_ct">
-                    <div className="fs_16 font_family_bold">주 40시간</div>
-                    <div className="fs_16 font_family_bold">주 5일</div>
+                    <div className="fs_16 font_family_bold">
+                      주 {weekTime}시간
+                    </div>
+                    <div className="fs_16 font_family_bold">주 {weekDay}일</div>
+                  </div>
+                  <div id="min_worktime_pay" className="fs_14">
+                    최저 시급 : 9620 원
                   </div>
                   <div
                     id="severance_pay_box"
@@ -319,7 +328,7 @@ export const ResultComp = ({
                   >
                     최저 월급 :
                     <span className="fs_25  font_color_white">
-                      {result_data?.toLocaleString()}
+                      {result_data?.leastMonthPay?.toLocaleString()}
                     </span>
                     원
                   </div>
@@ -329,17 +338,7 @@ export const ResultComp = ({
                   >
                     최저 일급 :
                     <span className="fs_25  font_color_white">
-                      {result_data?.toLocaleString()}
-                    </span>
-                    원
-                  </div>
-                  <div
-                    id="severance_pay_box"
-                    className="bg_color_main font_color_white"
-                  >
-                    최저 시급 :
-                    <span className="fs_25  font_color_white">
-                      {result_data?.toLocaleString()}
+                      {result_data?.dayPay?.toLocaleString()}
                     </span>
                     원
                   </div>
@@ -512,6 +511,7 @@ export const ResultComp = ({
       <div id="result_button_container">
         {cal_type === "leastPay" ||
           (cal_type !== "basic" &&
+            cal_type !== "multi" &&
             !next &&
             (result_data.succ ? (
               <Button

@@ -358,6 +358,7 @@ export const DateInputNormal = ({
   year,
   placeholder,
   callBack,
+  selected,
 }: {
   params?: string;
   label?: string;
@@ -366,6 +367,7 @@ export const DateInputNormal = ({
   year?: any;
   placeholder?: string;
   callBack?: CallableFunction | undefined;
+  selected?: string;
 }) => {
   const handler = new DateHandler({});
   const [dateValue, setDateValue] = useState("");

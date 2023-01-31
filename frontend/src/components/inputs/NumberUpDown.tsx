@@ -8,12 +8,16 @@ const NumberUpDown = ({
   callBack,
   unit,
   label_unit,
+  max_num,
+  updown_unit,
 }: {
   label?: string;
   params: string;
   callBack: CallableFunction;
   unit?: string;
   label_unit?: string;
+  max_num?: number;
+  updown_unit?: number;
 }) => {
   const [count, setCount] = useState<number | "">(0);
   const onClickCount = (is_updown: boolean) => {
@@ -22,16 +26,26 @@ const NumberUpDown = ({
     }
     if (typeof count !== "number") return;
     if (is_updown) {
+      if (max_num && max_num - 1 < count) return;
       setCount((prev: number | "") => {
         if (prev === 100) return 100;
-        return typeof prev === "number" ? prev + 1 : "";
+        if (updown_unit) {
+          return typeof prev === "number" ? prev + updown_unit : "";
+        } else {
+          return typeof prev === "number" ? prev + 1 : "";
+        }
       });
     } else {
       setCount((prev: number | "") => {
         if (prev === 0) return 0;
-        return typeof prev === "number" ? prev - 1 : "";
+        if (updown_unit) {
+          return typeof prev === "number" ? prev - updown_unit : "";
+        } else {
+          return typeof prev === "number" ? prev - 1 : "";
+        }
       });
     }
+
     callBack(params, count + 1);
   };
   const onChangeInput = (e: ChangeEvent<HTMLInputElement>) => {

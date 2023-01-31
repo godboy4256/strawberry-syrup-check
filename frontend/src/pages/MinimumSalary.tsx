@@ -7,6 +7,7 @@ import "../styles/minumum_saraly.css";
 import { ResultComp } from "../components/calculator/Result";
 import { Dispatch, SetStateAction, useEffect, useState } from "react";
 import Loading from "../components/common/Loading";
+import { CreatePopup } from "../components/common/Popup";
 
 class MinimumSalaryHandler extends InputHandler {
   public setCompState: Dispatch<SetStateAction<number>> | undefined = undefined;
@@ -15,14 +16,18 @@ class MinimumSalaryHandler extends InputHandler {
       workHour: this._Data.workHour,
       workMin: this._Data.workMin,
       workDay: this._Data.workDay,
-      pay: 12000,
+      pay: 9620,
     };
-    const result = await sendToServer("/leastPay", to_server);
-    this.SetPageVal("result", result);
-    this.setCompState && this.setCompState(2);
-    setTimeout(() => {
-      this.setCompState && this.setCompState(1);
-    }, 1000);
+    const res = await sendToServer("/leastPay", to_server);
+    if (res.statusCode === 400 || res.mesg) {
+      CreatePopup(undefined, res.mesg ? res.mesg : res.message, "only_check");
+    } else {
+      this.SetPageVal("result", res);
+      this.setCompState && this.setCompState(2);
+      setTimeout(() => {
+        this.setCompState && this.setCompState(1);
+      }, 1000);
+    }
   };
 }
 
@@ -50,11 +55,14 @@ const MinimumSalary = () => {
                   <NumberUpDown
                     params="workHour"
                     label="근무시간"
-                    label_unit="주"
+                    label_unit="일"
                     unit="시간"
+                    max_num={8}
                     callBack={handler.SetPageVal}
                   />
                   <NumberUpDown
+                    updown_unit={10}
+                    max_num={60}
                     params="workMin"
                     unit="분"
                     callBack={handler.SetPageVal}
@@ -80,6 +88,8 @@ const MinimumSalary = () => {
               result_data={handler.GetPageVal("result")}
               cal_type="leastPay"
               back_func={() => handler.setCompState && handler.setCompState(0)}
+              weekTime={handler._Data.workDay * handler._Data.workHour}
+              weekDay={handler._Data.workDay}
             />
           )}
         </>
