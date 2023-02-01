@@ -158,12 +158,8 @@ export function sumDayJobWorkingDay(workRecord: any[], isSimple: boolean = false
 }
 export function calDayJobPay(dayAvgPay: number, dayWorkTime: number, is2023: boolean = false) {
 	let realDayPay = Math.ceil(dayAvgPay * 0.6);
-	const highLimit = is2023
-		? Math.floor(66000 * Math.floor(dayWorkTime / 8))
-		: Math.floor(66000 * Math.floor(dayWorkTime / 8));
-	const lowLimit = is2023
-		? Math.floor(61568 * Math.floor(dayWorkTime / 8))
-		: Math.floor(60120 * Math.floor(dayWorkTime / 8));
+	const highLimit = is2023 ? Math.ceil(66000 * (dayWorkTime / 8)) : Math.ceil(66000 * (dayWorkTime / 8));
+	const lowLimit = is2023 ? Math.ceil(61568 * (dayWorkTime / 8)) : Math.ceil(60120 * (dayWorkTime / 8));
 
 	if (realDayPay > highLimit) realDayPay = highLimit;
 	if (realDayPay < lowLimit) realDayPay = lowLimit;
