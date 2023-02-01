@@ -46,7 +46,7 @@ server.get("/robots.txt", (req, res) => res.sendFile("robots.txt"));
 server.register(routes);
 
 function serverStart() {
-	server.listen({ port: 8000, host: "0.0.0.0" }, (err, addr) => {
+	server.listen({ port: 8080, host: "0.0.0.0" }, (err, addr) => {
 		if (err) {
 			console.error('ERROR AT "Listen"', err);
 			process.exit(1);
