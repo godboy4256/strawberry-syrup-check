@@ -1,4 +1,4 @@
-export const GetDateArr = (targetDate: Date | null) => {
+export const GetDateArr = (targetDate: Date | null | string) => {
   const date = targetDate ? new Date(targetDate) : new Date();
   return [date.getFullYear(), date.getMonth() + 1, date.getDate()];
 };
