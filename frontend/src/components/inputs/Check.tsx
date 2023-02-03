@@ -1,4 +1,4 @@
-import { Fragment, useState } from "react";
+import { Fragment, useEffect, useState } from "react";
 import "../../styles/checkbox.css";
 
 let checkList: string[] = [];
@@ -49,7 +49,6 @@ const CheckBoxInput = ({
   callBack: CallableFunction;
   selected?: string;
 }) => {
-  checkList = [];
   return (
     <>
       {label && <div className="fs_16 write_label">{label}</div>}
@@ -82,7 +81,10 @@ const CheckBoxInput = ({
                       type="radio"
                       name={label ? label : "any_radios"}
                       className="checkbox_list"
-                      onChange={() => callBack(params, el)}
+                      defaultChecked={selected === el ? true : false}
+                      onChange={() => {
+                        callBack(params, el);
+                      }}
                     />
                     <span className="check_mark"></span>
                   </div>

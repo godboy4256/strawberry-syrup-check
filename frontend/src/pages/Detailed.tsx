@@ -1,113 +1,25 @@
 import { ReactElement, useEffect, useState } from "react";
 import CalIsRetiree from "../components/calculator/IsRetiree";
-import {
-  DateInputIndividual,
-  DateInputNormal,
-} from "../components/inputs/Date";
+import { DateInputNormal } from "../components/inputs/Date";
 import Header from "../components/layout/Header";
 import SelectInput from "../components/inputs/Select";
 import TabInputs from "../components/inputs/TabInputs";
 import DetailedHandler from "../object/detailed";
 import WorkTypes, { jobCates } from "../components/calculator/WorkTypes";
 import { Year_Option_Generater } from "../utils/date";
-import { ClosePopup, CreatePopup } from "../components/common/Popup";
 import NumberInput from "../components/inputs/Pay";
 import NumberUpDown from "../components/inputs/NumberUpDown";
 import Button from "../components/inputs/Button";
-import InputHandler from "../object/Inputs";
 import { ResultComp } from "../components/calculator/Result";
 import CalContainer from "../components/calculator/CalContainer";
 import Loading from "../components/common/Loading";
-import "./../styles/detail.css";
 import { calRecording } from "../utils/calrecord";
 import CheckBoxInput from "../components/inputs/Check";
 import { DetailConfirmPopup } from "../components/calculator/confirmPopup";
+import WorkRecordGen from "../components/calculator/workRecordGen";
+import "./../styles/detail.css";
 
-class IndividualInputClass extends InputHandler {
-  public _Data_arr: any = [];
-}
-
-const handler2: any = new IndividualInputClass({});
 const handler: any = new DetailedHandler({});
-
-const IndividualInput = ({
-  label = "개별 입력란",
-  description,
-  handler,
-}: {
-  label?: string;
-  description: string[];
-  handler?: any;
-}) => {
-  useEffect(() => {
-    handler2._Data_arr = [];
-  }, []);
-
-  const current_year_list = Year_Option_Generater(10);
-  const [selectYears, setSelectYears] = useState<string[]>([]);
-  const onClickPopUpDate = (year: string) => {
-    if (!handler.GetPageVal("lastWorkDay")) {
-      CreatePopup(undefined, "마지막 근무일을 선택해주세요", "only_check");
-    } else {
-      CreatePopup(
-        `${String(year)}년`,
-        <DateInputIndividual
-          type={handler.GetPageVal("workCate")}
-          handler={handler2}
-          lastWorkDay={handler.GetPageVal("lastWorkDay")}
-          year={year}
-        />,
-        "confirm",
-        () => {
-          const months = Object.keys(handler2._Data).map((el) => {
-            return handler2._Data[el];
-          });
-          if (selectYears.includes(year)) {
-            handler2._Data_arr = handler2._Data_arr.filter((el: any) => {
-              return String(el.year) !== year;
-            });
-          }
-          handler2._Data_arr.push({
-            year: Number(year),
-            months,
-          });
-          handler.SetPageVal("workRecord", handler2._Data_arr);
-          setSelectYears(
-            handler2._Data_arr.map((el: any) => {
-              return String(el.year);
-            })
-          );
-          ClosePopup();
-        }
-      );
-    }
-  };
-  return (
-    <>
-      <label className="fs_16 write_label">{label}</label>
-      <div className="lndividual_input_container flex_box">
-        {current_year_list.map((el: string) => {
-          return (
-            <div
-              onClick={() => onClickPopUpDate(el)}
-              key={String(Date.now()) + el}
-              className={`fs_16 pd_810 ${
-                selectYears.includes(el) ? "select" : ""
-              }`}
-            >
-              {el}
-            </div>
-          );
-        })}
-      </div>
-      {description.map((el) => {
-        return (
-          <div key={String(Date.now()) + el} className="fs_10">{`* ${el}`}</div>
-        );
-      })}
-    </>
-  );
-};
 
 const _Belong_Form_Tab = ({
   label,
@@ -256,10 +168,7 @@ const _DetailCalDayJob = ({ handler }: { handler: any }) => {
               label="신청 예정일"
               callBack={handler.SetPageVal}
             />
-            <IndividualInput
-              description={["근무한 연월의 정보만 입력하시면 됩니다."]}
-              handler={handler}
-            />
+            <WorkRecordGen handler={handler} type="dayJob" />
             <DateInputNormal
               params="isOverTen"
               label="최근 근로일 정보"
@@ -390,10 +299,7 @@ const _DetailCalArt = ({ handler }: { handler: any }) => {
                 label="마지막 근무일"
                 callBack={handler.SetPageVal}
               />
-              <IndividualInput
-                description={["근무한 연월의 정보만 입력하시면 됩니다."]}
-                handler={handler}
-              />
+              <WorkRecordGen handler={handler} type="shorts" />
               <DateInputNormal
                 label="신청 예정일"
                 params="planToDo"
@@ -414,7 +320,6 @@ const _DetailCalArt = ({ handler }: { handler: any }) => {
                 label="마지막 근무일"
                 callBack={handler.SetPageVal}
               />
-
               <NumberInput
                 params={["employ_year", "employ_month"]}
                 label="고용보험 총 기간"

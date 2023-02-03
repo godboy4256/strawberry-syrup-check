@@ -88,7 +88,9 @@ export const DetailConfirmPopup = (confirm_data: any) => {
           <div>
             마지막 근무시간 : <div>{confirm_data?.dayWorkTime}</div>
           </div>
-          <div>1일 평균임금 : {}</div>
+          <div>
+            1일 평균임금 : <div>{confirm_data?.datAvgPay}</div>
+          </div>
         </>
       )}
       {confirm_data?.workCate === 7 && (

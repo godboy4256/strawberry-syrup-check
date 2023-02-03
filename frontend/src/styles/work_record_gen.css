@@ -1,0 +1,134 @@
+.lndividual_input_container {
+  flex-wrap: wrap;
+  margin-bottom: 5px;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.2);
+  border-right: 1px solid rgba(0, 0, 0, 0.2);
+}
+.date_indiviual_container {
+  width: 340px;
+  padding: 30px 45px;
+}
+.indiviual_input_header {
+  width: 100%;
+  background-color: #ffe3e2;
+  text-align: center;
+  font-size: 14px;
+  line-height: 21px;
+  padding: 11px 10px;
+  line-height: 21px;
+  border-top: 1px solid rgba(0, 0, 0, 0.2);
+}
+.lndividual_input_container > div {
+  width: 20%;
+  border: 1px solid rgba(0, 0, 0, 0.2);
+  text-align: center;
+  color: rgba(0, 0, 0, 0.2);
+  border-bottom: none;
+  border-right: none;
+}
+.date_indiviual_page {
+  width: 100%;
+  flex: none;
+  border-left: 1px solid #ccc;
+  border-right: 1px solid #ccc;
+  border-bottom: 1px solid #ccc;
+}
+.lndividual_input_container > div.select {
+  border: 1px solid #ff493a;
+  color: #ff493a;
+}
+.indiviual_input_container input {
+  padding: 11px 10px;
+  text-align: center;
+  line-height: 21px;
+  font-size: 14px;
+  width: 100%;
+  border-top: 1px solid rgba(0, 0, 0, 0.2);
+  color: #ff493a;
+  border-right: 1px solid #ccc;
+}
+.indiviual_input_container:nth-child(2n) input {
+  border-right: none;
+}
+.indiviual_input_container input.total {
+  padding: 4px 10px;
+}
+#date_indiviual_dayjob {
+  overflow: hidden;
+}
+#date_indiviual_shorts > div,
+#date_indiviual_dayjob > div {
+  display: flex;
+  position: relative;
+  align-items: center;
+}
+#date_indiviual_shorts,
+#date_indiviual_dayjob {
+  overflow: hidden;
+}
+#date_indiviual_shorts > div,
+#date_indiviual_dayjob > div {
+  display: flex;
+  position: relative;
+  align-items: center;
+}
+#date_indiviual_shorts .indiviual_input_container {
+  width: 50%;
+}
+#date_indiviual_shorts .date_indiviual_page {
+  display: flex;
+  flex-wrap: wrap;
+}
+#date_indiviual_shorts .indiviual_input_header {
+  color: rgba(0, 0, 0, 0.6);
+  border-right: 1px solid #ccc;
+}
+.indiviual_input_header.total {
+  padding: 4px 10px;
+}
+.indiviual_input_header.unset_header {
+  background-color: #c5c5c5;
+  color: #a3a3a3;
+  border-bottom: 1px solid #ccc;
+  padding: 4px 10px;
+}
+#date_indiviual_shorts
+  .indiviual_input_container:nth-child(2n)
+  .indiviual_input_header,
+#date_indiviual_shorts .indiviual_input_container:nth-child(2n) .unset_box {
+  border-right: none;
+}
+#date_indiviual_shorts .indiviual_input_header,
+#date_indiviual_shorts .date_indiviual_page input {
+  padding: 8px 10px;
+  font-size: 16px;
+  line-height: 24px;
+}
+#date_indiviual_shorts .unset_box {
+  font-size: 0;
+  padding: 8px 10px;
+}
+.unset_box {
+  line-height: 21px;
+  font-size: 0;
+  border-bottom: 1px solid #ccc;
+  border-right: 1px solid #ccc;
+}
+.unset_box:last-child {
+  border-bottom: none;
+}
+#date_indiviual_dayjob .unset_box {
+  padding: 4px 10px;
+}
+.date_indiviual_prev,
+.date_indiviual_next {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+}
+.date_indiviual_prev {
+  left: 15px;
+}
+.date_indiviual_next {
+  right: 15px;
+}

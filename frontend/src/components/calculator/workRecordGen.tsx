@@ -1,0 +1,354 @@
+import {
+  GetDateArr,
+  Month_Calculator,
+  Year_Option_Generater,
+} from "../../utils/date";
+import {
+  ChangeEvent,
+  Dispatch,
+  SetStateAction,
+  useEffect,
+  useRef,
+  useState,
+} from "react";
+import IMGPrev from "../../assets/image/new/i_date_prev.svg";
+import IMGNext from "../../assets/image/new/i_date_next.svg";
+import { ClosePopup, CreatePopup } from "../common/Popup";
+import "../../styles/work_record_gen.css";
+
+type WorkRecordGenTypes = {
+  label?: string;
+  handler: any;
+  type: "dayJob" | "shorts";
+};
+
+const _PopUpInvidual = ({
+  onChangeFunc,
+  lastWorkDay,
+  year,
+  workRecord,
+  type,
+}: any) => {
+  let lastYear = GetDateArr(lastWorkDay)[0],
+    locationPage = 0;
+  const lastMonth = GetDateArr(lastWorkDay)[1],
+    month_arr = Month_Calculator(lastMonth, "before", 12),
+    month_arr_three = [month_arr[0], month_arr[1], month_arr[2]],
+    year_arr =
+      month_arr_three[0] === 1 || month_arr_three[0] === 2
+        ? [lastYear - 1, lastYear]
+        : [lastYear],
+    refIndividualPage = useRef<HTMLInputElement>(null),
+    refPrev: any = useRef<HTMLInputElement>(null),
+    refNext: any = useRef<HTMLInputElement>(null),
+    monthsList =
+      type === "dayJob"
+        ? [
+            [1, 2, 3, 4],
+            [5, 6, 7, 8],
+            [9, 10, 11, 12],
+          ]
+        : [
+            [1, 2, 3, 4, 5, 6],
+            [7, 8, 9, 10, 11, 12],
+          ];
+
+  const isTotal = (month: number) => {
+    return year === lastYear
+      ? month_arr_three.includes(month)
+        ? "total"
+        : ""
+      : (year === lastYear - 1 && (month === 1 || month === 2)) ||
+        (year !== lastYear && year !== lastYear - 1)
+      ? ""
+      : month_arr_three.includes(month)
+      ? "total"
+      : "";
+  };
+
+  const onChangeInviualInpus = (
+    e: ChangeEvent<HTMLInputElement>,
+    target_month: number,
+    type: "day" | "pay"
+  ) => {
+    if (isNaN(Number(e.currentTarget.value))) {
+      e.currentTarget.value = e.currentTarget.value.slice(0, -1);
+    } else {
+      onChangeFunc(target_month, e.currentTarget.value, type);
+    }
+  };
+
+  if (workRecord?.months) {
+    workRecord?.months?.forEach((el: any) => {
+      onChangeFunc(el.month, el.day, "day");
+      if (el.pay) {
+        onChangeFunc(el.month, el.pay, "pay");
+      }
+    });
+  }
+
+  const monthUnitDefaultValue = (target_month: number) => {
+    const target_month_data = workRecord?.months?.filter((el: any) => {
+      return el.month === target_month;
+    });
+    return target_month_data ? target_month_data[0] : null;
+  };
+  return (
+    <div className="date_indiviual_container">
+      <div
+        id={
+          type === "dayJob" ? "date_indiviual_dayjob" : "date_indiviual_shorts"
+        }
+      >
+        <div ref={refIndividualPage}>
+          {monthsList.map((el) => {
+            return (
+              <div
+                key={String(Date.now()) + el}
+                className="date_indiviual_page"
+              >
+                {el.map((it) => {
+                  return (
+                    <div
+                      key={String(Date.now()) + it}
+                      className="indiviual_input_container"
+                    >
+                      <div
+                        className={`indiviual_input_header ${
+                          lastYear === year && lastMonth < it
+                            ? "unset_header"
+                            : ""
+                        } ${isTotal(it)}`}
+                      >
+                        {it} 월
+                      </div>
+                      {lastYear === year && lastMonth < it ? (
+                        <>
+                          <div className="unset_box">unset</div>
+                          <div className="unset_box">unset</div>
+                        </>
+                      ) : (
+                        <>
+                          <input
+                            className={isTotal(it)}
+                            defaultValue={monthUnitDefaultValue(it)?.day}
+                            placeholder="근무 일수"
+                            onChange={(e: ChangeEvent<HTMLInputElement>) =>
+                              onChangeInviualInpus(e, it, "day")
+                            }
+                          />
+                          {type === "shorts" ? (
+                            <input
+                              className="total"
+                              defaultValue={monthUnitDefaultValue(it)?.pay}
+                              placeholder="월 임금총액"
+                              onChange={(e: ChangeEvent<HTMLInputElement>) =>
+                                onChangeInviualInpus(e, it, "pay")
+                              }
+                            />
+                          ) : (
+                            year_arr.includes(year) &&
+                            (year === lastYear - 1 && (it === 1 || it === 2) ? (
+                              <></>
+                            ) : (
+                              <>
+                                {month_arr_three.includes(it) && (
+                                  <input
+                                    className="total"
+                                    defaultValue={
+                                      monthUnitDefaultValue(it)?.pay
+                                    }
+                                    placeholder="월 임금총액"
+                                    onChange={(
+                                      e: ChangeEvent<HTMLInputElement>
+                                    ) => onChangeInviualInpus(e, it, "pay")}
+                                  />
+                                )}
+                              </>
+                            ))
+                          )}
+                        </>
+                      )}
+                    </div>
+                  );
+                })}
+              </div>
+            );
+          })}
+        </div>
+      </div>
+      <button
+        ref={refNext}
+        className="date_indiviual_prev"
+        onClick={() => {
+          if (locationPage === 0) {
+            return;
+          }
+          const currentRef: any = refIndividualPage.current;
+          locationPage -= 100;
+          currentRef.style.left = `-${locationPage}%`;
+        }}
+      >
+        <img src={IMGPrev} alt="next button" />
+      </button>
+      <button
+        ref={refPrev}
+        className="date_indiviual_next"
+        onClick={() => {
+          if (type === "dayJob") {
+            if (locationPage >= 200) {
+              return;
+            }
+          } else {
+            if (locationPage >= 100) {
+              return;
+            }
+          }
+          const currentRef: any = refIndividualPage.current;
+          locationPage += 100;
+          currentRef.style.left = `-${locationPage}%`;
+        }}
+      >
+        <img src={IMGNext} alt="prev button" />
+      </button>
+    </div>
+  );
+};
+
+const _onClickPopUpInvidual = (
+  year: number,
+  lastWorkDay: string,
+  handler: any,
+  setSelectYears: Dispatch<SetStateAction<number[]>>,
+  type: "dayJob" | "shorts"
+) => {
+  const workRecordUnitsDays: any = {};
+  const workRecordUnitsPays: any = {};
+  const onChageMonthsGen = (
+    params: string,
+    value: number,
+    type: "day" | "pay"
+  ) => {
+    if (type === "day") {
+      workRecordUnitsDays[params] = value;
+    } else {
+      workRecordUnitsPays[params] = value;
+    }
+  };
+
+  if (!lastWorkDay) {
+    CreatePopup(undefined, "마지막 근무일을 선택해주세요", "only_check");
+    return;
+  }
+
+  const workRecord = handler.GetPageVal("workRecord"),
+    workRecordTargetUnit = workRecord.filter((el: any) => {
+      return el.year === year;
+    });
+
+  CreatePopup(
+    `${String(year)} 년`,
+    <_PopUpInvidual
+      onChangeFunc={onChageMonthsGen}
+      lastWorkDay={lastWorkDay}
+      year={year}
+      workRecord={workRecordTargetUnit[0]}
+      type={type}
+    />,
+    "confirm",
+    () => {
+      const workRecordUnits: any = [];
+      Object.keys(workRecordUnitsDays).forEach((el: any, idx: number) => {
+        workRecordUnits.push({
+          month: Number(el),
+          day: Number(workRecordUnitsDays[el]),
+          pay: workRecordUnitsPays[el] && Number(workRecordUnitsPays[el]),
+        });
+      });
+      const unit = {
+        year,
+        months: workRecordUnits,
+      };
+      if (unit.months.length === 0) {
+        CreatePopup(
+          undefined,
+          "달마다 근무일수와 월 임금총액을 입력해주세요.",
+          "confirm",
+          () =>
+            _onClickPopUpInvidual(
+              year,
+              lastWorkDay,
+              handler,
+              setSelectYears,
+              type
+            ),
+          undefined,
+          "확인"
+        );
+        return;
+      }
+      setSelectYears((prev: number[]) => {
+        return [...prev, year];
+      });
+      const isDuplicationYear = handler
+        .GetPageVal("workRecord")
+        .filter((el: any) => {
+          return el.year === year;
+        });
+      const currentWorkRecord =
+        isDuplicationYear.length > 0
+          ? [
+              ...handler.GetPageVal("workRecord").filter((el: any) => {
+                return el.year !== year;
+              }),
+              unit,
+            ]
+          : [...handler.GetPageVal("workRecord"), unit];
+
+      handler.SetPageVal("workRecord", currentWorkRecord);
+      ClosePopup();
+    }
+  );
+};
+
+const WorkRecordGen = ({
+  label = "개별 입력란",
+  handler,
+  type,
+}: WorkRecordGenTypes) => {
+  const current_year_list = Year_Option_Generater(10);
+  const [selectYears, setSelectYears] = useState<number[]>([]);
+  useEffect(() => {
+    handler.SetPageVal("workRecord", []);
+  }, []);
+  return (
+    <>
+      <label className="fs_16 write_label">{label}</label>
+      <div className="lndividual_input_container flex_box">
+        {current_year_list.map((el: string) => {
+          return (
+            <div
+              onClick={() =>
+                _onClickPopUpInvidual(
+                  Number(el),
+                  handler.GetPageVal("lastWorkDay"),
+                  handler,
+                  setSelectYears,
+                  type
+                )
+              }
+              key={String(Date.now()) + el}
+              className={`fs_16 pd_810 ${
+                el && selectYears.includes(Number(el)) ? "select" : ""
+              }`}
+            >
+              {el}
+            </div>
+          );
+        })}
+      </div>
+    </>
+  );
+};
+
+export default WorkRecordGen;

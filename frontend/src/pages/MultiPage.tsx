@@ -51,7 +51,6 @@ class MultiCalHandler extends DetailedHandler {
       ...to_server_unit,
       id: this.genericid,
     });
-
     this.SetPageVal("addData", this.to_server);
     const select_company = this.companys?.map((el) => {
       if (el.id === this.GetPageVal("select_multi")) {
@@ -248,6 +247,7 @@ const _MultiCalListCard = ({ company }: { company: Company }) => {
     });
     handler.setCompanys && handler.setCompanys(cur_companys);
   };
+  console.log("현재 데이터", handler._Data);
   return (
     <div className="company_list">
       <div
@@ -335,7 +335,7 @@ const _MultiCompanyList = () => {
           params="age_multi"
           label="생년월일"
           callBack={handler.SetPageVal}
-          selected={""}
+          selected={handler._Data.age_multi ? handler._Data.age_multi : ""}
           year={Year_Option_Generater(73)}
         />
         <CheckBoxInput
@@ -343,7 +343,11 @@ const _MultiCompanyList = () => {
           params="disabled_multi"
           callBack={handler.SetPageVal}
           label="장애여부"
-          selected={""}
+          selected={
+            handler._Data.disabled_multi
+              ? handler._Data.disabled_multi
+              : "비장애인"
+          }
           options={["장애인", "비장애인"]}
         />
       </div>

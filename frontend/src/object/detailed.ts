@@ -37,7 +37,6 @@ class DetailedHandler extends InputHandler {
       year: number;
       months: {
         month: number;
-        three_mbp?: number;
         pay?: number;
         day?: number;
       }[];
