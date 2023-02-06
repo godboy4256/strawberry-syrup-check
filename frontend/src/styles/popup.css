@@ -13,13 +13,13 @@
   position: fixed;
   top: 0;
   left: 0;
-  z-index: 99999;
   background-color: rgba(0, 0, 0, 0.5);
+  z-index: 9998;
 }
 
 #popup_content {
   width: fit-content;
-  position: absolute;
+  position: fixed;
   top: 50%;
   left: 50%;
   background-color: white;
@@ -27,6 +27,7 @@
   border-radius: 10px;
   border: 1px solid #ff6559;
   animation: fadeInContainer 0.4s ease-in-out 1 forwards;
+  z-index: 9999;
 }
 
 #date_button_container {

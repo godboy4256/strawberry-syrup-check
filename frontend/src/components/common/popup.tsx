@@ -1,4 +1,4 @@
-import { ReactElement, useState } from "react";
+import { MouseEvent, ReactElement, useState } from "react";
 import Button from "../inputs/Button";
 import "../../styles/popup.css";
 
@@ -28,71 +28,78 @@ const PopUpGlobal = () => {
   return (
     <>
       {content && (
-        <div id="popup_background">
-          <div id="popup_content" className={PopUpHandler.popup_type}>
-            {PopUpHandler.title && (
-              <div id="popup_title" className="font_family_bold">
-                {PopUpHandler.title}
-              </div>
-            )}
-            <div className={typeof content === "string" ? "string_popup" : ""}>
-              {content && content}
-            </div>
-            <div id={`${PopUpHandler.popup_type}_button_container`}>
-              {PopUpHandler.popup_type === "date" ? (
-                <>
-                  <Button
-                    text={
-                      PopUpHandler.cancel_text
-                        ? PopUpHandler.cancel_text
-                        : "아니오"
-                    }
-                    type="date_cancel"
-                    click_func={onClickCancel}
-                  />
-                  <Button
-                    text={
-                      PopUpHandler.confirm_text
-                        ? PopUpHandler.confirm_text
-                        : "예"
-                    }
-                    type="date_select"
-                    click_func={onClickConfirm}
-                  />
-                </>
-              ) : PopUpHandler.popup_type === "only_check" ? (
-                <Button
-                  text={
-                    PopUpHandler.confirm_text ? PopUpHandler.confirm_text : "예"
-                  }
-                  type="popup_ok"
-                  click_func={() => setContent(false)}
-                />
-              ) : PopUpHandler.popup_type === "confirm" ? (
-                <div id="popup_confirm_container">
-                  <Button
-                    text={
-                      PopUpHandler.cancel_text
-                        ? PopUpHandler.cancel_text
-                        : "아니오"
-                    }
-                    type="popup_cancel"
-                    click_func={onClickCancel}
-                  />
-                  <Button
-                    text={
-                      PopUpHandler.confirm_text
-                        ? PopUpHandler.confirm_text
-                        : "예"
-                    }
-                    type="popup_confirm"
-                    click_func={onClickConfirm}
-                  />
+        <>
+          <div id="popup_background" onClick={() => setContent(false)}></div>
+          <div>
+            <div id="popup_content" className={PopUpHandler.popup_type}>
+              {PopUpHandler.title && (
+                <div id="popup_title" className="font_family_bold">
+                  {PopUpHandler.title}
                 </div>
-              ) : null}
+              )}
+              <div
+                className={typeof content === "string" ? "string_popup" : ""}
+              >
+                {content && content}
+              </div>
+              <div id={`${PopUpHandler.popup_type}_button_container`}>
+                {PopUpHandler.popup_type === "date" ? (
+                  <>
+                    <Button
+                      text={
+                        PopUpHandler.cancel_texㅋ
+                          ? PopUpHandler.cancel_text
+                          : "아니오"
+                      }
+                      type="date_cancel"
+                      click_func={onClickCancel}
+                    />
+                    <Button
+                      text={
+                        PopUpHandler.confirm_text
+                          ? PopUpHandler.confirm_text
+                          : "예"
+                      }
+                      type="date_select"
+                      click_func={onClickConfirm}
+                    />
+                  </>
+                ) : PopUpHandler.popup_type === "only_check" ? (
+                  <Button
+                    text={
+                      PopUpHandler.confirm_text
+                        ? PopUpHandler.confirm_text
+                        : "예"
+                    }
+                    type="popup_ok"
+                    click_func={() => setContent(false)}
+                  />
+                ) : PopUpHandler.popup_type === "confirm" ? (
+                  <div id="popup_confirm_container">
+                    <Button
+                      text={
+                        PopUpHandler.cancel_text
+                          ? PopUpHandler.cancel_text
+                          : "아니오"
+                      }
+                      type="popup_cancel"
+                      click_func={onClickCancel}
+                    />
+                    <Button
+                      text={
+                        PopUpHandler.confirm_text
+                          ? PopUpHandler.confirm_text
+                          : "예"
+                      }
+                      type="popup_confirm"
+                      click_func={onClickConfirm}
+                    />
+                  </div>
+                ) : null}
+              </div>
             </div>
           </div>
-        </div>
+        </>
       )}
     </>
   );

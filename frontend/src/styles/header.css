@@ -12,6 +12,8 @@
   left: 50%;
   transform: translateX(-50%);
   z-index: 1001;
+  border-left: 1px solid #ccc;
+  border-right: 1px solid #ccc;
 }
 #header_container div,
 #header_container a {
@@ -23,7 +25,6 @@
 #header_left_contents {
   width: 30px;
 }
-
 #header_container > h1 {
   font-size: 21px;
   font-weight: 400;
@@ -66,4 +67,11 @@
 }
 #header_menu_btn.active span:nth-child(2) {
   opacity: 0;
+}
+
+@media screen and (max-width: 500px) {
+  #header_container {
+    border-left: 0;
+    border-right: 0;
+  }
 }

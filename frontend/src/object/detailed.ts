@@ -1,6 +1,7 @@
 import { Dispatch, SetStateAction } from "react";
 import { DetailConfirmPopup } from "../components/calculator/confirmPopup";
 import { ClosePopup, CreatePopup } from "../components/common/Popup";
+import { calRecording } from "../utils/calrecord";
 import { getAge, GetDateArr } from "../utils/date";
 import { sendToServer } from "../utils/sendToserver";
 import { CheckValiDation } from "../utils/validate";
@@ -418,6 +419,25 @@ class DetailedHandler extends InputHandler {
             );
           } else {
             ClosePopup();
+            calRecording(
+              res,
+              "상세형",
+              workCate === 0
+                ? "정규직"
+                : workCate === 1
+                ? "기간제"
+                : workCate === 2
+                ? this.GetPageVal("is_short")
+                : workCate === 4
+                ? this.GetPageVal("is_short")
+                : workCate === 6
+                ? "일용직"
+                : workCate === 7
+                ? "초단시간"
+                : workCate === 8
+                ? "자영업"
+                : ""
+            );
             this.setCompState && this.setCompState(5);
             setTimeout(() => {
               this.setCompState && this.setCompState(4);

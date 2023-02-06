@@ -1,5 +1,6 @@
 import { Fragment, useEffect, useState } from "react";
 import "../../styles/checkbox.css";
+import { CreatePopup } from "../common/Popup";
 
 let checkList: string[] = [];
 
@@ -8,17 +9,30 @@ const _BoxTypeCheckBox = ({
   type,
   callBack,
   params,
+  maxLenth,
+  label,
 }: {
   el: string;
   type: string;
   callBack: CallableFunction;
   params: string;
+  maxLenth?: number;
+  label?: string;
 }) => {
   const [onSelect, setOnSelect] = useState(false);
   return (
     <div
       className={`${type} ${onSelect ? "active" : ""}`}
       onClick={() => {
+        if (maxLenth)
+          if (checkList.length === maxLenth) {
+            CreatePopup(
+              undefined,
+              `${label}은 ${maxLenth}개까지 선택할 수 있습니다.`,
+              "only_check"
+            );
+            return;
+          }
         setOnSelect((prev) => !prev);
         if (!onSelect) {
           checkList.push(el);
@@ -41,6 +55,7 @@ const CheckBoxInput = ({
   params,
   callBack,
   selected,
+  maxLenth,
 }: {
   options: string[];
   type: "box_type" | "radio_box_type" | "circle_type" | "is_true_type";
@@ -48,6 +63,7 @@ const CheckBoxInput = ({
   params: string;
   callBack: CallableFunction;
   selected?: string;
+  maxLenth?: number;
 }) => {
   return (
     <>
@@ -57,11 +73,13 @@ const CheckBoxInput = ({
           ? options.map((el: string) => {
               return (
                 <_BoxTypeCheckBox
+                  maxLenth={maxLenth}
                   key={`${String(Date.now())}_for${el}`}
                   el={el}
                   type={type}
                   params={params}
                   callBack={callBack}
+                  label={label}
                 />
               );
             })
