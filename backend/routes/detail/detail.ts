@@ -426,7 +426,6 @@ export default function detailRoute(fastify: FastifyInstance, options: any, done
 				receiveDay,
 				realMonthPay,
 				workingDays: mainData.sumWorkDay,
-				severancePay: mainData.sumWorkDay >= 365 ? Math.ceil(dayAvgPay * (mainData.sumWorkDay / 365) * 30) : 0,
 			};
 
 		return {
@@ -437,7 +436,6 @@ export default function detailRoute(fastify: FastifyInstance, options: any, done
 			receiveDay,
 			realMonthPay,
 			workingDays: mainData.sumWorkDay,
-			severancePay: mainData.sumWorkDay >= 365 ? Math.ceil(dayAvgPay * (mainData.sumWorkDay / 365) * 30) : 0,
 			needDay: requireWorkingYear * 365 - mainData.sumWorkDay,
 			nextAmountCost: nextReceiveDay * realDayPay,
 			morePay: nextReceiveDay * realDayPay - receiveDay * realDayPay,
