@@ -181,17 +181,33 @@ export function getNextEmployerReceiveDay(workYear: number) {
 	return [0, 0];
 }
 
-export const calVeryShortWorkDay = (limmitDay: dayjs.Dayjs, retiredDay: dayjs.Dayjs, weekDay: number[]) => {
-	const diffToLimit = Math.floor(Math.floor(limmitDay.diff("1951-01-01", "day", true)) / 7); // 입사일 - 1951.1.1.
+export const calVeryShortWorkDay = (limitDay: dayjs.Dayjs, retiredDay: dayjs.Dayjs, weekDay: number[]) => {
+	const diffToLimit = Math.floor(Math.floor(limitDay.diff("1951-01-01", "day", true)) / 7); // 입사일 - 1951.1.1.
 	const diffToRetired = Math.floor(Math.floor(retiredDay.diff("1951-01-01", "day", true)) / 7); // 퇴사일 - 1951.1.1.
+	const diffRetiredAndLimit = retiredDay.diff(limitDay, "day");
 
-	let workDay = (diffToRetired - diffToLimit) * weekDay.length;
+	let workDay = (diffToRetired - diffToLimit - 1) * weekDay.length;
+	if (diffRetiredAndLimit <= 7) {
+		if (weekDay.length === 2) {
+			if (retiredDay.day() >= weekDay[1]) return 2;
+			if (retiredDay.day() >= weekDay[0]) return 1;
+			return workDay;
+		}
+		if (retiredDay.day() >= weekDay[0]) return 1;
+		return 0;
+	}
 
-	if (limmitDay.day() <= weekDay[0]) workDay += 2;
-	if (limmitDay.day() <= weekDay[1]) workDay += 1;
+	if (limitDay.day() <= weekDay[0]) {
+		workDay += 2;
+	} else if (limitDay.day() <= weekDay[1]) {
+		workDay += 1;
+	}
 
-	if (retiredDay.day() >= weekDay[1]) workDay += 2;
-	if (retiredDay.day() >= weekDay[0]) workDay += 1;
+	if (retiredDay.day() >= weekDay[1]) {
+		workDay += 2;
+	} else if (retiredDay.day() >= weekDay[0]) {
+		workDay += 1;
+	}
 
 	return workDay;
 };
