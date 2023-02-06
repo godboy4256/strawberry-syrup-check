@@ -90,8 +90,6 @@
   overflow: auto;
   border-bottom-left-radius: 5px;
   border-bottom-right-radius: 5px;
-  -ms-overflow-style: none;
-  scrollbar-width: none;
   z-index: 100000;
 }
 .custom_options > div {
@@ -100,11 +98,6 @@
 .custom_options > div:hover {
   background-color: #d35248;
 }
-
-.custom_options::-webkit-scrollbar {
-  display: none;
-}
-
 .custom_select.date_normal_style {
   border: 1px solid black;
   padding: 3px 9px;

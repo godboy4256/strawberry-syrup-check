@@ -5,7 +5,7 @@ import Header from "../components/layout/Header";
 import SelectInput from "../components/inputs/Select";
 import TabInputs from "../components/inputs/TabInputs";
 import DetailedHandler from "../object/detailed";
-import WorkTypes, { jobCates } from "../components/calculator/WorkTypes";
+import WorkTypes from "../components/calculator/WorkTypes";
 import { Year_Option_Generater } from "../utils/date";
 import NumberInput from "../components/inputs/Pay";
 import NumberUpDown from "../components/inputs/NumberUpDown";
@@ -18,6 +18,7 @@ import CheckBoxInput from "../components/inputs/Check";
 import { DetailConfirmPopup } from "../components/calculator/confirmPopup";
 import WorkRecordGen from "../components/calculator/workRecordGen";
 import "./../styles/detail.css";
+import { jobCates } from "../assets/data/worktype_data";
 
 const handler: any = new DetailedHandler({});
 
@@ -363,6 +364,7 @@ const _DetailCalVeryShort = ({ handler }: { handler: any }) => {
         label="근무 요일"
         params="weekDay"
         callBack={handler.SetPageVal}
+        maxLenth={2}
       />
       <NumberUpDown
         label="근무시간"
@@ -370,6 +372,7 @@ const _DetailCalVeryShort = ({ handler }: { handler: any }) => {
         unit="시간"
         callBack={handler.SetPageVal}
         params="time"
+        max_num={14}
       />
       <TabInputs
         label="월 급여"
@@ -487,25 +490,6 @@ const DetailCalPage = () => {
                     <DetailConfirmPopup
                       confirm_data={handler.GetPageVal("confirm_popup_result")}
                     />
-                  );
-                  calRecording(
-                    handler.GetPageVal("allresult"),
-                    "상세형",
-                    handler.GetPageVal("workCate") === 0
-                      ? "정규직"
-                      : handler.GetPageVal("workCate") === 1
-                      ? "기간제"
-                      : handler.GetPageVal("workCate") === 2
-                      ? handler.GetPageVal("is_short")
-                      : handler.GetPageVal("workCate") === 4
-                      ? handler.GetPageVal("is_short")
-                      : handler.GetPageVal("workCate") === 6
-                      ? "일용직"
-                      : handler.GetPageVal("workCate") === 7
-                      ? "초단시간"
-                      : handler.GetPageVal("workCate") === 8
-                      ? "자영업"
-                      : ""
                   );
                 }}
               />

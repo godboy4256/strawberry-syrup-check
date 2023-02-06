@@ -1,4 +1,8 @@
-import { jobCates, retire_reason, work_cate2 } from "./WorkTypes";
+import {
+  jobCates,
+  retire_reason_standard,
+  work_cate2,
+} from "../../assets/data/worktype_data";
 
 export const DetailConfirmPopup = (confirm_data: any) => {
   return (
@@ -6,9 +10,10 @@ export const DetailConfirmPopup = (confirm_data: any) => {
       <div>
         근로형태 : <div>{work_cate2[confirm_data?.workCate]}</div>
       </div>
-      {retire_reason[confirm_data?.retireReason] && (
+      {retire_reason_standard[confirm_data?.retireReason] && (
         <div>
-          퇴직사유 : <div>{retire_reason[confirm_data?.retireReason]}</div>
+          퇴직사유 :{" "}
+          <div>{retire_reason_standard[confirm_data?.retireReason]}</div>
         </div>
       )}
       <div>

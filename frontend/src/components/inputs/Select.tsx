@@ -1,4 +1,4 @@
-import { ChangeEvent, MouseEvent, ReactElement, useState } from "react";
+import { MouseEvent, ReactElement, useState } from "react";
 import IMGSelect from "../../assets/image/select_icon.svg";
 import IMGNormalSelect from "../../assets/image/new/select_icon_normal.svg";
 import { ClosePopup, CreatePopup } from "../common/Popup";
@@ -30,7 +30,7 @@ const _CustomSelect = ({
       onBlur={() => setOnSelect(false)}
     >
       <div className="custom_select_title">{select ? select : select_ment}</div>
-      <div className="custom_options">
+      <div className="custom_options" onBlur={() => setOnSelect(false)}>
         {onSelect &&
           options.map((el, idx: number) => {
             return (
@@ -92,7 +92,6 @@ const PopupSelect = ({
 };
 
 const SelectInput = ({
-  selected,
   options,
   label,
   type = "normal",
@@ -131,7 +130,9 @@ const SelectInput = ({
         if (check_popup) {
           CreatePopup(
             undefined,
-            check_popup[popup_select("popup_select")],
+            check_popup[popup_select("popup_select")] === undefined
+              ? check_popup[0]
+              : check_popup[popup_select("popup_select")],
             "confirm",
             () => {
               popUpCallBack &&

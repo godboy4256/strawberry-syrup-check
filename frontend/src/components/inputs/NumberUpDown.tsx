@@ -1,6 +1,7 @@
 import { ChangeEvent, useState } from "react";
 import IMGDown from "../../assets/image/new/select_icon_normal.svg";
 import "../../styles/numberupdown.css";
+import { CreatePopup } from "../common/Popup";
 
 const NumberUpDown = ({
   label,
@@ -50,8 +51,17 @@ const NumberUpDown = ({
   };
   const onChangeInput = (e: ChangeEvent<HTMLInputElement>) => {
     if (isNaN(Number(e.currentTarget.value))) return;
+    if (max_num && Number(e.currentTarget.value) > max_num) {
+      CreatePopup(
+        undefined,
+        `${max_num} 이상 입력할 수 없습니다.`,
+        "only_check"
+      );
+      return;
+    }
     callBack(params, Number(e.currentTarget.value));
     setCount(Number(e.currentTarget.value));
+    console.log();
   };
   return (
     <>

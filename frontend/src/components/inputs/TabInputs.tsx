@@ -17,6 +17,7 @@ const before_month_cal = (retiredDay: string) => {
     day1 = targetDate[2],
     day2 = new Date(2022, month2, 0).getDate(),
     day3 = new Date(2022, month3, 0).getDate();
+
   return [
     `${year1}.${String(month1).padStart(2, "0")}.01. ~ ${year1}.${String(
       month1
@@ -48,7 +49,9 @@ const TabInputs = ({
   const beforeMonthCal_input =
     valueDay && valueDay("retiredDay")
       ? before_month_cal(valueDay && valueDay("retiredDay"))
-      : null;
+      : before_month_cal(
+          `${GetDateArr(null)[0]}-${GetDateArr(null)[1]}-${GetDateArr(null)[2]}`
+        );
   const onChangeTabInput = (in_params: string, value: string) => {
     multi_salary_data[in_params] = value;
     callBack && callBack(params, Object.values(multi_salary_data));
@@ -71,10 +74,18 @@ const TabInputs = ({
               salarytab === "three_month" ? "three_month" : ""
             } ${salarytab == "all" ? "un_all" : ""}`}
             onClick={() => {
-              if (valueDay("retiredDay")) {
-                setSalaryTab("three_month");
+              if (valueDay("retired")) {
+                if (valueDay("retiredDay")) {
+                  setSalaryTab("three_month");
+                } else {
+                  CreatePopup(
+                    undefined,
+                    "퇴사일을 선택해주세요.",
+                    "only_check"
+                  );
+                }
               } else {
-                CreatePopup(undefined, "퇴사일을 선택해주세요.", "only_check");
+                setSalaryTab("three_month");
               }
             }}
           >
@@ -91,8 +102,7 @@ const TabInputs = ({
             (salarytab === "all" ? (
               <NumberInput params={params} num_unit="원" callBack={callBack} />
             ) : (
-              salarytab === "three_month" &&
-              valueDay("retiredDay") && (
+              salarytab === "three_month" && (
                 <>
                   <div className="fs_14">{beforeMonthCal_input?.[0]}</div>
                   <NumberInput
