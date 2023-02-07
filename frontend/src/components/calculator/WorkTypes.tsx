@@ -94,7 +94,6 @@ const WorkTypes = ({ handler }: { handler: any }) => {
     if (params === "workCate") {
       setState1("select");
       setWorkCate(value);
-      // console.log(workCate);
     } else {
       setState2("select");
     }
@@ -135,7 +134,7 @@ const WorkTypes = ({ handler }: { handler: any }) => {
             popup_select={handler.GetPageVal}
             params="retireReason"
             options={
-              workCate === 0
+              workCate === 0 || workCate === undefined
                 ? retire_reason_standard
                 : workCate === 2 || workCate === 3
                 ? retire_reason_art

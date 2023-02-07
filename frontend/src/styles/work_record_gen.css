@@ -45,9 +45,9 @@
   width: 100%;
   border-top: 1px solid rgba(0, 0, 0, 0.2);
   color: #ff493a;
-  border-right: 1px solid #ccc;
+  border-right: none;
 }
-.indiviual_input_container:nth-child(2n) input {
+.indiviual_input_container:nth-child(2n) #date_indiviual_shorts input {
   border-right: none;
 }
 .indiviual_input_container input.total {
@@ -92,27 +92,29 @@
   border-bottom: 1px solid #ccc;
   padding: 4px 10px;
 }
-#date_indiviual_shorts
-  .indiviual_input_container:nth-child(2n)
-  .indiviual_input_header,
-#date_indiviual_shorts .indiviual_input_container:nth-child(2n) .unset_box {
-  border-right: none;
-}
 #date_indiviual_shorts .indiviual_input_header,
 #date_indiviual_shorts .date_indiviual_page input {
   padding: 8px 10px;
   font-size: 16px;
   line-height: 24px;
+  border-right: 1px solid #ccc;
+}
+#date_indiviual_shorts
+  .indiviual_input_container:nth-child(2n)
+  .indiviual_input_header,
+#date_indiviual_shorts .indiviual_input_container:nth-child(2n) .unset_box,
+#date_indiviual_shorts .indiviual_input_container:nth-child(2n) input {
+  border-right: none;
 }
 #date_indiviual_shorts .unset_box {
   font-size: 0;
   padding: 8px 10px;
+  border-right: 1px solid #ccc;
 }
 .unset_box {
   line-height: 21px;
   font-size: 0;
   border-bottom: 1px solid #ccc;
-  border-right: 1px solid #ccc;
 }
 .unset_box:last-child {
   border-bottom: none;
