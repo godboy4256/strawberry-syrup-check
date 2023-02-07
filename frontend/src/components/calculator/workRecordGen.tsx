@@ -6,6 +6,7 @@ import {
 import {
   ChangeEvent,
   Dispatch,
+  MouseEvent,
   SetStateAction,
   useEffect,
   useRef,
@@ -65,19 +66,13 @@ const _PopUpInvidual = ({
       ? "total"
       : "";
   };
-
   const onChangeInviualInpus = (
-    e: ChangeEvent<HTMLInputElement>,
+    valueAnswer: number,
     target_month: number,
     type: "day" | "pay"
   ) => {
-    if (isNaN(Number(e.currentTarget.value))) {
-      e.currentTarget.value = e.currentTarget.value.slice(0, -1);
-    } else {
-      onChangeFunc(target_month, e.currentTarget.value, type);
-    }
+    onChangeFunc(target_month, valueAnswer, type);
   };
-
   if (workRecord?.months) {
     workRecord?.months?.forEach((el: any) => {
       onChangeFunc(el.month, el.day, "day");
@@ -86,13 +81,40 @@ const _PopUpInvidual = ({
       }
     });
   }
-
   const monthUnitDefaultValue = (target_month: number) => {
     const target_month_data = workRecord?.months?.filter((el: any) => {
       return el.month === target_month;
     });
     return target_month_data ? target_month_data[0] : null;
   };
+
+  useEffect(() => {
+    const currentRef: any = refIndividualPage.current;
+    if (lastYear === year) {
+      if (type === "dayJob") {
+        locationPage = monthsList[0].includes(lastMonth)
+          ? 0
+          : monthsList[1].includes(lastMonth)
+          ? 100
+          : monthsList[2].includes(lastMonth)
+          ? 200
+          : 0;
+      } else if (type === "shorts") {
+        locationPage = monthsList[0].includes(lastMonth)
+          ? 0
+          : monthsList[1].includes(lastMonth)
+          ? 100
+          : 0;
+      }
+      currentRef.style.left = `-${locationPage}%`;
+    }
+    if (locationPage === 0) {
+      refPrev.current.style.display = "none";
+    } else if (locationPage === 200) {
+      refNext.current.style.display = "none";
+    }
+  }, []);
+
   return (
     <div className="date_indiviual_container">
       <div
@@ -130,21 +152,38 @@ const _PopUpInvidual = ({
                       ) : (
                         <>
                           <input
+                            maxLength={2}
+                            placeholder="근무일수"
                             className={isTotal(it)}
                             defaultValue={monthUnitDefaultValue(it)?.day}
-                            placeholder="근무 일수"
-                            onChange={(e: ChangeEvent<HTMLInputElement>) =>
-                              onChangeInviualInpus(e, it, "day")
-                            }
+                            onChange={(e: ChangeEvent<HTMLInputElement>) => {
+                              onChangeInviualInpus(
+                                Number(e.currentTarget.value),
+                                it,
+                                "day"
+                              );
+                            }}
                           />
                           {type === "shorts" ? (
                             <input
                               className="total"
-                              defaultValue={monthUnitDefaultValue(it)?.pay}
+                              defaultValue={monthUnitDefaultValue(
+                                it
+                              )?.pay.toLocaleString()}
                               placeholder="월 임금총액"
-                              onChange={(e: ChangeEvent<HTMLInputElement>) =>
-                                onChangeInviualInpus(e, it, "pay")
-                              }
+                              onChange={(e: ChangeEvent<HTMLInputElement>) => {
+                                let valueAnswer = e.target.value;
+                                if (valueAnswer.includes(",")) {
+                                  valueAnswer = valueAnswer.split(",").join("");
+                                }
+                                e.target.value =
+                                  Number(valueAnswer).toLocaleString();
+                                onChangeInviualInpus(
+                                  Number(valueAnswer),
+                                  it,
+                                  "pay"
+                                );
+                              }}
                             />
                           ) : (
                             year_arr.includes(year) &&
@@ -155,13 +194,27 @@ const _PopUpInvidual = ({
                                 {month_arr_three.includes(it) && (
                                   <input
                                     className="total"
-                                    defaultValue={
-                                      monthUnitDefaultValue(it)?.pay
-                                    }
+                                    defaultValue={monthUnitDefaultValue(
+                                      it
+                                    )?.pay.toLocaleString()}
                                     placeholder="월 임금총액"
                                     onChange={(
                                       e: ChangeEvent<HTMLInputElement>
-                                    ) => onChangeInviualInpus(e, it, "pay")}
+                                    ) => {
+                                      let valueAnswer = e.target.value;
+                                      if (valueAnswer.includes(",")) {
+                                        valueAnswer = valueAnswer
+                                          .split(",")
+                                          .join("");
+                                      }
+                                      e.target.value =
+                                        Number(valueAnswer).toLocaleString();
+                                      onChangeInviualInpus(
+                                        Number(valueAnswer),
+                                        it,
+                                        "pay"
+                                      );
+                                    }}
                                   />
                                 )}
                               </>
@@ -178,11 +231,12 @@ const _PopUpInvidual = ({
         </div>
       </div>
       <button
-        ref={refNext}
+        ref={refPrev}
         className="date_indiviual_prev"
-        onClick={() => {
-          if (locationPage === 0) {
-            return;
+        onClick={(e: MouseEvent<HTMLButtonElement>) => {
+          refNext.current.style.display = "block";
+          if (locationPage === 100) {
+            e.currentTarget.style.display = "none";
           }
           const currentRef: any = refIndividualPage.current;
           locationPage -= 100;
@@ -192,16 +246,17 @@ const _PopUpInvidual = ({
         <img src={IMGPrev} alt="next button" />
       </button>
       <button
-        ref={refPrev}
+        ref={refNext}
         className="date_indiviual_next"
-        onClick={() => {
+        onClick={(e: MouseEvent<HTMLButtonElement>) => {
+          refPrev.current.style.display = "block";
           if (type === "dayJob") {
-            if (locationPage >= 200) {
-              return;
+            if (locationPage >= 100) {
+              e.currentTarget.style.display = "none";
             }
           } else {
-            if (locationPage >= 100) {
-              return;
+            if (locationPage >= 0) {
+              e.currentTarget.style.display = "none";
             }
           }
           const currentRef: any = refIndividualPage.current;

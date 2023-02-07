@@ -15,7 +15,7 @@ class DateHandler extends InputHandler {
   public setDay: Dispatch<SetStateAction<number>> | undefined = undefined;
   public setDays: Dispatch<SetStateAction<number[]>> | undefined = undefined;
 
-  public current_year_list = Year_Option_Generater(10);
+  public current_year_list = Year_Option_Generater(44);
   public plan_todo_data = [];
 
   SelectCallback = (params: string, value: string) => {
