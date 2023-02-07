@@ -559,6 +559,13 @@ export default function detailRoute(fastify: FastifyInstance, options: any, done
 		const retiredDay: dayjs.Dayjs = dayjs(req.body.retiredDay);
 		const insuranceGrade = req.body.insuranceGrade;
 
+		// 신청일이 이직일로 부터 1년 초과 확인
+		if (!req.body.isMany) {
+			const now = dayjs();
+			if (Math.floor(now.diff(retiredDay, "day", true)) > 365)
+				return { succ: false, errorCode: 0, mesg: DefinedParamErrorMesg.expire };
+		}
+
 		// 1. 자영업자로서 최소 1년간 고용보험에 보험료를 납부해야함
 		const workingDays = Math.floor(retiredDay.diff(enterDay, "day", true)) + 1;
 		console.log("1. ", workingDays);
