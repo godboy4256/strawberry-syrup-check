@@ -184,9 +184,10 @@ export function getNextEmployerReceiveDay(workYear: number) {
 export const calVeryShortWorkDay = (limitDay: dayjs.Dayjs, retiredDay: dayjs.Dayjs, weekDay: number[]) => {
 	const diffToLimit = Math.floor(Math.floor(limitDay.diff("1951-01-01", "day", true)) / 7); // 입사일 - 1951.1.1.
 	const diffToRetired = Math.floor(Math.floor(retiredDay.diff("1951-01-01", "day", true)) / 7); // 퇴사일 - 1951.1.1.
-	const diffRetiredAndLimit = retiredDay.diff(limitDay, "day");
 
 	let workDay = (diffToRetired - diffToLimit - 1) * weekDay.length;
+
+	const diffRetiredAndLimit = retiredDay.diff(limitDay, "day");
 	if (diffRetiredAndLimit <= 7) {
 		if (weekDay.length === 2) {
 			if (retiredDay.day() >= weekDay[1]) return 2;
@@ -238,7 +239,7 @@ export function calDetailWorkingDay(limitDay: Dayjs, retiredDay: Dayjs, weekDay:
 	const firstWeekWorkDay = weekDay.length - weekDay.findIndex(findLimitDayIndex) + 1; // 유급 휴일 추가
 	const lastWeekWorkDay = weekDay.findIndex(findRetiredDayIndex) + 2; // index는 0부터 시작해서 보정, 유급 휴일 추가
 
-	const workingDays = (diffToRetired - diffToLimit) * weekDay.length + firstWeekWorkDay + lastWeekWorkDay;
+	const workingDays = (diffToRetired - diffToLimit - 1) * weekDay.length + firstWeekWorkDay + lastWeekWorkDay;
 
 	return workingDays;
 }

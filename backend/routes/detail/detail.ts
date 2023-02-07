@@ -449,7 +449,7 @@ export default function detailRoute(fastify: FastifyInstance, options: any, done
 			retiredDay: dayjs(req.body.retiredDay),
 		};
 		const retiredDayArr = req.body.retiredDay.split("-").map(Number);
-		console.log(mainData);
+		// console.log(mainData);
 
 		// 기본 조건 확인
 		const employmentDate = Math.floor(mainData.retiredDay.diff(mainData.enterDay, "day", true) + 1);
@@ -478,7 +478,7 @@ export default function detailRoute(fastify: FastifyInstance, options: any, done
 
 		// 전체 피보험 단위 기간
 		const workingDays = calVeryShortWorkDay(mainData.enterDay, mainData.retiredDay, req.body.weekDay);
-		console.log("3. ", workingDays);
+		console.log("workingDays:", workingDays);
 
 		// 퇴사일 전 3개월 총일수
 		let sumLastThreeMonthDays = 0;
@@ -486,7 +486,7 @@ export default function detailRoute(fastify: FastifyInstance, options: any, done
 			const month = mainData.retiredDay.subtract(i, "month").month() + 1; // 이게 정상 작동한다면 calLeastPayInfo의 수정이 필요함
 			sumLastThreeMonthDays += new Date(retiredDayArr[0], month, 0).getDate();
 		}
-		console.log("4. ", sumLastThreeMonthDays);
+		// console.log("4. ", sumLastThreeMonthDays);
 
 		// 급여 산정
 		const tempDayWorkTime = Math.floor((mainData.weekWorkTime / mainData.weekDay.length) * 10) / 10;
@@ -497,18 +497,18 @@ export default function detailRoute(fastify: FastifyInstance, options: any, done
 			sumLastThreeMonthDays,
 			dayWorkTime
 		);
-		console.log("5. ", realDayPay, realMonthPay);
+		// console.log("5. ", realDayPay, realMonthPay);
 
 		//
 		// const limitDay = dayjs(req.body.limitDay);
 		const workDayForMulti = mainData.enterDay.isSameOrAfter(limitDay, "day")
 			? workingDays
 			: calVeryShortWorkDay(limitDay, mainData.retiredDay, req.body.weekDay);
-		console.log("9. ", workDayForMulti);
+		// console.log("9. ", workDayForMulti);
 
 		// 수급 인정/ 불인정 판단
 		const isPermit = permitWorkDay >= 180 ? [true] : [false, permitWorkDay, 180 - permitWorkDay];
-		console.log("6. ", isPermit);
+		// console.log("6. ", isPermit);
 		if (!isPermit[0])
 			return {
 				succ: false,
@@ -525,8 +525,8 @@ export default function detailRoute(fastify: FastifyInstance, options: any, done
 		const workingYears = Math.floor(workingDays / 365);
 		const receiveDay = getReceiveDay(workingYears, req.body.age, req.body.disabled);
 		const [requireWorkingYear, nextReceiveDay] = getNextReceiveDay(workingYears, req.body.age, req.body.disabled);
-		console.log("7. ", workingYears, receiveDay);
-		console.log("8. ", requireWorkingYear, nextReceiveDay);
+		// console.log("7. ", workingYears, receiveDay);
+		// console.log("8. ", requireWorkingYear, nextReceiveDay);
 
 		if (nextReceiveDay === 0) {
 			return {
