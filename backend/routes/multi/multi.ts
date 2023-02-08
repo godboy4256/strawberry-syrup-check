@@ -37,22 +37,21 @@ export default function multiRoute(fastify: FastifyInstance, options: any, done:
 		// if (mainData.workCate === 8) {
 		// 	tempAddDatas = addDatas.filter((el) => el.workCate === 8 || el.workCate === 2 || el.workCate === 3);
 		// }
-		const filteredAddDatas =
-			mainData.workCate !== 2 && mainData.workCate !== 3 && mainData.workCate !== 8
-				? addDatas.filter((el) => el.workCate !== 8)
-				: addDatas;
+		// const filteredAddDatas = mainData.workCate !== 8 ? addDatas.filter((el) => el.workCate !== 8) : addDatas;
+		if (mainData.workCate === 8) return { succ: false, mesg: "mainData workCate is 8" };
+		const filteredAddDatas = addDatas.filter((el) => el.workCate !== 8);
 		// if (mainData.workCate !== 2 && mainData.workCate !== 3 && mainData.workCate !== 8) {
 		// 	tempAddDatas = addDatas.filter((el) => el.workCate !== 8);
 		// }
 		// addDatas = tempAddDatas;
-		console.log(filteredAddDatas);
+		console.log("filterdAddDatas:", filteredAddDatas);
 		// console.log(tempAddDatas);
 		// console.log(addDatas);
 		///////////////////////////////////////////////////////////
 
 		// 2. 마지막 직장의 입사일과 전직장의 이직일 사이 기간이 3년을 초과하는 지 확인 & 다음 근로 정보가 3년을 초과하는 경우 가장 최근 근로 정보만 이용해서 계산
 		console.log("start" + 2);
-		if (filteredAddDatas.length === 0) {
+		if (!filteredAddDatas.length) {
 			res.statusCode = 204;
 			return { succ: true };
 		}
@@ -76,7 +75,7 @@ export default function multiRoute(fastify: FastifyInstance, options: any, done:
 
 		// 5. 마지막 근로형태가 불규칙이라면 수급 불인정 메세지 리턴
 		console.log("start" + 5);
-		if (permitAddCandidates.length !== 0 && permitAddCandidates[permitAddCandidates.length - 1].isIrregular)
+		if (!permitAddCandidates.length && permitAddCandidates[permitAddCandidates.length - 1].isIrregular)
 			return { succ: false, errorCode: 9, mesg: "isIrregular" };
 
 		// 6. 이중취득 여부 확인
