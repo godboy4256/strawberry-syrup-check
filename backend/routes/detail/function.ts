@@ -238,6 +238,9 @@ export function calDetailWorkingDay(limitDay: Dayjs, retiredDay: Dayjs, weekDay:
 
 	if (diffToRetired - diffToLimit === 0) return weekDay.findIndex(findRetiredDayIndex) + 1;
 
+	if (retiredDay.diff(limitDay, "day") <= 7)
+		return weekDay.length - weekDay.findIndex(findLimitDayIndex) + (weekDay.findIndex(findRetiredDayIndex) + 1);
+
 	const firstWeekWorkDay = weekDay.length - weekDay.findIndex(findLimitDayIndex) + 1; // 유급 휴일 추가
 	const lastWeekWorkDay = weekDay.findIndex(findRetiredDayIndex) + 2; // index는 0부터 시작해서 보정, 유급 휴일 추가
 
