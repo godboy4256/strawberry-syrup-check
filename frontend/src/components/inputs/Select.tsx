@@ -10,6 +10,7 @@ const _CustomSelect = ({
   select_ment = "선택해 주세요.",
   className,
   select_icon,
+  defaultSelect,
 }: {
   options: string[] | number[];
   option_func: (
@@ -20,17 +21,32 @@ const _CustomSelect = ({
   select_ment?: string | number;
   className?: string;
   select_icon?: string;
+  defaultSelect?: string | number;
 }) => {
   const [onSelect, setOnSelect] = useState(false);
-  const [select, setSelect] = useState<string | number>("");
+  const [select, setSelect] = useState<string | number>();
   return (
     <div
       className={`custom_select ${className ? className : ""}`}
       onClick={() => setOnSelect((prev) => !prev)}
-      onBlur={() => setOnSelect(false)}
     >
-      <div className="custom_select_title">{select ? select : select_ment}</div>
-      <div className="custom_options" onBlur={() => setOnSelect(false)}>
+      {defaultSelect ? (
+        <div className="custom_select_title">
+          {defaultSelect ? defaultSelect : select_ment}
+        </div>
+      ) : (
+        <div className="custom_select_title">
+          {select ? select : select_ment}
+        </div>
+      )}
+
+      <div
+        className="custom_options"
+        style={{
+          overflowY: onSelect ? "scroll" : "hidden",
+        }}
+        onBlur={() => setOnSelect(false)}
+      >
         {onSelect &&
           options.map((el, idx: number) => {
             return (
@@ -62,11 +78,13 @@ const PopupSelect = ({
   callBack,
   params,
   popup_select,
+  defaultSelect,
 }: {
   options: string[] | number[];
   callBack?: CallableFunction;
   params: string;
   popup_select?: CallableFunction;
+  defaultSelect?: number | string;
 }) => {
   const [select, setSelect] = useState<number>(
     popup_select && (popup_select("workCate") ? popup_select("workCate") : 0)
@@ -102,6 +120,7 @@ const SelectInput = ({
   popup_select,
   check_popup,
   value_type,
+  defaultSelect,
 }: {
   selected?: number | string;
   options: string[] | number[];
@@ -114,6 +133,7 @@ const SelectInput = ({
   popup_select?: CallableFunction;
   check_popup?: string[];
   value_type?: "number" | "string";
+  defaultSelect?: number | string;
 }) => {
   const onClickOnOptionList = () => {
     CreatePopup(
@@ -123,6 +143,7 @@ const SelectInput = ({
         callBack={callBack}
         params="popup_select"
         popup_select={popup_select}
+        defaultSelect={defaultSelect}
       />,
       "confirm",
       () => {
@@ -169,6 +190,7 @@ const SelectInput = ({
             select_ment={options[0]}
             select_icon={IMGSelect}
             className="date_normal_style"
+            defaultSelect={defaultSelect}
           />
         </>
       ) : (

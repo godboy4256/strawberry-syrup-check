@@ -31,7 +31,9 @@ const CalContainer = ({
     <div id="cal_container" className="header_top_space">
       <div id="cal_current_guide" className="pd_810 fs_14">
         {`${type} ${
-          GetValue && GetValue("retired") !== undefined
+          GetValue &&
+          GetValue("cal_state") !== "multi" &&
+          GetValue("retired") !== undefined
             ? GetValue("retired")
               ? "> 퇴직자"
               : "> 퇴직예정자"

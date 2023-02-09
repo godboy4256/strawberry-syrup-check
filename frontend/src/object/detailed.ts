@@ -143,7 +143,7 @@ class DetailedHandler extends InputHandler {
   public Action_Cal_Result = () => {
     const weekDay =
       this._Data.weekDay &&
-      Object.values(this._Data.weekDay).map((el) => {
+      Object.values([...new Set(this._Data.weekDay)]).map((el) => {
         if (el === "월") {
           return 1;
         }

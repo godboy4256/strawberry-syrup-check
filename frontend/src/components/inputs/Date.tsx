@@ -14,21 +14,25 @@ class DateHandler extends InputHandler {
   public setMonth: Dispatch<SetStateAction<number>> | undefined = undefined;
   public setDay: Dispatch<SetStateAction<number>> | undefined = undefined;
   public setDays: Dispatch<SetStateAction<number[]>> | undefined = undefined;
-
+  public setDateValue: Dispatch<SetStateAction<string>> | undefined = undefined;
   public current_year_list = Year_Option_Generater(44);
   public plan_todo_data = [];
 
-  SelectCallback = (params: string, value: string) => {
-    this.SetPageVal(params, value);
+  SelectCallback = (params: string, value: number) => {
+    this.SetPageVal(params, Number(value));
     if (params === "year") {
-      this.setDays &&
-        this.setDays(this.Days_Option_Generater(Number(value), currentDate[1]));
-      this.setYear && this.setYear(Number(value));
-    } else if (params === "month") {
-      this.setDays &&
-        this.setDays(this.Days_Option_Generater(currentDate[0], Number(value)));
-      this.setMonth && this.setMonth(Number(value));
+      this.setYear && this.setYear(value);
     }
+    if (params === "month") {
+      this.setMonth && this.setMonth(value);
+    }
+    this.setDays &&
+      this.setDays(
+        this.Days_Option_Generater(
+          Number(this._Data["year"]),
+          this._Data["month"]
+        )
+      );
   };
 
   SelectDateNextClick = () => {
@@ -43,12 +47,12 @@ class DateHandler extends InputHandler {
               if (prev === Number(this.current_year_list[0])) {
                 return minYear;
               } else {
-                return prev + 1;
+                return Number(prev) + 1;
               }
             });
           return 1;
         } else {
-          return prev + 1;
+          return Number(prev) + 1;
         }
       });
   };
@@ -65,12 +69,12 @@ class DateHandler extends InputHandler {
               if (prev === minYear) {
                 return Number(this.current_year_list[0]);
               } else {
-                return prev - 1;
+                return Number(prev) - 1;
               }
             });
           return 12;
         } else {
-          return prev - 1;
+          return Number(prev) - 1;
         }
       });
   };
@@ -129,22 +133,35 @@ class DateHandler extends InputHandler {
   };
 }
 
+const handler = new DateHandler({});
+
 const _DaysComp = ({
   handler,
   planToDo,
   planToDoYear,
   planToDoMonth,
+  currentSelectDay,
 }: {
   handler: any;
   planToDo: string;
   planToDoYear: string;
   planToDoMonth: string;
+  currentSelectDay: number;
 }) => {
   const [selectedDate, setSelectedDate] = useState<any>(
-    planToDo ? [] : currentDate[2]
+    planToDo
+      ? handler.GetPageVal("plan_todo_data")
+        ? handler.GetPageVal("plan_todo_data")
+        : []
+      : currentSelectDay
+      ? currentSelectDay
+      : currentDate[2]
   );
   const [days, setDays] = useState(
-    handler.Days_Option_Generater(currentDate[0], currentDate[1])
+    handler.Days_Option_Generater(
+      planToDo ? planToDo[0] : currentDate[0],
+      planToDo ? planToDo[1] : currentDate[1]
+    )
   );
   useEffect(() => {
     handler.setDays = setDays;
@@ -156,7 +173,6 @@ const _DaysComp = ({
           <div
             key={String(el + Date.now()) + idx}
             onClick={() => {
-              console.log(`${planToDoYear}-${planToDoMonth}-${el}`);
               if (!el) return;
               if (planToDo) {
                 if (selectedDate.includes(el)) {
@@ -203,15 +219,38 @@ const _DaysComp = ({
   );
 };
 
-const _DateHeader = ({
+const _DatePopUp = ({
   handler,
-  planTodo,
+  years,
+  planToDo,
 }: {
   handler: any;
-  planTodo: string;
+  years: any[];
+  planToDo?: any;
 }) => {
-  const [year, setYear] = useState(planTodo ? planTodo[0] : currentDate[0]);
-  const [month, setMonth] = useState(planTodo ? planTodo[1] : currentDate[1]);
+  const currentSelectDate = [
+    handler.GetPageVal("year"),
+    handler.GetPageVal("month"),
+    Number(handler.GetPageVal("day")),
+  ];
+  const planTodo = planToDo && GetDateArr(planToDo("planToDo"));
+  const [planToDoButton, setState] = useState(false);
+  const [planToDoYear, setPlanToDoYear] = useState(planTodo && planTodo[0]);
+  const [planToDoMonth, setPlanToDoMonth] = useState(planTodo && planTodo[1]);
+  const [year, setYear] = useState(
+    planTodo
+      ? planTodo[0]
+      : currentSelectDate[0]
+      ? currentSelectDate[0]
+      : currentDate[0]
+  );
+  const [month, setMonth] = useState(
+    planTodo
+      ? planTodo[1]
+      : currentSelectDate[1]
+      ? currentSelectDate[1]
+      : currentDate[1]
+  );
   const [day, setDay] = useState(planTodo ? planTodo[2] : currentDate[2]);
   useEffect(() => {
     handler.setYear = setYear;
@@ -219,34 +258,19 @@ const _DateHeader = ({
     handler.setDay = setDay;
   }, []);
   return (
-    <div className="date_input_header">
-      {year}년 {month}월 {!planTodo ? `${day} 일` : ""}
-    </div>
-  );
-};
-
-const _DatePopUp = ({
-  handler,
-  year,
-  planToDo,
-}: {
-  handler: any;
-  year: any[];
-  planToDo?: any;
-}) => {
-  const planTodo = planToDo && GetDateArr(planToDo("planToDo"));
-  const [planToDoButton, setState] = useState(false);
-  const [planToDoYear, setPlanToDoYear] = useState(planTodo && planTodo[0]);
-  const [planToDoMonth, setPlanToDoMonth] = useState(planTodo && planTodo[1]);
-  return (
     <div className="date_input_container">
-      <_DateHeader handler={handler} planTodo={planTodo} />
+      <div className="date_input_header">
+        {year}년 {month}월 {!planTodo ? `${day} 일` : ""}
+      </div>
       <div id="date_input_controllbar">
         <button
           id="date_prev_btn"
           className={planToDo ? (planToDoButton ? "acitve" : "") : ""}
           onClick={() => {
             if (planToDo) {
+              handler.setDays(
+                handler.Days_Option_Generater(planTodo[0], planTodo[0] - 1)
+              );
               setState(true);
               if (planToDoMonth === 1) {
                 setPlanToDoYear((prev: number) => prev - 1);
@@ -257,8 +281,13 @@ const _DatePopUp = ({
                 }
                 return prev - 1;
               });
+            } else {
+              handler.SetPageVal("year", year);
+              handler.SetPageVal("month", month + 1);
+              handler.SetPageVal("day", day);
+              handler.setDays(handler.Days_Option_Generater(year, month));
+              handler.SelectDatePrevClick();
             }
-            handler.SelectDatePrevClick();
           }}
         >
           <img src={IMGRedDirection} alt="Date Prev Button" />
@@ -271,18 +300,18 @@ const _DatePopUp = ({
           ) : (
             <>
               <SelectInput
-                selected={currentDate[0]}
                 type="date_normal"
-                options={year}
+                options={years}
                 params="year"
                 callBack={handler.SelectCallback}
+                defaultSelect={year}
               />
               <SelectInput
-                selected={currentDate[1]}
                 type="date_normal"
                 options={[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]}
                 params="month"
                 callBack={handler.SelectCallback}
+                defaultSelect={month}
               />
             </>
           )}
@@ -291,9 +320,12 @@ const _DatePopUp = ({
           id="date_next_btn"
           className={planToDo ? (!planToDoButton ? "acitve" : "") : ""}
           onClick={() => {
-            console.log(1);
+            handler.setDays([1, 1]);
             if (planToDo) {
               setState(false);
+              handler.setDays(
+                handler.Days_Option_Generater(planTodo[0], planTodo[0])
+              );
               if (planToDoMonth === 12) {
                 setPlanToDoYear((prev: number) => prev + 1);
               }
@@ -303,8 +335,13 @@ const _DatePopUp = ({
                 }
                 return prev + 1;
               });
+            } else {
+              handler.SetPageVal("year", year);
+              handler.SetPageVal("month", month + 1);
+              handler.SetPageVal("day", day);
+              handler.setDays(handler.Days_Option_Generater(year, month));
+              handler.SelectDateNextClick();
             }
-            handler.SelectDateNextClick();
           }}
         >
           <img src={IMGRedDirection} alt="Date Next Button" />
@@ -324,6 +361,7 @@ const _DatePopUp = ({
         planToDo={planTodo}
         planToDoYear={planToDoYear}
         planToDoMonth={planToDoMonth}
+        currentSelectDay={currentSelectDate[2]}
       />
     </div>
   );
@@ -339,7 +377,7 @@ export const DateInputNormal = ({
   callBack,
   selected,
 }: {
-  params?: string;
+  params: string;
   label?: string;
   planToDo?: any;
   description?: string | "enter_day" | "insurance_end_day" | "self-employment";
@@ -348,15 +386,19 @@ export const DateInputNormal = ({
   callBack?: CallableFunction | undefined;
   selected?: string;
 }) => {
-  const handler = new DateHandler({});
-  const [dateValue, setDateValue] = useState("");
+  const [dateValue, setDateValue] = useState(selected ? selected : "");
+  useEffect(() => {
+    !handler.GetPageVal("year") && handler.SetPageVal("year", currentDate[0]);
+    !handler.GetPageVal("month") && handler.SetPageVal("month", currentDate[1]);
+    handler.setDateValue = setDateValue;
+  });
   const popupDate = () => {
     CreatePopup(
       "",
       <_DatePopUp
         handler={handler}
         planToDo={planToDo}
-        year={year ? year : handler.current_year_list}
+        years={year ? year : handler.current_year_list}
       />,
       "date",
       () => {

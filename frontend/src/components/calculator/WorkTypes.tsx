@@ -105,7 +105,10 @@ const WorkTypes = ({ handler }: { handler: any }) => {
         title="정보입력"
         leftLink="/main"
         leftType="BACK"
-        leftFunc={() => handler.setCompState(1)}
+        leftFunc={() => {
+          handler.setCompState(1);
+          handler.SetPageVal("retired", undefined);
+        }}
       />
       <div id="detail_container_comp1" className="full_height_layout_cal">
         <div className="public_side_padding">
