@@ -21,6 +21,7 @@
 }
 #header_container.active {
   box-shadow: none;
+  border: none;
 }
 #header_left_contents {
   width: 30px;

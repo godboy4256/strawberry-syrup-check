@@ -424,11 +424,12 @@ export const DetailCalComp = ({
         title="정보입력"
         leftLink="/main"
         leftType="BACK"
-        leftFunc={() =>
+        leftFunc={() => {
           handler.setCompState(
             handler.GetPageVal("cal_state") === "multi" ? 1 : 2
-          )
-        }
+          );
+          handler.SetPageVal("workCate", undefined);
+        }}
       />
       <div className={`${workCate !== 6 ? "public_side_padding" : ""}`}>
         {workCate !== 6 && handler.GetPageVal("cal_state") !== "multi" && (

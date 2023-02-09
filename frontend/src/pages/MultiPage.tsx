@@ -247,7 +247,6 @@ const _MultiCalListCard = ({ company }: { company: Company }) => {
     });
     handler.setCompanys && handler.setCompanys(cur_companys);
   };
-  console.log("현재 데이터", handler._Data);
   return (
     <div className="company_list">
       <div
@@ -310,6 +309,7 @@ const _MultiCompanyList = () => {
   }, [companys]);
   useEffect(() => {
     handler.setCompanys = setCompanys;
+    handler.SetPageVal("disabled_multi", "비장애인");
   }, []);
   return (
     <>

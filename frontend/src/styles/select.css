@@ -86,11 +86,11 @@
   left: 0;
   width: 100%;
   background-color: rgba(234, 91, 80, 1);
-  max-height: 250px;
+  max-height: 200px;
   overflow: scroll;
   border-bottom-left-radius: 5px;
   border-bottom-right-radius: 5px;
-  z-index: 9997;
+  z-index: 9998;
 }
 .custom_options > div {
   cursor: pointer;
