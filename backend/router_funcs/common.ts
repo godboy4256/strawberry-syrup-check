@@ -105,9 +105,9 @@ export function getReceiveDay(workingYears: number, age: number = 15, disabled: 
 export function getNextReceiveDay(workingYears: number, age: number, disabled: boolean = false) {
 	if (age >= 50 || disabled) {
 		if (workingYears < 1) return [1, 180];
-		if (workingYears >= 1 && workingYears < 3) return [3 - workingYears, 210];
-		if (workingYears >= 3 && workingYears < 5) return [5 - workingYears, 240];
-		if (workingYears >= 5 && workingYears < 10) return [10 - workingYears, 270];
+		if (workingYears >= 1 && workingYears < 3) return [3, 210];
+		if (workingYears >= 3 && workingYears < 5) return [5, 240];
+		if (workingYears >= 5 && workingYears < 10) return [10, 270];
 	}
 	if (workingYears < 1) return [1, 150];
 	if (workingYears >= 1 && workingYears < 3) return [3, 180];

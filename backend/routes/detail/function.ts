@@ -185,17 +185,30 @@ export const calVeryShortWorkDay = (limitDay: dayjs.Dayjs, retiredDay: dayjs.Day
 	const diffToLimit = Math.floor(Math.floor(limitDay.diff("1951-01-01", "day", true)) / 7); // 입사일 - 1951.1.1.
 	const diffToRetired = Math.floor(Math.floor(retiredDay.diff("1951-01-01", "day", true)) / 7); // 퇴사일 - 1951.1.1.
 
+	const findLimitDayIndex = (day: number) => {
+		return day === limitDay.day();
+	};
+	const findRetiredDayIndex = (day: number) => {
+		return day === retiredDay.day();
+	};
+
 	let workDay = (diffToRetired - diffToLimit - 1) * weekDay.length;
 
 	const diffRetiredAndLimit = retiredDay.diff(limitDay, "day");
+	console.log(diffRetiredAndLimit);
 	if (diffRetiredAndLimit <= 7) {
-		if (weekDay.length === 2) {
-			if (retiredDay.day() >= weekDay[1]) return 2;
-			if (retiredDay.day() >= weekDay[0]) return 1;
-			return workDay;
-		}
-		if (retiredDay.day() >= weekDay[0]) return 1;
-		return 0;
+		console.log("Hi");
+		// if (weekDay.length === 2) {
+		// 	console.log("hi02", retiredDay.day());
+		// 	if (retiredDay.day() >= weekDay[1]) return 2;
+		// 	console.log("hi03", retiredDay.day());
+		// 	if (retiredDay.day() >= weekDay[0]) return 1;
+		// 	console.log("hi04");
+		// 	return workDay;
+		// }
+		// if (retiredDay.day() >= weekDay[0]) return 1;
+		return weekDay.length - weekDay.findIndex(findLimitDayIndex) + (weekDay.findIndex(findRetiredDayIndex) + 1);
+		// return 0
 	}
 
 	if (limitDay.day() <= weekDay[0]) {
@@ -235,6 +248,11 @@ export function calDetailWorkingDay(limitDay: Dayjs, retiredDay: Dayjs, weekDay:
 
 	const diffToLimit = Math.floor(Math.floor(limitDay.diff("1951-01-01", "day", true)) / 7); // 입사일 - 1951.1.1.
 	const diffToRetired = Math.floor(Math.floor(retiredDay.diff("1951-01-01", "day", true)) / 7); // 퇴사일 - 1951.
+
+	if (diffToRetired - diffToLimit === 0) return weekDay.findIndex(findRetiredDayIndex) + 1;
+
+	if (retiredDay.diff(limitDay, "day") <= 7)
+		return weekDay.length - weekDay.findIndex(findLimitDayIndex) + (weekDay.findIndex(findRetiredDayIndex) + 1);
 
 	const firstWeekWorkDay = weekDay.length - weekDay.findIndex(findLimitDayIndex) + 1; // 유급 휴일 추가
 	const lastWeekWorkDay = weekDay.findIndex(findRetiredDayIndex) + 2; // index는 0부터 시작해서 보정, 유급 휴일 추가
