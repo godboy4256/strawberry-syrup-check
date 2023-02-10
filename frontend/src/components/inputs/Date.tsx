@@ -133,8 +133,6 @@ class DateHandler extends InputHandler {
   };
 }
 
-const handler = new DateHandler({});
-
 const _DaysComp = ({
   handler,
   planToDo,
@@ -386,6 +384,7 @@ export const DateInputNormal = ({
   callBack?: CallableFunction | undefined;
   selected?: string;
 }) => {
+  const handler = new DateHandler({});
   const [dateValue, setDateValue] = useState(selected ? selected : "");
   useEffect(() => {
     !handler.GetPageVal("year") && handler.SetPageVal("year", currentDate[0]);

@@ -215,7 +215,7 @@ const _UnSupplyResult = ({
                   : result_data?.workingMonths
               )}
             </span>
-            {unit === "day" ? "일" : "달"}
+            {unit === "day" ? "일" : "개월"}
           </div>
           <div className="font_color_white flex_box fs_14">
             부족한 근무{unit === "day" ? "일" : "월"}수 :{" "}
@@ -226,7 +226,7 @@ const _UnSupplyResult = ({
                   : result_data?.requireMonths
               )}
             </span>
-            {unit === "day" ? "일" : "달"}
+            {unit === "day" ? "일" : "개월"}
           </div>
         </div>
       )}
@@ -422,7 +422,7 @@ export const ResultComp = ({
             ) : (
               <_UnSupplyResult
                 emoticon={EMTDetailArtsUnSupply}
-                unit="month"
+                unit={cal_type === 2 ? "day" : "month"}
                 result_data={result_data}
                 helps={
                   result_data.is_short === "단기 예술인"
@@ -449,7 +449,7 @@ export const ResultComp = ({
             ) : (
               <_UnSupplyResult
                 emoticon={EMTDetailSpecialsUnSupply}
-                unit="month"
+                unit={cal_type === 3 ? "day" : "month"}
                 helps={
                   result_data.is_short === "단기특고"
                     ? ["저는 여러 건을 합치면 월 평균 기준이 되는데요?"]

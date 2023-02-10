@@ -26,12 +26,14 @@ const _BoxTypeCheckBox = ({
       onClick={() => {
         if (maxLenth)
           if (checkList.length === maxLenth) {
-            CreatePopup(
-              undefined,
-              `${label}은 ${maxLenth}개까지 선택할 수 있습니다.`,
-              "only_check"
-            );
-            return;
+            if (onSelect === false) {
+              CreatePopup(
+                undefined,
+                `${label}은 ${maxLenth}개까지 선택할 수 있습니다.`,
+                "only_check"
+              );
+              return;
+            }
           }
         setOnSelect((prev) => !prev);
         if (!onSelect) {

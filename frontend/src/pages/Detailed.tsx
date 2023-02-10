@@ -13,7 +13,6 @@ import Button from "../components/inputs/Button";
 import { ResultComp } from "../components/calculator/Result";
 import CalContainer from "../components/calculator/CalContainer";
 import Loading from "../components/common/Loading";
-import { calRecording } from "../utils/calrecord";
 import CheckBoxInput from "../components/inputs/Check";
 import { DetailConfirmPopup } from "../components/calculator/confirmPopup";
 import WorkRecordGen from "../components/calculator/workRecordGen";
