@@ -80,6 +80,14 @@
 .custom_select {
   position: relative;
 }
+.custom_select.work_time .custom_options {
+  max-height: 300px;
+}
+.custom_select.normal_style.work_time .custom_options div {
+  font-size: 15px;
+  padding: 5px 0;
+}
+
 .custom_options {
   position: absolute;
   top: 100%;

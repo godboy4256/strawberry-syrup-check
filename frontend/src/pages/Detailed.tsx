@@ -92,6 +92,7 @@ const _DetailCalStandad = ({ handler }: { handler: any }) => {
         callBack={handler.SetPageVal}
       />
       <SelectInput
+        className="work_time"
         params="dayWorkTime"
         callBack={handler.SetPageVal}
         selected={"근무 시간을 선택해주세요."}
@@ -149,6 +150,7 @@ const _DetailCalDayJob = ({ handler }: { handler: any }) => {
               type="normal"
               label="마지막 근무시간"
               value_type="string"
+              className="work_time"
               options={[
                 "시간을 선택해주세요.",
                 "1시간",
@@ -189,6 +191,7 @@ const _DetailCalDayJob = ({ handler }: { handler: any }) => {
               type="normal"
               label="마지막 근무시간"
               value_type="string"
+              className="work_time"
               options={[
                 "시간을 선택해주세요.",
                 "1시간",

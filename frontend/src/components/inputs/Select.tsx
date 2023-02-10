@@ -121,6 +121,7 @@ const SelectInput = ({
   check_popup,
   value_type,
   defaultSelect,
+  className,
 }: {
   selected?: number | string;
   options: string[] | number[];
@@ -134,6 +135,7 @@ const SelectInput = ({
   check_popup?: string[];
   value_type?: "number" | "string";
   defaultSelect?: number | string;
+  className?: string;
 }) => {
   const onClickOnOptionList = () => {
     CreatePopup(
@@ -215,7 +217,7 @@ const SelectInput = ({
               }}
               select_ment={options[0]}
               select_icon={IMGNormalSelect}
-              className="normal_style"
+              className={`normal_style ${className ? className : ""}`}
             />
           </>
         )
