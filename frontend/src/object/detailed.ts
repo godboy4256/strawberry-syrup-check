@@ -259,9 +259,10 @@ class DetailedHandler extends InputHandler {
                   ? null
                   : this._Data.employ_month + this._Data.employ_year * 12
                 : this.sumCal("sumWorkDay", this._Data.workRecord),
-            sumTwoYearWorkDay: this._Data.workRecord
-              ? this.sumCal("twoYear", this._Data.workRecord)
-              : null,
+            sumTwoYearWorkDay:
+              this._Data.workRecord.length > 0
+                ? this.sumCal("twoYear", this._Data.workRecord)
+                : null,
             sumOneYearPay:
               this._Data.input === "개별 입력"
                 ? this.sumCal("pay", this._Data.workRecord)
@@ -298,12 +299,14 @@ class DetailedHandler extends InputHandler {
                 : this._Data.isOverTen === true
                 ? this._Data.isOverTen
                 : false,
-            sumWorkDay: this._Data.workRecord
-              ? this.sumCal("sumWorkDayAll", this._Data.workRecord)
-              : this._Data.sumWorkDay,
-            dayAvgPay: this._Data.workRecord
-              ? this.getDayAvgPay(this._Data.workRecord)
-              : this._Data.dayAvgPay,
+            sumWorkDay:
+              this._Data.workRecord.length > 0
+                ? this.sumCal("sumWorkDayAll", this._Data.workRecord)
+                : this._Data.sumWorkDay,
+            dayAvgPay:
+              this._Data.workRecord.length > 0
+                ? this.getDayAvgPay(this._Data.workRecord)
+                : this._Data.dayAvgPay,
           }
         : workCate === 7 // 초단 시간
         ? {

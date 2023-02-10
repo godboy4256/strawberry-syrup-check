@@ -3,10 +3,8 @@ import {
   retire_reason_standard,
   work_cate2,
 } from "../../assets/data/worktype_data";
-import { GetDateArr } from "../../utils/date";
 
 export const DetailConfirmPopup = (confirm_data: any) => {
-  console.log(121, confirm_data);
   return (
     <div id="detail_confirm_popup">
       <div className="confirm_title_row_bar">
@@ -18,7 +16,8 @@ export const DetailConfirmPopup = (confirm_data: any) => {
           <div>{retire_reason_standard[confirm_data?.retireReason]}</div>
         </div>
       )}
-      {confirm_data?.workCate !== 8 && (
+      {(confirm_data?.workCate !== 8 ||
+        confirm_data?.cal_state !== "multi") && (
         <>
           <div className="confirm_title_row_bar">
             연령 : <div>만 {confirm_data?.age}세</div>

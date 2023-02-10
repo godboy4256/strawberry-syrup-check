@@ -92,16 +92,21 @@ const PrevCal = () => {
                     <div className="lh_27">{el.disReason}</div>
                   </div>
                 )}
-                <div className="receive_card font_color_main font_family_bold">
-                  퇴직금
-                </div>
-                <div className="font_family_bold">
-                  대상여부 : <div className="font_color_main">{el.succ}</div>
-                </div>
-                {el.succ === "대상자" && (
-                  <div className="font_family_bold">
-                    금액 : <div>{el.severancePay?.toLocaleString()}원</div>
-                  </div>
+                {el.severancePay && (
+                  <>
+                    <div className="receive_card font_color_main font_family_bold">
+                      퇴직금
+                    </div>
+                    <div className="font_family_bold">
+                      대상여부 :{" "}
+                      <div className="font_color_main">{el.succ}</div>
+                    </div>
+                    {el.succ === "대상자" && (
+                      <div className="font_family_bold">
+                        금액 : <div>{el.severancePay?.toLocaleString()}원</div>
+                      </div>
+                    )}
+                  </>
                 )}
                 <div className="cal_reacor_btncontainer">
                   <Button
