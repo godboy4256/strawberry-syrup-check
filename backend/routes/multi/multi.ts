@@ -72,11 +72,14 @@ export default function multiRoute(fastify: FastifyInstance, options: any, done:
 		const permitAddCandidates: TaddData[] = filteredAddDatas.filter((addData) =>
 			dayjs(addData.retiredDay).isSameOrAfter(limitDay, "date")
 		);
+		console.log(permitAddCandidates);
 
 		// 5. 마지막 근로형태가 불규칙이라면 수급 불인정 메세지 리턴
 		console.log("start" + 5);
-		// if (!permitAddCandidates.length && permitAddCandidates[permitAddCandidates.length - 1].isIrregular)
-		// 	return { succ: false, errorCode: 9, mesg: "isIrregular" };
+		if (permitAddCandidates.length) {
+			if (!permitAddCandidates.length && permitAddCandidates[permitAddCandidates.length - 1].isIrregular)
+				return { succ: false, errorCode: 9, mesg: "isIrregular" };
+		}
 
 		// 6. 이중취득 여부 확인
 		console.log("start" + 6);
