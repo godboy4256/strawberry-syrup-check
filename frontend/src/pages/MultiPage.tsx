@@ -17,9 +17,10 @@ import EMTDetailSpecialsSupply from "../assets/image/emoticon/detail_specials_su
 import EMTDetailDayJobSupply from "../assets/image/emoticon/detail_dayjob_supply.svg";
 import EMTDetailEmploySupply from "../assets/image/emoticon/detail_employ_supply.svg";
 import EMTDetailFullTimeSupply from "../assets/image/emoticon/detail_fulltime_supply.svg";
+import EMTDetailContractSupply from "../assets/image/emoticon/detail_contract_supply.svg";
 import EMTDetailVeryShortsSupply from "../assets/image/emoticon/detail_veryshort_supply.svg";
 import { DetailCalComp } from "./Detailed";
-import "../styles/multi.css";
+
 import { getAge, Year_Option_Generater } from "../utils/date";
 import { sendToServer } from "../utils/sendToserver";
 import { ResultComp } from "../components/calculator/Result";
@@ -29,6 +30,8 @@ import CheckBoxInput from "../components/inputs/Check";
 import { DateInputNormal } from "../components/inputs/Date";
 import { DetailPathCal } from "../object/common";
 import { CheckValiDation } from "../utils/validate";
+
+import "../styles/multi.css";
 
 interface Company {
   id: number;
@@ -62,8 +65,10 @@ class MultiCalHandler extends DetailedHandler {
               : this.GetPageVal("lastWorkDay")
           } 퇴사`,
           emoticon:
-            this._Data.workCate === 0 || this._Data.workCate === 1
+            this._Data.workCate === 0
               ? EMTDetailFullTimeSupply
+              : this._Data.workCate === 1
+              ? EMTDetailContractSupply
               : this._Data.workCate === 2 || this._Data.workCate === 4
               ? EMTDetailArtsSupply
               : this._Data.workCate === 3 || this._Data.workCate === 5
@@ -168,10 +173,14 @@ const _MultiMainDataSelect = () => {
             });
             let permitDays = result.workDayForMulti;
             if (handler.GetPageVal("dayJobPermitDay")) {
-              permitDays = handler.GetPageVal("dayJobPermitDay");
+              permitDays = handler.GetPageVal("dayJobPermitDay")
+                ? handler.GetPageVal("dayJobPermitDay")
+                : 0;
             }
             if (handler.GetPageVal("shortsPermitDay")) {
-              permitDays = handler.GetPageVal("shortsPermitDay");
+              permitDays = handler.GetPageVal("shortsPermitDay")
+                ? handler.GetPageVal("shortsPermitDay")
+                : 0;
             }
             addDataResultArr.push({
               workCate: addData[i].workCate,
@@ -216,36 +225,55 @@ const _MultiMainDataSelect = () => {
             },
             addData: addDataResultArr,
           };
-
           const result = await sendToServer(
             employData.length > 0 || mainData[0].workCate === 8
               ? "/multi/employer"
               : "/multi",
             multi_to_server
           );
-          if (result) {
-            handler.setCompState && handler.setCompState(5);
-            setTimeout(() => {
-              handler.setCompState && handler.setCompState(4);
-            }, 1000);
-            handler.SetPageVal("result", result);
-            calRecording(result, "복수형");
-          } else {
-            CreatePopup(undefined, "잘못된 계산입니다.", "only_check");
+
+          if (result?.checkResult?.succ === false) {
+            CreatePopup(
+              undefined,
+              result.checkResult.mesg ? result.checkResult.mesg : "",
+              "only_check"
+            );
+            return;
           }
+          handler.setCompState && handler.setCompState(5);
+          setTimeout(() => {
+            handler.setCompState && handler.setCompState(4);
+          }, 1000);
+          handler.SetPageVal("result", result);
+          calRecording(result, "복수형");
         }}
       />
     </div>
   );
 };
 
-const _MultiCalListCard = ({ company }: { company: Company }) => {
+const _MultiCalListCard = ({
+  company,
+  list_num,
+}: {
+  company: Company;
+  list_num: number;
+}) => {
   const onClickCompanyDelete = (e: MouseEvent<HTMLDivElement>) => {
-    if (!handler.companys || !handler.setCompanys) return;
-    const cur_companys = handler.companys.filter((el) => {
-      return String(el.id) !== String(e.currentTarget.id.split("_")[0]);
-    });
-    handler.setCompanys && handler.setCompanys(cur_companys);
+    const targetId = e.currentTarget.id;
+    CreatePopup(
+      undefined,
+      "삭제한 근로 정보는 다시 복구할 수 없습니다.정말 삭제하시겠습니까?",
+      "confirm",
+      () => {
+        if (!handler.companys || !handler.setCompanys) return;
+        const cur_companys = handler.companys.filter((el) => {
+          return String(el.id) !== String(targetId.split("_")[0]);
+        });
+        handler.setCompanys && handler.setCompanys(cur_companys);
+        ClosePopup();
+      }
+    );
   };
   return (
     <div className="company_list">
@@ -256,7 +284,9 @@ const _MultiCalListCard = ({ company }: { company: Company }) => {
       >
         <span></span>
       </div>
-      <div className="font_color_main fs_16"> {company.content}</div>
+      <div className="font_color_main fs_16">
+        {company.content ? company.content : `${list_num + 1}번 회사`}
+      </div>
       <div className="font_color_main fs_14">
         <WorkCatePopup
           handler={handler}
@@ -294,12 +324,12 @@ const _MultiCompanyList = () => {
       : [
           {
             id: 1,
-            content: "1번 회사",
+            content: "",
             emoticon: "",
           },
           {
             id: 2,
-            content: "2번 회사",
+            content: "",
             emoticon: "",
           },
         ]
@@ -352,19 +382,31 @@ const _MultiCompanyList = () => {
         />
       </div>
       <div id="multi_company_list" className="public_side_padding">
-        {companys.map((el) => {
+        {companys.map((el, idx) => {
           return (
-            <_MultiCalListCard key={el.content + String(el.id)} company={el} />
+            <_MultiCalListCard
+              key={el.content + String(el.id)}
+              company={el}
+              list_num={idx}
+            />
           );
         })}
         <button
           id="company_add_btn"
           onClick={() => {
+            if (companys.length > 4) {
+              CreatePopup(
+                undefined,
+                "회사 근무 정보는 5개까지 입력할 수 있습니다.",
+                "only_check"
+              );
+              return;
+            }
             setCompanys([
               ...companys,
               {
                 id: companys.length + 1,
-                content: `${companys.length + 1}번 회사`,
+                content: "",
                 emoticon: undefined,
               },
             ]);
@@ -407,7 +449,29 @@ const MultiCalPage = () => {
                   <Button
                     text="초기화"
                     type="popup_cancel"
-                    click_func={() => {}}
+                    click_func={() => {
+                      CreatePopup(
+                        undefined,
+                        "입력했던 모든 근로 정보들이 초기화 됩니다.",
+                        "confirm",
+                        () => {
+                          handler.setCompanys &&
+                            handler.setCompanys([
+                              {
+                                id: 1,
+                                content: "",
+                                emoticon: "",
+                              },
+                              {
+                                id: 2,
+                                content: "",
+                                emoticon: "",
+                              },
+                            ]);
+                          ClosePopup();
+                        }
+                      );
+                    }}
                   />
                   <Button
                     text="계산하기"

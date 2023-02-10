@@ -157,7 +157,7 @@ const SelectInput = ({
             "confirm",
             () => {
               popUpCallBack &&
-                popUpCallBack(params, popup_select("popup_select"));
+                popUpCallBack(params, popup_select("popup_select") - 1);
               ClosePopup();
             },
             () => {}, // 다시 선택하면 돌아갈 수 있도록 함수 분리

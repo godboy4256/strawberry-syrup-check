@@ -13,21 +13,17 @@ const before_month_cal = (retiredDay: string) => {
     month3 = month2 - 1 === 0 ? 12 : month2 - 1,
     year1 = year_slice,
     year2 = month2 > month1 ? year_slice - 1 : year_slice,
-    year3 = month3 > month2 ? year_slice - 1 : year_slice,
-    day1 = targetDate[2],
-    day2 = new Date(2022, month2, 0).getDate(),
-    day3 = new Date(2022, month3, 0).getDate();
-
+    year3 = month3 > month2 ? year_slice - 1 : year_slice;
   return [
-    `${year1}.${String(month1).padStart(2, "0")}.01. ~ ${year1}.${String(
-      month1
-    ).padStart(2, "0")}.${day1}.`,
-    `${year2}.${String(month2).padStart(2, "0")}.01. ~ ${year2}.${String(
-      month2
-    ).padStart(2, "0")}.${day2}.`,
-    `${year3}.${String(month3).padStart(2, "0")}.01. ~ ${year3}.${String(
-      month3
-    ).padStart(2, "0")}.${day3}.`,
+    `${year1}.${String(month1).padStart(2, "0")}.${
+      targetDate[2]
+    }. ~ ${year1}.${String(month1).padStart(2, "0")}.${targetDate[2]}.`,
+    `${year2}.${String(month2).padStart(2, "0")}.${
+      targetDate[2]
+    }. ~${year1}.${String(month2).padStart(2, "0")}.${targetDate[2]}.`,
+    `${year3}.${String(month3).padStart(2, "0")}.${
+      targetDate[2]
+    }.~${year1}.${String(month3).padStart(2, "0")}.${targetDate[2]}.`,
   ];
 };
 
@@ -46,12 +42,6 @@ const TabInputs = ({
 }) => {
   const multi_salary_data: any = {};
   const [salarytab, setSalaryTab] = useState("all");
-  const beforeMonthCal_input =
-    valueDay && valueDay("retiredDay")
-      ? before_month_cal(valueDay && valueDay("retiredDay"))
-      : before_month_cal(
-          `${GetDateArr(null)[0]}-${GetDateArr(null)[1]}-${GetDateArr(null)[2]}`
-        );
   const onChangeTabInput = (in_params: string, value: string) => {
     multi_salary_data[in_params] = value;
     callBack && callBack(params, Object.values(multi_salary_data));
@@ -104,19 +94,25 @@ const TabInputs = ({
             ) : (
               salarytab === "three_month" && (
                 <>
-                  <div className="fs_14">{beforeMonthCal_input?.[0]}</div>
+                  <div className="fs_14">
+                    {before_month_cal(valueDay && valueDay("retiredDay"))?.[0]}
+                  </div>
                   <NumberInput
                     params="salary_01"
                     num_unit="원"
                     callBack={onChangeTabInput}
                   />
-                  <div className="fs_14">{beforeMonthCal_input?.[1]}</div>
+                  <div className="fs_14">
+                    {before_month_cal(valueDay && valueDay("retiredDay"))?.[1]}
+                  </div>
                   <NumberInput
                     params="salary_02"
                     num_unit="원"
                     callBack={onChangeTabInput}
                   />
-                  <div className="fs_14">{beforeMonthCal_input?.[2]}</div>
+                  <div className="fs_14">
+                    {before_month_cal(valueDay && valueDay("retiredDay"))?.[2]}
+                  </div>
                   <NumberInput
                     params="salary_03"
                     num_unit="원"

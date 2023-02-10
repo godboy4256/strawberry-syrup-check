@@ -17,11 +17,11 @@ const CalContainer = ({
       : GetValue("workCate") === 1
       ? "> 계약직"
       : GetValue("workCate") === 2
-      ? "> 일용직"
-      : GetValue("workCate") === 3
       ? "> 예술인"
-      : GetValue("workCate") === 4
+      : GetValue("workCate") === 3
       ? "> 특고"
+      : GetValue("workCate") === 4
+      ? "> 일용직"
       : GetValue("workCate") === 5
       ? "> 초단시간"
       : GetValue("workCate") === 6
