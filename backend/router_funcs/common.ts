@@ -60,7 +60,7 @@ export function getFailResult(
 	receiveDay: number,
 	dayAvgPay: number,
 	isDetail: boolean = false,
-	workDayForMulti: number
+	workDayForMulti?: number
 ) {
 	if (retired || isDetail) {
 		return {
@@ -87,7 +87,6 @@ export function getFailResult(
 		realDayPay, // 일 수급액
 		receiveDays: receiveDay, // 소정급여일수는 항상 120일로 최소단위 적용
 		realMonthPay, // 월 수급액
-		workDayForMulti,
 	};
 }
 
