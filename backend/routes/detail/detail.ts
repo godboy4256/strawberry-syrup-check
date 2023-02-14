@@ -88,7 +88,8 @@ export default function detailRoute(fastify: FastifyInstance, options: any, done
 				leastRequireWorkingDay,
 				receiveDay,
 				dayAvgPay,
-				true
+				true,
+				workDayForMulti
 			);
 
 		// 이 때 다음 단계 수급이 가능하다면 같이 전달
