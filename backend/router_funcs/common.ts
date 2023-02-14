@@ -59,7 +59,8 @@ export function getFailResult(
 	leastRequireWorkingDay: number,
 	receiveDay: number,
 	dayAvgPay: number,
-	isDetail: boolean = false
+	isDetail: boolean = false,
+	workDayForMulti: number
 ) {
 	if (retired || isDetail) {
 		return {
@@ -70,6 +71,7 @@ export function getFailResult(
 			requireDays: leastRequireWorkingDay - workingDays, // 부족 근무일수
 			realDayPay,
 			dayAvgPay,
+			workDayForMulti,
 		};
 	}
 	const availableDay = calDday(new Date(retiredDay.format("YYYY-MM-DD")), leastRequireWorkingDay - workingDays);
@@ -85,6 +87,7 @@ export function getFailResult(
 		realDayPay, // 일 수급액
 		receiveDays: receiveDay, // 소정급여일수는 항상 120일로 최소단위 적용
 		realMonthPay, // 월 수급액
+		workDayForMulti,
 	};
 }
 
