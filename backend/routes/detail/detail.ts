@@ -271,6 +271,12 @@ export default function detailRoute(fastify: FastifyInstance, options: any, done
 		console.log("3. ", "lastWorkDay:", lastWorkDay.format("YYYY-MM-DD"), "sumOneYearWorkDay:", sumOneYearWorkDay);
 		console.log(dayAvgPay, realDayPay, realMonthPay);
 
+		// 3. 가입일 추정 계산, 직종관련 조정, 근무 기간 조정
+		const tempEnterDay = mainData.isSimple // 개별입력, 결과만 입력
+			? lastWorkDay.subtract(mainData.sumWorkDay, "month")
+			: lastWorkDay.subtract(mainData.sumTwoYearWorkDay, "month");
+		const enterDay = mainData.workCate === 5 ? checkJobCate(tempEnterDay, mainData.jobCate) : tempEnterDay; // 직종 조정
+
 		// 3. 수급 인정/불인정 판단 => 결과만 입력 계산기능 필요
 		const isPermit = mainData.isSimple
 			? artShortCheckPermit(mainData.sumWorkDay, mainData.isSpecial)
@@ -284,7 +290,6 @@ export default function detailRoute(fastify: FastifyInstance, options: any, done
 		///////////////////////////////////////////////////////////////
 		// 8. 복수형에서 사용하기위한 workDayForMulti 계산
 		const limitDay = dayjs(mainData.limitDay);
-		const enterDay = lastWorkDay.subtract(mainData.sumWorkDay, "month"); // 입사일
 		console.log(enterDay.format("YYYY-MM-DD"));
 
 		const workDayForMulti = enterDay.isSameOrAfter(limitDay, "day")
