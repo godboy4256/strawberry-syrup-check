@@ -67,6 +67,12 @@ const CheckBoxInput = ({
   selected?: string;
   maxLenth?: number;
 }) => {
+  useEffect(() => {
+    return () => {
+      checkList = [];
+      console.log(checkList);
+    };
+  });
   return (
     <>
       {label && <div className="fs_16 write_label">{label}</div>}

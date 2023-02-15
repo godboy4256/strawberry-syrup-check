@@ -131,6 +131,46 @@ class DetailedHandler extends InputHandler {
     }
   };
 
+  public Action_Cal_Func = async (
+    url: any,
+    workCate: number,
+    to_servers: string
+  ) => {
+    const res = await sendToServer(url ? url : "", to_servers);
+    if (res.statusCode === 400 || res.mesg) {
+      CreatePopup(undefined, res.mesg ? res.mesg : res.message, "only_check");
+    } else {
+      ClosePopup();
+      calRecording(
+        res,
+        "상세형",
+        workCate === 0
+          ? "정규직"
+          : workCate === 1
+          ? "기간제"
+          : workCate === 2
+          ? this.GetPageVal("is_short")
+          : workCate === 4
+          ? this.GetPageVal("is_short")
+          : workCate === 6
+          ? "일용직"
+          : workCate === 7
+          ? "초단시간"
+          : workCate === 8
+          ? "자영업"
+          : ""
+      );
+      this.setCompState &&
+        this.setCompState(this.GetPageVal("cal_state") !== "multi" ? 5 : 1);
+      if (this.GetPageVal("cal_state") !== "multi") {
+        setTimeout(() => {
+          this.setCompState && this.setCompState(4);
+        }, 1000);
+      }
+      this.SetPageVal("allresult", res);
+    }
+  };
+
   public getSumOneYearPay = (arr: any) => {
     let answer: number = 0;
     for (let i = 0; i < arr.length; i++) {
@@ -404,55 +444,21 @@ class DetailedHandler extends InputHandler {
       return;
 
     this.SetPageVal("confirm_popup_result", to_servers);
-    CreatePopup(
-      "입력하신 정보가 맞습니까?",
-      DetailConfirmPopup(to_servers),
-      "confirm",
-      async () => {
-        if (this._Data.cal_state === "multi") {
-          ClosePopup();
-          this.setCompState && this.setCompState(1);
-        } else {
-          const res = await sendToServer(url ? url : "", to_servers);
-          if (res.statusCode === 400 || res.mesg) {
-            CreatePopup(
-              undefined,
-              res.mesg ? res.mesg : res.message,
-              "only_check"
-            );
-          } else {
-            ClosePopup();
-            calRecording(
-              res,
-              "상세형",
-              workCate === 0
-                ? "정규직"
-                : workCate === 1
-                ? "기간제"
-                : workCate === 2
-                ? this.GetPageVal("is_short")
-                : workCate === 4
-                ? this.GetPageVal("is_short")
-                : workCate === 6
-                ? "일용직"
-                : workCate === 7
-                ? "초단시간"
-                : workCate === 8
-                ? "자영업"
-                : ""
-            );
-            this.setCompState && this.setCompState(5);
-            setTimeout(() => {
-              this.setCompState && this.setCompState(4);
-            }, 1000);
-            this.SetPageVal("allresult", res);
-          }
-        }
-      },
-      () => {},
-      "예",
-      "아니오"
-    );
+    if (this._Data.cal_state !== "multi") {
+      CreatePopup(
+        "입력하신 정보가 맞습니까?",
+        DetailConfirmPopup(to_servers),
+        "confirm",
+        () => {
+          this.Action_Cal_Func(url, workCate, to_servers);
+        },
+        () => {},
+        "예",
+        "아니오"
+      );
+    } else {
+      this.Action_Cal_Func(url, workCate, to_servers);
+    }
 
     return this._Data.cal_state === "multi" ? to_servers : null;
   };

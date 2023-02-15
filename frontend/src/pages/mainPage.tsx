@@ -81,8 +81,8 @@ const MainPage = () => {
                   <img src={IMGTitleBasic} alt="기본형 타이틀" />
                 </h4>
                 <img src={IMGIconBasic} alt="기본형 이미지" />
-                <p className="bg_color_main fs_18 font_color_white font_family_bold lh_27">
-                  이미 퇴사한 사람뿐 아니라 재직 중인 사람도
+                <p className="bg_color_main fs_18 font_color_white font_family_bold lh_27 txt_ct">
+                  날짜와 돈만 안다면 쉽고 빠른 계산
                 </p>
               </div>
             </Link>
@@ -92,8 +92,8 @@ const MainPage = () => {
                   <img src={IMGTitleDetail} alt="상세형 타이틀" />
                 </h4>
                 <img src={IMGIconDetail} alt="상세형 이미지" />
-                <p className="bg_color_main fs_18 font_color_white font_family_bold lh_27">
-                  근로형태, 퇴직사유 등 사용자가 직접 입력
+                <p className="bg_color_main fs_18 font_color_white font_family_bold lh_27 txt_ct">
+                  나의 근로 형태에 따라 정확한 맞춤 계산
                 </p>
               </div>
             </Link>
@@ -103,8 +103,8 @@ const MainPage = () => {
                   <img src={IMGTitleMulti} alt="복수형 타이틀" />
                 </h4>
                 <img src={IMGIconMulti} alt="복수형 이미지" />
-                <p className="bg_color_main fs_18 font_color_white font_family_bold lh_27">
-                  두 곳 이상의 회사에서 재직한 경우 합산
+                <p className="bg_color_main fs_18 font_color_white font_family_bold lh_27 txt_ct">
+                  두 곳 이상 회사에서 재직했다면 합산
                 </p>
               </div>
             </Link>

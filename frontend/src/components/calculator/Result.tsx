@@ -276,14 +276,13 @@ export const ResultComp = ({
   weekDay?: number;
 }) => {
   const [next, setNext] = useState(false);
-  console.log("result_data", result_data);
   return (
     <>
       <Header
         title="계산 결과"
         leftLink="/main"
         leftType="BACK"
-        leftFunc={back_func}
+        leftFunc={next === false ? back_func : () => setNext(false)}
       />
       {next ? (
         <_NextSupplyResult
