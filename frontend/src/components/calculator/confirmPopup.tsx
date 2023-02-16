@@ -6,16 +6,18 @@ import {
 import { GetDateArr } from "../../utils/date";
 import IMGPrev from "../../assets/image/new/i_date_prev.svg";
 import IMGNext from "../../assets/image/new/i_date_next.svg";
-import { MouseEvent, useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 export const DetailConfirmPopup = (confirm_data: any) => {
-  const months = confirm_data?.sumWorkDay
-    ? Math.floor(confirm_data?.sumWorkDay / 30)
+  const years =
+    confirm_data?.sumWorkDay && Math.floor(confirm_data?.sumWorkDay / 12);
+  const remainingMonths = confirm_data?.sumWorkDay
+    ? Math.floor(confirm_data?.sumWorkDay) % 12
     : "";
-  const years = months ? Math.floor(months / 12) : "";
-  const remainingMonths = months ? months % 12 : "";
-  const sumWorkDayFormatted = months
-    ? `${years ? years + "년 " : ""}${remainingMonths}개월`
+  const sumWorkDayFormatted = confirm_data?.sumWorkDay
+    ? `${years ? years + "년 " : ""}${
+        remainingMonths ? `${remainingMonths}개월` : ""
+      }`
     : "";
   return (
     <div id="detail_confirm_popup">
@@ -60,9 +62,9 @@ export const DetailConfirmPopup = (confirm_data: any) => {
             <div className="fs_14">{confirm_data?.dayWorkTime}시간</div>
           </div>
           <div className="confirm_title_row_bar fs_14">
-            월 급여(세전)
+            월 급여 (세전)
             <div className="fs_14">
-              월 {confirm_data?.salary?.[0]?.toLocaleString()}원
+              {confirm_data?.salary?.[0]?.toLocaleString()}원
             </div>
           </div>
         </>
@@ -88,7 +90,7 @@ export const DetailConfirmPopup = (confirm_data: any) => {
             퇴직 전 12개월
             <br /> 급여 총액
             <div className="fs_14">
-              월 {confirm_data?.sumTwelveMonthSalary?.toLocaleString()}원
+              {confirm_data?.sumTwelveMonthSalary?.toLocaleString()}원
             </div>
           </div>
         </>
@@ -158,7 +160,7 @@ export const DetailConfirmPopup = (confirm_data: any) => {
             <div className="fs_14">주 {confirm_data?.weekDay?.length}일</div>
           </div>
           <div className="confirm_title_row_bar fs_14">
-            월 급여(세전)
+            월 급여 (세전)
             <div className="fs_14">
               {confirm_data?.salary?.[0]?.toLocaleString()}원
             </div>

@@ -15,16 +15,20 @@ const CalContainer = ({
     (GetValue("workCate") === 0
       ? "> 정규직"
       : GetValue("workCate") === 1
-      ? "> 계약직"
+      ? "> 기간제"
       : GetValue("workCate") === 2
       ? "> 예술인"
       : GetValue("workCate") === 3
       ? "> 특고"
       : GetValue("workCate") === 4
-      ? "> 일용직"
+      ? "> 단기 예술인"
       : GetValue("workCate") === 5
-      ? "> 초단시간"
+      ? "> 단기 특고"
       : GetValue("workCate") === 6
+      ? "> 일용직"
+      : GetValue("workCate") === 7
+      ? "> 초단시간"
+      : GetValue("workCate") === 8
       ? "> 자영업"
       : "");
   return (

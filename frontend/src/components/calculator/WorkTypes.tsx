@@ -91,10 +91,13 @@ const WorkTypes = ({ handler }: { handler: any }) => {
   const [workRypeInfo3, _] = useState<"select" | "next" | "none">("none");
   const popUpCallBack = (params: string, value: string | number) => {
     handler.SetPageVal(params, value);
-    if (value === undefined || isNaN(Number(value)))
+    if (value === undefined) {
       handler.SetPageVal(params, 0);
+    }
     if (params === "workCate") {
       setState1("select");
+      setState2("none");
+      handler.SetPageVal("retireReason", undefined);
       setWorkCate(value);
     } else {
       setState2("select");
@@ -141,7 +144,7 @@ const WorkTypes = ({ handler }: { handler: any }) => {
             options={
               workCate === 0 || workCate === undefined
                 ? retire_reason_standard
-                : workCate === 1 || workCate === 2 || workCate === 3
+                : workCate === 2 || workCate === 3
                 ? retire_reason_art
                 : workCate === 4 || workCate === 1 || workCate === 5
                 ? retire_reason_dayjob

@@ -65,6 +65,7 @@ export const retire_reason_art = [
 
 export const retire_reason_dayjob = [
   "권고사직",
+  "계약만료",
   "질병",
   "임신/출산/육아",
   "회사 잘못",

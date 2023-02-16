@@ -20,9 +20,12 @@ const server = fastify({
 	logger: false,
 });
 
+console.log("변경됨");
+
 server.register(cors, {
-	origin: ["https://www.moneysylove.com", "https://www.moneysylove.du.r.appspot.com"],
+	// origin: ["https://www.moneysylove.com", "https://www.moneysylove.du.r.appspot.com"],
 	// origin: ["http://localhost:8080/", "http://localhost:3000/"],
+	origin: true,
 	methods: ["GET", "POST"],
 	credentials: true,
 });

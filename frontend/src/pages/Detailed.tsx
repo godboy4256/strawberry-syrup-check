@@ -110,7 +110,7 @@ const _DetailCalStandad = ({ handler }: { handler: any }) => {
         ]}
       />
       <TabInputs
-        label="월 급여"
+        label="월 급여 (세전)"
         type="salary"
         params="salary"
         callBack={handler.SetPageVal}
@@ -283,7 +283,8 @@ const _DetailCalArt = ({ handler }: { handler: any }) => {
           )}
           <NumberInput
             params="sumTwelveMonthSalary"
-            label="퇴직 전 12개월 급여 총액"
+            placeholder="금액을 입력해주세요. (단위: 원) "
+            label="퇴직 전 12개월 급여 총액 (세전)"
             num_unit="원"
             callBack={handler.SetPageVal}
           />
@@ -330,10 +331,12 @@ const _DetailCalArt = ({ handler }: { handler: any }) => {
                 callBack={handler.SetPageVal}
                 double={true}
                 k_parser={false}
+                className="border_b"
               />
               <NumberInput
                 params="sumOneYearPay"
-                label="퇴직 전 12개월 급여 총액"
+                label="퇴직 전 12개월 급여 총액 (세전)"
+                placeholder="금액을 입력해주세요. (단위: 원) "
                 num_unit="원"
                 callBack={handler.SetPageVal}
               />
@@ -377,7 +380,7 @@ const _DetailCalVeryShort = ({ handler }: { handler: any }) => {
         max_num={14}
       />
       <TabInputs
-        label="월 급여"
+        label="월 급여 (세전)"
         type="salary"
         params="salary"
         callBack={handler.SetPageVal}
@@ -431,6 +434,7 @@ export const DetailCalComp = ({
             handler.GetPageVal("cal_state") === "multi" ? 1 : 2
           );
           handler.SetPageVal("workCate", undefined);
+          handler.SetPageVal("retireReason", undefined);
         }}
       />
       <div className={`${workCate !== 6 ? "public_side_padding" : ""}`}>

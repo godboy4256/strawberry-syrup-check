@@ -66,19 +66,17 @@ class MultiCalHandler extends DetailedHandler {
               : this.GetPageVal("lastWorkDay")
           } 퇴사`,
           emoticon:
-            this._Data.workCate === 0
+            this._Data.workCate === 0 || this._Data.workCate === 1
               ? EMTDetailFullTimeSupply
-              : this._Data.workCate === 1
-              ? EMTDetailContractSupply
-              : this._Data.workCate === 2
+              : this._Data.workCate === 2 || this._Data.workCate === 4
               ? EMTDetailArtsSupply
-              : this._Data.workCate === 3
+              : this._Data.workCate === 3 || this._Data.workCate === 5
               ? EMTDetailSpecialsSupply
-              : this._Data.workCate === 4
+              : this._Data.workCate === 6
               ? EMTDetailDayJobSupply
-              : this._Data.workCate === 5
+              : this._Data.workCate === 7
               ? EMTDetailVeryShortsSupply
-              : this._Data.workCate === 6 && EMTDetailEmploySupply,
+              : this._Data.workCate === 8 && EMTDetailEmploySupply,
         };
       } else {
         return el;
