@@ -24,6 +24,7 @@ const SlideGuideDirection = () => {
   const [slideComment, setSlideComment] = useState(0);
   useEffect(() => {
     handler.setSlideComment = setSlideComment;
+    console.log("확인차");
   }, []);
   return (
     <>

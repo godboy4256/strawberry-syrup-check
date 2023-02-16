@@ -231,6 +231,8 @@ class DetailedHandler extends InputHandler {
         ? 8
         : this._Data.workCate;
 
+    this.SetPageVal("workCate", workCate);
+
     const to_server_common = {
       retired: this._Data.retired ? this._Data.retired : true,
       workCate: workCate,

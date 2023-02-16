@@ -80,6 +80,8 @@ const WorkTypes = ({ handler }: { handler: any }) => {
       ...handler._Data,
       retired: handler._Data.retired,
     };
+    handler.SetPageVal("workCate", undefined);
+    handler.SetPageVal("retireReason", undefined);
   }, []);
   const [workCate, setWorkCate] = useState<number | string>(0);
   const [workRypeInfo1, setState1] = useState<"select" | "next" | "none">(
@@ -91,8 +93,9 @@ const WorkTypes = ({ handler }: { handler: any }) => {
   const [workRypeInfo3, _] = useState<"select" | "next" | "none">("none");
   const popUpCallBack = (params: string, value: string | number) => {
     handler.SetPageVal(params, value);
-    if (value === undefined || isNaN(Number(value)))
+    if (value === undefined) {
       handler.SetPageVal(params, 0);
+    }
     if (params === "workCate") {
       setState1("select");
       setWorkCate(value);
