@@ -447,8 +447,9 @@ class DetailedHandler extends InputHandler {
 
     this.SetPageVal("confirm_popup_result", to_servers);
     if (this._Data.cal_state !== "multi") {
+      console.log(12123, to_servers);
       CreatePopup(
-        "입력하신 정보가 맞습니까?",
+        "입력하신 정보가 맞습니까",
         DetailConfirmPopup(to_servers),
         "confirm",
         () => {

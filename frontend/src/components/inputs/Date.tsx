@@ -433,7 +433,7 @@ export const DateInputNormal = ({
           onClick={onClickDateOn}
           className={`date_container ${!dateValue ? "unselect" : ""}`}
         >
-          <div className={`date_value ${!dateValue ? "unselect" : ""}`}>
+          <div className={`date_value fs_14 ${!dateValue ? "unselect" : ""}`}>
             {!dateValue
               ? placeholder
                 ? placeholder

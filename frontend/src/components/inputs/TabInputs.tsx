@@ -88,7 +88,13 @@ const TabInputs = ({
   };
   return (
     <>
-      <div className="fs_16 write_label">{label}</div>
+      <div className="flex_box write_label write_label_and_guide">
+        <div className="fs_16">{label}</div>
+        <div className="font_color_gray fs_12 write_label_guide">
+          월 최저임금
+          <br /> 9620원
+        </div>
+      </div>
       <div id="salary_tab_container">
         <div id="salary_tab_header" className={salarytab}>
           <button
@@ -130,7 +136,12 @@ const TabInputs = ({
         >
           {type === "salary" &&
             (salarytab === "all" ? (
-              <NumberInput params={params} num_unit="원" callBack={callBack} />
+              <NumberInput
+                placeholder="금액을 입력해주세요. (단위 : 원)"
+                params={params}
+                num_unit="원"
+                callBack={callBack}
+              />
             ) : (
               salarytab === "three_month" && (
                 <>
@@ -141,6 +152,7 @@ const TabInputs = ({
                     params="salary_01"
                     num_unit="원"
                     callBack={onChangeTabInput}
+                    placeholder="금액을 입력해주세요. (단위 : 원)"
                   />
                   <div className="fs_14">
                     {before_month_cal(valueDay && valueDay("retiredDay"))[1]}
@@ -149,6 +161,7 @@ const TabInputs = ({
                     params="salary_02"
                     num_unit="원"
                     callBack={onChangeTabInput}
+                    placeholder="금액을 입력해주세요. (단위 : 원)"
                   />
                   <div className="fs_14">
                     {before_month_cal(valueDay && valueDay("retiredDay"))[2]}
@@ -157,6 +170,7 @@ const TabInputs = ({
                     params="salary_03"
                     num_unit="원"
                     callBack={onChangeTabInput}
+                    placeholder="금액을 입력해주세요. (단위 : 원)"
                   />
                 </>
               )

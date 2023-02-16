@@ -80,8 +80,6 @@ const WorkTypes = ({ handler }: { handler: any }) => {
       ...handler._Data,
       retired: handler._Data.retired,
     };
-    handler.SetPageVal("workCate", undefined);
-    handler.SetPageVal("retireReason", undefined);
   }, []);
   const [workCate, setWorkCate] = useState<number | string>(0);
   const [workRypeInfo1, setState1] = useState<"select" | "next" | "none">(
@@ -98,6 +96,8 @@ const WorkTypes = ({ handler }: { handler: any }) => {
     }
     if (params === "workCate") {
       setState1("select");
+      setState2("none");
+      handler.SetPageVal("retireReason", undefined);
       setWorkCate(value);
     } else {
       setState2("select");
@@ -144,7 +144,7 @@ const WorkTypes = ({ handler }: { handler: any }) => {
             options={
               workCate === 0 || workCate === undefined
                 ? retire_reason_standard
-                : workCate === 1 || workCate === 2 || workCate === 3
+                : workCate === 2 || workCate === 3
                 ? retire_reason_art
                 : workCate === 4 || workCate === 1 || workCate === 5
                 ? retire_reason_dayjob

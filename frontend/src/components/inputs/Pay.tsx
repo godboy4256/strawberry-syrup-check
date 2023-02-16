@@ -11,6 +11,7 @@ const NumberInput = ({
   placeholder,
   k_parser = true,
   double = false,
+  className,
 }: {
   params?: string | string[];
   label?: string;
@@ -20,6 +21,7 @@ const NumberInput = ({
   placeholder?: string;
   k_parser?: boolean;
   double?: boolean;
+  className?: string;
 }) => {
   const [value, setValue] = useState<string>("");
   const [value2, setValue2] = useState<string>("");
@@ -45,13 +47,14 @@ const NumberInput = ({
       {!double ? (
         <div className="w_100">
           {label && <label className="write_label fs_16">{label}</label>}
-          <div className={`input_style ${value ? "select" : ""}`}>
+          <div className={`fs_14 input_style ${value ? "select" : ""}`}>
             {by_date && by_date}
-            {num_unit?.[0]}
             <input
               value={value}
               placeholder={placeholder && placeholder}
-              className={value ? "select" : ""}
+              className={`${value2 ? "select" : ""} ${
+                className ? className : ""
+              }`}
               onChange={onChangeSetValue}
               type="text"
             />
@@ -68,11 +71,13 @@ const NumberInput = ({
           {label && <label className="write_label fs_16">{label}</label>}
           <div className="double_numberinput_content">
             <div>
-              <div className={`input_style ${value ? "select" : ""}`}>
+              <div className={`fs_14 input_style ${value ? "select" : ""}`}>
                 {by_date && by_date}
                 <input
                   placeholder={placeholder && placeholder}
-                  className={value ? "select" : ""}
+                  className={`${value2 ? "select" : ""} ${
+                    className ? className : ""
+                  }`}
                   onChange={onChangeSetValue}
                   type="text"
                 />
@@ -85,11 +90,13 @@ const NumberInput = ({
               ) : null}
             </div>
             <div>
-              <div className={`input_style ${value2 ? "select" : ""}`}>
+              <div className={`fs_14 input_style ${value2 ? "select" : ""}`}>
                 {by_date && by_date}
                 <input
                   placeholder={placeholder && placeholder}
-                  className={value2 ? "select" : ""}
+                  className={`${value2 ? "select" : ""} ${
+                    className ? className : ""
+                  }`}
                   onChange={onClickSetValue2}
                   type="text"
                 />
