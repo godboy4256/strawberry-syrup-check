@@ -3,13 +3,11 @@ import dayjs, { Dayjs } from "dayjs";
 import { DefinedParamErrorMesg } from "../../share/validate";
 
 export function calArtPay(sumOneYearPay: number[] | number, artWorkingDays: number, isSpecial: boolean = false) {
-	let dayAvgPay = 0;
-	if (Array.isArray(sumOneYearPay)) {
-		dayAvgPay = Math.ceil(sumOneYearPay[0] / artWorkingDays);
-	} else {
-		dayAvgPay = Math.ceil(sumOneYearPay / artWorkingDays);
-	}
+	const dayAvgPay = Array.isArray(sumOneYearPay)
+		? Math.ceil(sumOneYearPay[0] / artWorkingDays)
+		: Math.ceil(sumOneYearPay / artWorkingDays);
 	let realDayPay = Math.ceil(dayAvgPay * 0.6);
+
 	if (realDayPay > 66000) realDayPay = 66000;
 	if (isSpecial) {
 		if (realDayPay < 26600) realDayPay = 26600;
