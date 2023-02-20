@@ -21,16 +21,13 @@ const CalContainer = ({
       : GetValue("workCate") === 3
       ? "> 특고"
       : GetValue("workCate") === 4
-      ? "> 단기 예술인"
-      : GetValue("workCate") === 5
-      ? "> 단기 특고"
-      : GetValue("workCate") === 6
       ? "> 일용직"
-      : GetValue("workCate") === 7
-      ? "> 초단시간"
-      : GetValue("workCate") === 8
+      : GetValue("workCate") === 5
+      ? "> 초단 시간"
+      : GetValue("workCate") === 6
       ? "> 자영업"
       : "");
+
   return (
     <div id="cal_container" className="header_top_space">
       <div id="cal_current_guide" className="pd_810 fs_14">

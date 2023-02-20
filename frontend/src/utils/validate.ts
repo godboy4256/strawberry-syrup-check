@@ -20,7 +20,6 @@ const null_check_list: any = {
     "dayAvgPay",
     "enrollDay",
     "isOverTen",
-    "dayWorkTime",
   ],
   detail_dayjob2: [
     "age",
@@ -96,7 +95,6 @@ const valid_null_check_message: any = {
       "고용보험 총 기간 ( 개별입력 , 개별 입력 선택시 ) 을 입력해주세요.",
     dayAvgPay: "1일 평균임금 ( 개별입력 , 개별 입력 선택시 ) 을 입력해주세요.",
     isOverTen: "최근 근로일 정보를 선택해주세요.",
-    dayWorkTime: "마지막 근무시간을 입력해주세요.",
     enrollDay: "신청 예정일을 선택해주세요.",
   },
   detail_dayjob2: {
@@ -197,8 +195,11 @@ const retired_day_rules = (retiredDay: Date, enterDay: Date) => {
   const retiredDayDate = new Date(retiredDay);
   const enterDayDate = new Date(enterDay);
   if (retiredDayDate < enterDayDate) {
-    CreatePopup(undefined, "퇴사일이 입사일보다 빠릅니다.", "only_check", () =>
-      ClosePopup()
+    CreatePopup(
+      undefined,
+      "퇴사일이 입사일보다 빠를 수 없습니다.",
+      "only_check",
+      () => ClosePopup()
     );
     answer = false;
   }
