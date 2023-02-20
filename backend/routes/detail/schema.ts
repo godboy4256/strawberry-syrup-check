@@ -34,6 +34,7 @@ export type TartInput = {
 export type TartShortInput = {
 	retired: boolean;
 	workCate: number;
+	jobCate?: number;
 	retireReason: number;
 	age: number;
 	disabled: boolean;
@@ -115,6 +116,7 @@ const artBodyProp = {
 const shortArtBodyProp = {
 	retired: DefineParamInfo.retired, // 퇴직여부
 	workCate: DefineParamInfo.workCate, // 근로형태
+	jobCate: { type: "number", minimum: 0, maximum: 18 },
 	retireReason: DefineParamInfo.retireReason, // 퇴직사유
 	age: { type: "number" },
 	disabled: DefineParamInfo.disabled, // 장애여부
