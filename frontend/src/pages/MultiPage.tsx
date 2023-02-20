@@ -320,7 +320,7 @@ const _MultiCalListCard = ({
             handler.setCompState && handler.setCompState(2);
           }}
         >
-          입력
+          {company.content ? "수정 >" : "입력 >"}
         </div>
       </div>
     </div>

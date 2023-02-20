@@ -2,6 +2,7 @@ import { Fragment, useState } from "react";
 import NumberInput from "./Pay";
 import SelectInput from "./Select";
 import { GetDateArr } from "../../utils/date";
+import IMGHelpIcon from "../../assets/image/new/help_icon.svg";
 import { CreatePopup } from "../common/Popup";
 import "../../styles/salarytab.css";
 
@@ -73,12 +74,16 @@ const TabInputs = ({
   params,
   valueDay = () => {},
   type = "normal",
+  guide = true,
+  label_help = false,
 }: {
   label?: string;
   callBack?: CallableFunction;
   params?: string;
   valueDay?: CallableFunction;
   type?: "normal" | "salary" | "select";
+  guide?: boolean;
+  label_help?: boolean;
 }) => {
   const multi_salary_data: any = {};
   const [salarytab, setSalaryTab] = useState("all");
@@ -88,13 +93,22 @@ const TabInputs = ({
   };
   return (
     <>
-      <div className="flex_box write_label write_label_and_guide">
-        <div className="fs_16">{label}</div>
-        <div className="font_color_gray fs_12 write_label_guide">
-          월 최저임금
-          <br /> 9620원
+      {guide ? (
+        <div className="flex_box write_label write_label_and_guide">
+          <div className="fs_16">{label}</div>
+          <div className="font_color_gray fs_12 write_label_guide">
+            월 최저임금
+            <br /> 9620원
+          </div>
         </div>
-      </div>
+      ) : (
+        label && (
+          <label className="fs_16 write_label help_call">
+            {label}
+            {label_help && <img src={IMGHelpIcon} alt="help icon" />}
+          </label>
+        )
+      )}
       <div id="salary_tab_container">
         <div id="salary_tab_header" className={salarytab}>
           <button
@@ -153,6 +167,7 @@ const TabInputs = ({
                     num_unit="원"
                     callBack={onChangeTabInput}
                     placeholder="금액을 입력해주세요. (단위 : 원)"
+                    guide={false}
                   />
                   <div className="fs_14">
                     {before_month_cal(valueDay && valueDay("retiredDay"))[1]}
@@ -162,6 +177,7 @@ const TabInputs = ({
                     num_unit="원"
                     callBack={onChangeTabInput}
                     placeholder="금액을 입력해주세요. (단위 : 원)"
+                    guide={false}
                   />
                   <div className="fs_14">
                     {before_month_cal(valueDay && valueDay("retiredDay"))[2]}
@@ -171,6 +187,7 @@ const TabInputs = ({
                     num_unit="원"
                     callBack={onChangeTabInput}
                     placeholder="금액을 입력해주세요. (단위 : 원)"
+                    guide={false}
                   />
                 </>
               )
@@ -235,7 +252,9 @@ const TabInputs = ({
             ))}
         </div>
       </div>
-      <div className="fs_12">※ 퇴직전 3개월 간 급여가 다를 경우 각각 입력</div>
+      <div className="fs_12 out_description">
+        ※ 퇴직전 3개월 간 급여가 다를 경우 각각 입력
+      </div>
     </>
   );
 };

@@ -42,7 +42,7 @@ const handler = new BasicCalHandler({});
 
 const _BasicCalComp = () => {
   return (
-    <div className="full_height_layout_cal">
+    <div className="full_height_layout_cal pb_50">
       <Header
         title={handler.GetPageVal("retired") ? "퇴직자" : "퇴직예정자"}
         leftLink="/main"
@@ -79,6 +79,8 @@ const _BasicCalComp = () => {
           params="salary"
           label="월 급여(세전)"
           num_unit="원"
+          className="border_b"
+          guide={true}
           callBack={handler.SetPageVal}
         />
         <Button

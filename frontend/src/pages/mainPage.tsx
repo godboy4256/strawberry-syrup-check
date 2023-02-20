@@ -72,7 +72,6 @@ const MainPage = () => {
       <Header title="딸기시럽" leftType="LOGO" leftLink="/main" />
       <div id="main_page_container" className="full_height_layout">
         <div>
-          <SlideGuideDirection />
           <h3 className="fs_25 lh_37 font_family_bold">실업급여 계산기</h3>
           <Slider {...settings}>
             <Link to="/standard" className="main_slide_card">
@@ -109,6 +108,7 @@ const MainPage = () => {
               </div>
             </Link>
           </Slider>
+          <SlideGuideDirection />
         </div>
       </div>
     </>
