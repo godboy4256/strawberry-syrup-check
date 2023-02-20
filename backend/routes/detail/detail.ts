@@ -277,6 +277,11 @@ export default function detailRoute(fastify: FastifyInstance, options: any, done
 			: lastWorkDay.subtract(mainData.sumTwoYearWorkDay, "month");
 		const enterDay = mainData.workCate === 5 ? checkJobCate(tempEnterDay, mainData.jobCate) : tempEnterDay; // 직종 조정
 
+		console.log(`enterDay: ${enterDay}`);
+		if (mainData.workCate ====5 && mainData.isSpecial) mainData
+		const simpleWorkDay = lastWorkDay.diff(enterDay, "month");
+		if (mainData.isSimple && mainData.workCate === 5) console.log("h1ihi12h1ih1ih1i1ihihiihihihih");
+
 		// 3. 수급 인정/불인정 판단 => 결과만 입력 계산기능 필요
 		const isPermit = mainData.isSimple
 			? artShortCheckPermit(mainData.sumWorkDay, mainData.isSpecial)
