@@ -15,6 +15,9 @@
 .bg_color_white {
   background-color: white;
 }
+.font_color_gray {
+  color: rgba(0, 0, 0, 0.6);
+}
 .font_color_main {
   color: rgba(255, 73, 58, 1);
 }
@@ -39,6 +42,7 @@
 }
 .fs_14 {
   font-size: 14px;
+  line-height: 21px;
 }
 .fs_16 {
   font-size: 16px;
@@ -67,13 +71,28 @@
 .flex_direction {
   flex-direction: column;
 }
-
 .w_100 {
   width: 100%;
 }
 .write_label {
   margin: 30px 0 5px;
   line-height: 24px;
+}
+.write_label.help_call,
+.help_call {
+  display: flex;
+  line-height: 1;
+  margin-bottom: 9px;
+}
+.write_label.help_call img,
+.help_call img {
+  width: 16px;
+  height: 16px;
+}
+.write_label.write_label_and_guide {
+  line-height: 1.5;
+  display: flex;
+  justify-content: space-between;
 }
 .public_side_padding {
   padding: 0 30px;
@@ -88,6 +107,9 @@
   font-size: 10px;
   line-height: 15px;
   color: rgba(0, 0, 0, 0.4);
+}
+.pb_50 {
+  padding-bottom: 50px;
 }
 .calbtn_bottom_space {
   padding-bottom: 100px;
@@ -104,15 +126,13 @@
   border-left: 1px solid #ccc;
   border-right: 1px solid #ccc;
 }
-
 .full_height_layout {
   margin-top: 50px;
   height: calc(100vh - 80px);
   overflow: hidden;
 }
 .full_height_layout_cal {
-  height: calc(100vh - 136px);
-  overflow: hidden;
+  min-height: calc(100vh - 136px);
 }
 .emoticon_w {
   width: 158px;
@@ -142,7 +162,7 @@
 }
 .description {
   margin-top: 5px;
-  font-size: 10px;
+  font-size: 12px;
 }
 .label_unit {
   font-size: 13px;
@@ -163,7 +183,18 @@
 .txt_ct {
   text-align: center;
 }
-
+.write_label_guide {
+  text-align: right;
+}
+.border_b {
+  border-bottom: 1px solid #ccc;
+}
+.lh_1 {
+  line-height: 1;
+}
+.out_description {
+  margin-top: 5px;
+}
 @media screen and (max-width: 500px) {
   #root {
     border: none;

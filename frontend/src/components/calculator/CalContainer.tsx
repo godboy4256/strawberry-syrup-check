@@ -15,7 +15,7 @@ const CalContainer = ({
     (GetValue("workCate") === 0
       ? "> 정규직"
       : GetValue("workCate") === 1
-      ? "> 계약직"
+      ? "> 기간제"
       : GetValue("workCate") === 2
       ? "> 예술인"
       : GetValue("workCate") === 3
@@ -23,10 +23,11 @@ const CalContainer = ({
       : GetValue("workCate") === 4
       ? "> 일용직"
       : GetValue("workCate") === 5
-      ? "> 초단시간"
+      ? "> 초단 시간"
       : GetValue("workCate") === 6
       ? "> 자영업"
       : "");
+
   return (
     <div id="cal_container" className="header_top_space">
       <div id="cal_current_guide" className="pd_810 fs_14">

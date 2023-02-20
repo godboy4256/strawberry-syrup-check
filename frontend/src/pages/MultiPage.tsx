@@ -7,7 +7,7 @@ import {
   useState,
 } from "react";
 import CalContainer from "../components/calculator/CalContainer";
-import { WorkCatePopup } from "../components/calculator/WorkTypes";
+import WorkTypes, { WorkCatePopup } from "../components/calculator/WorkTypes";
 import { ClosePopup, CreatePopup } from "../components/common/Popup";
 import Button from "../components/inputs/Button";
 import Header from "../components/layout/Header";
@@ -32,6 +32,7 @@ import { DetailPathCal } from "../object/common";
 import { CheckValiDation } from "../utils/validate";
 
 import "../styles/multi.css";
+import { MultiConfirmPopup } from "../components/calculator/confirmPopup";
 
 interface Company {
   id: number;
@@ -65,10 +66,8 @@ class MultiCalHandler extends DetailedHandler {
               : this.GetPageVal("lastWorkDay")
           } 퇴사`,
           emoticon:
-            this._Data.workCate === 0
+            this._Data.workCate === 0 || this._Data.workCate === 1
               ? EMTDetailFullTimeSupply
-              : this._Data.workCate === 1
-              ? EMTDetailContractSupply
               : this._Data.workCate === 2 || this._Data.workCate === 4
               ? EMTDetailArtsSupply
               : this._Data.workCate === 3 || this._Data.workCate === 5
@@ -122,130 +121,151 @@ const _MultiMainDataSelect = () => {
       <Button
         type="bottom"
         text="확인"
-        click_func={async () => {
-          const mainData = handler.GetPageVal("mainData");
-          const addData = handler.GetPageVal("addData").filter((el: any) => {
-            return el.id !== mainData[0].id;
-          });
-          const employData = addData.filter((el: any) => {
-            return el.workCate === 8;
-          });
-          const targetDate = new Date(
-            mainData[0].lastWorkDay
-              ? mainData[0].lastWorkDay
-              : mainData[0].retiredDay
-          );
-          const limitNum =
-            mainData[0].workCate === 0 ||
-            mainData[0].workCate === 1 ||
-            mainData[0].workCate === 6
-              ? 18
-              : 24;
-          const limitDay = new Date(
-            targetDate.getFullYear(),
-            targetDate.getMonth() - limitNum,
-            targetDate.getDate()
-          );
+        click_func={() => {
+          CreatePopup(
+            undefined,
+            <MultiConfirmPopup
+              confirm_data_arr={handler.GetPageVal("addData")}
+              mainData={handler.GetPageVal("mainData")[0]}
+            />,
+            "confirm",
+            async () => {
+              ClosePopup();
+              const mainData = handler.GetPageVal("mainData");
+              const addData = handler
+                .GetPageVal("addData")
+                .filter((el: any) => {
+                  return el.id !== mainData[0].id;
+                });
+              const employData = addData.filter((el: any) => {
+                return el.workCate === 8;
+              });
+              const targetDate = new Date(
+                mainData[0].lastWorkDay
+                  ? mainData[0].lastWorkDay
+                  : mainData[0].retiredDay
+              );
+              const limitNum =
+                mainData[0].workCate === 0 ||
+                mainData[0].workCate === 1 ||
+                mainData[0].workCate === 6
+                  ? 18
+                  : 24;
+              const limitDay = new Date(
+                targetDate.getFullYear(),
+                targetDate.getMonth() - limitNum,
+                targetDate.getDate()
+              );
 
-          const addDataResultArr: any[] = [];
-          const url = DetailPathCal(mainData[0].workCate);
-          const mainDataResult = await sendToServer(url ? url : "", {
-            ...mainData[0],
-            age: Number(
-              getAge(new Date(String(handler.GetPageVal("age_multi")))).age
-            ),
-            disabled:
-              handler.GetPageVal("disabled_multi") === "장애인" ? true : false,
-          });
+              const addDataResultArr: any[] = [];
+              const url = DetailPathCal(mainData[0].workCate);
+              const mainDataResult = await sendToServer(url ? url : "", {
+                ...mainData[0],
+                age: Number(
+                  getAge(new Date(String(handler.GetPageVal("age_multi")))).age
+                ),
+                disabled:
+                  handler.GetPageVal("disabled_multi") === "장애인"
+                    ? true
+                    : false,
+              });
 
-          for (let i = 0; i < addData.length; i++) {
-            const url = DetailPathCal(addData[i].workCate);
-            const result = await sendToServer(url ? url : "", {
-              ...addData[i],
-              limitDay,
-              age: Number(
-                getAge(new Date(String(handler.GetPageVal("age_multi")))).age
-              ),
-              disabled:
-                handler.GetPageVal("disabled_multi") === "장애인"
-                  ? true
-                  : false,
-            });
-            let permitDays = result.workDayForMulti;
-            if (handler.GetPageVal("dayJobPermitDay")) {
-              permitDays = handler.GetPageVal("dayJobPermitDay")
-                ? handler.GetPageVal("dayJobPermitDay")
-                : 0;
+              for (let i = 0; i < addData.length; i++) {
+                const url = DetailPathCal(addData[i].workCate);
+                const result = await sendToServer(url ? url : "", {
+                  ...addData[i],
+                  limitDay,
+                  age: Number(
+                    getAge(new Date(String(handler.GetPageVal("age_multi"))))
+                      .age
+                  ),
+                  disabled:
+                    handler.GetPageVal("disabled_multi") === "장애인"
+                      ? true
+                      : false,
+                });
+                let permitDays = result.workDayForMulti;
+                if (handler.GetPageVal("dayJobPermitDay")) {
+                  permitDays = handler.GetPageVal("dayJobPermitDay")
+                    ? handler.GetPageVal("dayJobPermitDay")
+                    : 0;
+                }
+                if (handler.GetPageVal("shortsPermitDay")) {
+                  permitDays = handler.GetPageVal("shortsPermitDay")
+                    ? handler.GetPageVal("shortsPermitDay")
+                    : 0;
+                }
+                addDataResultArr.push({
+                  workCate: addData[i].workCate,
+                  isIrregular: addData[i].isSimple
+                    ? addData[i].isSimple
+                    : false,
+                  enterDay: addData[i].enterDay
+                    ? addData[i].enterDay
+                    : addData[i].lastWorkDay,
+                  retiredDay: addData[i].retiredDay
+                    ? addData[i].retiredDay
+                    : addData[i].lastWorkDay,
+                  workingDays: result.workingDays
+                    ? result.workingDays
+                    : result.workingMonths,
+                  permitDays,
+                });
+              }
+
+              const multi_to_server = {
+                mainData: {
+                  age: Number(
+                    getAge(new Date(String(handler.GetPageVal("age_multi"))))
+                      .age
+                  ),
+                  disabled:
+                    handler.GetPageVal("disabled_multi") === "장애인"
+                      ? true
+                      : false,
+                  workCate: mainData[0].workCate,
+                  isIrregular: mainData[0].isSimple
+                    ? mainData[0].isSimple
+                    : false,
+                  enterDay: mainData[0].enterDay
+                    ? mainData[0].enterDay
+                    : mainData[0].lastWorkDay,
+                  retiredDay: mainData[0].retiredDay
+                    ? mainData[0].retiredDay
+                    : mainData[0].lastWorkDay,
+                  workingDays: mainDataResult.workingDays
+                    ? mainDataResult.workingDays
+                    : mainDataResult.workingMonths,
+                  dayAvgPay: mainDataResult.dayAvgPay
+                    ? mainDataResult.dayAvgPay
+                    : 0,
+                  realDayPay: mainDataResult.realDayPay,
+                },
+                addData: addDataResultArr,
+              };
+              const result = await sendToServer(
+                employData.length > 0 || mainData[0].workCate === 8
+                  ? "/multi/employer"
+                  : "/multi",
+                multi_to_server
+              );
+
+              if (result?.checkResult?.succ === false) {
+                CreatePopup(
+                  undefined,
+                  result.checkResult.mesg ? result.checkResult.mesg : "",
+                  "only_check"
+                );
+                return;
+              }
+              handler.setCompState && handler.setCompState(5);
+              setTimeout(() => {
+                handler.setCompState && handler.setCompState(6);
+              }, 1000);
+              handler.SetPageVal("result", result);
+              calRecording(result, "복수형");
             }
-            if (handler.GetPageVal("shortsPermitDay")) {
-              permitDays = handler.GetPageVal("shortsPermitDay")
-                ? handler.GetPageVal("shortsPermitDay")
-                : 0;
-            }
-            addDataResultArr.push({
-              workCate: addData[i].workCate,
-              isIrregular: addData[i].isSimple ? addData[i].isSimple : false,
-              enterDay: addData[i].enterDay
-                ? addData[i].enterDay
-                : addData[i].lastWorkDay,
-              retiredDay: addData[i].retiredDay
-                ? addData[i].retiredDay
-                : addData[i].lastWorkDay,
-              workingDays: result.workingDays
-                ? result.workingDays
-                : result.workingMonths,
-              permitDays,
-            });
-          }
-
-          const multi_to_server = {
-            mainData: {
-              age: Number(
-                getAge(new Date(String(handler.GetPageVal("age_multi")))).age
-              ),
-              disabled:
-                handler.GetPageVal("disabled_multi") === "장애인"
-                  ? true
-                  : false,
-              workCate: mainData[0].workCate,
-              isIrregular: mainData[0].isSimple ? mainData[0].isSimple : false,
-              enterDay: mainData[0].enterDay
-                ? mainData[0].enterDay
-                : mainData[0].lastWorkDay,
-              retiredDay: mainData[0].retiredDay
-                ? mainData[0].retiredDay
-                : mainData[0].lastWorkDay,
-              workingDays: mainDataResult.workingDays
-                ? mainDataResult.workingDays
-                : mainDataResult.workingMonths,
-              dayAvgPay: mainDataResult.dayAvgPay
-                ? mainDataResult.dayAvgPay
-                : 0,
-              realDayPay: mainDataResult.realDayPay,
-            },
-            addData: addDataResultArr,
-          };
-          const result = await sendToServer(
-            employData.length > 0 || mainData[0].workCate === 8
-              ? "/multi/employer"
-              : "/multi",
-            multi_to_server
           );
-
-          if (result?.checkResult?.succ === false) {
-            CreatePopup(
-              undefined,
-              result.checkResult.mesg ? result.checkResult.mesg : "",
-              "only_check"
-            );
-            return;
-          }
-          handler.setCompState && handler.setCompState(5);
-          setTimeout(() => {
-            handler.setCompState && handler.setCompState(4);
-          }, 1000);
-          handler.SetPageVal("result", result);
-          calRecording(result, "복수형");
         }}
       />
     </div>
@@ -288,30 +308,20 @@ const _MultiCalListCard = ({
         {company.content ? company.content : `${list_num + 1}번 회사`}
       </div>
       <div className="font_color_main fs_14">
-        <WorkCatePopup
-          handler={handler}
-          popUpCallBack={(params: string, value: string) => {
-            handler.SetPageVal(params, value);
+        <div
+          id={`${String(company.id)}_inputs`}
+          className="font_color_main fs_14"
+          onClick={(e: MouseEvent<HTMLDivElement>) => {
+            handler.SetPageVal(
+              "select_multi",
+              Number(e.currentTarget.id.split("_")[0])
+            );
+            handler.GetPageVal("select_multi");
             handler.setCompState && handler.setCompState(2);
-            if (value === undefined) handler.SetPageVal(params, 0);
-            ClosePopup();
           }}
-          popup_focus_template={
-            <div
-              id={`${String(company.id)}_inputs`}
-              className="font_color_main fs_14"
-              onClick={(e: MouseEvent<HTMLDivElement>) => {
-                handler.SetPageVal(
-                  "select_multi",
-                  Number(e.currentTarget.id.split("_")[0])
-                );
-                handler.GetPageVal("select_multi");
-              }}
-            >
-              입력
-            </div>
-          }
-        />
+        >
+          {company.content ? "수정 >" : "입력 >"}
+        </div>
       </div>
     </div>
   );
@@ -426,12 +436,26 @@ const _MultiCompanyList = () => {
 
 const MultiCalPage = () => {
   const [compState, setCompState] = useState(1);
-  useEffect(() => {
-    handler.setCompState = setCompState;
-    handler.SetPageVal("cal_state", "multi");
-    handler.SetPageVal("retired", true);
-  }, []);
-
+  handler.setCompState = setCompState;
+  handler.SetPageVal("cal_state", "multi");
+  handler.SetPageVal("retired", true);
+  // useEffect(() => {
+  //   return () =>
+  //     handler.SetPageVal("companys_list", [
+  //       [
+  //         {
+  //           id: 1,
+  //           content: "",
+  //           emoticon: "",
+  //         },
+  //         {
+  //           id: 2,
+  //           content: "",
+  //           emoticon: "",
+  //         },
+  //       ],
+  //     ]);
+  // });
   return (
     <>
       {compState === 5 ? (
@@ -439,7 +463,18 @@ const MultiCalPage = () => {
       ) : (
         <CalContainer type="복수형" GetValue={handler.GetPageVal}>
           <>
-            <Header title="정보 입력" leftLink="/main" leftType="BACK" />
+            <Header
+              title="정보 입력"
+              leftLink="/main"
+              leftType="BACK"
+              leftFunc={
+                compState === 1
+                  ? undefined
+                  : () => {
+                      handler.setCompState && handler.setCompState(1);
+                    }
+              }
+            />
             {compState === 1 && (
               <>
                 <div id="multi_container">
@@ -486,13 +521,14 @@ const MultiCalPage = () => {
                         })
                       )
                         return;
-                      handler.setCompState && handler.setCompState(3);
+                      handler.setCompState && handler.setCompState(4);
                     }}
                   />
                 </div>
               </>
             )}
-            {compState === 2 && (
+            {compState === 2 && <WorkTypes handler={handler} />}
+            {compState === 3 && (
               <DetailCalComp
                 handler={handler}
                 workCate={handler.GetPageVal("workCate")}
@@ -501,13 +537,13 @@ const MultiCalPage = () => {
                 }}
               />
             )}
-            {compState === 3 && <_MultiMainDataSelect />}
-            {compState === 4 && (
+            {compState === 4 && <_MultiMainDataSelect />}
+            {compState === 6 && (
               <ResultComp
                 cal_type="multi"
                 result_data={handler.GetPageVal("result")}
                 back_func={() =>
-                  handler.setCompState && handler.setCompState(3)
+                  handler.setCompState && handler.setCompState(4)
                 }
               />
             )}

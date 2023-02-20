@@ -13,7 +13,7 @@ const Header = ({
 }: {
   title?: string;
   leftType?: "BACK" | "LOGO";
-  leftFunc?: () => void;
+  leftFunc?: () => void | undefined;
   leftLink?: string;
 }) => {
   const [onMenu, setOnMenu] = useState(false);

@@ -77,6 +77,7 @@ export const WorkCatePopup = ({
 const WorkTypes = ({ handler }: { handler: any }) => {
   useEffect(() => {
     handler._Data = {
+      ...handler._Data,
       retired: handler._Data.retired,
     };
   }, []);
@@ -90,9 +91,13 @@ const WorkTypes = ({ handler }: { handler: any }) => {
   const [workRypeInfo3, _] = useState<"select" | "next" | "none">("none");
   const popUpCallBack = (params: string, value: string | number) => {
     handler.SetPageVal(params, value);
-    if (value === undefined) handler.SetPageVal(params, 0);
+    if (value === undefined) {
+      handler.SetPageVal(params, 0);
+    }
     if (params === "workCate") {
       setState1("select");
+      setState2("none");
+      handler.SetPageVal("retireReason", undefined);
       setWorkCate(value);
     } else {
       setState2("select");
@@ -157,7 +162,11 @@ const WorkTypes = ({ handler }: { handler: any }) => {
                 handler.GetPageVal("workCate") !== undefined &&
                 handler.GetPageVal("retireReason") !== undefined
               ) {
-                handler.setCompState(3);
+                if (handler.cal_state === "multi") {
+                  handler.setCompState(2);
+                } else {
+                  handler.setCompState(3);
+                }
               } else {
                 CreatePopup(
                   undefined,

@@ -18,10 +18,13 @@ import { DetailConfirmPopup } from "../components/calculator/confirmPopup";
 import WorkRecordGen from "../components/calculator/workRecordGen";
 import "./../styles/detail.css";
 import { jobCates } from "../assets/data/worktype_data";
+import IMGHelpIcon from "../assets/image/new/help_icon.svg";
+import { CreatePopup } from "../components/common/Popup";
 
 const handler: any = new DetailedHandler({});
 
 const _Belong_Form_Tab = ({
+  label_help = true,
   label,
   options,
   form01,
@@ -29,6 +32,7 @@ const _Belong_Form_Tab = ({
   callBack,
   params,
 }: {
+  label_help?: boolean;
   label?: string | undefined | boolean;
   options?: string[] | undefined | boolean;
   form01: ReactElement;
@@ -40,13 +44,35 @@ const _Belong_Form_Tab = ({
   return (
     <>
       <>
-        <label className="fs_16 write_label">{label}</label>
+        <label className="fs_16 write_label help_call">
+          {label}
+          {label_help && <img src={IMGHelpIcon} alt="help icon" />}
+        </label>
         <div className="belong_form_tab">
           {Array.isArray(options) &&
             options?.map((el: string) => {
               return (
                 <div
                   onClick={() => {
+                    if (handler.GetPageVal(params) === el) return;
+                    if (el === "결과만 입력") {
+                      CreatePopup(
+                        undefined,
+                        <div className="string_popup">
+                          ‘결과만 입력’은 근무일수 요건(피보험단위기간)이
+                          충족되었음을 가정합니다.
+                          <br />
+                          <br />
+                          보다 정확한 결과를 얻으시려면 개별 입력을 선택하여
+                          주시기 바랍니다.
+                        </div>,
+                        "only_check",
+                        undefined,
+                        undefined,
+                        "확인",
+                        undefined
+                      );
+                    }
                     setState(el);
                     callBack && callBack(params, el);
                   }}
@@ -110,7 +136,7 @@ const _DetailCalStandad = ({ handler }: { handler: any }) => {
         ]}
       />
       <TabInputs
-        label="월 급여"
+        label="월 급여 (세전)"
         type="salary"
         params="salary"
         callBack={handler.SetPageVal}
@@ -127,6 +153,7 @@ const _DetailCalDayJob = ({ handler }: { handler: any }) => {
   return (
     <>
       <CheckBoxInput
+        label_help={true}
         type="is_true_type"
         options={["건설일용직에 해당합니다."]}
         label="특수"
@@ -134,7 +161,7 @@ const _DetailCalDayJob = ({ handler }: { handler: any }) => {
         callBack={handler.SetPageVal}
       />
       <_Belong_Form_Tab
-        label="근로 정보"
+        label="근로정보"
         params="input"
         callBack={handler.SetPageVal}
         options={["개별 입력", "결과만 입력"]}
@@ -145,37 +172,28 @@ const _DetailCalDayJob = ({ handler }: { handler: any }) => {
               label="마지막 근무일"
               callBack={handler.SetPageVal}
             />
-            <SelectInput
-              selected={"시간을 선택해주세요."}
-              type="normal"
-              label="마지막 근무시간"
-              value_type="string"
-              className="work_time"
-              options={[
-                "시간을 선택해주세요.",
-                "1시간",
-                "2시간",
-                "3시간",
-                "4시간",
-                "5시간",
-                "6시간",
-                "7시간",
-                "8시간 이상",
-              ]}
-              params="dayWorkTime"
-              callBack={handler.SetPageVal}
-            />
+            <WorkRecordGen handler={handler} type="dayJob" />
+            <div className="fs_12 out_description">
+              ※ 퇴사 이전 18개월 내 180일 충족
+              <br /> ※ 근무한 연월의 정보만 입력하시면 됩니다.
+            </div>
             <DateInputNormal
               params="planToDo"
               label="신청 예정일"
               callBack={handler.SetPageVal}
             />
-            <WorkRecordGen handler={handler} type="dayJob" />
+            <div className="fs_12 out_description">
+              ※ 신청일 이전 1개월간 근로한 일수가 10일 미만
+              <br /> ※ 건설 일용직의 경우, 신청일 이전 14일간 연속하여
+              <br />
+              근로내역이 없는 경우에도 수급 가능
+            </div>
             <DateInputNormal
               params="isOverTen"
               label="최근 근로일 정보"
               callBack={handler.SetPageVal}
               planToDo={handler.GetPageVal}
+              placeholder="신청 예정일 기준으로 최근 2달 근무일 선택"
             />
           </>
         }
@@ -206,27 +224,32 @@ const _DetailCalDayJob = ({ handler }: { handler: any }) => {
               params="dayWorkTime"
               callBack={handler.SetPageVal}
             />
+            <div className="fs_12 out_description">
+              ※ “마지막 근무일”에 근무한 시간
+            </div>
             <NumberInput
               params="sumWorkDay"
               label="고용보험 총 기간"
               num_unit={["총", "일"]}
               callBack={handler.SetPageVal}
               k_parser={false}
+              className="border_b"
             />
-            <div className="fs_10 description">
-              ※ 업무시작일이 아닌{" "}
-              <span className="font_color_main fs_10">
+            <div className="fs_12 description">
+              ※ 업무시작일이 아닌
+              <span className="font_color_main fs_12">
                 고용보험 전체 가입기간
               </span>
               을 기재해 주세요.
             </div>
             <NumberInput
               params="dayAvgPay"
-              label="1일 평균임금"
+              label="1일 평균임금(세전)"
               num_unit="원"
               callBack={handler.SetPageVal}
+              placeholder="금액을 입력해주세요.(단위 : 원)"
+              guide={true}
             />
-            <div className="fs_14">※ 세전 금액으로 입력해 주세요.</div>
           </>
         }
       />
@@ -243,6 +266,7 @@ const _DetailCalArt = ({ handler }: { handler: any }) => {
   }, []);
   return (
     <_Belong_Form_Tab
+      label_help={false}
       callBack={handler.SetPageVal}
       params="is_short"
       label={
@@ -283,15 +307,17 @@ const _DetailCalArt = ({ handler }: { handler: any }) => {
           )}
           <NumberInput
             params="sumTwelveMonthSalary"
-            label="퇴직 전 12개월 급여 총액"
+            placeholder="금액을 입력해주세요. (단위: 원) "
+            label="퇴직 전 12개월 급여 총액 (세전)"
             num_unit="원"
             callBack={handler.SetPageVal}
+            guide={true}
           />
         </>
       }
       form02={
         <_Belong_Form_Tab
-          label="근로 정보"
+          label="근로정보"
           callBack={handler.SetPageVal}
           params="input"
           options={["개별 입력", "결과만 입력"]}
@@ -303,16 +329,27 @@ const _DetailCalArt = ({ handler }: { handler: any }) => {
                 callBack={handler.SetPageVal}
               />
               <WorkRecordGen handler={handler} type="shorts" />
+              <div className="fs_12 out_description">
+                ※ 근무한 연월의 정보만 입력하시면 됩니다.
+              </div>
               <DateInputNormal
                 label="신청 예정일"
                 params="planToDo"
                 callBack={handler.SetPageVal}
               />
+              <div className="fs_12 out_description">
+                ※ 신청일 이전 1개월간 근로한 일수가 10일 미만
+                <br />
+                ※ 단기예술인, 신청일 이전 14일간 연속하여
+                <br />
+                근로내역이 없는 경우에도 수급 가능
+              </div>
               <DateInputNormal
                 planToDo={handler.GetPageVal}
                 params="isOverTen"
                 label="최근 근로일 정보"
                 callBack={handler.SetPageVal}
+                placeholder="신청 예정일 기준으로 최근 2달 근무일 선택"
               />
             </>
           }
@@ -330,12 +367,16 @@ const _DetailCalArt = ({ handler }: { handler: any }) => {
                 callBack={handler.SetPageVal}
                 double={true}
                 k_parser={false}
+                className="border_b"
               />
               <NumberInput
+                label_help={handler.GetPageVal("workCate") === 2 ? false : true}
                 params="sumOneYearPay"
-                label="퇴직 전 12개월 급여 총액"
+                label="퇴직 전 12개월 급여 총액 (세전)"
+                placeholder="금액을 입력해주세요. (단위: 원) "
                 num_unit="원"
                 callBack={handler.SetPageVal}
+                guide={true}
               />
             </>
           }
@@ -376,8 +417,13 @@ const _DetailCalVeryShort = ({ handler }: { handler: any }) => {
         params="time"
         max_num={14}
       />
+      <div className="fs_12 out_description">
+        ※ 실제 근로시간이 아닌,{" "}
+        <span className="font_color_main fs_12">소정근로시간</span>을
+        기재해주세요.
+      </div>
       <TabInputs
-        label="월 급여"
+        label="월 급여 (세전)"
         type="salary"
         params="salary"
         callBack={handler.SetPageVal}
@@ -402,7 +448,9 @@ const _DetailCalEmploy = ({ handler }: { handler: any }) => {
           description="self-employment"
         />
         <TabInputs
-          label="고용 보험 등급"
+          label_help={true}
+          guide={false}
+          label="고용보험 등급"
           type="select"
           callBack={handler.SetPageVal}
           valueDay={handler.GetPageVal}
@@ -431,6 +479,7 @@ export const DetailCalComp = ({
             handler.GetPageVal("cal_state") === "multi" ? 1 : 2
           );
           handler.SetPageVal("workCate", undefined);
+          handler.SetPageVal("retireReason", undefined);
         }}
       />
       <div className={`${workCate !== 6 ? "public_side_padding" : ""}`}>

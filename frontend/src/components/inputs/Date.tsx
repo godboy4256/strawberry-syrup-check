@@ -433,7 +433,7 @@ export const DateInputNormal = ({
           onClick={onClickDateOn}
           className={`date_container ${!dateValue ? "unselect" : ""}`}
         >
-          <div className={`date_value ${!dateValue ? "unselect" : ""}`}>
+          <div className={`date_value fs_14 ${!dateValue ? "unselect" : ""}`}>
             {!dateValue
               ? placeholder
                 ? placeholder
@@ -445,33 +445,6 @@ export const DateInputNormal = ({
           </div>
         </div>
       </div>
-      {description && (
-        <div className="date_description">
-          <span className="fs_10">※</span>
-          {description === "enter_day" ? (
-            <span className="fs_10">
-              고용보험 가입일이 입·퇴사일과 다르다면,
-              <br />
-              <span className="font_color_main fs_10">고용보험 가입일</span>을
-              기재해주세요.
-            </span>
-          ) : description === "insurance_end_day" ? (
-            <span className="fs_10">
-              업무시작일이 아닌
-              <span className="font_color_main fs_10"> 고용보험 가입일</span>을
-              기재해주세요.
-            </span>
-          ) : description === "self-employment" ? (
-            <span className="fs_10">
-              개업, 폐업일이 아닌
-              <span className="font_color_main fs_10"> 고용보험 가입일</span>을
-              기재해주세요.
-            </span>
-          ) : (
-            <span className="fs_14">{description}</span>
-          )}
-        </div>
-      )}
     </>
   );
 };

@@ -1,4 +1,4 @@
-import { MouseEvent, ReactElement, useState } from "react";
+import { MouseEvent, ReactElement, useEffect, useState } from "react";
 import IMGSelect from "../../assets/image/select_icon.svg";
 import IMGNormalSelect from "../../assets/image/new/select_icon_normal.svg";
 import { ClosePopup, CreatePopup } from "../common/Popup";
@@ -77,18 +77,22 @@ const PopupSelect = ({
   options,
   callBack,
   params,
+  select_params,
   popup_select,
-  defaultSelect,
 }: {
   options: string[] | number[];
   callBack?: CallableFunction;
   params: string;
+  select_params: string;
   popup_select?: CallableFunction;
-  defaultSelect?: number | string;
 }) => {
   const [select, setSelect] = useState<number>(
-    popup_select && (popup_select("workCate") ? popup_select("workCate") : 0)
+    popup_select &&
+      (popup_select(select_params) ? popup_select(select_params) : 0)
   );
+  useEffect(() => {
+    callBack && callBack(params, undefined);
+  }, []);
   return (
     <div className="popup_select_container">
       {options?.map((el: string | number, idx: number) => (
@@ -144,8 +148,8 @@ const SelectInput = ({
         options={options}
         callBack={callBack}
         params="popup_select"
+        select_params={params}
         popup_select={popup_select}
-        defaultSelect={defaultSelect}
       />,
       "confirm",
       () => {
@@ -159,10 +163,10 @@ const SelectInput = ({
             "confirm",
             () => {
               popUpCallBack &&
-                popUpCallBack(params, popup_select("popup_select") - 1);
+                popUpCallBack(params, popup_select("popup_select"));
               ClosePopup();
             },
-            () => {}, // 다시 선택하면 돌아갈 수 있도록 함수 분리
+            () => {},
             "예",
             "아니오"
           );

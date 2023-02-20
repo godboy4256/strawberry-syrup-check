@@ -1,5 +1,6 @@
 import { Fragment, useEffect, useState } from "react";
 import "../../styles/checkbox.css";
+import IMGHelpIcon from "../../assets/image/new/help_icon.svg";
 import { CreatePopup } from "../common/Popup";
 
 let checkList: string[] = [];
@@ -22,7 +23,7 @@ const _BoxTypeCheckBox = ({
   const [onSelect, setOnSelect] = useState(false);
   return (
     <div
-      className={`${type} ${onSelect ? "active" : ""}`}
+      className={`${type} ${onSelect ? "active" : ""} fs_14`}
       onClick={() => {
         if (maxLenth)
           if (checkList.length === maxLenth) {
@@ -51,6 +52,7 @@ const _BoxTypeCheckBox = ({
 };
 
 const CheckBoxInput = ({
+  label_help = false,
   options,
   type,
   label,
@@ -59,6 +61,7 @@ const CheckBoxInput = ({
   selected,
   maxLenth,
 }: {
+  label_help?: boolean;
   options: string[];
   type: "box_type" | "radio_box_type" | "circle_type" | "is_true_type";
   label?: string;
@@ -67,9 +70,18 @@ const CheckBoxInput = ({
   selected?: string;
   maxLenth?: number;
 }) => {
+  useEffect(() => {
+    return () => {
+      checkList = [];
+      console.log(checkList);
+    };
+  });
   return (
     <>
-      {label && <div className="fs_16 write_label">{label}</div>}
+      <label className="fs_16 write_label help_call">
+        {label}
+        {label_help && <img src={IMGHelpIcon} alt="help icon" />}
+      </label>
       <div className={`checkbox_container ${type}`}>
         {type === "box_type"
           ? options.map((el: string) => {

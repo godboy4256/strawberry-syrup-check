@@ -1,5 +1,6 @@
 import { ChangeEvent, useState } from "react";
 import { money_korean } from "../../utils/pays";
+import IMGHelpIcon from "../../assets/image/new/help_icon.svg";
 import "../../styles/input.css";
 
 const NumberInput = ({
@@ -11,6 +12,9 @@ const NumberInput = ({
   placeholder,
   k_parser = true,
   double = false,
+  className,
+  guide,
+  label_help = false,
 }: {
   params?: string | string[];
   label?: string;
@@ -20,6 +24,9 @@ const NumberInput = ({
   placeholder?: string;
   k_parser?: boolean;
   double?: boolean;
+  className?: string;
+  guide?: boolean;
+  label_help?: boolean;
 }) => {
   const [value, setValue] = useState<string>("");
   const [value2, setValue2] = useState<string>("");
@@ -44,14 +51,36 @@ const NumberInput = ({
     <>
       {!double ? (
         <div className="w_100">
-          {label && <label className="write_label fs_16">{label}</label>}
-          <div className={`input_style ${value ? "select" : ""}`}>
+          {guide ? (
+            <div className="flex_box write_label write_label_and_guide">
+              {label && (
+                <label className="fs_16 help_call">
+                  {label}
+                  {label_help && <img src={IMGHelpIcon} alt="help icon" />}
+                </label>
+              )}
+              <div className="font_color_gray fs_12 write_label_guide">
+                월 최저임금
+                <br /> 9620원
+              </div>
+            </div>
+          ) : (
+            label && (
+              <label className="fs_16 write_label help_call">
+                {label}
+                {label_help && <img src={IMGHelpIcon} alt="help icon" />}
+              </label>
+            )
+          )}
+
+          <div className={`fs_14 input_style ${value ? "select" : ""}`}>
             {by_date && by_date}
-            {num_unit?.[0]}
             <input
               value={value}
               placeholder={placeholder && placeholder}
-              className={value ? "select" : ""}
+              className={`${value2 ? "select" : ""} ${
+                className ? className : ""
+              }`}
               onChange={onChangeSetValue}
               type="text"
             />
@@ -68,11 +97,13 @@ const NumberInput = ({
           {label && <label className="write_label fs_16">{label}</label>}
           <div className="double_numberinput_content">
             <div>
-              <div className={`input_style ${value ? "select" : ""}`}>
+              <div className={`fs_14 input_style ${value ? "select" : ""}`}>
                 {by_date && by_date}
                 <input
                   placeholder={placeholder && placeholder}
-                  className={value ? "select" : ""}
+                  className={`${value2 ? "select" : ""} ${
+                    className ? className : ""
+                  }`}
                   onChange={onChangeSetValue}
                   type="text"
                 />
@@ -85,11 +116,13 @@ const NumberInput = ({
               ) : null}
             </div>
             <div>
-              <div className={`input_style ${value2 ? "select" : ""}`}>
+              <div className={`fs_14 input_style ${value2 ? "select" : ""}`}>
                 {by_date && by_date}
                 <input
                   placeholder={placeholder && placeholder}
-                  className={value2 ? "select" : ""}
+                  className={`${value2 ? "select" : ""} ${
+                    className ? className : ""
+                  }`}
                   onChange={onClickSetValue2}
                   type="text"
                 />
