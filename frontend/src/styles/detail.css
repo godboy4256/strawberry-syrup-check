@@ -70,7 +70,6 @@
 }
 .lndividual_input_container {
   flex-wrap: wrap;
-  margin-bottom: 5px;
   border-bottom: 1px solid rgba(0, 0, 0, 0.2);
   border-right: 1px solid rgba(0, 0, 0, 0.2);
 }

@@ -110,9 +110,10 @@
 }
 .slick-next,
 .slick-prev {
-  top: -40px;
+  top: calc(100% + 40px);
   width: 100px;
-  height: 50px;
+  height: 100px;
+  z-index: 99999;
 }
 .slick-next::before,
 .slick-prev::before {

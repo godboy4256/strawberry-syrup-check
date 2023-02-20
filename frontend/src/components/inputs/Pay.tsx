@@ -1,5 +1,6 @@
 import { ChangeEvent, useState } from "react";
 import { money_korean } from "../../utils/pays";
+import IMGHelpIcon from "../../assets/image/new/help_icon.svg";
 import "../../styles/input.css";
 
 const NumberInput = ({
@@ -12,6 +13,8 @@ const NumberInput = ({
   k_parser = true,
   double = false,
   className,
+  guide,
+  label_help = false,
 }: {
   params?: string | string[];
   label?: string;
@@ -22,6 +25,8 @@ const NumberInput = ({
   k_parser?: boolean;
   double?: boolean;
   className?: string;
+  guide?: boolean;
+  label_help?: boolean;
 }) => {
   const [value, setValue] = useState<string>("");
   const [value2, setValue2] = useState<string>("");
@@ -46,7 +51,28 @@ const NumberInput = ({
     <>
       {!double ? (
         <div className="w_100">
-          {label && <label className="write_label fs_16">{label}</label>}
+          {guide ? (
+            <div className="flex_box write_label write_label_and_guide">
+              {label && (
+                <label className="fs_16 help_call">
+                  {label}
+                  {label_help && <img src={IMGHelpIcon} alt="help icon" />}
+                </label>
+              )}
+              <div className="font_color_gray fs_12 write_label_guide">
+                월 최저임금
+                <br /> 9620원
+              </div>
+            </div>
+          ) : (
+            label && (
+              <label className="fs_16 write_label help_call">
+                {label}
+                {label_help && <img src={IMGHelpIcon} alt="help icon" />}
+              </label>
+            )
+          )}
+
           <div className={`fs_14 input_style ${value ? "select" : ""}`}>
             {by_date && by_date}
             <input
