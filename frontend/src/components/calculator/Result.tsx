@@ -268,12 +268,14 @@ export const ResultComp = ({
   back_func,
   weekTime,
   weekDay,
+  isShorts,
 }: {
   cal_type: 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | "basic" | "multi" | "leastPay";
   result_data: any;
   back_func: () => void;
   weekTime?: number;
   weekDay?: number;
+  isShorts?: string;
 }) => {
   const [next, setNext] = useState(false);
   return (
@@ -421,21 +423,15 @@ export const ResultComp = ({
             ) : (
               <_UnSupplyResult
                 emoticon={EMTDetailArtsUnSupply}
-                unit={cal_type === 2 ? "day" : "month"}
+                unit={isShorts === "단기예술인" ? "month" : "day"}
                 result_data={result_data}
                 helps={
-                  result_data.is_short === "단기 예술인"
+                  isShorts === "단기예술인"
                     ? ["단기예술인 실업급여의 계산방법이 궁금하신가요?"]
                     : ["저는 여러 건을 합치면 월 평균 기준이 되는데요?"]
                 }
-                helps_to={
-                  result_data.is_short === "단기 예술인"
-                    ? ["/help/6"]
-                    : ["/help/8"]
-                }
-                average_guide={
-                  result_data.is_short !== "단기 예술인" ? "50만원" : ""
-                }
+                helps_to={isShorts === "단기예술인" ? ["/help/6"] : ["/help/8"]}
+                average_guide={isShorts !== "단기예술인" ? "50만원" : ""}
               />
             ))}
           {(cal_type === 3 || cal_type === 5) &&
@@ -448,15 +444,13 @@ export const ResultComp = ({
             ) : (
               <_UnSupplyResult
                 emoticon={EMTDetailSpecialsUnSupply}
-                unit={cal_type === 3 ? "day" : "month"}
+                unit={isShorts === "단기특고" ? "month" : "day"}
                 helps={
-                  result_data.is_short === "단기특고"
+                  isShorts === "단기특고"
                     ? ["저는 여러 건을 합치면 월 평균 기준이 되는데요?"]
                     : undefined
                 }
-                helps_to={
-                  result_data.is_short === "단기특고" ? ["/help/9"] : undefined
-                }
+                helps_to={isShorts === "단기특고" ? ["/help/9"] : undefined}
                 result_data={result_data}
               />
             ))}

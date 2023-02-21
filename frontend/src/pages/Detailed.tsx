@@ -309,6 +309,7 @@ const _DetailCalArt = ({ handler }: { handler: any }) => {
             params="sumTwelveMonthSalary"
             placeholder="금액을 입력해주세요. (단위: 원) "
             label="퇴직 전 12개월 급여 총액 (세전)"
+            className="fs_14"
             num_unit="원"
             callBack={handler.SetPageVal}
             guide={true}
@@ -372,6 +373,7 @@ const _DetailCalArt = ({ handler }: { handler: any }) => {
               <NumberInput
                 label_help={handler.GetPageVal("workCate") === 2 ? false : true}
                 params="sumOneYearPay"
+                className="fs_14"
                 label="퇴직 전 12개월 급여 총액 (세전)"
                 placeholder="금액을 입력해주세요. (단위: 원) "
                 num_unit="원"
@@ -548,6 +550,7 @@ const DetailCalPage = () => {
             )}
             {compState === 4 && (
               <ResultComp
+                isShorts={handler.GetPageVal("is_short")}
                 cal_type={handler.GetPageVal("workCate")}
                 result_data={handler.GetPageVal("allresult")}
                 back_func={() => handler.setCompState(3)}

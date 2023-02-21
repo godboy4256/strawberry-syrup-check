@@ -7,8 +7,10 @@ import BasicCalPage from "./pages/Standad";
 import "./styles/root.css";
 import HelpPage from "./pages/HelpPage";
 import MinimumSalary from "./pages/MinimumSalary";
+import { useEffect } from "react";
 
 function App() {
+  useEffect(() => {}, []);
   return (
     <Routes>
       <Route path="/main" element={<MainPage />} />

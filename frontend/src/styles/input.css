@@ -22,6 +22,8 @@
 }
 .input_style.select input {
   color: rgba(255, 101, 89, 1);
+  font-size: 16px;
+  line-height: 24px;
 }
 .input_style.select input.border_b {
   border-color: rgba(255, 101, 89, 1);

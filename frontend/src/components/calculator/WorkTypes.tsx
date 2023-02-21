@@ -1,11 +1,14 @@
 import { MouseEventHandler, useEffect, useState } from "react";
 import {
   retire_reason_standard,
-  retire_reason_popup,
   work_cate,
   retire_reason_art,
   retire_reason_dayjob,
   retire_reason_employ,
+  retire_reason_standard_popup,
+  retire_reason_art_popup,
+  retire_reason_dayjob_popup,
+  retire_reason_employ_popup,
 } from "../../assets/data/worktype_data";
 import { ClosePopup, CreatePopup } from "../common/Popup";
 import SelectInput from "../inputs/Select";
@@ -36,7 +39,9 @@ const _CompSelectTemplete = ({
           {level}단계 <span className="boundary"></span>
         </div>
         <div className="comp_select_templete_title fs_16">{name}</div>
-        <div className="flex_left fs_14 un_value_font_color">{"입력 >"}</div>
+        <div className="flex_left fs_14 un_value_font_color">
+          {selectState === "select" ? "수정 >" : "입력 >"}
+        </div>
       </div>
       {selectState === "select" ? (
         <img
@@ -104,6 +109,7 @@ const WorkTypes = ({ handler }: { handler: any }) => {
     }
     ClosePopup();
   };
+
   return (
     <>
       <Header
@@ -150,7 +156,15 @@ const WorkTypes = ({ handler }: { handler: any }) => {
                 ? retire_reason_dayjob
                 : retire_reason_employ
             }
-            check_popup={retire_reason_popup}
+            check_popup={
+              workCate === 0 || workCate === undefined
+                ? retire_reason_standard_popup
+                : workCate === 2 || workCate === 3
+                ? retire_reason_art_popup
+                : workCate === 4 || workCate === 1 || workCate === 5
+                ? retire_reason_dayjob_popup
+                : retire_reason_employ_popup
+            }
             type="popup"
           />
           <_CompSelectTemplete
