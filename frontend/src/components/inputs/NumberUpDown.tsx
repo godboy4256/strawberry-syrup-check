@@ -61,7 +61,6 @@ const NumberUpDown = ({
     }
     callBack(params, Number(e.currentTarget.value));
     setCount(Number(e.currentTarget.value));
-    console.log();
   };
   return (
     <>

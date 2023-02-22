@@ -73,7 +73,6 @@ const CheckBoxInput = ({
   useEffect(() => {
     return () => {
       checkList = [];
-      console.log(checkList);
     };
   });
   return (
