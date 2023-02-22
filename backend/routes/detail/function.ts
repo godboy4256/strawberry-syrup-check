@@ -6,14 +6,28 @@ export function calArtPay(sumOneYearPay: number[] | number, artWorkingDays: numb
 	const dayAvgPay = Array.isArray(sumOneYearPay)
 		? Math.ceil(sumOneYearPay[0] / artWorkingDays)
 		: Math.ceil(sumOneYearPay / artWorkingDays);
-	let realDayPay = Math.ceil(dayAvgPay * 0.6);
 
+	let realDayPay = Math.ceil(dayAvgPay * 0.6);
 	if (realDayPay > 66000) realDayPay = 66000;
 	if (isSpecial) {
 		if (realDayPay < 26600) realDayPay = 26600;
 	} else {
 		if (realDayPay < 16000) realDayPay = 16000;
 	}
+
+	const realMonthPay = realDayPay * 30;
+
+	return { dayAvgPay, realDayPay, realMonthPay };
+}
+export function calSpecialPay(sumOneYearPay: number[] | number, artWorkingDays: number) {
+	const dayAvgPay = Array.isArray(sumOneYearPay)
+		? Math.ceil(sumOneYearPay[0] / artWorkingDays)
+		: Math.ceil(sumOneYearPay / artWorkingDays);
+
+	let realDayPay = Math.ceil(dayAvgPay * 0.6);
+	if (realDayPay > 66000) realDayPay = 66000;
+	if (realDayPay < 26600) realDayPay = 26600;
+
 	const realMonthPay = realDayPay * 30;
 
 	return { dayAvgPay, realDayPay, realMonthPay };
@@ -340,14 +354,14 @@ export function calEmployerSumPay(
 	return sumPay;
 }
 
-export function checkJobCate(enterDay: Dayjs, jobCate: number) {
+export function checkJobCate(enterDay: Dayjs, jobCate: number): [boolean, Dayjs] {
 	const checkOne = dayjs("2021-07-01");
 	const checkTwo = dayjs("2022-01-01");
 	const checkThree = dayjs("2022-07-01");
 
-	if (jobCate <= 11) return enterDay.isSameOrAfter(checkOne) ? enterDay : checkOne;
-	if (jobCate >= 14) return enterDay.isSameOrAfter(checkThree) ? enterDay : checkThree;
-	return enterDay.isSameOrAfter(checkTwo) ? enterDay : checkTwo;
+	if (jobCate <= 11) return enterDay.isSameOrAfter(checkOne) ? [false, enterDay] : [true, checkOne];
+	if (jobCate >= 14) return enterDay.isSameOrAfter(checkThree) ? [false, enterDay] : [true, checkThree];
+	return enterDay.isSameOrAfter(checkTwo) ? [false, enterDay] : [true, checkTwo];
 }
 
 export function calSumOneYearWorkDay(lastWorkDay: Dayjs) {

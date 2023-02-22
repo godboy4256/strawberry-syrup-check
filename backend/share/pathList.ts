@@ -7,6 +7,7 @@ export const detailPath = {
 	standard: "/standard",
 	art: "/art",
 	shortArt: "/art/short",
+	shortSpecial: "/special/short",
 	dayJob: "/dayjob",
 	veryShort: "/veryShort",
 	employer: "/employer",

@@ -1,4 +1,4 @@
-import dayjs from "dayjs";
+import dayjs, { Dayjs } from "dayjs";
 import { FastifyInstance } from "fastify";
 import isSameOrAfter from "dayjs/plugin/isSameOrAfter";
 
@@ -11,10 +11,12 @@ import {
 	dayJobSchema,
 	employerSchema,
 	shortArtSchema,
+	shortSpecialSchema,
 	standardSchema,
 	TartInput,
 	TartShortInput,
 	TdayJobInput,
+	TspecialShortInput,
 	TstandardInput,
 	TveryShortInput,
 	veryShortSchema,
@@ -140,7 +142,7 @@ export default function detailRoute(fastify: FastifyInstance, options: any, done
 		// 1. 특고 피보험자격취득일 조정
 		if (mainData.workCate === 3) {
 			console.log("2. Modify enterDay!!!");
-			mainData.enterDay = checkJobCate(mainData.enterDay, mainData.jobCate);
+			mainData.enterDay = checkJobCate(mainData.enterDay, mainData.jobCate)[1];
 		}
 
 		// 2. 기본 조건 확인 & 복수형이 아니면 추가 조건확인
@@ -237,7 +239,7 @@ export default function detailRoute(fastify: FastifyInstance, options: any, done
 	fastify.post(detailPath.shortArt, shortArtSchema, (req: any, res) => {
 		const mainData: TartShortInput = { ...req.body };
 
-		console.log("shrot start!");
+		console.log("short start!");
 
 		// 신청일이 이직일로 부터 1년 초과 확인
 		if (!mainData.isMany) {
@@ -254,10 +256,8 @@ export default function detailRoute(fastify: FastifyInstance, options: any, done
 
 			// 단기 예술인/특고로 3개월 이상 근무해야한다.
 			console.log("2. ", "isMany:", mainData.isMany, "sumWorkDay:", mainData.sumWorkDay);
-			if (!mainData.isMany) {
-				if (mainData.sumWorkDay < 3)
-					return { succ: false, errorCode: 4, mesg: "단기 예술인/특고로 3개월 이상 근무해야합니다." };
-			}
+			if (mainData.sumWorkDay < 3)
+				return { succ: false, errorCode: 4, mesg: "단기 예술인으로 3개월 이상 근무해야합니다." };
 		}
 
 		// 2. 급여(일수령액, 월수령액) 계산
@@ -271,16 +271,9 @@ export default function detailRoute(fastify: FastifyInstance, options: any, done
 		console.log("3. ", "lastWorkDay:", lastWorkDay.format("YYYY-MM-DD"), "sumOneYearWorkDay:", sumOneYearWorkDay);
 		console.log(dayAvgPay, realDayPay, realMonthPay);
 
-		// 3. 가입일 추정 계산, 직종관련 조정, 근무 기간 조정
-		const tempEnterDay = mainData.isSimple // 개별입력, 결과만 입력
-			? lastWorkDay.subtract(mainData.sumWorkDay, "month")
-			: lastWorkDay.subtract(mainData.sumTwoYearWorkDay, "month");
-		const enterDay = mainData.workCate === 5 ? checkJobCate(tempEnterDay, mainData.jobCate) : tempEnterDay; // 직종 조정
-
+		// 3. 가입일 추정 계산
+		const enterDay = lastWorkDay.subtract(mainData.sumWorkDay, "month");
 		console.log(`enterDay: ${enterDay}`);
-		if (mainData.workCate ====5 && mainData.isSpecial) mainData
-		const simpleWorkDay = lastWorkDay.diff(enterDay, "month");
-		if (mainData.isSimple && mainData.workCate === 5) console.log("h1ihi12h1ih1ih1i1ihihiihihihih");
 
 		// 3. 수급 인정/불인정 판단 => 결과만 입력 계산기능 필요
 		const isPermit = mainData.isSimple
@@ -331,7 +324,7 @@ export default function detailRoute(fastify: FastifyInstance, options: any, done
 		console.log("8. ", "nextReceiveInfo:", requireWorkingYear, nextReceiveDay);
 
 		// 9. 결과 리턴
-		if (nextReceiveDay === 0) {
+		if (!nextReceiveDay) {
 			return {
 				succ: true,
 				retired: mainData.retired,
@@ -344,6 +337,115 @@ export default function detailRoute(fastify: FastifyInstance, options: any, done
 				workDayForMulti,
 			};
 		}
+		return {
+			succ: true,
+			retired: mainData.retired,
+			amountCost: realDayPay * receiveDay,
+			dayAvgPay,
+			realDayPay,
+			receiveDay,
+			realMonthPay,
+			workingMonths: mainData.sumWorkDay,
+			needMonth: Math.floor((requireWorkingYear * 12 - mainData.sumWorkDay) * 10) / 10,
+			nextAmountCost: nextReceiveDay * realDayPay,
+			morePay: nextReceiveDay * realDayPay - realDayPay * receiveDay,
+			workDayForMulti,
+		};
+	});
+
+	fastify.post(detailPath.shortSpecial, shortSpecialSchema, (req: any, res) => {
+		const mainData: TspecialShortInput = { ...req.body };
+
+		console.log("short special start!");
+
+		if (!mainData.isMany) {
+			const now = mainData.isSimple ? dayjs() : dayjs(mainData.enrollDay);
+			console.log(
+				`1. now: ${now.format("YYYY-MM-DD")} over365: ${
+					Math.floor(now.diff(mainData.lastWorkDay, "day")) > 365
+				}`
+			);
+			if (Math.floor(now.diff(mainData.lastWorkDay, "day")) > 365)
+				return { succ: false, errorCode: 0, mesg: DefinedParamErrorMesg.expire };
+			console.log(`2. sumWorkDay: ${mainData.sumWorkDay}`);
+			if (mainData.sumWorkDay < 3)
+				return { succ: false, errorCode: 4, mesg: "단기 특고로 3개월 이상 근무해야합니다." };
+		}
+
+		// 2. 급여 계산
+		const lastWorkDay = dayjs(mainData.lastWorkDay);
+		const sumOneYearWorkDay = calSumOneYearWorkDay(lastWorkDay);
+		const { dayAvgPay, realDayPay, realMonthPay } = calArtPay(
+			mainData.sumOneYearPay,
+			sumOneYearWorkDay,
+			mainData.isSpecial
+		);
+		console.log(`3. lastWorkDay: ${lastWorkDay.format("YYYY-MM-DD")} sumOneYearWorkDay: ${sumOneYearWorkDay}`);
+		console.log(dayAvgPay, realDayPay, realMonthPay);
+
+		// 3. 가입일 추정 계산, 직종관련 조정, 근무기간 조정
+		const tempEnterDay = lastWorkDay.subtract(mainData.sumWorkDay, "month");
+		const enterDay: [boolean, Dayjs] = checkJobCate(tempEnterDay, mainData.jobCate);
+		if (mainData.isSimple) {
+			if (!enterDay[0]) mainData.sumWorkDay = lastWorkDay.diff(enterDay[1], "month");
+		}
+
+		// 4. 수급 인정/불인정
+		const isPermit = mainData.isSimple
+			? artShortCheckPermit(mainData.sumWorkDay, mainData.isSpecial)
+			: artShortCheckPermit(mainData.sumTwoYearWorkDay, mainData.isSpecial);
+		console.log(`4. isPermit: ${isPermit}`);
+
+		// 5. 추가 근로 정보에서 단기 특고 조건 확인
+		if (mainData.isOverTen && mainData.hasWork)
+			return { succ: false, errorCode: 5, workingMonths: isPermit[1], requireMonths: isPermit[2] };
+
+		// 6. 복수형에서 사용하기 위한 workDayForMulti 계산
+		const limitDay = dayjs(mainData.limitDay);
+
+		const workDayForMulti = enterDay[1].isSameOrAfter(limitDay, "day")
+			? lastWorkDay.diff(enterDay[1], "day")
+			: lastWorkDay.diff(limitDay, "day");
+		console.log(`5. limitDay: ${limitDay.format("YYYY-MM-DD")}  workDayForMulti: ${workDayForMulti}`);
+
+		// 7. 수급 불인정
+		if (!isPermit[0])
+			return {
+				succ: false,
+				errorCode: 2,
+				retired: mainData.retired,
+				dayAvgPay,
+				realDayPay,
+				workingMonths: isPermit[1],
+				requireMonths: isPermit[2],
+				workDayForMulti,
+			};
+
+		// 8. 피보험기간(년) 계산
+		const workingYear = Math.floor(mainData.sumWorkDay / 12);
+		console.log(`6. ${workingYear}`);
+
+		// 9. 소정급여일수 계산
+		const receiveDay = getReceiveDay(workingYear, mainData.age, mainData.disabled);
+		console.log(`7. receiveDay: ${receiveDay}`);
+
+		// 10. 다음단계 수급
+		const [requireWorkingYear, nextReceiveDay] = getNextReceiveDay(workingYear, mainData.age, mainData.disabled);
+		console.log(`8. nextReceiveInfo: ${requireWorkingYear}, ${nextReceiveDay}`);
+
+		// 11. 결과 리턴
+		if (!nextReceiveDay)
+			return {
+				succ: true,
+				retired: mainData.retired,
+				amountCost: realDayPay * receiveDay,
+				dayAvgPay,
+				realDayPay,
+				receiveDay,
+				realMonthPay,
+				workingMonths: mainData.sumWorkDay,
+				workDayForMulti,
+			};
 		return {
 			succ: true,
 			retired: mainData.retired,
