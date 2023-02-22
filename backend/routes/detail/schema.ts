@@ -51,6 +51,26 @@ export type TartShortInput = {
 	isMany: boolean;
 };
 
+export type TspecialShortInput = {
+	retired: boolean;
+	workCate: number;
+	jobCate: number;
+	retireReason: number;
+	age: number;
+	disabled: boolean;
+	lastWorkDay: string;
+	enrollDay?: string;
+	sumOneYearPay: number;
+	sumTwoYearWorkDay?: number;
+	sumWorkDay: number;
+	isSpecial: boolean;
+	isSimple: boolean;
+	isOverTen: boolean;
+	hasWork: boolean;
+	limitDay: string;
+	isMany: boolean;
+};
+
 export type TdayJobInput = {
 	retired: boolean;
 	workCate: number;
@@ -133,6 +153,26 @@ const shortArtBodyProp = {
 	isMany: { type: "boolean" },
 };
 
+const shortSepcialBodyProp = {
+	retired: DefineParamInfo.retired, // 퇴직여부
+	workCate: DefineParamInfo.workCate, // 근로형태
+	jobCate: { type: "number", minimum: 0, maximum: 18 },
+	retireReason: DefineParamInfo.retireReason, // 퇴직사유
+	age: { type: "number" },
+	disabled: DefineParamInfo.disabled, // 장애여부
+	lastWorkDay: DefineParamInfo.lastWorkDay, // 마지막 근무일
+	enrollDay: { type: "string" },
+	sumOneYearPay: { type: "number", minimum: 0 }, // 퇴직 전 12개월 급여 총액
+	sumTwoYearWorkDay: { type: "number", minimum: 0 },
+	sumWorkDay: { type: "number", minimum: 0 }, // 마지막 근무일
+	isSpecial: { type: "boolean" },
+	isSimple: { type: "boolean" },
+	isOverTen: { type: "boolean" },
+	hasWork: { type: "boolean" },
+	limitDay: { type: "string" },
+	isMany: { type: "boolean" },
+};
+
 const dayJobBodyProp = {
 	retired: DefineParamInfo.retired, // 퇴직여부
 	workCate: DefineParamInfo.workCate, // 근로형태
@@ -189,6 +229,7 @@ const employerBodyExamples = [
 export const standardSchema = {
 	schema: {
 		tags: ["detail"],
+		summary: "정규직/자영업",
 		body: {
 			type: "object",
 			required: [
@@ -212,6 +253,7 @@ export const standardSchema = {
 export const artSchema = {
 	schema: {
 		tags: ["detail"],
+		summary: "예술인/특고",
 		body: {
 			type: "object",
 			required: [
@@ -234,6 +276,7 @@ export const artSchema = {
 export const shortArtSchema = {
 	schema: {
 		tags: ["detail"],
+		summary: "단기 예술인",
 		body: {
 			type: "object",
 			required: ["age", "disabled", "lastWorkDay", "hasWork", "isSimple", "limitDay"],
@@ -241,10 +284,22 @@ export const shortArtSchema = {
 		},
 	},
 };
+export const shortSpecialSchema = {
+	schema: {
+		tags: ["detail"],
+		summary: "단기 특고",
+		body: {
+			type: "object",
+			required: ["age", "disabled", "lastWorkDay", "hasWork", "isSimple", "limitDay"],
+			properties: shortSepcialBodyProp,
+		},
+	},
+};
 
 export const dayJobSchema = {
 	schema: {
 		tags: ["detail"],
+		summary: "일용직",
 		body: {
 			type: "object",
 			required: [
@@ -266,6 +321,7 @@ export const dayJobSchema = {
 export const veryShortSchema = {
 	schema: {
 		tags: ["detail"],
+		summary: "초단시간",
 		body: {
 			type: "object",
 			required: [
@@ -287,6 +343,7 @@ export const veryShortSchema = {
 export const employerSchema = {
 	schema: {
 		tags: ["detail"],
+		summary: "자영업",
 		body: {
 			type: "object",
 			required: ["enterDay", "retiredDay", "insuranceGrade", "limitDay", "isMany"],
