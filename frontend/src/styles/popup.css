@@ -24,7 +24,7 @@
   left: 50%;
   background-color: white;
   transform: translate(-50%, -50%);
-  border-radius: 10px;
+  border-radius: 5px;
   border: 1px solid #ff6559;
   animation: fadeInContainer 0.4s ease-in-out 1 forwards;
   z-index: 10001;
@@ -38,7 +38,7 @@
 
 #popup_title {
   text-align: center;
-  border-bottom: 1px solid rgba(0, 0, 0, 0.5);
+  border-bottom: 1px solid rgba(0, 0, 0, 0.2);
   padding: 20px 0 15px;
   line-height: 27px;
   margin: 0 20px;

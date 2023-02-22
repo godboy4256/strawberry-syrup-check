@@ -290,12 +290,10 @@ const _onClickPopUpInvidual = (
       workRecordUnitsPays[params] = value;
     }
   };
-
   if (!lastWorkDay) {
     CreatePopup(undefined, "마지막 근무일을 선택해주세요", "only_check");
     return;
   }
-
   const workRecord = handler.GetPageVal("workRecord"),
     workRecordTargetUnit = workRecord.filter((el: any) => {
       return el.year === year;
@@ -312,19 +310,41 @@ const _onClickPopUpInvidual = (
     />,
     "confirm",
     () => {
-      const workRecordUnits: any = [];
-      Object.keys(workRecordUnitsDays).forEach((el: any, idx: number) => {
-        workRecordUnits.push({
-          month: Number(el),
-          day: Number(workRecordUnitsDays[el]),
-          pay: workRecordUnitsPays[el] && Number(workRecordUnitsPays[el]),
+      let valid = false;
+      if (
+        Object.values(workRecordUnitsDays).length +
+          Object.values(workRecordUnitsPays).length ===
+        0
+      ) {
+        valid = true;
+      }
+      if (type === "shorts") {
+        if (
+          Object.values(workRecordUnitsDays).length !==
+          Object.values(workRecordUnitsPays).length
+        ) {
+          valid = true;
+        }
+      }
+
+      if (type === "dayJob") {
+        Object.keys(workRecordUnitsPays).forEach((el) => {
+          if (!Object.keys(workRecordUnitsDays).includes(el)) {
+            valid = true;
+          }
         });
-      });
-      const unit = {
-        year,
-        months: workRecordUnits,
-      };
-      if (unit.months.length === 0) {
+      }
+
+      if (
+        GetDateArr(lastWorkDay)[0] === year ||
+        GetDateArr(lastWorkDay)[0] - 1 === year
+      ) {
+        if (Object.values(workRecordUnitsPays).length === 0) {
+          valid = true;
+        }
+      }
+
+      if (valid) {
         CreatePopup(
           undefined,
           "달마다 근무일수와 월 임금총액을 입력해주세요.",
@@ -342,6 +362,19 @@ const _onClickPopUpInvidual = (
         );
         return;
       }
+
+      const workRecordUnits: any = [];
+      Object.keys(workRecordUnitsDays).forEach((el: any) => {
+        workRecordUnits.push({
+          month: Number(el),
+          day: workRecordUnitsDays[el] && Number(workRecordUnitsDays[el]),
+          pay: workRecordUnitsPays[el] && Number(workRecordUnitsPays[el]),
+        });
+      });
+      const unit = {
+        year,
+        months: workRecordUnits,
+      };
       setSelectYears((prev: number[]) => {
         return [...prev, year];
       });

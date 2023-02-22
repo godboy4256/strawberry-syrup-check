@@ -47,7 +47,7 @@ const PopUpGlobal = () => {
                   <>
                     <Button
                       text={
-                        PopUpHandler.cancel_texㅋ
+                        PopUpHandler.cancel_text
                           ? PopUpHandler.cancel_text
                           : "아니오"
                       }

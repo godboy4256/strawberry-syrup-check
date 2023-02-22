@@ -401,8 +401,24 @@ export const DateInputNormal = ({
       />,
       "date",
       () => {
-        handler.Action_Get_Date(callBack && callBack, setDateValue, params);
-        ClosePopup();
+        if (params === "isOverTen") {
+          if (handler._Data.plan_todo_data === undefined) {
+            CreatePopup(
+              undefined,
+              "최근 근로일을 1일 이상 선택하세요.",
+              "only_check",
+              () => {},
+              () => {},
+              "확인"
+            );
+          } else {
+            handler.Action_Get_Date(callBack && callBack, setDateValue, params);
+            ClosePopup();
+          }
+        } else {
+          handler.Action_Get_Date(callBack && callBack, setDateValue, params);
+          ClosePopup();
+        }
       },
       undefined,
       "선택",

@@ -136,7 +136,7 @@ const SelectInput = ({
   callBack: CallableFunction | undefined;
   popUpCallBack?: CallableFunction;
   popup_select?: CallableFunction;
-  check_popup?: string[];
+  check_popup?: string[] | ReactElement[] | "employ";
   value_type?: "number" | "string";
   defaultSelect?: number | string;
   className?: string;
@@ -153,10 +153,22 @@ const SelectInput = ({
       />,
       "confirm",
       () => {
+        if (
+          check_popup === "employ" ||
+          String(options[popup_select && popup_select("popup_select")]) ===
+            "소득감소"
+        ) {
+          popUpCallBack &&
+            popUpCallBack(params, popup_select && popup_select("popup_select"));
+          ClosePopup();
+          return;
+        }
         if (!popup_select) return;
         if (check_popup) {
           CreatePopup(
-            undefined,
+            popup_select("popup_select") === undefined
+              ? String(options[0])
+              : String(options[popup_select("popup_select")]),
             check_popup[popup_select("popup_select")] === undefined
               ? check_popup[0]
               : check_popup[popup_select("popup_select")],

@@ -42,7 +42,7 @@ const handler = new BasicCalHandler({});
 
 const _BasicCalComp = () => {
   return (
-    <div className="full_height_layout_cal pb_50">
+    <div className="full_height_layout_cal pd_50">
       <Header
         title={handler.GetPageVal("retired") ? "퇴직자" : "퇴직예정자"}
         leftLink="/main"

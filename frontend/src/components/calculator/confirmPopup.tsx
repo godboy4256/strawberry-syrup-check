@@ -29,7 +29,7 @@ export const DetailConfirmPopup = (confirm_data: any) => {
         <div className="confirm_title_row_bar fs_14">
           퇴직사유
           <div className="fs_14">
-            {/* {retire_reason_standard[confirm_data?.retireReason]} */}
+            {retire_reason_standard[confirm_data?.retireReason]}
           </div>
         </div>
       )}
