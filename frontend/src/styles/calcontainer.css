@@ -4,3 +4,7 @@
 #cal_current_guide {
   margin-bottom: 25px;
 }
+
+#cal_current_guide.multi_margin {
+  margin-bottom: 0;
+}

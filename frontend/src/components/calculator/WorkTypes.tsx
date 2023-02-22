@@ -8,7 +8,6 @@ import {
   retire_reason_standard_popup,
   retire_reason_art_popup,
   retire_reason_dayjob_popup,
-  retire_reason_employ_popup,
 } from "../../assets/data/worktype_data";
 import { ClosePopup, CreatePopup } from "../common/Popup";
 import SelectInput from "../inputs/Select";
@@ -163,7 +162,7 @@ const WorkTypes = ({ handler }: { handler: any }) => {
                 ? retire_reason_art_popup
                 : workCate === 4 || workCate === 1 || workCate === 5
                 ? retire_reason_dayjob_popup
-                : retire_reason_employ_popup
+                : "employ"
             }
             type="popup"
           />

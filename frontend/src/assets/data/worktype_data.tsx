@@ -186,10 +186,3 @@ export const retire_reason_employ = [
   "자연재해",
   "기타 불가피한 사유",
 ];
-
-export const retire_reason_employ_popup = [
-  <RetireReasonPopup01 />,
-  <RetireReasonPopup02 />,
-  <RetireReasonPopup03 />,
-  <RetireReasonPopup04 />,
-];
