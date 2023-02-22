@@ -143,6 +143,9 @@ export default function detailRoute(fastify: FastifyInstance, options: any, done
 		if (mainData.workCate === 3) {
 			console.log("2. Modify enterDay!!!");
 			mainData.enterDay = checkJobCate(mainData.enterDay, mainData.jobCate)[1];
+		} else {
+			const artLawStartDay = dayjs("2020-12-01");
+			mainData.enterDay = mainData.enterDay.isSameOrAfter(artLawStartDay) ? mainData.enterDay : artLawStartDay;
 		}
 
 		// 2. 기본 조건 확인 & 복수형이 아니면 추가 조건확인
