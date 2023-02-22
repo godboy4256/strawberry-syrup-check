@@ -175,7 +175,6 @@ const null_check_rules = (
   null_check_list[type].forEach((el: string) => {
     console.log("null_check", to_server[el]);
     console.log("to_server", to_server);
-    console.log(type);
     if (to_server[el] === null || to_server[el] === undefined) {
       CreatePopup(
         undefined,
