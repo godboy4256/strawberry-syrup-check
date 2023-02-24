@@ -6,7 +6,7 @@ import SelectInput from "../components/inputs/Select";
 import TabInputs from "../components/inputs/TabInputs";
 import DetailedHandler from "../object/detailed";
 import WorkTypes from "../components/calculator/WorkTypes";
-import { Year_Option_Generater } from "../utils/date";
+import { Art_Year_Generater, Year_Option_Generater } from "../utils/date";
 import NumberInput from "../components/inputs/Pay";
 import NumberUpDown from "../components/inputs/NumberUpDown";
 import Button from "../components/inputs/Button";
@@ -19,7 +19,8 @@ import WorkRecordGen from "../components/calculator/workRecordGen";
 import "./../styles/detail.css";
 import { jobCates } from "../assets/data/worktype_data";
 import IMGHelpIcon from "../assets/image/new/help_icon.svg";
-import { CreatePopup } from "../components/common/Popup";
+import IMGResetIcon from "../assets/image/new/reset_icon.svg";
+import { ClosePopup, CreatePopup } from "../components/common/Popup";
 
 const handler: any = new DetailedHandler({});
 
@@ -296,6 +297,10 @@ const _DetailCalArt = ({ handler }: { handler: any }) => {
             params="enterDay"
             label="고용보험 가입일"
             callBack={handler.SetPageVal}
+            year={Art_Year_Generater()}
+            alarm_comment="예술인의 피보험 단위기간은 2020년 12월을 기준으로 적용됩니다."
+            max_date="2023-2"
+            min_date="2020-12"
           />
           {handler.GetPageVal("retired") && (
             <DateInputNormal
@@ -324,6 +329,17 @@ const _DetailCalArt = ({ handler }: { handler: any }) => {
           options={["개별 입력", "결과만 입력"]}
           form01={
             <>
+              {handler.GetPageVal("workCate") === 3 && (
+                <SelectInput
+                  params="jobCate"
+                  callBack={handler.SetPageVal}
+                  selected={"직종을 선택해주세요."}
+                  type="normal"
+                  value_type="number"
+                  label="직종"
+                  options={jobCates}
+                />
+              )}
               <DateInputNormal
                 params="lastWorkDay"
                 label="마지막 근무일"
@@ -470,6 +486,9 @@ export const DetailCalComp = ({
   handler: any;
   clickCallBack: CallableFunction;
 }) => {
+  const [resetInfoList, setState] = useState({
+    age: false,
+  });
   return (
     <div id={`${workCate !== 6 ? "detail_comp_container" : ""}`}>
       <Header
@@ -484,12 +503,30 @@ export const DetailCalComp = ({
           handler.SetPageVal("retireReason", undefined);
         }}
       />
+      <button
+        className="pd_810 help_link"
+        onClick={() => {
+          CreatePopup(
+            "초기화",
+            "입력 값들이 모두 초기화됩니다.",
+            "confirm",
+            () => {
+              setState({ age: true });
+              ClosePopup();
+            }
+          );
+        }}
+      >
+        <img src={IMGResetIcon} alt="reset icon" />
+        <span className="fs_12">초기화</span>
+      </button>
       <div className={`${workCate !== 6 ? "public_side_padding" : ""}`}>
         {workCate !== 6 && handler.GetPageVal("cal_state") !== "multi" && (
           <>
             <DateInputNormal
               params="age"
               label="생년월일"
+              isReset={resetInfoList.age}
               callBack={handler.SetPageVal}
               year={Year_Option_Generater(73)}
             />
@@ -535,7 +572,7 @@ const DetailCalPage = () => {
           <>
             {compState === 1 && <CalIsRetiree handler={handler} />}
             {compState === 2 && <WorkTypes handler={handler} />}
-            {compState === 3 && (
+            {(compState === 3 || compState === 6) && (
               <DetailCalComp
                 handler={handler}
                 workCate={handler.GetPageVal("workCate")}

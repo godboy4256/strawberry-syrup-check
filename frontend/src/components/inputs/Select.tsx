@@ -3,6 +3,7 @@ import IMGSelect from "../../assets/image/select_icon.svg";
 import IMGNormalSelect from "../../assets/image/new/select_icon_normal.svg";
 import { ClosePopup, CreatePopup } from "../common/Popup";
 import "../../styles/select.css";
+import { jobCates, jobCates_ed } from "../../assets/data/worktype_data";
 
 const _CustomSelect = ({
   options,
@@ -49,6 +50,7 @@ const _CustomSelect = ({
       >
         {onSelect &&
           options.map((el, idx: number) => {
+            if (idx === 0) return null;
             return (
               <div
                 key={String(Date.now()) + el}
@@ -109,6 +111,19 @@ const PopupSelect = ({
           {el}
         </div>
       ))}
+    </div>
+  );
+};
+
+const _EmploymentPopUp = ({ job, jobed }: { job: string; jobed: string }) => {
+  return (
+    <div className="string_popup txt_ct fs_12">
+      <div>선택하신 직종의 고용보험이 적용되는 시행일은 다음과 같습니다.</div>
+      <br /> <br />
+      <div>
+        <div className="fs_16 lh_27">{job}</div>
+        <div className="fs_16 lh_27">{jobed}</div>
+      </div>
     </div>
   );
 };
@@ -222,6 +237,27 @@ const SelectInput = ({
                 e: MouseEvent<HTMLDivElement>,
                 idx?: number
               ) => {
+                if (params === "jobCate") {
+                  CreatePopup(
+                    undefined,
+                    <_EmploymentPopUp
+                      job={String(el)}
+                      jobed={
+                        [1, 2, 3, 4, 5, 6, 7, 8, 9, 10].includes(Number(idx))
+                          ? jobCates_ed[0]
+                          : [11, 12].includes(Number(idx))
+                          ? jobCates_ed[1]
+                          : [13, 14, 15, 16, 17].includes(Number(idx))
+                          ? jobCates_ed[2]
+                          : ""
+                      }
+                    />,
+                    "only_check",
+                    undefined,
+                    undefined,
+                    "확인"
+                  );
+                }
                 e?.currentTarget?.parentElement?.parentElement?.classList?.add(
                   "active"
                 );

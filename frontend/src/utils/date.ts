@@ -26,6 +26,17 @@ export const Year_Option_Generater = (count: number, max?: number) => {
   return year_arr;
 };
 
+export const Art_Year_Generater = () => {
+  const year_arr = [];
+  for (let i = 0; i < new Date().getFullYear(); i++) {
+    year_arr.push(String(new Date().getFullYear() - i));
+    if (new Date().getFullYear() - i === 2020) {
+      break;
+    }
+  }
+  return year_arr;
+};
+
 export const Month_Calculator = (
   target_month: number,
   direction: string,

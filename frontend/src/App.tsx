@@ -1,13 +1,13 @@
 import { Route, Routes } from "react-router-dom";
 import DetailCalPage from "./pages/Detailed";
-import MainPage from "./pages/MainPage";
 import MultiCalPage from "./pages/MultiPage";
 import CalRecord from "./pages/CalRecord";
 import BasicCalPage from "./pages/Standad";
-import "./styles/root.css";
 import HelpPage from "./pages/HelpPage";
 import MinimumSalary from "./pages/MinimumSalary";
+import MainPage from "./pages/mainPage";
 import { useEffect } from "react";
+import "./styles/root.css";
 
 function App() {
   useEffect(() => {}, []);

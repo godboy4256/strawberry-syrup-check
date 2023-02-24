@@ -6,38 +6,35 @@ import IMGHelpIcon from "../../assets/image/new/help_icon.svg";
 import { CreatePopup } from "../common/Popup";
 import "../../styles/salarytab.css";
 
-const before_month_cal = (retiredDay: string) => {
-  let now = retiredDay ? new Date(retiredDay) : new Date();
+const before_month_cal = (retiredDay: Date) => {
+  let startMonth = new Date(retiredDay).getMonth() - 2;
+  let startYear = new Date(retiredDay).getFullYear();
 
-  let threeMonthsAgo = new Date();
-  threeMonthsAgo.setMonth(now.getMonth() - 2);
-
-  let startDate = new Date(
-    threeMonthsAgo.getFullYear(),
-    threeMonthsAgo.getMonth(),
-    1
-  );
-  let endDate = new Date(now.getFullYear(), now.getMonth() + 1, 1);
-
-  let yearRange = [];
+  if (startMonth < 0) {
+    startMonth += 12;
+    startYear--;
+  }
   let monthRange = [];
 
-  for (
-    let year = startDate.getFullYear();
-    year <= endDate.getFullYear();
-    year++
-  ) {
-    yearRange.push(year);
-    let startMonth =
-      year === startDate.getFullYear() ? startDate.getMonth() : 0;
-    let endMonth = year === endDate.getFullYear() ? endDate.getMonth() : 11;
-    for (let month = startMonth; month <= endMonth; month++) {
-      monthRange.push({
-        year: year,
-        month: month === 0 ? 12 : month,
-        day: now.getDate(),
-      });
+  for (var i = 0; i < 4; i++) {
+    let year = startYear;
+    let month = startMonth + i;
+
+    if (month >= 12) {
+      year++;
+      month -= 12;
     }
+
+    const dateObj = new Date(year, month, new Date(retiredDay).getDate());
+
+    monthRange.push({
+      year:
+        dateObj.getMonth() === 0
+          ? dateObj.getFullYear() - 1
+          : dateObj.getFullYear(),
+      month: dateObj.getMonth() === 0 ? 12 : dateObj.getMonth(),
+      day: dateObj.getDate(),
+    });
   }
 
   return [
@@ -125,12 +122,12 @@ const TabInputs = ({
             } ${salarytab == "all" ? "un_all" : ""}`}
             onClick={() => {
               if (valueDay("retired")) {
-                if (valueDay("retiredDay")) {
+                if (valueDay("retiredDay") && valueDay("enterDay")) {
                   setSalaryTab("three_month");
                 } else {
                   CreatePopup(
                     undefined,
-                    "퇴사일을 선택해주세요.",
+                    "퇴사일(고용보험 종료일) 과 입사일(고용보험 가입일)을 모두 선택해주세요.",
                     "only_check"
                   );
                 }
@@ -199,6 +196,7 @@ const TabInputs = ({
                 type="normal"
                 value_type="string"
                 options={[
+                  "등급을 선택해주세요.",
                   "1등급",
                   "2등급",
                   "3등급",
@@ -225,14 +223,15 @@ const TabInputs = ({
                     .map((_, idx: number) => {
                       return (
                         <Fragment key={String(Date.now())}>
-                          <div>
+                          <div className="fs_14 pd_810">
                             {GetDateArr(valueDay("enterDay"))[0] + idx} 년
-                          </div>
+                          </div>{" "}
                           <SelectInput
                             selected={"1등급"}
                             type="normal"
                             value_type="string"
                             options={[
+                              "등급을 선택해주세요.",
                               "1등급",
                               "2등급",
                               "3등급",

@@ -1,4 +1,12 @@
-import { Dispatch, SetStateAction, useEffect, useState } from "react";
+import {
+  Dispatch,
+  MouseEvent,
+  ReactElement,
+  SetStateAction,
+  useEffect,
+  useRef,
+  useState,
+} from "react";
 import IMGDate from "../../assets/image/date_icon.svg";
 import IMGRedDirection from "../../assets/image/red_direction.svg";
 import SelectInput from "./Select";
@@ -15,6 +23,8 @@ class DateHandler extends InputHandler {
   public setDay: Dispatch<SetStateAction<number>> | undefined = undefined;
   public setDays: Dispatch<SetStateAction<number[]>> | undefined = undefined;
   public setDateValue: Dispatch<SetStateAction<string>> | undefined = undefined;
+  public refNext: any = undefined;
+  public refPrev: any = undefined;
   public current_year_list = Year_Option_Generater(44);
   public plan_todo_data = [];
 
@@ -221,10 +231,14 @@ const _DatePopUp = ({
   handler,
   years,
   planToDo,
+  max_date,
+  min_date,
 }: {
   handler: any;
   years: any[];
   planToDo?: any;
+  max_date?: any;
+  min_date?: any;
 }) => {
   const currentSelectDate = [
     handler.GetPageVal("year"),
@@ -235,6 +249,8 @@ const _DatePopUp = ({
   const [planToDoButton, setState] = useState(false);
   const [planToDoYear, setPlanToDoYear] = useState(planTodo && planTodo[0]);
   const [planToDoMonth, setPlanToDoMonth] = useState(planTodo && planTodo[1]);
+  const refNext: any = useRef(null);
+  const refPrev: any = useRef(null);
   const [year, setYear] = useState(
     planTodo
       ? planTodo[0]
@@ -254,6 +270,8 @@ const _DatePopUp = ({
     handler.setYear = setYear;
     handler.setMonth = setMonth;
     handler.setDay = setDay;
+    handler.refNext = refNext;
+    handler.refPrev = refPrev;
   }, []);
   return (
     <div className="date_input_container">
@@ -263,6 +281,7 @@ const _DatePopUp = ({
       <div id="date_input_controllbar">
         <button
           id="date_prev_btn"
+          ref={refPrev}
           className={planToDo ? (planToDoButton ? "acitve" : "") : ""}
           onClick={() => {
             if (planToDo) {
@@ -299,14 +318,14 @@ const _DatePopUp = ({
             <>
               <SelectInput
                 type="date_normal"
-                options={years}
+                options={[0, ...years]}
                 params="year"
                 callBack={handler.SelectCallback}
                 defaultSelect={year}
               />
               <SelectInput
                 type="date_normal"
-                options={[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]}
+                options={[0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]}
                 params="month"
                 callBack={handler.SelectCallback}
                 defaultSelect={month}
@@ -316,8 +335,9 @@ const _DatePopUp = ({
         </div>
         <button
           id="date_next_btn"
+          ref={refNext}
           className={planToDo ? (!planToDoButton ? "acitve" : "") : ""}
-          onClick={() => {
+          onClick={(e: MouseEvent<HTMLButtonElement>) => {
             handler.setDays([1, 1]);
             if (planToDo) {
               setState(false);
@@ -374,6 +394,10 @@ export const DateInputNormal = ({
   placeholder,
   callBack,
   selected,
+  isReset,
+  alarm_comment,
+  max_date,
+  min_date,
 }: {
   params: string;
   label?: string;
@@ -383,21 +407,30 @@ export const DateInputNormal = ({
   placeholder?: string;
   callBack?: CallableFunction | undefined;
   selected?: string;
+  isReset?: boolean;
+  alarm_comment?: string | ReactElement;
+  max_date?: string;
+  min_date?: string;
 }) => {
   const handler = new DateHandler({});
-  const [dateValue, setDateValue] = useState(selected ? selected : "");
+  const [dateValue, setDateValue] = useState(
+    isReset ? "" : selected ? selected : ""
+  );
   useEffect(() => {
     !handler.GetPageVal("year") && handler.SetPageVal("year", currentDate[0]);
     !handler.GetPageVal("month") && handler.SetPageVal("month", currentDate[1]);
     handler.setDateValue = setDateValue;
   });
-  const popupDate = () => {
+
+  const createPopupDate = () => {
     CreatePopup(
       "",
       <_DatePopUp
         handler={handler}
         planToDo={planToDo}
         years={year ? year : handler.current_year_list}
+        max_date={max_date}
+        min_date={min_date}
       />,
       "date",
       () => {
@@ -424,6 +457,22 @@ export const DateInputNormal = ({
       "선택",
       "취소"
     );
+  };
+  const popupDate = () => {
+    if (alarm_comment) {
+      CreatePopup(
+        undefined,
+        alarm_comment,
+        "only_check",
+        () => {
+          createPopupDate();
+        },
+        undefined,
+        "확인"
+      );
+    } else {
+      createPopupDate();
+    }
   };
   const onClickDateOn = () => {
     if (planToDo) {
