@@ -29,6 +29,7 @@ export const jobCates = [
   "관공통역 안내사",
   "화물차주 (유통배송기사, 택배 지간선기사, 특정품목운송차주)",
 ];
+export const jobCates_ed = ["2021.07.01.", "2022.01.01.", "2022.07.01."];
 export const work_cate2 = [
   "정규직",
   "기간제",
@@ -40,7 +41,6 @@ export const work_cate2 = [
   "초단시간",
   "자영업",
 ];
-
 const RetireReasonPopup01 = () => {
   return (
     <div className="string_popup fs_16 lh_24">

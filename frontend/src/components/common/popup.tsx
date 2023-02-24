@@ -72,7 +72,11 @@ const PopUpGlobal = () => {
                         : "예"
                     }
                     type="popup_ok"
-                    click_func={() => setContent(false)}
+                    click_func={() => {
+                      if (PopUpHandler.confirm_func) {
+                        PopUpHandler.confirm_func();
+                      } else setContent(false);
+                    }}
                   />
                 ) : PopUpHandler.popup_type === "confirm" ? (
                   <div id="popup_confirm_container">

@@ -29,6 +29,7 @@ const _PopUpInvidual = ({
   year,
   workRecord,
   type,
+  workCate,
 }: any) => {
   let lastYear = GetDateArr(lastWorkDay)[0],
     locationPage = 0;
@@ -137,14 +138,16 @@ const _PopUpInvidual = ({
                     >
                       <div
                         className={`indiviual_input_header ${
-                          lastYear === year && lastMonth < it
+                          (workCate === 2 && 2020 === year && it < 12) ||
+                          (lastYear === year && lastMonth < it)
                             ? "unset_header"
                             : ""
                         } ${isTotal(it)}`}
                       >
                         {it} 월
                       </div>
-                      {lastYear === year && lastMonth < it ? (
+                      {(lastYear === year && lastMonth < it) ||
+                      (workCate === 2 && 2020 === year && it < 12) ? (
                         <>
                           <div className="unset_box">unset</div>
                           <div className="unset_box">unset</div>
@@ -307,6 +310,7 @@ const _onClickPopUpInvidual = (
       year={year}
       workRecord={workRecordTargetUnit[0]}
       type={type}
+      workCate={handler.GetPageVal("workCate")}
     />,
     "confirm",
     () => {
@@ -416,15 +420,28 @@ const WorkRecordGen = ({
         {current_year_list.map((el: string) => {
           return (
             <div
-              onClick={() =>
+              onClick={() => {
+                if (handler.GetPageVal("workCate") === 2) {
+                  if (Number(el) < 2020) {
+                    CreatePopup(
+                      undefined,
+                      "예술인 / 단기예술인은 2020년 12월부터 피보험단위기간이 적용됩니다.",
+                      "only_check",
+                      () => ClosePopup(),
+                      undefined,
+                      "확인"
+                    );
+                    return;
+                  }
+                }
                 _onClickPopUpInvidual(
                   Number(el),
                   handler.GetPageVal("lastWorkDay"),
                   handler,
                   setSelectYears,
                   type
-                )
-              }
+                );
+              }}
               key={String(Date.now()) + el}
               className={`fs_16 pd_810 ${
                 el && selectYears.includes(Number(el)) ? "select" : ""
