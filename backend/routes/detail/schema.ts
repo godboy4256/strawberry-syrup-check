@@ -229,7 +229,7 @@ const employerBodyExamples = [
 export const standardSchema = {
 	schema: {
 		tags: ["detail"],
-		summary: "정규직/자영업",
+		summary: "정규직/기간제",
 		body: {
 			type: "object",
 			required: [
