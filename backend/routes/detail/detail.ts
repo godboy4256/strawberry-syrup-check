@@ -105,7 +105,7 @@ export default function detailRoute(fastify: FastifyInstance, options: any, done
 				realDayPay,
 				receiveDay,
 				realMonthPay,
-				severancePay: employmentDate >= 365 ? Math.ceil(dayAvgPay * (employmentDate / 365) * 30) : 0,
+				severancePay: employmentDate >= 365 ? Math.ceil(dayAvgPay * 30 * (employmentDate / 365)) : 0,
 				workingDays,
 				workDayForMulti, // 복수형에서만 사용
 			};
@@ -118,7 +118,7 @@ export default function detailRoute(fastify: FastifyInstance, options: any, done
 				realDayPay,
 				receiveDay,
 				realMonthPay,
-				severancePay: employmentDate >= 365 ? Math.ceil(dayAvgPay * (employmentDate / 365) * 30) : 0,
+				severancePay: employmentDate >= 365 ? Math.ceil(dayAvgPay * 30 * (employmentDate / 365)) : 0,
 				workingDays,
 				needDay: requireWorkingYear * 365 - employmentDate,
 				availableDay: calDday(
