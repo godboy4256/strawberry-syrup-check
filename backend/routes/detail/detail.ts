@@ -188,8 +188,9 @@ export default function detailRoute(fastify: FastifyInstance, options: any, done
 		// 이 과정은 중복 가입된 상황을 고려하지 않는다.
 		const limitDay = dayjs(mainData.limitDay); // 마지막 직장 퇴사일로 부터 필요한 개월 수(18 또는 24) 전
 		const workDayForMulti = mainData.enterDay.isSameOrAfter(limitDay, "day")
-			? employmentDate
-			: Math.floor(mainData.retiredDay.diff(limitDay, "day", true) + 1);
+			? Math.floor(mainData.retiredDay.diff(mainData.enterDay, "month", true) * 10) / 10
+			: Math.floor(mainData.retiredDay.diff(limitDay, "month", true) * 10) / 10;
+		// ? employmentDate
 
 		// 수급 불인정
 		if (!isPermit) {
@@ -299,8 +300,8 @@ export default function detailRoute(fastify: FastifyInstance, options: any, done
 		console.log(enterDay[1].format("YYYY-MM-DD"));
 
 		const workDayForMulti = enterDay[1].isSameOrAfter(limitDay, "day")
-			? lastWorkDay.diff(enterDay[1], "day")
-			: lastWorkDay.diff(limitDay, "day");
+			? mainData.sumWorkDay
+			: lastWorkDay.diff(limitDay, "month");
 		console.log("5. ", "workDayForMulti:", workDayForMulti);
 		///////////////////////////////////////////////////////////////
 
@@ -407,8 +408,8 @@ export default function detailRoute(fastify: FastifyInstance, options: any, done
 		const limitDay = dayjs(mainData.limitDay);
 
 		const workDayForMulti = enterDay[1].isSameOrAfter(limitDay, "day")
-			? lastWorkDay.diff(enterDay[1], "day")
-			: lastWorkDay.diff(limitDay, "day");
+			? mainData.sumWorkDay
+			: lastWorkDay.diff(limitDay, "month");
 		console.log(`5. limitDay: ${limitDay.format("YYYY-MM-DD")}  workDayForMulti: ${workDayForMulti}`);
 
 		// 7. 수급 불인정
