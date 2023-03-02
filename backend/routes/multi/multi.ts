@@ -4,12 +4,11 @@ import isSameOrAfter from "dayjs/plugin/isSameOrAfter";
 
 import { getNextReceiveDay, getReceiveDay } from "../../router_funcs/common";
 import { permitRangeData, requiredWorkingDay } from "../../data/data";
-import { getEmployerReceiveDay } from "../detail/function";
+import { checkBasicRequirements, getEmployerReceiveDay } from "../detail/function";
 
 import { multiSchema, TaddData, TmainData } from "./schema";
 import { getDuplicateAcquisitionInfo, makeAddCadiates } from "./function/checkDuplicationAcquisition";
 import { commonCasePermitCheck, doubleCasePermitCheck, mergeWorkingDays } from "./function/permitCheck";
-import { checkMultiBasicRequirements } from "./function/checkBasicRequirements";
 
 dayjs.extend(isSameOrAfter);
 
@@ -29,7 +28,8 @@ export default function multiRoute(fastify: FastifyInstance, options: any, done:
 
 		// 1. 기본 조건 확인
 		console.log("start" + 1);
-		const checkResult = checkMultiBasicRequirements(mainData);
+		const employmentDate = Math.floor(mainRetiredDay.diff(mainData.enterDay, "day") + 1);
+		const checkResult = checkBasicRequirements(mainData, employmentDate);
 		if (!checkResult.succ) return { checkResult };
 		if (mainData.workCate === 8) return { succ: false, mesg: "mainData workCate is 8" };
 
@@ -147,7 +147,8 @@ export default function multiRoute(fastify: FastifyInstance, options: any, done:
 		const joinDays = mainRetiredDay.diff(mainEnterDay, "day");
 
 		// 1. 기본 조건 확인
-		const checkResult = checkMultiBasicRequirements(mainData);
+		const employmentDate = Math.floor(mainRetiredDay.diff(mainData.enterDay, "day") + 1);
+		const checkResult = checkBasicRequirements(mainData, employmentDate);
 		if (!checkResult.succ) return { checkResult };
 
 		// 2. 자영업자 관련 조건 확인 필터
