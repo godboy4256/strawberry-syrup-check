@@ -40,15 +40,15 @@ export const commonCasePermitCheck = (permitAddCandidates: TaddData[], mainData:
 };
 
 export const mergeWorkingDays = (mainData: TmainData, addDatas: (TmainData | TaddData)[]) => {
-	let workingDays = dayjs(mainData.retiredDay).diff(mainData.enterDay, "day");
+	let workingDays = dayjs(mainData.retiredDay).diff(mainData.enterDay, "day"); // 급여신청 근로의 피보험기간(보험 해지일 - 가입일)
 
 	addDatas.forEach((addData, idx, addDatas) => {
 		addData.enterDay = dayjs(addData.enterDay);
 		addData.retiredDay = dayjs(addData.retiredDay);
 
 		if (idx === 0) {
-			mainData.enterDay = dayjs(mainData.enterDay);
-			mainData.retiredDay = dayjs(mainData.retiredDay);
+			mainData.enterDay = dayjs(mainData.enterDay); // 입사일
+			mainData.retiredDay = dayjs(mainData.retiredDay); // 퇴사일
 
 			if (addData.enterDay > mainData.enterDay) {
 				if (addData.enterDay < mainData.retiredDay) {

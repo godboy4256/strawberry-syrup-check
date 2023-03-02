@@ -63,13 +63,12 @@ export const makeAddCadiates = (addDatas: TaddData[], mainEnterDay: dayjs.Dayjs)
 	const addCadiates: TaddData[] = [];
 	for (let i = 0; i < addDatas.length; i++) {
 		if (i === 0) {
-			if (mainEnterDay.diff(addDatas[i].retiredDay, "day") <= 1095) addCadiates.push(addDatas[i]);
-		} else if (i !== 0) {
+			addCadiates.push(addDatas[i]);
+			// if (mainEnterDay.diff(addDatas[i].retiredDay, "day") <= 1095) addCadiates.push(addDatas[i]);
+		} else {
 			if (dayjs(addDatas[i - 1].enterDay).diff(addDatas[i].retiredDay, "day") <= 1095) {
 				addCadiates.push(addDatas[i]);
 			}
-		} else {
-			break;
 		}
 	}
 

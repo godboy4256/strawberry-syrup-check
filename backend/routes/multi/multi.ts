@@ -2,7 +2,7 @@ import { FastifyInstance, FastifyReply, FastifyRequest } from "fastify";
 import dayjs, { Dayjs } from "dayjs";
 import isSameOrAfter from "dayjs/plugin/isSameOrAfter";
 
-import { getReceiveDay } from "../../router_funcs/common";
+import { getNextReceiveDay, getReceiveDay } from "../../router_funcs/common";
 import { permitRangeData, requiredWorkingDay } from "../../data/data";
 import { getEmployerReceiveDay } from "../detail/function";
 
@@ -121,6 +121,9 @@ export default function multiRoute(fastify: FastifyInstance, options: any, done:
 				? 120
 				: tempReceiveDay - 30
 			: tempReceiveDay;
+
+		// // 12. 다음단계 수급 확인
+		// const [] = getNextReceiveDay(workingYears, main);
 
 		// 12. 결과 리턴
 		console.log("start" + 12);
