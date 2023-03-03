@@ -2,14 +2,13 @@ import { FastifyInstance, FastifyReply, FastifyRequest } from "fastify";
 import dayjs, { Dayjs } from "dayjs";
 import isSameOrAfter from "dayjs/plugin/isSameOrAfter";
 
-import { getReceiveDay } from "../../router_funcs/common";
+import { getNextReceiveDay, getReceiveDay } from "../../router_funcs/common";
 import { permitRangeData, requiredWorkingDay } from "../../data/data";
-import { getEmployerReceiveDay } from "../detail/function";
+import { checkBasicRequirements, getEmployerReceiveDay } from "../detail/function";
 
 import { multiSchema, TaddData, TmainData } from "./schema";
 import { getDuplicateAcquisitionInfo, makeAddCadiates } from "./function/checkDuplicationAcquisition";
 import { commonCasePermitCheck, doubleCasePermitCheck, mergeWorkingDays } from "./function/permitCheck";
-import { checkMultiBasicRequirements } from "./function/checkBasicRequirements";
 
 dayjs.extend(isSameOrAfter);
 
@@ -29,7 +28,8 @@ export default function multiRoute(fastify: FastifyInstance, options: any, done:
 
 		// 1. 기본 조건 확인
 		console.log("start" + 1);
-		const checkResult = checkMultiBasicRequirements(mainData);
+		const employmentDate = Math.floor(mainRetiredDay.diff(mainData.enterDay, "day") + 1);
+		const checkResult = checkBasicRequirements(mainData, employmentDate);
 		if (!checkResult.succ) return { checkResult };
 		if (mainData.workCate === 8) return { succ: false, mesg: "mainData workCate is 8" };
 
@@ -108,10 +108,13 @@ export default function multiRoute(fastify: FastifyInstance, options: any, done:
 		console.log("start" + 9);
 		const addCadiates = makeAddCadiates(filteredAddDatas, mainEnterDay);
 
+		//////////////////////////////////////////////////////////////////////////////////
+		// 수정 필요!!
 		// 10. 피보험기간 산정
 		console.log("start" + 10);
 		const workingDays = mergeWorkingDays(mainData, addCadiates);
 		const workingYears = Math.floor(workingDays / 365); // 월 단위의 경우 12로 나눈다. 자영업자는 이거
+		//////////////////////////////////////////////////////////////////////////////////
 
 		// 11. 소정급여일수 산정
 		console.log("start" + 11);
@@ -122,8 +125,31 @@ export default function multiRoute(fastify: FastifyInstance, options: any, done:
 				: tempReceiveDay - 30
 			: tempReceiveDay;
 
-		// 12. 결과 리턴
+		// 12. 다음단계 수급 확인
+		const [requireWorkingYear, nextReceiveDay] = getNextReceiveDay(workingYears, mainData.age, mainData.disabled);
+
+		// 13. 결과 리턴
 		console.log("start" + 12);
+		if (nextReceiveDay) {
+			const needDay =
+				mainData.workCate === 4 || mainData.workCate === 5
+					? requireWorkingYear * 12 - workingDays
+					: requireWorkingYear * 365 - workingDays;
+
+			return {
+				succ: true,
+				amountCost: mainData.realDayPay * receiveDay,
+				workingDays,
+				realDayPay: mainData.realDayPay,
+				receiveDay,
+				realMonthPay: mainData.realDayPay * 30,
+				severancePay: joinDays >= 365 ? mainData.dayAvgPay * 30 * Math.floor(joinDays / 365) : 0,
+				needDay,
+				nextAmountCost: nextReceiveDay * mainData.realDayPay,
+				morePay: nextReceiveDay * mainData.realDayPay - receiveDay * mainData.realDayPay,
+			};
+		}
+
 		return {
 			succ: true,
 			amountCost: mainData.realDayPay * receiveDay,
@@ -144,7 +170,8 @@ export default function multiRoute(fastify: FastifyInstance, options: any, done:
 		const joinDays = mainRetiredDay.diff(mainEnterDay, "day");
 
 		// 1. 기본 조건 확인
-		const checkResult = checkMultiBasicRequirements(mainData);
+		const employmentDate = Math.floor(mainRetiredDay.diff(mainData.enterDay, "day") + 1);
+		const checkResult = checkBasicRequirements(mainData, employmentDate);
 		if (!checkResult.succ) return { checkResult };
 
 		// 2. 자영업자 관련 조건 확인 필터
@@ -204,7 +231,20 @@ export default function multiRoute(fastify: FastifyInstance, options: any, done:
 				: tempReceiveDay - 30
 			: tempReceiveDay;
 
+		// 12. 다음단계 수급 확인
+		const [requireWorkingYear, nextReceiveDay] = getNextReceiveDay(workingYears, mainData.age, mainData.disabled);
+
 		// 12. 결과 리턴
+		if (!nextReceiveDay)
+			return {
+				succ: true,
+				amountCost: mainData.realDayPay * receiveDay,
+				workingDays,
+				realDayPay: mainData.realDayPay,
+				receiveDay,
+				realMonthPay: mainData.realDayPay * 30,
+				severancePay: joinDays >= 365 ? mainData.dayAvgPay * 30 * Math.floor(joinDays / 365) : 0,
+			};
 		return {
 			succ: true,
 			amountCost: mainData.realDayPay * receiveDay,
@@ -213,6 +253,9 @@ export default function multiRoute(fastify: FastifyInstance, options: any, done:
 			receiveDay,
 			realMonthPay: mainData.realDayPay * 30,
 			severancePay: joinDays >= 365 ? mainData.dayAvgPay * 30 * Math.floor(joinDays / 365) : 0,
+			needDay: requireWorkingYear * 365 - workingDays,
+			nextAmountCost: nextReceiveDay * mainData.realDayPay,
+			morePay: nextReceiveDay * mainData.realDayPay - receiveDay * mainData.realDayPay,
 		};
 	});
 

@@ -36,7 +36,6 @@ export function calLeastPayInfo(
 	}
 	let sumLastThreeMonthDays = 0; // 퇴사일 전 월 부터 3개월 일수
 	for (let i = 0; i < 3; i++) {
-		// let month = lastThreeMonth[i].month() === 11 ? 12 : lastThreeMonth[i].month() + 1;
 		sumLastThreeMonthDays += new Date(retiredDayArray[0], lastThreeMonth[i], 0).getDate();
 	}
 	const dayAvgPay = Math.ceil(sumSalary / sumLastThreeMonthDays); // 1일 평균 급여액

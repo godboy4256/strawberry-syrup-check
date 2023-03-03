@@ -42,6 +42,10 @@ export const getDuplicateAcquisitionInfo = (mainData: TmainData, permitAddCandid
 		const artWorkCates = [2, 4];
 		const specialWorkCates = [3, 5];
 
+		if (artWorkCates.includes(mainData.workCate)) artWorkCount.permitMonths += mainData.workingDays;
+		else if (specialWorkCates.includes(mainData.workCate)) specialWorkCount.permitMonths += mainData.workingDays;
+		else tempWorkCount.permitDays += mainData.workingDays;
+
 		permitAddCandidates.forEach((permitAddCandidate) => {
 			if (artWorkCates.includes(permitAddCandidate.workCate)) {
 				artWorkCount.count++;
@@ -63,13 +67,12 @@ export const makeAddCadiates = (addDatas: TaddData[], mainEnterDay: dayjs.Dayjs)
 	const addCadiates: TaddData[] = [];
 	for (let i = 0; i < addDatas.length; i++) {
 		if (i === 0) {
-			if (mainEnterDay.diff(addDatas[i].retiredDay, "day") <= 1095) addCadiates.push(addDatas[i]);
-		} else if (i !== 0) {
+			addCadiates.push(addDatas[i]);
+			// if (mainEnterDay.diff(addDatas[i].retiredDay, "day") <= 1095) addCadiates.push(addDatas[i]);
+		} else {
 			if (dayjs(addDatas[i - 1].enterDay).diff(addDatas[i].retiredDay, "day") <= 1095) {
 				addCadiates.push(addDatas[i]);
 			}
-		} else {
-			break;
 		}
 	}
 

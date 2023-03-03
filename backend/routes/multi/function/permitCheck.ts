@@ -12,19 +12,22 @@ export const doubleCasePermitCheck = (
 	if (mainWorkCate === 2 || mainWorkCate === 4) {
 		result[0] = artDoubleCheckFormula(tempWoringDays, artWorkingMonths, specialWorkingMonths);
 		if (!result[0]) {
-			result.push(calRequireDays(tempWoringDays, artWorkingMonths, specialWorkingMonths, artDoubleCheckFormula));
+			result[1] = calRequireDays(tempWoringDays, artWorkingMonths, specialWorkingMonths, artDoubleCheckFormula);
 		}
 	} else if (mainWorkCate === 3 || mainWorkCate === 5) {
 		result[0] = specialDoubleCheckFormula(tempWoringDays, artWorkingMonths, specialWorkingMonths);
 		if (!result[0]) {
-			result.push(
-				calRequireDays(tempWoringDays, artWorkingMonths, specialWorkingMonths, specialDoubleCheckFormula)
+			result[1] = calRequireDays(
+				tempWoringDays,
+				artWorkingMonths,
+				specialWorkingMonths,
+				specialDoubleCheckFormula
 			);
 		}
 	} else {
 		result[0] = tempDoubleCheckFormula(tempWoringDays, artWorkingMonths, specialWorkingMonths);
 		if (!result[0]) {
-			result.push(calRequireDays(tempWoringDays, artWorkingMonths, specialWorkingMonths, tempDoubleCheckFormula));
+			result[1] = calRequireDays(tempWoringDays, artWorkingMonths, specialWorkingMonths, tempDoubleCheckFormula);
 		}
 	}
 
@@ -40,15 +43,15 @@ export const commonCasePermitCheck = (permitAddCandidates: TaddData[], mainData:
 };
 
 export const mergeWorkingDays = (mainData: TmainData, addDatas: (TmainData | TaddData)[]) => {
-	let workingDays = dayjs(mainData.retiredDay).diff(mainData.enterDay, "day");
+	let workingDays = dayjs(mainData.retiredDay).diff(mainData.enterDay, "day"); // 급여신청 근로의 피보험기간(보험 해지일 - 가입일)
 
 	addDatas.forEach((addData, idx, addDatas) => {
 		addData.enterDay = dayjs(addData.enterDay);
 		addData.retiredDay = dayjs(addData.retiredDay);
 
 		if (idx === 0) {
-			mainData.enterDay = dayjs(mainData.enterDay);
-			mainData.retiredDay = dayjs(mainData.retiredDay);
+			mainData.enterDay = dayjs(mainData.enterDay); // 입사일
+			mainData.retiredDay = dayjs(mainData.retiredDay); // 퇴사일
 
 			if (addData.enterDay > mainData.enterDay) {
 				if (addData.enterDay < mainData.retiredDay) {
@@ -94,7 +97,7 @@ const calRequireDays = (
 	iteratee: (arg0: number, arg1: number, arg2: number) => boolean
 ) => {
 	let tempIncreasingVal = 0;
-	while (iteratee(tempWoringDays, artWorkingMonths, specialWorkingMonths)) {
+	while (!iteratee(tempWoringDays, artWorkingMonths, specialWorkingMonths)) {
 		tempWoringDays++;
 		tempIncreasingVal++;
 	}
