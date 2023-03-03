@@ -5,7 +5,7 @@ import CalRecord from "./pages/CalRecord";
 import BasicCalPage from "./pages/Standad";
 import HelpPage from "./pages/HelpPage";
 import MinimumSalary from "./pages/MinimumSalary";
-import MainPage from "./pages/mainPage";
+import MainPage from "./pages/MainPage";
 import { useEffect } from "react";
 import "./styles/root.css";
 
