@@ -97,7 +97,7 @@ const calRequireDays = (
 	iteratee: (arg0: number, arg1: number, arg2: number) => boolean
 ) => {
 	let tempIncreasingVal = 0;
-	while (iteratee(tempWoringDays, artWorkingMonths, specialWorkingMonths)) {
+	while (!iteratee(tempWoringDays, artWorkingMonths, specialWorkingMonths)) {
 		tempWoringDays++;
 		tempIncreasingVal++;
 	}
