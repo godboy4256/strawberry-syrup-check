@@ -12,19 +12,22 @@ export const doubleCasePermitCheck = (
 	if (mainWorkCate === 2 || mainWorkCate === 4) {
 		result[0] = artDoubleCheckFormula(tempWoringDays, artWorkingMonths, specialWorkingMonths);
 		if (!result[0]) {
-			result.push(calRequireDays(tempWoringDays, artWorkingMonths, specialWorkingMonths, artDoubleCheckFormula));
+			result[1] = calRequireDays(tempWoringDays, artWorkingMonths, specialWorkingMonths, artDoubleCheckFormula);
 		}
 	} else if (mainWorkCate === 3 || mainWorkCate === 5) {
 		result[0] = specialDoubleCheckFormula(tempWoringDays, artWorkingMonths, specialWorkingMonths);
 		if (!result[0]) {
-			result.push(
-				calRequireDays(tempWoringDays, artWorkingMonths, specialWorkingMonths, specialDoubleCheckFormula)
+			result[1] = calRequireDays(
+				tempWoringDays,
+				artWorkingMonths,
+				specialWorkingMonths,
+				specialDoubleCheckFormula
 			);
 		}
 	} else {
 		result[0] = tempDoubleCheckFormula(tempWoringDays, artWorkingMonths, specialWorkingMonths);
 		if (!result[0]) {
-			result.push(calRequireDays(tempWoringDays, artWorkingMonths, specialWorkingMonths, tempDoubleCheckFormula));
+			result[1] = calRequireDays(tempWoringDays, artWorkingMonths, specialWorkingMonths, tempDoubleCheckFormula);
 		}
 	}
 
