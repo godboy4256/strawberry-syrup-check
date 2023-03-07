@@ -45,6 +45,16 @@ export const commonCasePermitCheck = (permitAddCandidates: TaddData[], mainData:
 export const mergeWorkingDays = (mainData: TmainData, addDatas: (TmainData | TaddData)[]) => {
 	let workingDays = dayjs(mainData.retiredDay).diff(mainData.enterDay, "day"); // 급여신청 근로의 피보험기간(보험 해지일 - 가입일)
 
+	function calOverlappingDays(addData: any, compareData: any, workingDays: number) {
+		if (addData.enterDay.isBefore(compareData.enterDay)) {
+			if (addData.retiredDay.isAfter(compareData.enterDay))
+				workingDays += compareData.enterDay.diff(addData.enterDay, "day");
+			if (addData.retiredDay.isBefore(compareData.enterDay))
+				workingDays += addData.retiredDay.diff(addData.enterDay, "day");
+		}
+		return workingDays;
+	}
+
 	addDatas.forEach((addData, idx, addDatas) => {
 		addData.enterDay = dayjs(addData.enterDay);
 		addData.retiredDay = dayjs(addData.retiredDay);
@@ -53,36 +63,14 @@ export const mergeWorkingDays = (mainData: TmainData, addDatas: (TmainData | Tad
 			mainData.enterDay = dayjs(mainData.enterDay); // 입사일
 			mainData.retiredDay = dayjs(mainData.retiredDay); // 퇴사일
 
-			if (addData.enterDay > mainData.enterDay) {
-				if (addData.enterDay < mainData.retiredDay) {
-					if (addData.retiredDay > mainData.retiredDay)
-						workingDays += mainData.retiredDay.diff(addData.enterDay, "day");
-				}
-			}
-			if (addData.enterDay < mainData.enterDay) {
-				if (addData.retiredDay < mainData.retiredDay)
-					workingDays += addData.retiredDay.diff(addData.enterDay, "day");
-				if (addData.retiredDay > mainData.enterDay)
-					workingDays += mainData.enterDay.diff(addData.enterDay, "day");
-			}
+			workingDays = calOverlappingDays(addData, mainData, workingDays);
 		} else {
 			for (let i = 1; i <= idx; i++) {
 				const compareData = { ...addDatas[idx - i] };
 				compareData.enterDay = dayjs(compareData.enterDay);
 				compareData.retiredDay = dayjs(compareData.retiredDay);
 
-				if (addData.enterDay > compareData.enterDay) {
-					if (addData.enterDay < compareData.retiredDay) {
-						if (addData.retiredDay > compareData.retiredDay)
-							workingDays += compareData.retiredDay.diff(addData.enterDay, "day");
-					}
-				}
-				if (addData.enterDay < compareData.enterDay) {
-					if (addData.retiredDay < compareData.retiredDay)
-						workingDays += addData.retiredDay.diff(addData.enterDay, "day");
-					if (addData.retiredDay > compareData.enterDay)
-						workingDays += compareData.enterDay.diff(addData.enterDay, "day");
-				}
+				workingDays = calOverlappingDays(addData, compareData, workingDays);
 			}
 		}
 	});
