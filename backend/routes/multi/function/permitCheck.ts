@@ -65,13 +65,11 @@ export const mergeWorkingDays = (mainData: TmainData, addDatas: (TmainData | Tad
 
 			workingDays = calOverlappingDays(addData, mainData, workingDays);
 		} else {
-			for (let i = 1; i <= idx; i++) {
-				const compareData = { ...addDatas[idx - i] };
-				compareData.enterDay = dayjs(compareData.enterDay);
-				compareData.retiredDay = dayjs(compareData.retiredDay);
+			const compareData = { ...addDatas[idx - 1] };
+			compareData.enterDay = dayjs(compareData.enterDay);
+			compareData.retiredDay = dayjs(compareData.retiredDay);
 
-				workingDays = calOverlappingDays(addData, compareData, workingDays);
-			}
+			workingDays = calOverlappingDays(addData, compareData, workingDays);
 		}
 	});
 
