@@ -29,7 +29,7 @@ const multiBodyProp = {
 				enterDay: DefineParamInfo.enterDay,
 				retiredDay: DefineParamInfo.retiredDay,
 				workingDays: { type: "number", minimum: 0 },
-				permitDays: { type: "number", minimum: 0 },
+				permitDays: { type: "number" },
 			},
 		},
 		minItems: 1,

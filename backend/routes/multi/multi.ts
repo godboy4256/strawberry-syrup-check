@@ -114,6 +114,7 @@ export default function multiRoute(fastify: FastifyInstance, options: any, done:
 		console.log("start" + 10);
 		const workingDays = mergeWorkingDays(mainData, addCadiates);
 		const workingYears = Math.floor(workingDays / 365); // 월 단위의 경우 12로 나눈다. 자영업자는 이거
+		console.log(workingDays, workingYears);
 		//////////////////////////////////////////////////////////////////////////////////
 
 		// 11. 소정급여일수 산정
@@ -131,10 +132,12 @@ export default function multiRoute(fastify: FastifyInstance, options: any, done:
 		// 13. 결과 리턴
 		console.log("start" + 12);
 		if (nextReceiveDay) {
-			const needDay =
-				mainData.workCate === 4 || mainData.workCate === 5
-					? requireWorkingYear * 12 - workingDays
-					: requireWorkingYear * 365 - workingDays;
+			const needDay = requireWorkingYear * 365 - workingDays;
+			// mergeWorkingDays()에서 단위 분리가 가능하면 사용
+			// const needDay =
+			// 	mainData.workCate === 4 || mainData.workCate === 5
+			// 		? requireWorkingYear * 12 - workingDays
+			// 		: requireWorkingYear * 365 - workingDays;
 
 			return {
 				succ: true,
