@@ -1,6 +1,6 @@
 const leastPayBodyProp = {
-	workHour: { type: "number", minimum: 0, maximum: 8 },
-	workMin: { type: "number", minimum: 0, maximum: 60 },
+	workHour: { type: "number", minimum: 0, maximum: 40 },
+	workMin: { type: "number", minimum: 0, maximum: 50 },
 	workDay: { type: "number", minimum: 1, maximum: 5 },
 	pay: { type: "number", minimum: 0, maximum: 9999999 },
 };
