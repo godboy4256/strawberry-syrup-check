@@ -1,14 +1,15 @@
 import { FastifyInstance, FastifyReply, FastifyRequest } from "fastify";
-import dayjs, { Dayjs } from "dayjs";
 import isSameOrAfter from "dayjs/plugin/isSameOrAfter";
+import dayjs from "dayjs";
 
+import { checkBasicRequirements, getEmployerReceiveDay } from "../detail/function";
 import { getNextReceiveDay, getReceiveDay } from "../../router_funcs/common";
 import { permitRangeData, requiredWorkingDay } from "../../data/data";
-import { checkBasicRequirements, getEmployerReceiveDay } from "../detail/function";
 
-import { multiSchema, TaddData, TmainData } from "./schema";
-import { getDuplicateAcquisitionInfo, makeAddCadiates } from "./function/checkDuplicationAcquisition";
 import { commonCasePermitCheck, doubleCasePermitCheck, mergeWorkingDays } from "./function/permitCheck";
+import { getDuplicateAcquisitionInfo, makeAddCadiates } from "./function/checkDuplicationAcquisition";
+import { multiSchema, TaddData, TmainData } from "./schema";
+import { checkArtOrSpecial } from "./function/common";
 
 dayjs.extend(isSameOrAfter);
 
@@ -35,6 +36,9 @@ export default function multiRoute(fastify: FastifyInstance, options: any, done:
 
 		const filteredAddDatas = addDatas.filter((el) => el.workCate !== 8);
 		console.log("filterdAddDatas:", filteredAddDatas);
+
+		// 입력된 데이터 중에 근로형태가 예술인, 특고, 단기 예술인, 단기특고가 있는 경우 플래그 값을 true로 전달
+		const hasArtOrSpecial = checkArtOrSpecial(mainData, filteredAddDatas);
 
 		// 2. 마지막 직장의 입사일과 전직장의 이직일 사이 기간이 3년을 초과하는 지 확인 & 다음 근로 정보가 3년을 초과하는 경우 가장 최근 근로 정보만 이용해서 계산
 		console.log("start" + 2);
@@ -131,7 +135,7 @@ export default function multiRoute(fastify: FastifyInstance, options: any, done:
 
 		// 13. 결과 리턴
 		console.log("start" + 12);
-		if (nextReceiveDay) {
+		if (nextReceiveDay && !hasArtOrSpecial) {
 			const needDay = requireWorkingYear * 365 - workingDays;
 			// mergeWorkingDays()에서 단위 분리가 가능하면 사용
 			// const needDay =
@@ -178,11 +182,16 @@ export default function multiRoute(fastify: FastifyInstance, options: any, done:
 		if (!checkResult.succ) return { checkResult };
 
 		// 2. 자영업자 관련 조건 확인 필터
-		const filteredAddDatas = addData.filter((el) => el.workCate === 8 || el.workCate === 2 || el.workCate === 3);
+		const filteredAddDatas = addData.filter((el) => el.workCate === 8);
 		if (filteredAddDatas.length === 0) {
 			res.statusCode = 204;
 			return { succ: true };
 		}
+		// const filteredAddDatas = addData.filter((el) => el.workCate === 8 || el.workCate === 2 || el.workCate === 3);
+		// if (filteredAddDatas.length === 0) {
+		// 	res.statusCode = 204;
+		// 	return { succ: true };
+		// }
 
 		// 3. 마지막 직장의 입사일과 전직장의 이직일 사이 기간이 3년을 초과하는 지 확인 & 다음 근로 정보가 3년을 초과하는 경우 가장 최근 근로 정보만 이용해서 계산
 		const secondRetiredDay = dayjs(filteredAddDatas[0].retiredDay);
