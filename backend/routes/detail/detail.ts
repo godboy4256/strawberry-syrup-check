@@ -209,35 +209,19 @@ export default function detailRoute(fastify: FastifyInstance, options: any, done
 		}
 
 		// 7. 이 때 다음 단계 수급이 가능하다면 같이 전달, 현재 수급 불인정인 경우는 없다고 가정
-		const [requireWorkingYear, nextReceiveDay] = getNextReceiveDay(joinYears, req.body.age, req.body.disabled);
-		if (nextReceiveDay === 0) {
-			return {
-				succ: true,
-				retired: req.body.retired,
-				amountCost: realDayPay * receiveDay,
-				dayAvgPay,
-				realDayPay,
-				receiveDay,
-				realMonthPay,
-				workingDays: employmentDate,
-				workDayForMulti,
-			};
-		} else {
-			return {
-				succ: true,
-				retired: req.body.retired,
-				amountCost: realDayPay * receiveDay,
-				dayAvgPay,
-				realDayPay,
-				receiveDay,
-				realMonthPay,
-				workingDays: employmentDate,
-				needDay: requireWorkingYear * 365 - employmentDate, // 예술인에 맞게 변경필요 피보험 단위기간 관련
-				nextAmountCost: nextReceiveDay * realDayPay,
-				morePay: nextReceiveDay * realDayPay - receiveDay * realDayPay,
-				workDayForMulti,
-			};
-		}
+		// const [requireWorkingYear, nextReceiveDay] = getNextReceiveDay(joinYears, req.body.age, req.body.disabled);
+
+		return {
+			succ: true,
+			retired: req.body.retired,
+			amountCost: realDayPay * receiveDay,
+			dayAvgPay,
+			realDayPay,
+			receiveDay,
+			realMonthPay,
+			workingDays: employmentDate,
+			workDayForMulti,
+		};
 	});
 
 	fastify.post(detailPath.shortArt, shortArtSchema, (req: any, res) => {
@@ -325,22 +309,10 @@ export default function detailRoute(fastify: FastifyInstance, options: any, done
 		const receiveDay = getReceiveDay(workingYear, mainData.age, mainData.disabled);
 		console.log("7. ", "receiveDay:", receiveDay);
 		// 10. 다음단계 수급
-		const [requireWorkingYear, nextReceiveDay] = getNextReceiveDay(workingYear, mainData.age, mainData.disabled);
-		console.log("8. ", "nextReceiveInfo:", requireWorkingYear, nextReceiveDay);
+		// const [requireWorkingYear, nextReceiveDay] = getNextReceiveDay(workingYear, mainData.age, mainData.disabled);
+		// console.log("8. ", "nextReceiveInfo:", requireWorkingYear, nextReceiveDay);
 
 		// 11. 결과 리턴
-		if (!nextReceiveDay)
-			return {
-				succ: true,
-				retired: mainData.retired,
-				amountCost: realDayPay * receiveDay,
-				dayAvgPay,
-				realDayPay,
-				receiveDay,
-				realMonthPay,
-				workingMonths: mainData.sumWorkDay,
-				workDayForMulti,
-			};
 		return {
 			succ: true,
 			retired: mainData.retired,
@@ -350,9 +322,6 @@ export default function detailRoute(fastify: FastifyInstance, options: any, done
 			receiveDay,
 			realMonthPay,
 			workingMonths: mainData.sumWorkDay,
-			needMonth: Math.floor((requireWorkingYear * 12 - mainData.sumWorkDay) * 10) / 10,
-			nextAmountCost: nextReceiveDay * realDayPay,
-			morePay: nextReceiveDay * realDayPay - realDayPay * receiveDay,
 			workDayForMulti,
 		};
 	});
