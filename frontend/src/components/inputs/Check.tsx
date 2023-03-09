@@ -1,7 +1,7 @@
 import { Fragment, useEffect, useState } from "react";
 import "../../styles/checkbox.css";
 import IMGHelpIcon from "../../assets/image/new/help_icon.svg";
-import { CreatePopup } from "../common/Popup";
+import { CreatePopup } from "../common/popup";
 
 let checkList: string[] = [];
 

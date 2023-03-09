@@ -132,7 +132,7 @@ const CreatePopup = (
 };
 
 const ClosePopup = () => {
-  PopUpHandler.create_func(false);
+  PopUpHandler?.create_func(false);
 };
 
 export { CreatePopup, PopUpGlobal, ClosePopup };

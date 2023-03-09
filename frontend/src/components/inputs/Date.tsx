@@ -12,7 +12,7 @@ import IMGRedDirection from "../../assets/image/red_direction.svg";
 import SelectInput from "./Select";
 import InputHandler from "../../object/Inputs";
 import { GetDateArr, Year_Option_Generater } from "../../utils/date";
-import { ClosePopup, CreatePopup } from "../common/Popup";
+import { ClosePopup, CreatePopup } from "../common/popup";
 import "../../styles/date.css";
 
 const currentDate = GetDateArr(null);
@@ -389,7 +389,6 @@ export const DateInputNormal = ({
   params,
   label,
   planToDo,
-  description,
   year,
   placeholder,
   callBack,
@@ -402,7 +401,6 @@ export const DateInputNormal = ({
   params: string;
   label?: string;
   planToDo?: any;
-  description?: string | "enter_day" | "insurance_end_day" | "self-employment";
   year?: any;
   placeholder?: string;
   callBack?: CallableFunction | undefined;
@@ -421,7 +419,6 @@ export const DateInputNormal = ({
     !handler.GetPageVal("month") && handler.SetPageVal("month", currentDate[1]);
     handler.setDateValue = setDateValue;
   });
-
   const createPopupDate = () => {
     CreatePopup(
       "",

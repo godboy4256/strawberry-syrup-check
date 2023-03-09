@@ -7,7 +7,7 @@ import "../styles/minumum_saraly.css";
 import { ResultComp } from "../components/calculator/Result";
 import { Dispatch, SetStateAction, useEffect, useState } from "react";
 import Loading from "../components/common/Loading";
-import { CreatePopup } from "../components/common/Popup";
+import { CreatePopup } from "../components/common/popup";
 
 class MinimumSalaryHandler extends InputHandler {
   public setCompState: Dispatch<SetStateAction<number>> | undefined = undefined;
@@ -55,14 +55,16 @@ const MinimumSalary = () => {
                   <NumberUpDown
                     params="workHour"
                     label="근무시간"
-                    label_unit="일"
+                    label_unit="주"
                     unit="시간"
                     max_num={8}
+                    typing={false}
                     callBack={handler.SetPageVal}
                   />
                   <NumberUpDown
                     updown_unit={10}
                     max_num={60}
+                    typing={false}
                     params="workMin"
                     unit="분"
                     callBack={handler.SetPageVal}
@@ -72,6 +74,8 @@ const MinimumSalary = () => {
                     label="근무일수"
                     label_unit="주"
                     unit="일"
+                    max_num={5}
+                    typing={false}
                     callBack={handler.SetPageVal}
                   />
                 </div>

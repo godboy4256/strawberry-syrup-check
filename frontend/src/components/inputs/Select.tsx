@@ -1,9 +1,9 @@
 import { MouseEvent, ReactElement, useEffect, useState } from "react";
 import IMGSelect from "../../assets/image/select_icon.svg";
 import IMGNormalSelect from "../../assets/image/new/select_icon_normal.svg";
-import { ClosePopup, CreatePopup } from "../common/Popup";
+import { ClosePopup, CreatePopup } from "../common/popup";
 import "../../styles/select.css";
-import { jobCates, jobCates_ed } from "../../assets/data/worktype_data";
+import { jobCates_ed } from "../../assets/data/worktype_data";
 
 const _CustomSelect = ({
   options,
@@ -23,6 +23,7 @@ const _CustomSelect = ({
   className?: string;
   select_icon?: string;
   defaultSelect?: string | number;
+  type?: "popup" | "normal" | "date_normal";
 }) => {
   const [onSelect, setOnSelect] = useState(false);
   const [select, setSelect] = useState<string | number>();
@@ -75,7 +76,7 @@ const _CustomSelect = ({
   );
 };
 
-const PopupSelect = ({
+export const PopupSelect = ({
   options,
   callBack,
   params,

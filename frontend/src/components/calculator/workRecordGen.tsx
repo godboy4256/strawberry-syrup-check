@@ -14,7 +14,7 @@ import {
 } from "react";
 import IMGPrev from "../../assets/image/new/i_date_prev.svg";
 import IMGNext from "../../assets/image/new/i_date_next.svg";
-import { ClosePopup, CreatePopup } from "../common/Popup";
+import { ClosePopup, CreatePopup } from "../common/popup";
 import "../../styles/work_record_gen.css";
 
 type WorkRecordGenTypes = {

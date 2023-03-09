@@ -1,6 +1,6 @@
 import { Dispatch, SetStateAction } from "react";
 import { DetailConfirmPopup } from "../components/calculator/confirmPopup";
-import { ClosePopup, CreatePopup } from "../components/common/Popup";
+import { ClosePopup, CreatePopup } from "../components/common/popup";
 import { calRecording } from "../utils/calrecord";
 import { getAge, GetDateArr } from "../utils/date";
 import { sendToServer } from "../utils/sendToserver";
@@ -138,7 +138,12 @@ class DetailedHandler extends InputHandler {
   ) => {
     const res = await sendToServer(url ? url : "", to_servers);
     if (res.statusCode === 400 || res.mesg) {
-      CreatePopup(undefined, res.mesg ? res.mesg : res.message, "only_check");
+      CreatePopup(
+        undefined,
+        res.mesg ? res.mesg : res.message,
+        "only_check",
+        () => ClosePopup()
+      );
     } else {
       ClosePopup();
       calRecording(

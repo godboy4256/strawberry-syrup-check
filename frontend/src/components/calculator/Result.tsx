@@ -502,17 +502,16 @@ export const ResultComp = ({
         </>
       )}
       <div id="result_button_container">
-        {cal_type === "leastPay" ||
-          (cal_type !== "basic" &&
-            cal_type !== "multi" &&
-            !next &&
-            (result_data.succ ? (
+        {!next && cal_type !== "leastPay" && cal_type !== "basic" && (
+          <>
+            {result_data.nextAmountCost && (
               <Button
                 text={"N달 더 일하면?"}
                 type="popup_cancel"
                 click_func={() => setNext(true)}
               />
-            ) : (
+            )}
+            {!result_data.succ && (
               <Link to="/multi">
                 <Button
                   text={"복수형 계산기로"}
@@ -520,7 +519,9 @@ export const ResultComp = ({
                   click_func={() => {}}
                 />
               </Link>
-            )))}
+            )}
+          </>
+        )}
         <Link to="/main">
           <Button text="홈으로" type="popup_ok" click_func={() => {}} />
         </Link>

@@ -7,8 +7,8 @@ import {
   useState,
 } from "react";
 import CalContainer from "../components/calculator/CalContainer";
-import WorkTypes, { WorkCatePopup } from "../components/calculator/WorkTypes";
-import { ClosePopup, CreatePopup } from "../components/common/Popup";
+import WorkTypes from "../components/calculator/WorkTypes";
+import { ClosePopup, CreatePopup } from "../components/common/popup";
 import Button from "../components/inputs/Button";
 import Header from "../components/layout/Header";
 import DetailedHandler from "../object/detailed";
@@ -21,18 +21,18 @@ import EMTDetailContractSupply from "../assets/image/emoticon/detail_contract_su
 import EMTDetailVeryShortsSupply from "../assets/image/emoticon/detail_veryshort_supply.svg";
 import { DetailCalComp } from "./Detailed";
 
-import { getAge, Year_Option_Generater } from "../utils/date";
+import { getAge } from "../utils/date";
 import { sendToServer } from "../utils/sendToserver";
 import { ResultComp } from "../components/calculator/Result";
 import Loading from "../components/common/Loading";
 import { calRecording } from "../utils/calrecord";
 import CheckBoxInput from "../components/inputs/Check";
-import { DateInputNormal } from "../components/inputs/Date";
 import { DetailPathCal } from "../object/common";
 import { CheckValiDation } from "../utils/validate";
 
 import "../styles/multi.css";
 import { MultiConfirmPopup } from "../components/calculator/confirmPopup";
+import Calendar from "../components/inputs/Calendar";
 
 interface Company {
   id: number;
@@ -371,12 +371,11 @@ const _MultiCompanyList = () => {
         </div>
       </div>
       <div className="public_side_padding">
-        <DateInputNormal
+        <Calendar
           params="age_multi"
           label="생년월일"
-          callBack={handler.SetPageVal}
+          handler={handler}
           selected={handler._Data.age_multi ? handler._Data.age_multi : ""}
-          year={Year_Option_Generater(73)}
         />
         <CheckBoxInput
           type="circle_type"
