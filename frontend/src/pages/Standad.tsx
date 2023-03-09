@@ -1,7 +1,6 @@
 import { useState, Dispatch, SetStateAction, useEffect } from "react";
 import IsRetiree from "../components/calculator/IsRetiree";
 import Button from "../components/inputs/Button";
-import { DateInputNormal } from "../components/inputs/Date";
 import NumberInput from "../components/inputs/Pay";
 import InputHandler from "../object/Inputs";
 import { sendToServer } from "../utils/sendToserver";
@@ -15,6 +14,8 @@ import Loading from "../components/common/Loading";
 import { CheckValiDation } from "../utils/validate";
 import { calRecording } from "../utils/calrecord";
 import "./../styles/basic.css";
+import NewDate from "../components/inputs/Calendar";
+import Calendar from "../components/inputs/Calendar";
 
 class BasicCalHandler extends InputHandler {
   public result: {} = {};
@@ -63,17 +64,9 @@ const _BasicCalComp = () => {
             alt="Basic Strawberry Emoticon"
           />
         </div>
-        <DateInputNormal
-          params="enterDay"
-          label="입사일"
-          callBack={handler.SetPageVal}
-        />
+        <Calendar handler={handler} params="enterDay" label="입사일" />
         {handler.GetPageVal("retired") && (
-          <DateInputNormal
-            params="retiredDay"
-            label="퇴사일"
-            callBack={handler.SetPageVal}
-          />
+          <Calendar handler={handler} params="retiredDay" label="퇴사일" />
         )}
         <NumberInput
           params="salary"

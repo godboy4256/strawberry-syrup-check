@@ -23,7 +23,6 @@
   width: 100%;
   background-color: rgba(255, 73, 58, 1);
   color: white;
-  border-bottom-right-radius: 5px;
 }
 .popup_cancel {
   padding: 9px 0;
@@ -31,7 +30,6 @@
   background-color: white;
   border: 1px solid rgba(255, 73, 58, 1);
   color: rgba(255, 73, 58, 1);
-  border-bottom-left-radius: 5px;
 }
 .date_select {
   padding: 4.5px 17px;

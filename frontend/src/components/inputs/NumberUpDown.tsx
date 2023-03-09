@@ -1,7 +1,7 @@
 import { ChangeEvent, useState } from "react";
 import IMGDown from "../../assets/image/new/select_icon_normal.svg";
 import "../../styles/numberupdown.css";
-import { CreatePopup } from "../common/Popup";
+import { CreatePopup } from "../common/popup";
 
 const NumberUpDown = ({
   label,
@@ -11,6 +11,7 @@ const NumberUpDown = ({
   label_unit,
   max_num,
   updown_unit,
+  typing = true,
 }: {
   label?: string;
   params: string;
@@ -19,6 +20,7 @@ const NumberUpDown = ({
   label_unit?: string;
   max_num?: number;
   updown_unit?: number;
+  typing?: boolean;
 }) => {
   const [count, setCount] = useState<number | "">(0);
   const onClickCount = (is_updown: boolean) => {
@@ -50,6 +52,7 @@ const NumberUpDown = ({
     callBack(params, count + 1);
   };
   const onChangeInput = (e: ChangeEvent<HTMLInputElement>) => {
+    if (!typing) return;
     if (isNaN(Number(e.currentTarget.value))) return;
     if (max_num && Number(e.currentTarget.value) > max_num) {
       CreatePopup(
@@ -83,8 +86,10 @@ const NumberUpDown = ({
           <input
             type="text"
             onFocus={() => {
+              if (!typing) return;
               setCount("");
             }}
+            disabled={!typing ? true : false}
             onChange={onChangeInput}
             value={count}
             className={`fs_14 ${count !== 0 ? "active" : ""}`}

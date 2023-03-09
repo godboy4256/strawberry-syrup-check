@@ -6,7 +6,6 @@ import SelectInput from "../components/inputs/Select";
 import TabInputs from "../components/inputs/TabInputs";
 import DetailedHandler from "../object/detailed";
 import WorkTypes from "../components/calculator/WorkTypes";
-import { Art_Year_Generater, Year_Option_Generater } from "../utils/date";
 import NumberInput from "../components/inputs/Pay";
 import NumberUpDown from "../components/inputs/NumberUpDown";
 import Button from "../components/inputs/Button";
@@ -20,7 +19,8 @@ import "./../styles/detail.css";
 import { jobCates } from "../assets/data/worktype_data";
 import IMGHelpIcon from "../assets/image/new/help_icon.svg";
 import IMGResetIcon from "../assets/image/new/reset_icon.svg";
-import { ClosePopup, CreatePopup } from "../components/common/Popup";
+import { ClosePopup, CreatePopup } from "../components/common/popup";
+import Calendar from "../components/inputs/Calendar";
 
 const handler: any = new DetailedHandler({});
 
@@ -98,18 +98,9 @@ const _Belong_Form_Tab = ({
 const _DetailCalStandad = ({ handler }: { handler: any }) => {
   return (
     <>
-      <DateInputNormal
-        params="enterDay"
-        label="입사일"
-        callBack={handler.SetPageVal}
-      />
+      <Calendar handler={handler} params="enterDay" label="입사일" />
       {handler.GetPageVal("retired") && (
-        <DateInputNormal
-          params="retiredDay"
-          label="퇴사일"
-          callBack={handler.SetPageVal}
-          description="insurance_end_day"
-        />
+        <Calendar params="retiredDay" handler={handler} label="퇴사일" />
       )}
       <CheckBoxInput
         type="box_type"
@@ -168,21 +159,18 @@ const _DetailCalDayJob = ({ handler }: { handler: any }) => {
         options={["개별 입력", "결과만 입력"]}
         form01={
           <>
-            <DateInputNormal
+            <Calendar
               params="lastWorkDay"
               label="마지막 근무일"
-              callBack={handler.SetPageVal}
+              handler={handler}
+              time_select={true}
             />
             <WorkRecordGen handler={handler} type="dayJob" />
             <div className="fs_12 out_description">
               ※ 퇴사 이전 18개월 내 180일 충족
               <br /> ※ 근무한 연월의 정보만 입력하시면 됩니다.
             </div>
-            <DateInputNormal
-              params="planToDo"
-              label="신청 예정일"
-              callBack={handler.SetPageVal}
-            />
+            <Calendar params="planToDo" label="신청 예정일" handler={handler} />
             <div className="fs_12 out_description">
               ※ 신청일 이전 1개월간 근로한 일수가 10일 미만
               <br /> ※ 건설 일용직의 경우, 신청일 이전 14일간 연속하여
@@ -200,10 +188,10 @@ const _DetailCalDayJob = ({ handler }: { handler: any }) => {
         }
         form02={
           <>
-            <DateInputNormal
+            <Calendar
               params="lastWorkDay"
               label="마지막 근무일"
-              callBack={handler.SetPageVal}
+              handler={handler}
             />
             <SelectInput
               selected={"시간을 선택해주세요."}
@@ -293,21 +281,19 @@ const _DetailCalArt = ({ handler }: { handler: any }) => {
               options={jobCates}
             />
           )}
-          <DateInputNormal
+          <Calendar
             params="enterDay"
             label="고용보험 가입일"
-            callBack={handler.SetPageVal}
-            year={Art_Year_Generater()}
-            alarm_comment="예술인의 피보험 단위기간은 2020년 12월을 기준으로 적용됩니다."
-            max_date="2023-2"
+            handler={handler}
+            alarm="예술인의 피보험 단위기간은 2020년 12월을 기준으로 적용됩니다."
+            max_date="2023-3"
             min_date="2020-12"
           />
           {handler.GetPageVal("retired") && (
-            <DateInputNormal
+            <Calendar
               params="retiredDay"
               label="고용보험 종료일"
-              callBack={handler.SetPageVal}
-              description="insurance_end_day"
+              handler={handler}
             />
           )}
           <NumberInput
@@ -340,19 +326,19 @@ const _DetailCalArt = ({ handler }: { handler: any }) => {
                   options={jobCates}
                 />
               )}
-              <DateInputNormal
+              <Calendar
                 params="lastWorkDay"
                 label="마지막 근무일"
-                callBack={handler.SetPageVal}
+                handler={handler}
               />
               <WorkRecordGen handler={handler} type="shorts" />
               <div className="fs_12 out_description">
                 ※ 근무한 연월의 정보만 입력하시면 됩니다.
               </div>
-              <DateInputNormal
+              <Calendar
                 label="신청 예정일"
                 params="planToDo"
-                callBack={handler.SetPageVal}
+                handler={handler}
               />
               <div className="fs_12 out_description">
                 ※ 신청일 이전 1개월간 근로한 일수가 10일 미만
@@ -406,18 +392,9 @@ const _DetailCalArt = ({ handler }: { handler: any }) => {
 const _DetailCalVeryShort = ({ handler }: { handler: any }) => {
   return (
     <>
-      <DateInputNormal
-        params="enterDay"
-        label="입사일"
-        callBack={handler.SetPageVal}
-      />
+      <Calendar params="enterDay" label="입사일" handler={handler} />
       {handler.GetPageVal("retired") && (
-        <DateInputNormal
-          params="retiredDay"
-          label="퇴사일"
-          callBack={handler.SetPageVal}
-          description="enter_day"
-        />
+        <Calendar params="retiredDay" label="퇴사일" handler={handler} />
       )}
       <CheckBoxInput
         type="box_type"
@@ -454,16 +431,11 @@ const _DetailCalEmploy = ({ handler }: { handler: any }) => {
   return (
     <div id="detail_container_employ">
       <div className="public_side_padding">
-        <DateInputNormal
-          params="enterDay"
-          label="고용보험 가입일"
-          callBack={handler.SetPageVal}
-        />
-        <DateInputNormal
+        <Calendar params="enterDay" label="고용보험 가입일" handler={handler} />
+        <Calendar
           params="retiredDay"
           label="고용보험 종료일"
-          callBack={handler.SetPageVal}
-          description="self-employment"
+          handler={handler}
         />
         <TabInputs
           label_help={true}
@@ -523,12 +495,11 @@ export const DetailCalComp = ({
       <div className={`${workCate !== 6 ? "public_side_padding" : ""}`}>
         {workCate !== 6 && handler.GetPageVal("cal_state") !== "multi" && (
           <>
-            <DateInputNormal
+            <Calendar
               params="age"
               label="생년월일"
               isReset={resetInfoList.age}
-              callBack={handler.SetPageVal}
-              year={Year_Option_Generater(73)}
+              handler={handler}
             />
             <CheckBoxInput
               type="circle_type"
@@ -536,6 +507,7 @@ export const DetailCalComp = ({
               callBack={handler.SetPageVal}
               label="장애여부"
               options={["장애인", "비장애인"]}
+              selected={"비장애인"}
             />
           </>
         )}

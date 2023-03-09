@@ -3,7 +3,7 @@ import NumberInput from "./Pay";
 import SelectInput from "./Select";
 import { GetDateArr } from "../../utils/date";
 import IMGHelpIcon from "../../assets/image/new/help_icon.svg";
-import { CreatePopup } from "../common/Popup";
+import { CreatePopup } from "../common/popup";
 import "../../styles/salarytab.css";
 
 const before_month_cal = (retiredDay: Date) => {

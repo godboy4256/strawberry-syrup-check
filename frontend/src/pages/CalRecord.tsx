@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
-import { CreatePopup } from "../components/common/Popup";
+import { CreatePopup } from "../components/common/popup";
 import Button from "../components/inputs/Button";
 import Header from "../components/layout/Header";
 import "../styles/calrecord.css";

@@ -28,6 +28,7 @@
   border: 1px solid #ff6559;
   animation: fadeInContainer 0.4s ease-in-out 1 forwards;
   z-index: 10001;
+  overflow: hidden;
 }
 
 #date_button_container {

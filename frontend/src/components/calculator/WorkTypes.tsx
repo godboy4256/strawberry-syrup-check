@@ -9,7 +9,7 @@ import {
   retire_reason_art_popup,
   retire_reason_dayjob_popup,
 } from "../../assets/data/worktype_data";
-import { ClosePopup, CreatePopup } from "../common/Popup";
+import { ClosePopup, CreatePopup } from "../common/popup";
 import SelectInput from "../inputs/Select";
 import Header from "../layout/Header";
 import IMGWorkTypeSelect from "./../../assets/image/new/detail_info01_select.svg";
@@ -59,25 +59,6 @@ const _CompSelectTemplete = ({
   );
 };
 
-export const WorkCatePopup = ({
-  handler,
-  popUpCallBack,
-  popup_focus_template,
-}: any) => {
-  return (
-    <SelectInput
-      label="근로형태 선택"
-      popUpCallBack={popUpCallBack}
-      callBack={handler.SetPageVal}
-      popup_focus_template={popup_focus_template}
-      popup_select={handler.GetPageVal}
-      params="workCate"
-      options={work_cate}
-      type="popup"
-    />
-  );
-};
-
 const WorkTypes = ({ handler }: { handler: any }) => {
   useEffect(() => {
     handler._Data = {
@@ -122,9 +103,10 @@ const WorkTypes = ({ handler }: { handler: any }) => {
       />
       <div id="detail_container_comp1" className="full_height_layout_cal">
         <div className="public_side_padding">
-          <WorkCatePopup
-            handler={handler}
+          <SelectInput
+            label="근로형태 선택"
             popUpCallBack={popUpCallBack}
+            callBack={handler.SetPageVal}
             popup_focus_template={
               <_CompSelectTemplete
                 level={1}
@@ -132,6 +114,10 @@ const WorkTypes = ({ handler }: { handler: any }) => {
                 selectState={workRypeInfo1}
               />
             }
+            popup_select={handler.GetPageVal}
+            params="workCate"
+            options={work_cate}
+            type="popup"
           />
           <SelectInput
             label="퇴직사유 선택"

@@ -1,4 +1,4 @@
-import { ClosePopup, CreatePopup } from "../components/common/Popup";
+import { ClosePopup, CreatePopup } from "../components/common/popup";
 
 const null_check_list: any = {
   standad: ["enterDay", "retiredDay", "salary"],
