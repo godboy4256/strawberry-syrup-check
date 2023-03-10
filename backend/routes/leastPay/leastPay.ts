@@ -12,7 +12,7 @@ export default function leastPayRoute(fastify: FastifyInstance, options: any, do
 			const weekWorkTime = workTime * workDay;
 			const leastTimePay = 9620;
 
-			if (workTime >= 40 && workDay === 5) return 209 * leastTimePay;
+			if (workHour + workMin >= 40) return 209 * leastTimePay;
 
 			const dayPay = leastTimePay * workTime;
 			const commonPay = (Math.ceil(weekWorkTime * 4.345 * 10) / 10) * leastTimePay;
