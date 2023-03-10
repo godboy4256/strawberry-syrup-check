@@ -12,11 +12,12 @@ export default function leastPayRoute(fastify: FastifyInstance, options: any, do
 			const weekWorkTime = workTime * workDay;
 			const leastTimePay = 9620;
 
-			if (workHour + workMin >= 40) return 209 * leastTimePay;
+			const dayPay = Math.ceil(leastTimePay * workTime);
 
-			const dayPay = leastTimePay * workTime;
-			const commonPay = (Math.ceil(weekWorkTime * 4.345 * 10) / 10) * leastTimePay;
-			const addPay = (Math.ceil((weekWorkTime / 40) * 8 * 4.345 * 10) / 10) * leastTimePay;
+			if (workHour + workMin >= 40) return { leastMonthPay: 209 * leastTimePay, dayPay };
+
+			const commonPay = Math.ceil(weekWorkTime * 4.345) * leastTimePay;
+			const addPay = Math.ceil((weekWorkTime / 40) * 8 * 4.345) * leastTimePay;
 			const isAddPay = weekWorkTime >= 15;
 			const leastMonthPay = isAddPay ? commonPay + addPay : commonPay;
 			return { leastMonthPay, dayPay };
