@@ -34,6 +34,7 @@ export default function multiRoute(fastify: FastifyInstance, options: any, done:
 		if (!checkResult.succ) return { checkResult };
 		if (mainData.workCate === 8) return { succ: false, mesg: "mainData workCate is 8" };
 
+		// 2. 근로형태 자영업자가 아닌 근로
 		const filteredAddDatas = addDatas.filter((el) => el.workCate !== 8);
 		console.log("filterdAddDatas:", filteredAddDatas);
 
@@ -124,6 +125,7 @@ export default function multiRoute(fastify: FastifyInstance, options: any, done:
 		// 11. 소정급여일수 산정
 		console.log("start" + 11);
 		const tempReceiveDay = getReceiveDay(workingYears, mainData.age, mainData.disabled);
+		console.log("lkjsdfsd", tempReceiveDay);
 		const receiveDay = addCadiates[addCadiates.length - 1].isIrregular
 			? tempReceiveDay === 120
 				? 120
@@ -187,11 +189,6 @@ export default function multiRoute(fastify: FastifyInstance, options: any, done:
 			res.statusCode = 204;
 			return { succ: true };
 		}
-		// const filteredAddDatas = addData.filter((el) => el.workCate === 8 || el.workCate === 2 || el.workCate === 3);
-		// if (filteredAddDatas.length === 0) {
-		// 	res.statusCode = 204;
-		// 	return { succ: true };
-		// }
 
 		// 3. 마지막 직장의 입사일과 전직장의 이직일 사이 기간이 3년을 초과하는 지 확인 & 다음 근로 정보가 3년을 초과하는 경우 가장 최근 근로 정보만 이용해서 계산
 		const secondRetiredDay = dayjs(filteredAddDatas[0].retiredDay);
