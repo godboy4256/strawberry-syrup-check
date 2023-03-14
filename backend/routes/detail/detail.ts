@@ -54,6 +54,8 @@ export default function detailRoute(fastify: FastifyInstance, options: any, done
 		if (!mainData.isMany) {
 			const checkResult = checkBasicRequirements(mainData, employmentDate);
 			if (!checkResult.succ) return { checkResult };
+		} else {
+			if (employmentDate <= 0) return { succ: false, errorCode: 1, mesg: DefinedParamErrorMesg.ealryRetire };
 		}
 
 		// 2. 급여 산정
@@ -154,10 +156,10 @@ export default function detailRoute(fastify: FastifyInstance, options: any, done
 			const checkResult = checkBasicRequirements(mainData, employmentDate);
 			console.log("1. ", employmentDate, checkResult);
 			if (!checkResult.succ) return { checkResult };
-
-			if (employmentDate < 90)
-				return { succ: false, errorCode: 3, mesg: "예술인/특고로 3개월 이상 근무해야합니다." };
+		} else {
+			if (employmentDate <= 0) return { succ: false, errorCode: 1, mesg: DefinedParamErrorMesg.ealryRetire };
 		}
+		if (employmentDate < 90) return { succ: false, errorCode: 3, mesg: "예술인/특고로 3개월 이상 근무해야합니다." };
 
 		// 3. 급여 산정
 		const sumOneYearWorkDay = calSumOneYearWorkDay(mainData.retiredDay);
@@ -539,9 +541,11 @@ export default function detailRoute(fastify: FastifyInstance, options: any, done
 
 		// 기본 조건 확인
 		const employmentDate = Math.floor(mainData.retiredDay.diff(mainData.enterDay, "day", true) + 1);
-		if (mainData.isMany) {
+		if (!mainData.isMany) {
 			const checkResult = checkBasicRequirements(mainData, employmentDate);
 			if (!checkResult.succ) return { checkResult };
+		} else {
+			if (employmentDate <= 0) return { succ: false, errorCode: 1, mesg: DefinedParamErrorMesg.ealryRetire };
 		}
 
 		// 초단 시간 추가 조건 확인

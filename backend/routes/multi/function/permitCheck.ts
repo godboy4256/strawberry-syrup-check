@@ -43,37 +43,39 @@ export const commonCasePermitCheck = (permitAddCandidates: TaddData[], mainData:
 };
 
 export const mergeWorkingDays = (mainData: TmainData, addDatas: (TmainData | TaddData)[]) => {
-	let workingDays = dayjs(mainData.retiredDay).diff(mainData.enterDay, "day"); // 급여신청 근로의 피보험기간(보험 해지일 - 가입일)
-
-	function calOverlappingDays(addData: any, compareData: any, workingDays: number) {
-		if (addData.enterDay.isBefore(compareData.enterDay)) {
-			if (addData.retiredDay.isAfter(compareData.enterDay))
-				workingDays += compareData.enterDay.diff(addData.enterDay, "day");
-			if (addData.retiredDay.isBefore(compareData.enterDay))
-				workingDays += addData.retiredDay.diff(addData.enterDay, "day");
-		}
-		return workingDays;
-	}
-
-	addDatas.forEach((addData, idx, addDatas) => {
-		addData.enterDay = dayjs(addData.enterDay);
-		addData.retiredDay = dayjs(addData.retiredDay);
-
-		if (idx === 0) {
-			mainData.enterDay = dayjs(mainData.enterDay); // 입사일
-			mainData.retiredDay = dayjs(mainData.retiredDay); // 퇴사일
-
-			workingDays = calOverlappingDays(addData, mainData, workingDays);
-		} else {
-			const compareData = { ...addDatas[idx - 1] };
-			compareData.enterDay = dayjs(compareData.enterDay);
-			compareData.retiredDay = dayjs(compareData.retiredDay);
-
-			workingDays = calOverlappingDays(addData, compareData, workingDays);
-		}
-	});
-
+	const workingDays = addDatas.reduce((acc, cur) => acc + cur.workingDays, mainData.workingDays);
 	return workingDays;
+	// let workingDays = dayjs(mainData.retiredDay).diff(mainData.enterDay, "day"); // 급여신청 근로의 피보험기간(보험 해지일 - 가입일)
+
+	// function calOverlappingDays(addData: any, compareData: any, workingDays: number) {
+	// 	if (addData.enterDay.isBefore(compareData.enterDay)) {
+	// 		if (addData.retiredDay.isAfter(compareData.enterDay))
+	// 			workingDays += compareData.enterDay.diff(addData.enterDay, "day");
+	// 		if (addData.retiredDay.isBefore(compareData.enterDay))
+	// 			workingDays += addData.retiredDay.diff(addData.enterDay, "day");
+	// 	}
+	// 	return workingDays;
+	// }
+
+	// addDatas.forEach((addData, idx, addDatas) => {
+	// 	addData.enterDay = dayjs(addData.enterDay);
+	// 	addData.retiredDay = dayjs(addData.retiredDay);
+
+	// 	if (idx === 0) {
+	// 		mainData.enterDay = dayjs(mainData.enterDay); // 입사일
+	// 		mainData.retiredDay = dayjs(mainData.retiredDay); // 퇴사일
+
+	// 		workingDays = calOverlappingDays(addData, mainData, workingDays);
+	// 	} else {
+	// 		const compareData = { ...addDatas[idx - 1] };
+	// 		compareData.enterDay = dayjs(compareData.enterDay);
+	// 		compareData.retiredDay = dayjs(compareData.retiredDay);
+
+	// 		workingDays = calOverlappingDays(addData, compareData, workingDays);
+	// 	}
+	// });
+
+	// return workingDays;
 };
 
 const calRequireDays = (
