@@ -43,7 +43,12 @@ export const commonCasePermitCheck = (permitAddCandidates: TaddData[], mainData:
 };
 
 export const mergeWorkingDays = (mainData: TmainData, addDatas: (TmainData | TaddData)[]) => {
-	const workingDays = addDatas.reduce((acc, cur) => acc + cur.workingDays, mainData.workingDays);
+	addDatas.forEach((addData) => console.log(addData.workingDays));
+	const workingDays = addDatas.reduce((acc, cur) => {
+		return cur.workCate === 4 || cur.workCate === 5
+			? acc + Math.floor(cur.workingDays * 30.4)
+			: acc + cur.workingDays;
+	}, mainData.workingDays);
 	return workingDays;
 	// let workingDays = dayjs(mainData.retiredDay).diff(mainData.enterDay, "day"); // 급여신청 근로의 피보험기간(보험 해지일 - 가입일)
 
