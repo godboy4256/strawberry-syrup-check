@@ -16,7 +16,7 @@ const server = fastify(LOGGER_CONFIG);
 
 server.register(cors, CORS_CONFIG);
 server.register(fastifyStatic, {
-	root: path.join(__dirname, "../page_resource/front"),
+	root: path.join(__dirname, "../page_resource"),
 });
 server.setNotFoundHandler(function (req, reply) {
 	reply.code(404).sendFile("index.html");

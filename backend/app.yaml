@@ -17,7 +17,6 @@ automatic_scaling:
     min_idle_instances: 1
 
 vpc_access_connector:
-    # name: "projects/moneysylove/locations/asia-northeast3/connectors/moneysylove-conn-prod" // project: moneysylove
     name: "projects/moneysylove-dev-378310/locations/asia-northeast3/connectors/moneysylove-dev-app-conn"
 
 handlers:
