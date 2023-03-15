@@ -32,23 +32,12 @@ export const permitRangeData = {
 };
 
 export const requiredWorkingDay = {
-	// 0: 180,
-	// 1: 270, // 9 or 12 month => 예술인, 특고
-	// 2: 270, // 9 or 12 month => 단기 예술인, 단기 특고
-	// 3: 180,
-	// 4: 180,
-	// 5: 12, // 12 month 1 year
-	// // 예정
-	// 6: 12, // 12 month 1 year
-	// 7: 12, // 12 month 1 year
-	// 8: 12, // 12 month 1 year
-
 	0: 180,
 	1: 180,
-	2: 9, // 9 or 12 month => 단기 예술인, 단기 특고
-	3: 12,
-	4: 9,
-	5: 12, // 12 month 1 year
+	2: Math.floor(9 * 30.4),
+	3: 365,
+	4: 9, // 9 or 12 month => 단기 예술인, 단기 특고
+	5: 12,
 	6: 180, // 12 month 1 year
 	7: 180, // 12 month 1 year
 	8: 12, // 12 month 1 year

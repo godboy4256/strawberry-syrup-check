@@ -2,7 +2,7 @@ import { FastifyInstance, FastifyReply, FastifyRequest } from "fastify";
 import isSameOrAfter from "dayjs/plugin/isSameOrAfter";
 import dayjs from "dayjs";
 
-import { checkBasicRequirements, getEmployerReceiveDay } from "../detail/function";
+import { checkBasicRequirements, getEmployerReceiveDay, getNextEmployerReceiveDay } from "../detail/function";
 import { getNextReceiveDay, getReceiveDay } from "../../router_funcs/common";
 import { permitRangeData, requiredWorkingDay } from "../../data/data";
 
@@ -71,36 +71,14 @@ export default function multiRoute(fastify: FastifyInstance, options: any, done:
 		if (permitAddCandidates.length && permitAddCandidates[permitAddCandidates.length - 1].isIrregular)
 			return { succ: false, errorCode: 9, mesg: "isIrregular" };
 
-		// 6. 이중취득 여부 확인
-		console.log("start" + 6);
-		const { isDuplicateAcquisition, tempWorkCount, artWorkCount, specialWorkCount } = getDuplicateAcquisitionInfo(
-			mainData,
-			permitAddCandidates
-		);
-
 		// 7. 수급 인정/불인정 판단
 		console.log("start" + 7);
-		console.log(isDuplicateAcquisition);
-		const isPermit = isDuplicateAcquisition
-			? doubleCasePermitCheck(
-					tempWorkCount.permitDays,
-					artWorkCount.permitMonths,
-					specialWorkCount.permitMonths,
-					mainData.workCate
-			  )
-			: commonCasePermitCheck(permitAddCandidates, mainData);
+		const isPermit = commonCasePermitCheck(permitAddCandidates, mainData);
 
 		// 8. 수급 불인정 조건에 맞는 경우 불인정 메세지 리턴
 		console.log("start" + 8);
 		console.log(isPermit, leastRequireWorkingDay);
 		if (!isPermit[0]) {
-			if (isDuplicateAcquisition)
-				return {
-					succ: false,
-					errorCode: 10,
-					requireDays: isPermit[1],
-					mesg: "근로자로 requireDays만큼 더 일해야 한다.",
-				};
 			return {
 				succ: false,
 				errorCode: 2,
@@ -113,19 +91,16 @@ export default function multiRoute(fastify: FastifyInstance, options: any, done:
 		console.log("start" + 9);
 		const addCadiates = makeAddCadiates(filteredAddDatas, mainEnterDay);
 
-		//////////////////////////////////////////////////////////////////////////////////
-		// 수정 필요!!
 		// 10. 피보험기간 산정
 		console.log("start" + 10);
 		const workingDays = mergeWorkingDays(mainData, addCadiates);
-		const workingYears = Math.floor(workingDays / 365); // 월 단위의 경우 12로 나눈다. 자영업자는 이거
+		const workingYears = Math.floor(workingDays / 365); // 월 단위의 경우 12로 나눈다.
 		console.log(workingDays, workingYears);
-		//////////////////////////////////////////////////////////////////////////////////
 
 		// 11. 소정급여일수 산정
 		console.log("start" + 11);
 		const tempReceiveDay = getReceiveDay(workingYears, mainData.age, mainData.disabled);
-		console.log("lkjsdfsd", tempReceiveDay);
+		console.log("tempRecieveDay: ", tempReceiveDay);
 		const receiveDay = addCadiates[addCadiates.length - 1].isIrregular
 			? tempReceiveDay === 120
 				? 120
@@ -158,7 +133,6 @@ export default function multiRoute(fastify: FastifyInstance, options: any, done:
 				morePay: nextReceiveDay * mainData.realDayPay - receiveDay * mainData.realDayPay,
 			};
 		}
-
 		return {
 			succ: true,
 			amountCost: mainData.realDayPay * receiveDay,
@@ -211,10 +185,6 @@ export default function multiRoute(fastify: FastifyInstance, options: any, done:
 		if (permitAddCandidates.length !== 0 && permitAddCandidates[permitAddCandidates.length - 1].isIrregular)
 			return { succ: false, errorCode: 9, mesg: "isIrregular" };
 
-		/**
-		 * 이중취득 여부 확인 안함
-		 */
-
 		// 7. 수급 인정/불인정 판단 & 불인정인 경우 불인정 메세지 리턴
 		const isPermit = commonCasePermitCheck(permitAddCandidates, mainData);
 		if (!isPermit[0])
@@ -233,15 +203,10 @@ export default function multiRoute(fastify: FastifyInstance, options: any, done:
 		const workingYears = Math.floor(workingDays / 365);
 
 		// 11. 소정급여일수 산정
-		const tempReceiveDay = getEmployerReceiveDay(workingYears);
-		const receiveDay = addCadiates[addCadiates.length - 1].isIrregular
-			? tempReceiveDay === 120
-				? 120
-				: tempReceiveDay - 30
-			: tempReceiveDay;
+		const receiveDay = getEmployerReceiveDay(workingYears);
 
 		// 12. 다음단계 수급 확인
-		const [requireWorkingYear, nextReceiveDay] = getNextReceiveDay(workingYears, mainData.age, mainData.disabled);
+		const [requireWorkingYear, nextReceiveDay] = getNextEmployerReceiveDay(workingYears);
 
 		// 12. 결과 리턴
 		if (!nextReceiveDay)
