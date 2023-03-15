@@ -40,5 +40,5 @@ export const requiredWorkingDay = {
 	5: 12,
 	6: 180, // 12 month 1 year
 	7: 180, // 12 month 1 year
-	8: 12, // 12 month 1 year
+	8: 365, // 12 month 1 year
 };
