@@ -192,7 +192,6 @@ export default function detailRoute(fastify: FastifyInstance, options: any, done
 		const workDayForMulti = mainData.enterDay.isSameOrAfter(limitDay, "day")
 			? Math.floor(mainData.retiredDay.diff(mainData.enterDay, "month", true) * 10) / 10
 			: Math.floor(mainData.retiredDay.diff(limitDay, "month", true) * 10) / 10;
-		// ? employmentDate
 
 		// 수급 불인정
 		if (!isPermit) {
@@ -280,7 +279,6 @@ export default function detailRoute(fastify: FastifyInstance, options: any, done
 		if (mainData.isOverTen && mainData.hasWork)
 			return { succ: false, errorCode: 5, workingMonths: isPermit[1], requireMonths: isPermit[2] };
 
-		///////////////////////////////////////////////////////////////
 		// 6. 복수형에서 사용하기위한 workDayForMulti 계산
 		const limitDay = dayjs(mainData.limitDay);
 		console.log(enterDay[1].format("YYYY-MM-DD"));
@@ -289,7 +287,6 @@ export default function detailRoute(fastify: FastifyInstance, options: any, done
 			? mainData.sumWorkDay
 			: lastWorkDay.diff(limitDay, "month");
 		console.log("5. ", "workDayForMulti:", workDayForMulti);
-		///////////////////////////////////////////////////////////////
 
 		// 7. 수급 불인정 시 불인정 메세지 리턴
 		if (!isPermit[0])

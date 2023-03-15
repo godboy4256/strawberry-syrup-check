@@ -4,7 +4,7 @@ service: default
 
 env_variables:
     TZ: "Asia/Seoul"
-#     PS: "PROD"
+    PS: "PROD"
 
 entrypoint: node ./build/server.js
 
