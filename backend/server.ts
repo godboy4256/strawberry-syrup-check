@@ -7,7 +7,7 @@ import fastifyFavicon from "fastify-favicon";
 import path from "path";
 
 import { createServerAsCluster } from "./lib/cluster";
-import { swaggerConfig } from "./config/swagger";
+import { swaggerConfig } from "./config/swagger.config";
 import { routes } from "./routes/routes";
 
 import { CORS_CONFIG, LOGGER_CONFIG } from "./config/server.config";
