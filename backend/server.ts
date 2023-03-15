@@ -10,22 +10,11 @@ import { createServerAsCluster } from "./lib/cluster";
 import { swaggerConfig } from "./config/swagger";
 import { routes } from "./routes/routes";
 
-const server = fastify({
-	// logger: {
-	// 	timestamp: () => `,"time":"${new Date(Date.now()).toISOString()}"`,
-	// 	transport: {
-	// 		target: "pino-pretty",
-	// 	},
-	// },
-	logger: false,
-});
+import { CORS_CONFIG, LOGGER_CONFIG } from "./config/server.config";
 
-server.register(cors, {
-	origin: ["https://www.moneysylove.com", "https://www.moneysylove.du.r.appspot.com"],
-	// origin: ["http://localhost:8080", "http://localhost:3000"],
-	methods: ["GET", "POST"],
-	credentials: true,
-});
+const server = fastify(LOGGER_CONFIG);
+
+server.register(cors, CORS_CONFIG);
 server.register(fastifyFavicon, {
 	path: "static",
 	name: "favicon.ico",
@@ -34,7 +23,7 @@ server.register(fastifyStatic, {
 	root: path.join(__dirname, "../page_resource/front"),
 });
 server.setNotFoundHandler(function (req, reply) {
-	reply.code(404).sendFile("index.html"); //send({ error: 'Not Found', message: 'Four Oh Four 🤷‍♂️', statusCode: 404 })
+	reply.code(404).sendFile("index.html");
 });
 
 server.register(fastifySwagger, swaggerConfig);
@@ -51,6 +40,7 @@ function serverStart() {
 			console.error('ERROR AT "Listen"', err);
 			process.exit(1);
 		}
+		console.log("MOD:", process.env.PS);
 		console.log(`Server is Listening on ${addr}`);
 	});
 }
