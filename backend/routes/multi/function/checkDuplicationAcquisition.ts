@@ -7,22 +7,22 @@ const checkDuplicateAcquisition = (mainData: TmainData, permitAddCandidates: Tad
 
 	for (let i = 0; i < permitAddCandidates.length; i++) {
 		if (
-			permitAddCandidates[i].enterDay < mainData.enterDay &&
-			permitAddCandidates[i].retiredDay > mainData.enterDay &&
+			permitAddCandidates[i].enterDay <= mainData.enterDay &&
+			permitAddCandidates[i].retiredDay >= mainData.enterDay &&
 			(checkWorkCates.includes(mainData.workCate) || checkWorkCates.includes(permitAddCandidates[i].workCate))
 		)
 			return (isDoubleAcquisition = true);
 
 		if (
-			permitAddCandidates[i].enterDay > mainData.enterDay &&
-			permitAddCandidates[i].retiredDay < mainData.retiredDay &&
+			permitAddCandidates[i].enterDay >= mainData.enterDay &&
+			permitAddCandidates[i].retiredDay <= mainData.retiredDay &&
 			(checkWorkCates.includes(mainData.workCate) || checkWorkCates.includes(permitAddCandidates[i].workCate))
 		)
 			return (isDoubleAcquisition = true);
 
 		if (
-			permitAddCandidates[i].enterDay > mainData.enterDay &&
-			permitAddCandidates[i].retiredDay > mainData.retiredDay &&
+			permitAddCandidates[i].enterDay >= mainData.enterDay &&
+			permitAddCandidates[i].retiredDay >= mainData.retiredDay &&
 			(checkWorkCates.includes(mainData.workCate) || checkWorkCates.includes(permitAddCandidates[i].workCate))
 		)
 			return (isDoubleAcquisition = true);
