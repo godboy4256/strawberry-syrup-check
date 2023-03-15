@@ -2,7 +2,6 @@ import fastify from "fastify";
 import cors from "@fastify/cors";
 import fastifyStatic from "@fastify/static";
 import fastifySwagger from "@fastify/swagger";
-import fastifyFavicon from "fastify-favicon";
 
 import path from "path";
 
