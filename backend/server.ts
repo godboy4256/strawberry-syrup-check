@@ -2,12 +2,11 @@ import fastify from "fastify";
 import cors from "@fastify/cors";
 import fastifyStatic from "@fastify/static";
 import fastifySwagger from "@fastify/swagger";
-import fastifyFavicon from "fastify-favicon";
 
 import path from "path";
 
 import { createServerAsCluster } from "./lib/cluster";
-import { swaggerConfig } from "./config/swagger";
+import { swaggerConfig } from "./config/swagger.config";
 import { routes } from "./routes/routes";
 
 import { CORS_CONFIG, LOGGER_CONFIG } from "./config/server.config";
@@ -15,12 +14,8 @@ import { CORS_CONFIG, LOGGER_CONFIG } from "./config/server.config";
 const server = fastify(LOGGER_CONFIG);
 
 server.register(cors, CORS_CONFIG);
-server.register(fastifyFavicon, {
-	path: "static",
-	name: "favicon.ico",
-});
 server.register(fastifyStatic, {
-	root: path.join(__dirname, "../page_resource/front"),
+	root: path.join(__dirname, "../page_resource"),
 });
 server.setNotFoundHandler(function (req, reply) {
 	reply.code(404).sendFile("index.html");
