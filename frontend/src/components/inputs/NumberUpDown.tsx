@@ -1,7 +1,9 @@
 import { ChangeEvent, useState } from "react";
+import { useRecoilState } from "recoil";
+import { setTimeCount } from "../../assets/atom/time";
 import IMGDown from "../../assets/image/new/select_icon_normal.svg";
 import "../../styles/numberupdown.css";
-import { CreatePopup } from "../common/popup";
+import { ClosePopup, CreatePopup } from "../common/popup";
 
 const NumberUpDown = ({
   label,
@@ -22,7 +24,7 @@ const NumberUpDown = ({
   updown_unit?: number;
   typing?: boolean;
 }) => {
-  const [count, setCount] = useState<number | "">(0);
+  const [count, setCount] = useRecoilState(setTimeCount);
   const onClickCount = (is_updown: boolean) => {
     if (count === "") {
       setCount(0);
@@ -30,7 +32,8 @@ const NumberUpDown = ({
     if (typeof count !== "number") return;
     if (is_updown) {
       if (max_num && max_num - 1 < count) return;
-      setCount((prev: number | "") => {
+      if (typeof count === "string") return;
+      setCount((prev: any) => {
         if (prev === 100) return 100;
         if (updown_unit) {
           return typeof prev === "number" ? prev + updown_unit : "";
@@ -39,7 +42,7 @@ const NumberUpDown = ({
         }
       });
     } else {
-      setCount((prev: number | "") => {
+      setCount((prev: any) => {
         if (prev === 0) return 0;
         if (updown_unit) {
           return typeof prev === "number" ? prev - updown_unit : "";
@@ -58,7 +61,8 @@ const NumberUpDown = ({
       CreatePopup(
         undefined,
         `${max_num} 이상 입력할 수 없습니다.`,
-        "only_check"
+        "only_check",
+        () => ClosePopup()
       );
       return;
     }
@@ -73,16 +77,14 @@ const NumberUpDown = ({
           <span className="label_unit"> / {label_unit}</span>
         </label>
       )}
-      <div className={`num_updowun_container ${count !== 0 ? "active" : ""}`}>
+      <div className={`num_updowun_container ${count ? "active" : ""}`}>
         <button
           onClick={() => onClickCount(false)}
-          className={`number_down ${count !== 0 ? "active" : ""}`}
+          className={`number_down ${count ? "active" : ""}`}
         >
           <img src={IMGDown} alt="number down" />
         </button>
-        <div
-          className={`num_updown_unitbox fs_14 ${count !== 0 ? "active" : ""}`}
-        >
+        <div className={`num_updown_unitbox fs_14 ${count ? "active" : ""}`}>
           <input
             type="text"
             onFocus={() => {
@@ -92,13 +94,13 @@ const NumberUpDown = ({
             disabled={!typing ? true : false}
             onChange={onChangeInput}
             value={count}
-            className={`fs_14 ${count !== 0 ? "active" : ""}`}
+            className={`fs_14 ${count ? "active" : ""}`}
           />
           <div className="fs_14">{unit}</div>
         </div>
         <button
           onClick={() => onClickCount(true)}
-          className={`number_up ${count !== 0 ? "active" : ""}`}
+          className={`number_up ${count ? "active" : ""}`}
         >
           <img src={IMGDown} alt="number up" />
         </button>

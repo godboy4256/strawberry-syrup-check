@@ -14,6 +14,8 @@ import InputHandler from "../../object/Inputs";
 import { GetDateArr, Year_Option_Generater } from "../../utils/date";
 import { ClosePopup, CreatePopup } from "../common/popup";
 import "../../styles/date.css";
+import { useRecoilState } from "recoil";
+import { hasWorkState } from "../../assets/atom/date";
 
 const currentDate = GetDateArr(null);
 
@@ -22,7 +24,7 @@ class DateHandler extends InputHandler {
   public setMonth: Dispatch<SetStateAction<number>> | undefined = undefined;
   public setDay: Dispatch<SetStateAction<number>> | undefined = undefined;
   public setDays: Dispatch<SetStateAction<number[]>> | undefined = undefined;
-  public setDateValue: Dispatch<SetStateAction<string>> | undefined = undefined;
+  public setDateValue: any = undefined;
   public refNext: any = undefined;
   public refPrev: any = undefined;
   public current_year_list = Year_Option_Generater(44);
@@ -100,7 +102,7 @@ class DateHandler extends InputHandler {
 
   Action_Get_Date = (
     callBack?: CallableFunction,
-    setValueState?: Dispatch<SetStateAction<string>>,
+    setValueState?: any,
     params?: string
   ) => {
     const viewDate = `${this._Data.year ? this._Data.year : currentDate[0]}-${
@@ -411,9 +413,7 @@ export const DateInputNormal = ({
   min_date?: string;
 }) => {
   const handler = new DateHandler({});
-  const [dateValue, setDateValue] = useState(
-    isReset ? "" : selected ? selected : ""
-  );
+  const [dateValue, setDateValue] = useRecoilState(hasWorkState);
   useEffect(() => {
     !handler.GetPageVal("year") && handler.SetPageVal("year", currentDate[0]);
     !handler.GetPageVal("month") && handler.SetPageVal("month", currentDate[1]);

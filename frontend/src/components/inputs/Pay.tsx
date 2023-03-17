@@ -1,7 +1,21 @@
-import { ChangeEvent, useState } from "react";
+import { ChangeEvent } from "react";
 import { money_korean } from "../../utils/pays";
 import IMGHelpIcon from "../../assets/image/new/help_icon.svg";
 import "../../styles/input.css";
+import { useRecoilState } from "recoil";
+import {
+  NormalSalary,
+  setDayAvgPay,
+  setEmployMonth,
+  setEmployYear,
+  setSumOneYearPay,
+  setSumWorkDay,
+} from "../../assets/atom/pay";
+import {
+  SalaryTabInput01,
+  SalaryTabInput02,
+  SalaryTabInput03,
+} from "../../assets/atom/pay";
 
 const NumberInput = ({
   params,
@@ -28,8 +42,26 @@ const NumberInput = ({
   guide?: boolean;
   label_help?: boolean;
 }) => {
-  const [value, setValue] = useState<string>("");
-  const [value2, setValue2] = useState<string>("");
+  const [value, setValue] = useRecoilState(
+    params === "salary_01"
+      ? SalaryTabInput01
+      : params === "salary_02"
+      ? SalaryTabInput02
+      : params === "salary_03"
+      ? SalaryTabInput03
+      : params === "sumOneYearPay"
+      ? setSumOneYearPay
+      : params === "employ_year"
+      ? setEmployYear
+      : params === "employ_month"
+      ? setEmployMonth
+      : params === "sumWorkDay"
+      ? setSumWorkDay
+      : params === "dayAvgPay"
+      ? setDayAvgPay
+      : NormalSalary
+  );
+  const [value2, setValue2] = useRecoilState(NormalSalary);
   const onChangeSetValue = (e: ChangeEvent<HTMLInputElement>) => {
     let protoNum = Number(e.currentTarget.value.split(",").join(""));
     let toStringNum = String(Number(protoNum).toLocaleString());
@@ -47,6 +79,7 @@ const NumberInput = ({
     callBack && callBack(params?.[1], protoNum);
     setValue2(toStringNum);
   };
+
   return (
     <>
       {!double ? (

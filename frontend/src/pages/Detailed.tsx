@@ -1,4 +1,10 @@
-import { ReactElement, useEffect, useState } from "react";
+import {
+  Dispatch,
+  ReactElement,
+  SetStateAction,
+  useEffect,
+  useState,
+} from "react";
 import CalIsRetiree from "../components/calculator/IsRetiree";
 import { DateInputNormal } from "../components/inputs/Date";
 import Header from "../components/layout/Header";
@@ -18,9 +24,19 @@ import WorkRecordGen from "../components/calculator/workRecordGen";
 import "./../styles/detail.css";
 import { jobCates } from "../assets/data/worktype_data";
 import IMGHelpIcon from "../assets/image/new/help_icon.svg";
-import IMGResetIcon from "../assets/image/new/reset_icon.svg";
 import { ClosePopup, CreatePopup } from "../components/common/popup";
 import Calendar from "../components/inputs/Calendar";
+import ResetButton from "../components/inputs/resetButton";
+import { useRecoilState, useRecoilValue } from "recoil";
+import { duplicationDateCheck } from "../assets/atom/multi";
+import { Get_Dates_InRange } from "../utils/date";
+import { disabledCheck } from "../assets/atom/checkbox";
+import {
+  tabBelongArtIsShort,
+  tabBelongInput,
+  tabBelongSpecialIsShort,
+} from "../assets/atom/tab";
+import TabSelects from "../components/inputs/TabSelect";
 
 const handler: any = new DetailedHandler({});
 
@@ -35,13 +51,22 @@ const _Belong_Form_Tab = ({
 }: {
   label_help?: boolean;
   label?: string | undefined | boolean;
-  options?: string[] | undefined | boolean;
+  options?: any;
   form01: ReactElement;
   form02: ReactElement;
   callBack?: CallableFunction;
   params?: string;
 }) => {
-  const [state, setState] = useState(Array.isArray(options) && options[0]);
+  const [state, setState] = useRecoilState(
+    params === "input"
+      ? tabBelongInput
+      : params === "is_short"
+      ? options[0] === "예술인"
+        ? tabBelongArtIsShort
+        : tabBelongSpecialIsShort
+      : tabBelongInput
+  );
+  console.log("리렌ㅁ더");
   return (
     <>
       <>
@@ -68,7 +93,7 @@ const _Belong_Form_Tab = ({
                           주시기 바랍니다.
                         </div>,
                         "only_check",
-                        undefined,
+                        () => ClosePopup(),
                         undefined,
                         "확인",
                         undefined
@@ -245,7 +270,13 @@ const _DetailCalDayJob = ({ handler }: { handler: any }) => {
     </>
   );
 };
-const _DetailCalArt = ({ handler }: { handler: any }) => {
+const _DetailCalArt = ({
+  handler,
+  select_date,
+}: {
+  handler: any;
+  select_date: Dispatch<SetStateAction<any>> | undefined;
+}) => {
   useEffect(() => {
     handler.SetPageVal("input", "개별 입력");
     handler.SetPageVal(
@@ -358,10 +389,10 @@ const _DetailCalArt = ({ handler }: { handler: any }) => {
           }
           form02={
             <>
-              <DateInputNormal
+              <Calendar
                 params="lastWorkDay"
                 label="마지막 근무일"
-                callBack={handler.SetPageVal}
+                handler={handler}
               />
               <NumberInput
                 params={["employ_year", "employ_month"]}
@@ -437,11 +468,10 @@ const _DetailCalEmploy = ({ handler }: { handler: any }) => {
           label="고용보험 종료일"
           handler={handler}
         />
-        <TabInputs
+        <TabSelects
+          handler={handler}
           label_help={true}
-          guide={false}
           label="고용보험 등급"
-          type="select"
           callBack={handler.SetPageVal}
           valueDay={handler.GetPageVal}
         />
@@ -449,6 +479,7 @@ const _DetailCalEmploy = ({ handler }: { handler: any }) => {
     </div>
   );
 };
+
 export const DetailCalComp = ({
   workCate,
   handler,
@@ -458,9 +489,9 @@ export const DetailCalComp = ({
   handler: any;
   clickCallBack: CallableFunction;
 }) => {
-  const [resetInfoList, setState] = useState({
-    age: false,
-  });
+  const [check_select_date, setState] =
+    useRecoilState<any>(duplicationDateCheck);
+  const disabled = useRecoilValue(disabledCheck);
   return (
     <div id={`${workCate !== 6 ? "detail_comp_container" : ""}`}>
       <Header
@@ -475,39 +506,18 @@ export const DetailCalComp = ({
           handler.SetPageVal("retireReason", undefined);
         }}
       />
-      <button
-        className="pd_810 help_link"
-        onClick={() => {
-          CreatePopup(
-            "초기화",
-            "입력 값들이 모두 초기화됩니다.",
-            "confirm",
-            () => {
-              setState({ age: true });
-              ClosePopup();
-            }
-          );
-        }}
-      >
-        <img src={IMGResetIcon} alt="reset icon" />
-        <span className="fs_12">초기화</span>
-      </button>
+      <ResetButton workCate={workCate} handler={handler} />
       <div className={`${workCate !== 6 ? "public_side_padding" : ""}`}>
         {workCate !== 6 && handler.GetPageVal("cal_state") !== "multi" && (
           <>
-            <Calendar
-              params="age"
-              label="생년월일"
-              isReset={resetInfoList.age}
-              handler={handler}
-            />
+            <Calendar params="age" label="생년월일" handler={handler} />
             <CheckBoxInput
               type="circle_type"
               params="disabled"
               callBack={handler.SetPageVal}
               label="장애여부"
               options={["장애인", "비장애인"]}
-              selected={"비장애인"}
+              selected={disabled}
             />
           </>
         )}
@@ -515,15 +525,36 @@ export const DetailCalComp = ({
           <_DetailCalStandad handler={handler} />
         )}
         {(workCate === 2 || workCate === 3) && (
-          <_DetailCalArt handler={handler} />
+          <_DetailCalArt
+            handler={handler}
+            select_date={
+              handler.GetPageVal("cal_state") === "multi" ? setState : undefined
+            }
+          />
         )}
         {workCate === 4 && <_DetailCalDayJob handler={handler} />}
         {workCate === 5 && <_DetailCalVeryShort handler={handler} />}
         {workCate === 6 && <_DetailCalEmploy handler={handler} />}
         <Button
-          text="계산하기"
+          text={
+            handler.GetPageVal("cal_state") === "multi"
+              ? "입력완료"
+              : "계산하기"
+          }
           type="bottom"
-          click_func={() => clickCallBack()}
+          click_func={() => {
+            if (handler.GetPageVal("cal_state") === "multi") {
+              const addRange = Get_Dates_InRange(
+                handler.GetPageVal("enterDay"),
+                handler.GetPageVal("retiredDay")
+              );
+              const new_arr = [];
+              new_arr.push(...check_select_date);
+              new_arr.push(...addRange);
+              setState(new_arr);
+            }
+            clickCallBack();
+          }}
         />
       </div>
     </div>

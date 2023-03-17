@@ -10,6 +10,7 @@ import InputHandler from "./Inputs";
 
 class DetailedHandler extends InputHandler {
   public result: any = {};
+  public setLevelYearArr = [];
   public setCompState: Dispatch<SetStateAction<number>> | undefined = undefined;
   public setTab: Dispatch<SetStateAction<string>> | undefined = undefined;
   public setIsValueSelect01: Dispatch<SetStateAction<number>> | undefined =
@@ -439,7 +440,6 @@ class DetailedHandler extends InputHandler {
       to_servers.disabled = true;
       to_servers.age = 25;
     }
-
     if (
       !CheckValiDation(
         checkValidationType ? checkValidationType : "detail_standad",

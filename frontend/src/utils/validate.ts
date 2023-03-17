@@ -2,10 +2,9 @@ import { ClosePopup, CreatePopup } from "../components/common/popup";
 
 const null_check_list: any = {
   standad: ["enterDay", "retiredDay", "salary"],
-  common: ["age", "disabled"],
+  common: ["age"],
   detail_standad: [
     "age",
-    "disabled",
     "enterDay",
     "retiredDay",
     "weekDay",
@@ -14,7 +13,6 @@ const null_check_list: any = {
   ],
   detail_dayjob1: [
     "age",
-    "disabled",
     "lastWorkDay",
     "sumWorkDay",
     "dayAvgPay",
@@ -23,22 +21,14 @@ const null_check_list: any = {
   ],
   detail_dayjob2: [
     "age",
-    "disabled",
     "lastWorkDay",
     "sumWorkDay",
     "dayAvgPay",
     "dayWorkTime",
   ],
-  detail_art1: [
-    "age",
-    "disabled",
-    "enterDay",
-    "retiredDay",
-    "sumTwelveMonthSalary",
-  ],
+  detail_art1: ["age", "enterDay", "retiredDay", "sumTwelveMonthSalary"],
   detail_art2: [
     "age",
-    "disabled",
     "enterDay",
     "retiredDay",
     "jobCate",
@@ -46,22 +36,14 @@ const null_check_list: any = {
   ],
   detail_shorts1: [
     "age",
-    "disabled",
     "lastWorkDay",
     "sumOneYearPay",
     "enrollDay",
     "hasWork",
   ],
-  detail_shorts2: [
-    "age",
-    "disabled",
-    "lastWorkDay",
-    "sumOneYearPay",
-    "sumWorkDay",
-  ],
+  detail_shorts2: ["age", "lastWorkDay", "sumOneYearPay", "sumWorkDay"],
   detail_veryshorts: [
     "age",
-    "disabled",
     "enterDay",
     "retiredDay",
     "salary",
@@ -69,7 +51,7 @@ const null_check_list: any = {
     "weekWorkTime",
   ],
   detail_employ: ["insuranceGrade", "enterDay", "retiredDay"],
-  multi_one: ["age", "disabled", "companys_list"],
+  multi_one: ["age", "companys_list"],
 };
 
 const valid_null_check_message: any = {
@@ -83,13 +65,11 @@ const valid_null_check_message: any = {
     retiredDay: "퇴사일을 선택해주세요.",
     salary: "월 급여를 기입해주세요.",
     age: "생년월일을 선택해주세요.",
-    disabled: "장애여부를 선택해주세요.",
     weekDay: "근무 요일을 선택해주세요.",
     dayWorkTime: "근무 시간을 선택해주세요.",
   },
   detail_dayjob1: {
     age: "생년월일을 선택해주세요.",
-    disabled: "장애여부를 선택해주세요.",
     lastWorkDay: "마지막 근무일을 선택해주세요.",
     sumWorkDay:
       "고용보험 총 기간 ( 개별입력 , 개별 입력 선택시 ) 을 입력해주세요.",
@@ -99,7 +79,6 @@ const valid_null_check_message: any = {
   },
   detail_dayjob2: {
     age: "생년월일을 선택해주세요.",
-    disabled: "장애여부를 선택해주세요.",
     lastWorkDay: "마지막 근무일을 선택해주세요.",
     sumWorkDay: "고용보험 총 기간을 입력해주세요.",
     dayAvgPay: "1일 평균임금을 입력해주세요.",
@@ -109,21 +88,18 @@ const valid_null_check_message: any = {
     enterDay: "고용 보험 가입일을 선택해주세요.",
     retiredDay: "고용 보험 종료일을 선택해주세요.",
     age: "생년월일을 선택해주세요.",
-    disabled: "장애여부를 선택해주세요.",
     sumTwelveMonthSalary: "퇴직 전 12개월 급여 총액을 입력해주세요.",
   },
   detail_art2: {
     enterDay: "고용 보험 가입일을 선택해주세요.",
     retiredDay: "고용 보험 종료일을 선택해주세요.",
     age: "생년월일을 선택해주세요.",
-    disabled: "장애여부를 선택해주세요.",
     jobCate: "직종을 선택해주세요.",
     sumTwelveMonthSalary: "퇴직 전 12개월 급여 총액을 입력해주세요.",
   },
   detail_shorts1: {
     lastWorkDay: "마지막 근무일을 선택해주세요.",
     age: "생년월일을 선택해주세요.",
-    disabled: "장애여부를 선택해주세요.",
     sumOneYearPay: "개별 입력란 ( 퇴직전 12개월 근로 정보 ) 을 입력해주세요.",
     enrollDay: "신청 예정일을 선택해주세요.",
     hasWork: "최근 근로일 정보를 입력해주세요.",
@@ -131,7 +107,6 @@ const valid_null_check_message: any = {
   detail_shorts2: {
     lastWorkDay: "마지막 근무일을 선택해주세요.",
     age: "생년월일을 선택해주세요.",
-    disabled: "장애여부를 선택해주세요.",
     sumOneYearPay: "퇴직 전 12개월 급여 총액을 입력해주세요.",
     sumWorkDay: "고용 보험 총 기간을 입력해주세요.",
   },
@@ -139,7 +114,6 @@ const valid_null_check_message: any = {
     enterDay: "입사일을 선택해주세요.",
     retiredDay: "퇴사일을 선택해주세요.",
     age: "생년월일을 선택해주세요.",
-    disabled: "장애여부를 선택해주세요.",
     salary: "월 급여를 기입해주세요.",
     weekDay: "근무 요일을 선택해주세요.",
     weekWorkTime: "주 근무 시간을 선택해주세요.",
@@ -151,7 +125,6 @@ const valid_null_check_message: any = {
   },
   multi_one: {
     age: "생년월일을 선택해주세요.",
-    disabled: "장애여부를 선택해주세요.",
     companys_list: "두 개 이상의 근무 정보가 필요합니다.",
   },
 };

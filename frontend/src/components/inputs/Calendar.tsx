@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import IMGDate from "../../assets/image/date_icon.svg";
 import IMGRedDirection from "../../assets/image/red_direction.svg";
 import SelectInput, { PopupSelect } from "./Select";
@@ -6,6 +6,15 @@ import { GetDateArr, Year_Option_Generater } from "../../utils/date";
 import "../../styles/date.css";
 import Button from "./Button";
 import { ClosePopup, CreatePopup } from "../common/popup";
+import { useRecoilState, useRecoilValue } from "recoil";
+import {
+  ageState,
+  enterDayeState,
+  lastWorkDayState,
+  planToDoState,
+  retiredDayeState,
+} from "../../assets/atom/date";
+import { duplicationDateCheck } from "../../assets/atom/multi";
 
 const Days_Option_Generater = (year: number, month: number) => {
   const days_arr = new Array(new Date(year, month - 1, 1).getDay()).fill("");
@@ -37,9 +46,6 @@ const Calendar = ({
   label,
   placeholder,
   alarm,
-  selected,
-  isReset,
-  isHasWork,
   time_select,
 }: {
   handler: any;
@@ -49,25 +55,40 @@ const Calendar = ({
   label?: string;
   alarm?: string;
   placeholder?: string;
-  selected?: string;
-  isReset?: boolean;
-  isHasWork?: boolean;
   time_select?: boolean;
 }) => {
   const currentDate = GetDateArr(null);
+  const [date, setDate] = useRecoilState<any>(
+    params === "age" || params === "age_multi"
+      ? ageState
+      : params === "enterDay"
+      ? enterDayeState
+      : params === "lastWorkDay"
+      ? lastWorkDayState
+      : params === "retiredDay"
+      ? retiredDayeState
+      : params === "planToDo"
+      ? planToDoState
+      : ageState
+  );
 
-  const [date, setDate] = useState(selected ? selected : "");
   const [year, setYear] = useState(currentDate[0]);
   const [month, setMonth] = useState(currentDate[1]);
   const [day, setDay] = useState(currentDate[2]);
+  const [selectDate, setSelectDate] = useState<string>(
+    `${String(year)}-${String(month)}-${currentDate[2]}`
+  );
   const [days, setDays] = useState(Days_Option_Generater(year, month));
   const [onCalendar, setOnCalendar] = useState(false);
+  const multi_dup_check =
+    handler.GetPageVal("cal_state") === "multi"
+      ? useRecoilValue(duplicationDateCheck)
+      : undefined;
 
   const max_year = max_date ? max_date.split("-")[0] : currentDate[0];
   const min_year = min_date ? min_date.split("-")[0] : 1980;
   const max_month = max_date ? max_date?.split("-")[1] : currentDate[1];
   const min_month = min_date ? min_date?.split("-")[1] : 1;
-
   const years: any = Year_Option_Generater(
     max_date ? Number(max_year) - Number(min_year) + 1 : 44
   );
@@ -114,12 +135,11 @@ const Calendar = ({
       setMonth(Number(value));
     }
   };
-
   return (
     <>
       {onCalendar && (
         <>
-          <div className="modal_background"></div>
+          <div className="modal_background" onClick={() => {}}></div>
           <div className="calendar_container">
             <div className="date_input_container">
               <div className="date_input_header">
@@ -206,11 +226,24 @@ const Calendar = ({
                 {days.map((el: string, idx: number) => {
                   return (
                     <div
-                      className={String(el) === String(day) ? "select" : ""}
+                      className={` ${
+                        (params === "retiredDay" || params === "enterDay") &&
+                        multi_dup_check &&
+                        multi_dup_check.includes(
+                          `${String(year)}-${String(month)}-${el}`
+                        )
+                          ? "unset_dates"
+                          : ""
+                      } ${
+                        selectDate === `${String(year)}-${String(month)}-${el}`
+                          ? "select"
+                          : ""
+                      }`}
                       key={String(el + Date.now()) + idx + Date.now()}
                       onClick={() => {
                         if (!el) return;
                         setDay(Number(el));
+                        setSelectDate(`${String(year)}-${String(month)}-${el}`);
                       }}
                     >
                       <div>{el}</div>

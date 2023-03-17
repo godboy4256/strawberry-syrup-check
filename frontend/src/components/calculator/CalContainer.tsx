@@ -30,10 +30,7 @@ const CalContainer = ({
 
   return (
     <div id="cal_container" className="header_top_space">
-      <div
-        id="cal_current_guide"
-        className={`pd_810 fs_14 ${type === "복수형" ? "multi_margin" : ""}`}
-      >
+      <div id="cal_current_guide" className={`pd_810 fs_14`}>
         {`${type} ${
           GetValue &&
           GetValue("cal_state") !== "multi" &&

@@ -4,8 +4,16 @@ import IMGNormalSelect from "../../assets/image/new/select_icon_normal.svg";
 import { ClosePopup, CreatePopup } from "../common/popup";
 import "../../styles/select.css";
 import { jobCates_ed } from "../../assets/data/worktype_data";
+import {
+  dayWorkTimeSelectState,
+  jobCateSelectState,
+  normalSelectState,
+} from "../../assets/atom/select";
+import { useRecoilState } from "recoil";
 
 const _CustomSelect = ({
+  handler,
+  params,
   options,
   option_func,
   select_ment = "선택해 주세요.",
@@ -13,6 +21,8 @@ const _CustomSelect = ({
   select_icon,
   defaultSelect,
 }: {
+  handler?: any;
+  params: string;
   options: string[] | number[];
   option_func: (
     el: string | number,
@@ -26,10 +36,34 @@ const _CustomSelect = ({
   type?: "popup" | "normal" | "date_normal";
 }) => {
   const [onSelect, setOnSelect] = useState(false);
-  const [select, setSelect] = useState<string | number>();
+  const [select, setSelect] = useRecoilState(
+    params === "dayWorkTime"
+      ? dayWorkTimeSelectState
+      : params === "jobCate"
+      ? jobCateSelectState
+      : normalSelectState
+  );
+  const [levelState, setLevelState] = useState("");
+  useEffect(() => {
+    if (params.includes("year")) {
+      if (handler?.setLevelYearArr) {
+        if (!handler?.setLevelYearArr.includes(setLevelState)) {
+          handler?.setLevelYearArr.push(setLevelState);
+        }
+      }
+    }
+  }, []);
   return (
     <div
-      className={`custom_select ${className ? className : ""}`}
+      className={`custom_select ${className ? className : ""} ${
+        params.includes("year")
+          ? levelState
+            ? "active"
+            : ""
+          : select
+          ? "active"
+          : ""
+      }`}
       onClick={() => setOnSelect((prev) => !prev)}
     >
       {defaultSelect ? (
@@ -38,7 +72,13 @@ const _CustomSelect = ({
         </div>
       ) : (
         <div className="custom_select_title">
-          {select ? select : select_ment}
+          {params.includes("year")
+            ? levelState
+              ? levelState
+              : select_ment
+            : select
+            ? select
+            : select_ment}
         </div>
       )}
 
@@ -50,14 +90,18 @@ const _CustomSelect = ({
         onBlur={() => setOnSelect(false)}
       >
         {onSelect &&
-          options.map((el, idx: number) => {
+          options.map((el: any, idx: number) => {
             if (idx === 0) return null;
             return (
               <div
                 key={String(Date.now()) + el}
                 onClick={(e: MouseEvent<HTMLDivElement>) => {
                   option_func(el, e, idx);
-                  setSelect(el);
+                  if (params.includes("year")) {
+                    setLevelState(el);
+                  } else {
+                    setSelect(el);
+                  }
                 }}
               >
                 {el}
@@ -130,6 +174,8 @@ const _EmploymentPopUp = ({ job, jobed }: { job: string; jobed: string }) => {
 };
 
 const SelectInput = ({
+  handler,
+  selected,
   options,
   label,
   type = "normal",
@@ -143,7 +189,8 @@ const SelectInput = ({
   defaultSelect,
   className,
 }: {
-  selected?: number | string;
+  handler?: any;
+  selected?: any;
   options: string[] | number[];
   label?: string;
   type?: "popup" | "normal" | "date_normal";
@@ -217,6 +264,8 @@ const SelectInput = ({
       ) : type === "date_normal" ? (
         <>
           <_CustomSelect
+            handler={handler}
+            params={params}
             options={options}
             option_func={(el: string | number) =>
               callBack && callBack(params, el)
@@ -232,6 +281,8 @@ const SelectInput = ({
           <>
             {label && <label className="fs_16 write_label">{label}</label>}
             <_CustomSelect
+              handler={handler}
+              params={params}
               options={options}
               option_func={(
                 el: string | number,
@@ -254,14 +305,11 @@ const SelectInput = ({
                       }
                     />,
                     "only_check",
-                    undefined,
+                    () => ClosePopup(),
                     undefined,
                     "확인"
                   );
                 }
-                e?.currentTarget?.parentElement?.parentElement?.classList?.add(
-                  "active"
-                );
                 if (value_type === "number") {
                   callBack && options && callBack(params, idx);
                 } else {

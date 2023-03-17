@@ -14,7 +14,6 @@ import Loading from "../components/common/Loading";
 import { CheckValiDation } from "../utils/validate";
 import { calRecording } from "../utils/calrecord";
 import "./../styles/basic.css";
-import NewDate from "../components/inputs/Calendar";
 import Calendar from "../components/inputs/Calendar";
 
 class BasicCalHandler extends InputHandler {
