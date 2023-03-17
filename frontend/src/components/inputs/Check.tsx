@@ -1,12 +1,14 @@
-import { Fragment, useEffect, useState } from "react";
+import { Fragment } from "react";
 import "../../styles/checkbox.css";
 import IMGHelpIcon from "../../assets/image/new/help_icon.svg";
 import { CreatePopup } from "../common/popup";
-
-let checkList: string[] = [];
+import { useRecoilState, useSetRecoilState } from "recoil";
+import { weeKDayState } from "../../assets/atom/weekDay";
+import { disabledCheck, isSpecialCheck } from "../../assets/atom/checkbox";
 
 const _BoxTypeCheckBox = ({
   el,
+  idx,
   type,
   callBack,
   params,
@@ -14,35 +16,41 @@ const _BoxTypeCheckBox = ({
   label,
 }: {
   el: string;
+  idx: number;
   type: string;
   callBack: CallableFunction;
   params: string;
   maxLenth?: number;
   label?: string;
 }) => {
-  const [onSelect, setOnSelect] = useState(false);
+  const [onSelect, setOnSelect] = useRecoilState<any>(weeKDayState);
+  const checkList: number[] = [];
   return (
     <div
-      className={`${type} ${onSelect ? "active" : ""} fs_14`}
+      className={`${type} ${onSelect[idx] ? "active" : ""} fs_14`}
       onClick={() => {
-        if (maxLenth)
-          if (checkList.length === maxLenth) {
-            if (onSelect === false) {
-              CreatePopup(
-                undefined,
-                `${label}은 ${maxLenth}개까지 선택할 수 있습니다.`,
-                "only_check"
-              );
-              return;
-            }
+        const onSelectUpdate = onSelect.map((el: any, idx_in: number) => {
+          if (idx_in === idx) {
+            return el === true ? false : true;
           }
-        setOnSelect((prev) => !prev);
-        if (!onSelect) {
-          checkList.push(el);
-        } else {
-          const delete_num = checkList.indexOf(el);
-          checkList.splice(delete_num, 1);
-        }
+          return el;
+        });
+        onSelectUpdate.forEach((el: any, idx_in: number) => {
+          if (el) {
+            checkList.push(idx_in);
+          }
+        });
+
+        if (maxLenth)
+          if (checkList.length === maxLenth + 1) {
+            CreatePopup(
+              undefined,
+              `${label}은 ${maxLenth}개까지 선택할 수 있습니다.`,
+              "only_check"
+            );
+            return;
+          }
+        setOnSelect(onSelectUpdate);
         callBack(params, checkList);
       }}
     >
@@ -70,11 +78,8 @@ const CheckBoxInput = ({
   selected?: string;
   maxLenth?: number;
 }) => {
-  useEffect(() => {
-    return () => {
-      checkList = [];
-    };
-  });
+  const setChecked = useSetRecoilState(disabledCheck);
+  const [isSpecial, setIsSpecial] = useRecoilState(isSpecialCheck);
   return (
     <>
       <label className="fs_16 write_label help_call">
@@ -83,9 +88,10 @@ const CheckBoxInput = ({
       </label>
       <div className={`checkbox_container ${type}`}>
         {type === "box_type"
-          ? options.map((el: string) => {
+          ? options.map((el: string, idx: number) => {
               return (
                 <_BoxTypeCheckBox
+                  idx={idx}
                   maxLenth={maxLenth}
                   key={`${String(Date.now())}_for${el}`}
                   el={el}
@@ -103,20 +109,24 @@ const CheckBoxInput = ({
                   className="checkbox_wrapper"
                   key={`${String(Date.now())}_for${el}`}
                 >
-                  <label className="fs_16" htmlFor={`${String(el)}_for${idx}`}>
+                  <label className="fs_16" htmlFor={`check_option_for${idx}`}>
                     {el}
                   </label>
                   <div className="radio_input_box">
                     <input
-                      id={`${String(el)}_for${idx}`}
+                      id={`check_option_for${idx}`}
                       type="radio"
                       name={label ? label : "any_radios"}
                       className="checkbox_list"
                       defaultChecked={selected === el ? true : false}
                       onChange={() => {
+                        if (params === "disabled") {
+                          typeof el === "string" && setChecked(el);
+                        }
                         callBack(params, el);
                       }}
                     />
+
                     <span className="check_mark"></span>
                   </div>
                 </div>
@@ -150,10 +160,13 @@ const CheckBoxInput = ({
                     type="checkbox"
                     className="checkbox_list"
                     onChange={(e) => {
+                      if (params === "isSpecial") {
+                        setIsSpecial(e.target.checked);
+                      }
                       callBack(params, e.target.checked);
                     }}
                   />
-                  <span className="check_mark"></span>
+                  {isSpecial && <span className="check_mark"></span>}
                 </div>
               </div>
             )}

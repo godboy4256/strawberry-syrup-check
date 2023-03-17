@@ -5,6 +5,8 @@ import { GetDateArr } from "../../utils/date";
 import IMGHelpIcon from "../../assets/image/new/help_icon.svg";
 import { CreatePopup } from "../common/popup";
 import "../../styles/salarytab.css";
+import { useRecoilState } from "recoil";
+import { tabStateSalary } from "../../assets/atom/tab";
 
 const before_month_cal = (retiredDay: Date) => {
   let startMonth = new Date(retiredDay).getMonth() - 2;
@@ -83,11 +85,12 @@ const TabInputs = ({
   label_help?: boolean;
 }) => {
   const multi_salary_data: any = {};
-  const [salarytab, setSalaryTab] = useState("all");
+  const [salarytab, setSalaryTab] = useRecoilState(tabStateSalary);
   const onChangeTabInput = (in_params: string, value: string) => {
     multi_salary_data[in_params] = value;
     callBack && callBack(params, Object.values(multi_salary_data));
   };
+
   return (
     <>
       {guide ? (
@@ -227,7 +230,6 @@ const TabInputs = ({
                             {GetDateArr(valueDay("enterDay"))[0] + idx} 년
                           </div>{" "}
                           <SelectInput
-                            selected={"1등급"}
                             type="normal"
                             value_type="string"
                             options={[
@@ -257,4 +259,5 @@ const TabInputs = ({
     </>
   );
 };
+
 export default TabInputs;

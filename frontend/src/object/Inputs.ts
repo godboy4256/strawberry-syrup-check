@@ -3,6 +3,10 @@ export default class InputHandler {
   constructor(keyList_: {}) {
     this._Data = keyList_;
   }
+  ResetVal = (reset_list: any) => {
+    this._Data = reset_list;
+    console.log(this._Data);
+  };
   GetPageVal = (key: string) => {
     return this._Data[key];
   };

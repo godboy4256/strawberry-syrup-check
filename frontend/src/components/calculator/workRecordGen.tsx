@@ -16,6 +16,8 @@ import IMGPrev from "../../assets/image/new/i_date_prev.svg";
 import IMGNext from "../../assets/image/new/i_date_next.svg";
 import { ClosePopup, CreatePopup } from "../common/popup";
 import "../../styles/work_record_gen.css";
+import { useRecoilState } from "recoil";
+import { workRecordState } from "../../assets/atom/workRecordGen";
 
 type WorkRecordGenTypes = {
   label?: string;
@@ -409,7 +411,7 @@ const WorkRecordGen = ({
   type,
 }: WorkRecordGenTypes) => {
   const current_year_list = Year_Option_Generater(10);
-  const [selectYears, setSelectYears] = useState<number[]>([]);
+  const [selectYears, setSelectYears] = useRecoilState(workRecordState);
   useEffect(() => {
     handler.SetPageVal("workRecord", []);
   }, []);

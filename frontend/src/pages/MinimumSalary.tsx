@@ -57,13 +57,13 @@ const MinimumSalary = () => {
                     label="근무시간"
                     label_unit="주"
                     unit="시간"
-                    max_num={8}
+                    max_num={40}
                     typing={false}
                     callBack={handler.SetPageVal}
                   />
                   <NumberUpDown
                     updown_unit={10}
-                    max_num={60}
+                    max_num={50}
                     typing={false}
                     params="workMin"
                     unit="분"

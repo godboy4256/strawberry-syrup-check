@@ -72,3 +72,16 @@ export const One_Month_Ago = (targetDate: Date | null) => {
     oneMonthAgo.getDate(),
   ];
 };
+
+export const Get_Dates_InRange = (startDate: string, endDate: string) => {
+  const dates = [];
+  let currentDate = new Date(startDate);
+
+  while (currentDate <= new Date(endDate)) {
+    const dateFormat = GetDateArr(new Date(currentDate));
+    dates.push(`${dateFormat[0]}-${dateFormat[1]}-${dateFormat[2]}`);
+    currentDate.setDate(currentDate.getDate() + 1);
+  }
+
+  return dates;
+};

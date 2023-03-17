@@ -371,12 +371,7 @@ const _MultiCompanyList = () => {
         </div>
       </div>
       <div className="public_side_padding">
-        <Calendar
-          params="age_multi"
-          label="생년월일"
-          handler={handler}
-          selected={handler._Data.age_multi ? handler._Data.age_multi : ""}
-        />
+        <Calendar params="age_multi" label="생년월일" handler={handler} />
         <CheckBoxInput
           type="circle_type"
           params="disabled_multi"
@@ -400,6 +395,7 @@ const _MultiCompanyList = () => {
             />
           );
         })}
+        <div className="fs_14">* 주의 : 근무기간 중복</div>
         <button
           id="company_add_btn"
           onClick={() => {
@@ -438,23 +434,6 @@ const MultiCalPage = () => {
   handler.setCompState = setCompState;
   handler.SetPageVal("cal_state", "multi");
   handler.SetPageVal("retired", true);
-  // useEffect(() => {
-  //   return () =>
-  //     handler.SetPageVal("companys_list", [
-  //       [
-  //         {
-  //           id: 1,
-  //           content: "",
-  //           emoticon: "",
-  //         },
-  //         {
-  //           id: 2,
-  //           content: "",
-  //           emoticon: "",
-  //         },
-  //       ],
-  //     ]);
-  // });
   return (
     <>
       {compState === 5 ? (

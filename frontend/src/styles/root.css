@@ -78,6 +78,10 @@
   margin: 30px 0 5px;
   line-height: 24px;
 }
+.first_label {
+  margin-bottom: 5px;
+  line-height: 24px;
+}
 .write_label.help_call,
 .help_call {
   display: flex;
@@ -149,11 +153,13 @@
 .help_link span {
   color: #0089ed;
 }
-#reset_button {
+.reset_button {
+  width: 100%;
   display: flex;
   align-items: center;
+  justify-content: flex-end;
 }
-#reset_button span {
+.reset_button span {
   color: #0089ed;
 }
 .cal_top_contents {
