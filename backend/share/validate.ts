@@ -187,5 +187,7 @@ export const DefinedParamErrorMesg: { [col_: string]: string } = {
 	retiredDay: "입사일 및 퇴사일을 입력해 주세요",
 	ealryRetire: "퇴사일이 입사일보다 빠릅니다.",
 	salary: "월 급여를 입력해 주세요",
-	expire: "실업급여는 퇴직한 다음날부터 12개월이 경과하면	지급 받을 수 없습니다.",
+	expire: "수급기간(퇴직 후 1년)이 경과하면 실업급여가 지급되지 않습니다.",
+	isOverTen: "신청일 이전 1달 간 근로일수가 10일 미만이어야 합니다.",
+	hasWork: "신청일 이전 14일간 연속근로내역이 없어야 합니다.",
 };
