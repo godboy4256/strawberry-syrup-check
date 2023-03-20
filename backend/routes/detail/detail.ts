@@ -42,95 +42,105 @@ dayjs.extend(isSameOrAfter);
 
 export default function detailRoute(fastify: FastifyInstance, options: any, done: any) {
 	fastify.post(detailPath.standard, standardSchema, (req: any, res) => {
-		const mainData: TstandardInput = {
-			...req.body,
-			enterDay: dayjs(req.body.enterDay),
-			retiredDay: dayjs(req.body.retiredDay),
-		};
-		const retiredDayArray = req.body.retiredDay.split("-");
-
-		// // 1. 기본 조건 확인
-		const employmentDate = Math.floor(mainData.retiredDay.diff(mainData.enterDay, "day", true) + 1);
-		if (!mainData.isMany) {
-			const checkResult = checkBasicRequirements(mainData, employmentDate);
-			if (!checkResult.succ) return { checkResult };
-		} else {
-			if (employmentDate <= 0) return { succ: false, errorCode: 1, mesg: DefinedParamErrorMesg.ealryRetire };
-		}
-
-		// 2. 급여 산정
-		const { dayAvgPay, realDayPay, realMonthPay } =
-			retiredDayArray[0] === "2023"
-				? calLeastPayInfo(mainData.retiredDay, retiredDayArray, mainData.salary, mainData.dayWorkTime, true)
-				: calLeastPayInfo(mainData.retiredDay, retiredDayArray, mainData.salary, mainData.dayWorkTime);
-
-		// 3. 소정급여일수 산정
-		const joinYears = Math.floor(employmentDate / 365);
-		const receiveDay = getReceiveDay(joinYears, req.body.age, req.body.disabled);
-
-		// 4. 피보험단위기간 산정
-		const tempLimitDay = mainData.retiredDay.subtract(18, "month");
-		const limitDay = mainData.enterDay.isSameOrAfter(tempLimitDay) ? mainData.enterDay : tempLimitDay;
-		const workingDays = calDetailWorkingDay(limitDay, mainData.retiredDay, mainData.weekDay);
-
-		// 5. 복수형에 사용되는 마지막 직장인 경우 workDawyForMulti 계산
-		// 이 과정은 중복 가입된 상황을 고려하지 않는다.
-		const limitDayForMulti = dayjs(req.body.limitDay); // 마지막 직장 퇴사일로 부터 필요한 개월 수(18 또는 24) 전
-		const workDayForMulti = mainData.enterDay.isSameOrAfter(limitDayForMulti, "day")
-			? workingDays
-			: calDetailWorkingDay(limitDayForMulti, mainData.retiredDay, mainData.weekDay);
-
-		// 6. 수급 인정 / 불인정에 따라 결과 리턴
-		const leastRequireWorkingDay = 180;
-		if (workingDays < leastRequireWorkingDay)
-			return getFailResult(
-				req.body.retired,
-				mainData.retiredDay,
-				workingDays,
-				realDayPay,
-				realMonthPay,
-				leastRequireWorkingDay,
-				receiveDay,
-				dayAvgPay,
-				true,
-				workDayForMulti
-			);
-
-		// 이 때 다음 단계 수급이 가능하다면 같이 전달
-		const [requireWorkingYear, nextReceiveDay] = getNextReceiveDay(joinYears, req.body.age, req.body.disabled);
-		if (nextReceiveDay === 0) {
-			return {
-				succ: true,
-				retired: req.body.retired,
-				amountCost: realDayPay * receiveDay,
-				dayAvgPay,
-				realDayPay,
-				receiveDay,
-				realMonthPay,
-				severancePay: employmentDate >= 365 ? Math.ceil(dayAvgPay * 30 * (employmentDate / 365)) : 0,
-				workingDays,
-				workDayForMulti, // 복수형에서만 사용
+		try {
+			const mainData: TstandardInput = {
+				...req.body,
+				enterDay: dayjs(req.body.enterDay),
+				retiredDay: dayjs(req.body.retiredDay),
 			};
-		} else {
-			return {
-				succ: true,
-				retired: req.body.retired,
-				amountCost: realDayPay * receiveDay,
-				dayAvgPay,
-				realDayPay,
-				receiveDay,
-				realMonthPay,
-				severancePay: employmentDate >= 365 ? Math.ceil(dayAvgPay * 30 * (employmentDate / 365)) : 0,
-				workingDays,
-				needDay: requireWorkingYear * 365 - employmentDate,
-				availableDay: calDday(
-					new Date(mainData.retiredDay.format("YYYY-MM-DD")),
-					requireWorkingYear * 365 - workingDays
-				),
-				nextAmountCost: nextReceiveDay * realDayPay,
-				morePay: nextReceiveDay * realDayPay - receiveDay * realDayPay,
-				workDayForMulti, // 복수형에서만 사용
-			};
+			const retiredDayArray = req.body.retiredDay.split("-");
+
+			// // 1. 기본 조건 확인
+			const employmentDate = Math.floor(mainData.retiredDay.diff(mainData.enterDay, "day", true) + 1);
+			if (!mainData.isMany) {
+				const checkResult = checkBasicRequirements(mainData, employmentDate);
+				if (!checkResult.succ) return res.code(400).send(checkResult);
+			} else {
+				if (employmentDate <= 0)
+					return res.code(400).send({ succ: false, errorCode: 1, mesg: DefinedParamErrorMesg.ealryRetire });
+			}
+
+			// 2. 급여 산정
+			const { dayAvgPay, realDayPay, realMonthPay } =
+				retiredDayArray[0] === "2023"
+					? calLeastPayInfo(mainData.retiredDay, retiredDayArray, mainData.salary, mainData.dayWorkTime, true)
+					: calLeastPayInfo(mainData.retiredDay, retiredDayArray, mainData.salary, mainData.dayWorkTime);
+
+			// 3. 소정급여일수 산정
+			const joinYears = Math.floor(employmentDate / 365);
+			const receiveDay = getReceiveDay(joinYears, req.body.age, req.body.disabled);
+
+			// 4. 피보험단위기간 산정
+			const tempLimitDay = mainData.retiredDay.subtract(18, "month");
+			const limitDay = mainData.enterDay.isSameOrAfter(tempLimitDay) ? mainData.enterDay : tempLimitDay;
+			const workingDays = calDetailWorkingDay(limitDay, mainData.retiredDay, mainData.weekDay);
+
+			// 5. 복수형에 사용되는 마지막 직장인 경우 workDawyForMulti 계산
+			// 이 과정은 중복 가입된 상황을 고려하지 않는다.
+			const limitDayForMulti = dayjs(req.body.limitDay); // 마지막 직장 퇴사일로 부터 필요한 개월 수(18 또는 24) 전
+			const workDayForMulti = mainData.enterDay.isSameOrAfter(limitDayForMulti, "day")
+				? workingDays
+				: calDetailWorkingDay(limitDayForMulti, mainData.retiredDay, mainData.weekDay);
+
+			// 6. 수급 인정 / 불인정에 따라 결과 리턴
+			const leastRequireWorkingDay = 180;
+			if (workingDays < leastRequireWorkingDay)
+				return res
+					.code(202)
+					.send(
+						getFailResult(
+							req.body.retired,
+							mainData.retiredDay,
+							workingDays,
+							realDayPay,
+							realMonthPay,
+							leastRequireWorkingDay,
+							receiveDay,
+							dayAvgPay,
+							true,
+							workDayForMulti
+						)
+					);
+
+			// 이 때 다음 단계 수급이 가능하다면 같이 전달
+			const [requireWorkingYear, nextReceiveDay] = getNextReceiveDay(joinYears, req.body.age, req.body.disabled);
+			if (nextReceiveDay === 0) {
+				return {
+					succ: true,
+					retired: req.body.retired,
+					amountCost: realDayPay * receiveDay,
+					dayAvgPay,
+					realDayPay,
+					receiveDay,
+					realMonthPay,
+					severancePay: employmentDate >= 365 ? Math.ceil(dayAvgPay * 30 * (employmentDate / 365)) : 0,
+					workingDays,
+					workDayForMulti, // 복수형에서만 사용
+				};
+			} else {
+				return {
+					succ: true,
+					retired: req.body.retired,
+					amountCost: realDayPay * receiveDay,
+					dayAvgPay,
+					realDayPay,
+					receiveDay,
+					realMonthPay,
+					severancePay: employmentDate >= 365 ? Math.ceil(dayAvgPay * 30 * (employmentDate / 365)) : 0,
+					workingDays,
+					needDay: requireWorkingYear * 365 - employmentDate,
+					availableDay: calDday(
+						new Date(mainData.retiredDay.format("YYYY-MM-DD")),
+						requireWorkingYear * 365 - workingDays
+					),
+					nextAmountCost: nextReceiveDay * realDayPay,
+					morePay: nextReceiveDay * realDayPay - receiveDay * realDayPay,
+					workDayForMulti, // 복수형에서만 사용
+				};
+			}
+		} catch (error) {
+			console.error(error);
+			return res.code(500).send();
 		}
 	});
 

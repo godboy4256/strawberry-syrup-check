@@ -116,6 +116,107 @@ const standardBodyProp = {
 	dayWorkTime: DefineParamInfo.dayWorkTime,
 	salary: DefineParamInfo.salary,
 	limitDay: { type: "string" },
+	isMany: { type: "boolean" },
+};
+
+const standardResponse = {
+	400: {
+		description: "신청일이 퇴직일부터 1년 초과 또는,\n\n입사일이 퇴사일보다 빠름",
+		type: "object",
+		properties: {
+			succ: { type: "boolean" },
+			errorCode: { type: "number" },
+			mesg: { type: "string" },
+		},
+		examples: [
+			{
+				succ: false,
+				errorCode: 0,
+				mesg: "실업급여는 퇴직한 다음날부터 12개월이 경과하면\t지급 받을 수 없습니다.",
+			},
+			{
+				succ: false,
+				errorCode: 1,
+				mesg: "퇴사일이 입사일보다 빠릅니다.",
+			},
+		],
+	},
+	202: {
+		description: "수급 불인정",
+		type: "object",
+		properties: {
+			succ: { type: "boolean" },
+			errorCode: { type: "number" },
+			retired: { type: "boolean" }, // 퇴직자/퇴직예정자
+			workingDays: { type: "number" },
+			requireDays: { type: "number" },
+			realDayPay: { type: "number" },
+			dayAvgPay: { type: "number" },
+			workDayForMulti: { type: "number" },
+		},
+		examples: [
+			{
+				succ: false,
+				errorCode: 2,
+				retired: true,
+				workingDays: 48,
+				requireDays: 132,
+				realDayPay: 61568,
+				dayAvgPay: 66667,
+				workDayForMulti: 48,
+			},
+		],
+	},
+	200: {
+		description: "수급 인정",
+		type: "object",
+		properties: {
+			succ: { type: "boolean" },
+			retired: { type: "boolean" },
+			amountCost: { type: "number" },
+			dayAvgPay: { type: "number" },
+			realDayPay: { type: "number" },
+			receiveDay: { type: "number" },
+			realMonthPay: { type: "number" },
+			severancePay: { type: "number" },
+			workingDays: { type: "number" },
+			workDayForMulti: { type: "number" },
+			needDay: { type: "number" }, // 다음 단계 수급
+			availableDay: { type: "string" }, // 다음 단계 수급
+			nextAmountCost: { type: "number" }, // 다음 단계 수급
+			morePay: { type: "number" }, // 다음 단계 수급
+		},
+		examples: [
+			{
+				succ: true,
+				retired: true,
+				amountCost: 14776320,
+				dayAvgPay: 66667,
+				realDayPay: 61568,
+				receiveDay: 240,
+				realMonthPay: 1847040,
+				severancePay: 20054895,
+				workingDays: 401,
+				workDayForMulti: 284,
+			},
+			{
+				succ: true,
+				retired: true,
+				amountCost: 9235200,
+				dayAvgPay: 66667,
+				realDayPay: 61568,
+				receiveDay: 150,
+				realMonthPay: 1847040,
+				severancePay: 4043856,
+				workingDays: 401,
+				needDay: 357,
+				availableDay: "2025-4-28",
+				nextAmountCost: 11082240,
+				morePay: 1847040,
+				workDayForMulti: 284,
+			},
+		],
+	},
 };
 
 const artBodyProp = {
@@ -247,6 +348,7 @@ export const standardSchema = {
 			],
 			properties: standardBodyProp,
 		},
+		response: standardResponse,
 	},
 };
 
