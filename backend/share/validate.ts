@@ -86,7 +86,6 @@ export const DefineParamInfo = {
 		minimum: 0,
 	},
 	salary: {
-		// 월급
 		type: "array",
 		items: {
 			type: "number",

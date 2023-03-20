@@ -121,7 +121,7 @@ const standardBodyProp = {
 
 const standardResponse = {
 	400: {
-		description: "신청일이 퇴직일부터 1년 초과 또는,\n\n입사일이 퇴사일보다 빠름",
+		description: "신청일이 퇴직일부터 1년 초과 또는,\n\n퇴사일이 입사일보다 빠름",
 		type: "object",
 		properties: {
 			succ: { type: "boolean" },
@@ -232,6 +232,90 @@ const artBodyProp = {
 	isSpecial: { type: "boolean" },
 	limitDay: { type: "string" },
 	isMany: { type: "boolean" },
+};
+
+const artResponse = {
+	400: {
+		description:
+			"신청일이 퇴직일부터 1년 초과 또는,\n\n퇴사일이 입사일보다 빠름\n\n예술인/특고로 3개월 이상 근무하지 않은 경우",
+		type: "object",
+		properties: {
+			succ: { type: "boolean" },
+			errorCode: { type: "number" },
+			mesg: { type: "string" },
+		},
+		examples: [
+			{
+				succ: false,
+				errorCode: 0,
+				mesg: "실업급여는 퇴직한 다음날부터 12개월이 경과하면\t지급 받을 수 없습니다.",
+			},
+			{
+				succ: false,
+				errorCode: 1,
+				mesg: "퇴사일이 입사일보다 빠릅니다.",
+			},
+			{
+				succ: false,
+				errorCode: 3,
+				mesg: "예술인/특고로 3개월 이상 근무해야합니다.",
+			},
+		],
+	},
+	202: {
+		description: "수급 불인정",
+		type: "object",
+		properties: {
+			succ: { type: "boolean" },
+			errorCode: { type: "number" },
+			retired: { type: "boolean" },
+			workingDays: { type: "number" },
+			requireMonths: { type: "number" },
+			realDayPay: { type: "number" },
+			dayAvgPay: { type: "number" },
+			workDayForMulti: { type: "number" },
+		},
+		examples: [
+			{
+				succ: false,
+				errorCode: 2,
+				retired: true,
+				dayAvgPay: 65754,
+				realDayPay: 39453,
+				workingDays: 253,
+				requireMonths: 17,
+				workDayForMulti: 3.3,
+			},
+		],
+	},
+	200: {
+		description: "수급 인정",
+		type: "object",
+		properties: {
+			succ: { type: "boolean" },
+			retired: { type: "boolean" },
+			amountCost: { type: "number" },
+			dayAvgPay: { type: "number" },
+			realDayPay: { type: "number" },
+			receiveDay: { type: "number" },
+			realMonthPay: { type: "number" },
+			workingDays: { type: "number" },
+			workDayForMulti: { type: "number" },
+		},
+		examples: [
+			{
+				succ: true,
+				retired: true,
+				amountCost: 5917950,
+				dayAvgPay: 65754,
+				realDayPay: 39453,
+				receiveDay: 150,
+				realMonthPay: 1183590,
+				workingDays: 731,
+				workDayForMulti: 24,
+			},
+		],
+	},
 };
 
 const shortArtBodyProp = {
@@ -372,6 +456,7 @@ export const artSchema = {
 			],
 			properties: artBodyProp,
 		},
+		response: artResponse,
 	},
 };
 
