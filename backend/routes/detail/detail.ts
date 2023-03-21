@@ -337,9 +337,11 @@ export default function detailRoute(fastify: FastifyInstance, options: any, done
 			if (!mainData.isMany) {
 				const now = mainData.isSimple ? dayjs() : dayjs(mainData.enrollDay);
 				if (Math.floor(now.diff(mainData.lastWorkDay, "day")) > 365)
-					return { succ: false, errorCode: 0, mesg: DefinedParamErrorMesg.expire };
+					return res.code(400).send({ succ: false, errorCode: 0, mesg: DefinedParamErrorMesg.expire });
 				if (mainData.sumWorkDay < 3)
-					return { succ: false, errorCode: 4, mesg: DefinedParamErrorMesg.needShortSpecialCareer };
+					return res
+						.code(400)
+						.send({ succ: false, errorCode: 4, mesg: DefinedParamErrorMesg.needShortSpecialCareer });
 			}
 
 			// 2. 급여 계산
@@ -422,11 +424,10 @@ export default function detailRoute(fastify: FastifyInstance, options: any, done
 		};
 
 		// 1. 신청일이 이직일로 부터 1년 초과 확인
-		if (mainData.isMany) {
+		if (!mainData.isMany) {
 			const now = mainData.isSimple ? dayjs(new Date()) : dayjs(mainData.enrollDay);
-			console.log("1. ", now.format("YYYY-MM-DD"), Math.floor(now.diff(mainData.lastWorkDay, "day", true)) > 365);
 			if (Math.floor(now.diff(mainData.lastWorkDay, "day", true)) > 365)
-				return { succ: false, errorCode: 0, mesg: DefinedParamErrorMesg.expire };
+				return res.code(400).send({ succ: false, errorCode: 0, mesg: DefinedParamErrorMesg.expire });
 		}
 
 		// // 3. 피보험단위기간 산정

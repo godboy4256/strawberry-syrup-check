@@ -542,6 +542,7 @@ const dayJobBodyProp = {
 	limitDay: { type: "string" },
 	isMany: { type: "boolean" },
 };
+const dayJobResponse = {};
 
 const veryShortBodyProp = {
 	retired: DefineParamInfo.retired,
@@ -670,6 +671,7 @@ export const dayJobSchema = {
 			],
 			properties: dayJobBodyProp,
 		},
+		response: dayJobResponse,
 	},
 };
 
