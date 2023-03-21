@@ -240,89 +240,94 @@ export default function detailRoute(fastify: FastifyInstance, options: any, done
 	});
 
 	fastify.post(detailPath.shortArt, shortArtSchema, (req: any, res) => {
-		const mainData: TartShortInput = { ...req.body };
+		try {
+			const mainData: TartShortInput = { ...req.body };
 
-		// 신청일이 이직일로 부터 1년 초과 확인
-		if (!mainData.isMany) {
-			const now = mainData.isSimple ? dayjs() : dayjs(mainData.enrollDay);
-			if (Math.floor(now.diff(mainData.lastWorkDay, "day")) > 365)
-				return res.code(400).send({ succ: false, errorCode: 0, mesg: DefinedParamErrorMesg.expire });
+			// 신청일이 이직일로 부터 1년 초과 확인
+			if (!mainData.isMany) {
+				const now = mainData.isSimple ? dayjs() : dayjs(mainData.enrollDay);
+				if (Math.floor(now.diff(mainData.lastWorkDay, "day")) > 365)
+					return res.code(400).send({ succ: false, errorCode: 0, mesg: DefinedParamErrorMesg.expire });
 
-			// 단기 예술인으로 3개월 이상 근무해야한다.
-			if (mainData.sumWorkDay < 3)
-				return res
-					.code(400)
-					.send({ succ: false, errorCode: 5, mesg: "단기 예술인으로 3개월 이상 근무해야합니다." });
-		}
+				// 단기 예술인으로 3개월 이상 근무해야한다.
+				if (mainData.sumWorkDay < 3)
+					return res
+						.code(400)
+						.send({ succ: false, errorCode: 5, mesg: "단기 예술인으로 3개월 이상 근무해야합니다." });
+			}
 
-		// 2. 급여(일수령액, 월수령액) 계산
-		const lastWorkDay = dayjs(mainData.lastWorkDay);
-		const sumOneYearWorkDay = calSumOneYearWorkDay(lastWorkDay);
-		const { dayAvgPay, realDayPay, realMonthPay } = calArtPay(
-			mainData.sumOneYearPay,
-			sumOneYearWorkDay,
-			mainData.isSpecial
-		);
+			// 2. 급여(일수령액, 월수령액) 계산
+			const lastWorkDay = dayjs(mainData.lastWorkDay);
+			const sumOneYearWorkDay = calSumOneYearWorkDay(lastWorkDay);
+			const { dayAvgPay, realDayPay, realMonthPay } = calArtPay(
+				mainData.sumOneYearPay,
+				sumOneYearWorkDay,
+				mainData.isSpecial
+			);
 
-		// 3. 가입일 추정 계산
-		const tempEnterDay = lastWorkDay.subtract(mainData.sumWorkDay, "month");
-		const lawStartDay = dayjs("2020-12-01");
-		const enterDay: [boolean, Dayjs] = tempEnterDay.isSameOrAfter(lawStartDay)
-			? [false, tempEnterDay]
-			: [true, lawStartDay];
-		if (mainData.isSimple) {
-			if (!enterDay[0]) mainData.sumWorkDay = lastWorkDay.diff(enterDay[1], "month");
-		}
+			// 3. 가입일 추정 계산
+			const tempEnterDay = lastWorkDay.subtract(mainData.sumWorkDay, "month");
+			const lawStartDay = dayjs("2020-12-01");
+			const enterDay: [boolean, Dayjs] = tempEnterDay.isSameOrAfter(lawStartDay)
+				? [false, tempEnterDay]
+				: [true, lawStartDay];
+			if (mainData.isSimple) {
+				if (!enterDay[0]) mainData.sumWorkDay = lastWorkDay.diff(enterDay[1], "month");
+			}
 
-		// 4. 수급 인정/불인정 판단 => 결과만 입력 계산기능 필요
-		const isPermit = mainData.isSimple
-			? artShortCheckPermit(mainData.sumWorkDay, mainData.isSpecial)
-			: artShortCheckPermit(mainData.sumTwoYearWorkDay, mainData.isSpecial); // null 체크 필요
+			// 4. 수급 인정/불인정 판단 => 결과만 입력 계산기능 필요
+			const isPermit = mainData.isSimple
+				? artShortCheckPermit(mainData.sumWorkDay, mainData.isSpecial)
+				: artShortCheckPermit(mainData.sumTwoYearWorkDay, mainData.isSpecial); // null 체크 필요
 
-		// 5. 추가 근로 정보에서 단기 예술인/특고 추가 조건 확인
-		if (mainData.isOverTen && mainData.hasWork)
-			return res.code(400).send({
-				succ: false,
-				errorCode: 5,
-				mesg: DefinedParamErrorMesg.isOverTen + "," + DefinedParamErrorMesg.hasWork,
-			});
+			// 5. 추가 근로 정보에서 단기 예술인/특고 추가 조건 확인
+			if (mainData.isOverTen && mainData.hasWork)
+				return res.code(400).send({
+					succ: false,
+					errorCode: 5,
+					mesg: DefinedParamErrorMesg.isOverTen + "," + DefinedParamErrorMesg.hasWork,
+				});
 
-		// 6. 복수형에서 사용하기위한 workDayForMulti 계산
-		const limitDay = dayjs(mainData.limitDay);
-		const workDayForMulti = enterDay[1].isSameOrAfter(limitDay, "day")
-			? mainData.sumWorkDay
-			: lastWorkDay.diff(limitDay, "month");
+			// 6. 복수형에서 사용하기위한 workDayForMulti 계산
+			const limitDay = dayjs(mainData.limitDay);
+			const workDayForMulti = enterDay[1].isSameOrAfter(limitDay, "day")
+				? mainData.sumWorkDay
+				: lastWorkDay.diff(limitDay, "month");
 
-		// 7. 수급 불인정 시 불인정 메세지 리턴
-		if (!isPermit[0])
-			return res.code(202).send({
-				succ: false,
-				errorCode: 2,
+			// 7. 수급 불인정 시 불인정 메세지 리턴
+			if (!isPermit[0])
+				return res.code(202).send({
+					succ: false,
+					errorCode: 2,
+					retired: mainData.retired,
+					dayAvgPay,
+					realDayPay,
+					workingMonths: isPermit[1],
+					requireMonths: isPermit[2],
+					workDayForMulti,
+				});
+
+			// 8. 피보험기간 년수 계산
+			const workingYear = Math.floor(mainData.sumWorkDay / 12);
+			// 9. 소정급여일수 계산
+			const receiveDay = getReceiveDay(workingYear, mainData.age, mainData.disabled);
+
+			// 11. 결과 리턴
+			return {
+				succ: true,
 				retired: mainData.retired,
+				amountCost: realDayPay * receiveDay,
 				dayAvgPay,
 				realDayPay,
-				workingMonths: isPermit[1],
-				requireMonths: isPermit[2],
+				receiveDay,
+				realMonthPay,
+				workingMonths: mainData.sumWorkDay,
 				workDayForMulti,
-			});
-
-		// 8. 피보험기간 년수 계산
-		const workingYear = Math.floor(mainData.sumWorkDay / 12);
-		// 9. 소정급여일수 계산
-		const receiveDay = getReceiveDay(workingYear, mainData.age, mainData.disabled);
-
-		// 11. 결과 리턴
-		return {
-			succ: true,
-			retired: mainData.retired,
-			amountCost: realDayPay * receiveDay,
-			dayAvgPay,
-			realDayPay,
-			receiveDay,
-			realMonthPay,
-			workingMonths: mainData.sumWorkDay,
-			workDayForMulti,
-		};
+			};
+		} catch (error) {
+			console.error(error);
+			return res.code(500).send();
+		}
 	});
 
 	fastify.post(detailPath.shortSpecial, shortSpecialSchema, (req: any, res) => {
