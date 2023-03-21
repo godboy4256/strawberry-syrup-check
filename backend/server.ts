@@ -13,7 +13,13 @@ import { CORS_CONFIG, LOGGER_CONFIG } from "./config/server.config";
 
 const server = fastify(LOGGER_CONFIG);
 
-server.register(cors, CORS_CONFIG);
+server.register(cors, {
+	// origin: ["https://www.moneysylove.com", "https://www.moneysylove.du.r.appspot.com"],
+
+	origin: true,
+	methods: ["GET", "POST"],
+	credentials: true,
+});
 server.register(fastifyStatic, {
 	root: path.join(__dirname, "../page_resource"),
 });

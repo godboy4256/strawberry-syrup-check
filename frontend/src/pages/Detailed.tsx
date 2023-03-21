@@ -306,9 +306,13 @@ const _DetailCalArt = ({ handler }: { handler: any }) => {
             params="enterDay"
             label="고용보험 가입일"
             handler={handler}
-            alarm="예술인의 피보험 단위기간은 2020년 12월을 기준으로 적용됩니다."
-            max_date="2023-3"
-            min_date="2020-12"
+            alarm={
+              handler.GetPageVal("workCate") === 2
+                ? "예술인의 피보험 단위기간은 2020년 12월을 기준으로 적용됩니다."
+                : ""
+            }
+            max_date={handler.GetPageVal("workCate") === 2 ? "2023-3" : ""}
+            min_date={handler.GetPageVal("workCate") === 2 ? "2020-12" : ""}
           />
           {handler.GetPageVal("retired") && (
             <Calendar
