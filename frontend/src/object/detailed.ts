@@ -138,43 +138,34 @@ class DetailedHandler extends InputHandler {
     to_servers: string
   ) => {
     const res = await sendToServer(url ? url : "", to_servers);
-    if (res.statusCode === 400 || res.mesg) {
-      CreatePopup(
-        undefined,
-        res.mesg ? res.mesg : res.message,
-        "only_check",
-        () => ClosePopup()
-      );
-    } else {
-      ClosePopup();
-      calRecording(
-        res,
-        "상세형",
-        workCate === 0
-          ? "정규직"
-          : workCate === 1
-          ? "기간제"
-          : workCate === 2
-          ? this.GetPageVal("is_short")
-          : workCate === 4
-          ? this.GetPageVal("is_short")
-          : workCate === 6
-          ? "일용직"
-          : workCate === 7
-          ? "초단시간"
-          : workCate === 8
-          ? "자영업"
-          : ""
-      );
-      this.setCompState &&
-        this.setCompState(this.GetPageVal("cal_state") !== "multi" ? 5 : 1);
-      if (this.GetPageVal("cal_state") !== "multi") {
-        setTimeout(() => {
-          this.setCompState && this.setCompState(4);
-        }, 1000);
-      }
-      this.SetPageVal("allresult", res);
+    ClosePopup();
+    calRecording(
+      res,
+      "상세형",
+      workCate === 0
+        ? "정규직"
+        : workCate === 1
+        ? "기간제"
+        : workCate === 2
+        ? this.GetPageVal("is_short")
+        : workCate === 4
+        ? this.GetPageVal("is_short")
+        : workCate === 6
+        ? "일용직"
+        : workCate === 7
+        ? "초단시간"
+        : workCate === 8
+        ? "자영업"
+        : ""
+    );
+    this.setCompState &&
+      this.setCompState(this.GetPageVal("cal_state") !== "multi" ? 5 : 1);
+    if (this.GetPageVal("cal_state") !== "multi") {
+      setTimeout(() => {
+        this.setCompState && this.setCompState(4);
+      }, 1000);
     }
+    this.SetPageVal("allresult", res);
   };
 
   public getSumOneYearPay = (arr: any) => {

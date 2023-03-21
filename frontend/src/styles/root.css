@@ -158,6 +158,8 @@
   display: flex;
   align-items: center;
   justify-content: flex-end;
+  padding-top: 0;
+  padding-bottom: 0;
 }
 .reset_button span {
   color: #0089ed;

@@ -204,30 +204,38 @@ const _UnSupplyResult = ({
             <br /> 실업급여를 받으실 수 있습니다.
           </div>
         </div>
+      ) : result_data?.workingDays || result_data?.workingMonths ? (
+        (result_data?.requireDays || result_data?.requireMonths)(
+          <div id="result_unsupply_container" className="bg_color_main">
+            <div className="font_color_white flex_box fs_14">
+              현재 근무{unit === "day" ? "일" : "월"}수 :
+              <span className="unsupply_result_value font_color_white">
+                {Math.ceil(
+                  result_data?.workingDays
+                    ? result_data?.workingDays
+                    : result_data?.workingMonths
+                )}
+              </span>
+              {unit === "day" ? "일" : "개월"}
+            </div>
+            <div className="font_color_white flex_box fs_14">
+              부족한 근무{unit === "day" ? "일" : "월"}수 :{" "}
+              <span className="unsupply_result_value font_color_white">
+                {Math.ceil(
+                  result_data?.requireDays
+                    ? result_data?.requireDays
+                    : result_data?.requireMonths
+                )}
+              </span>
+              {unit === "day" ? "일" : "개월"}
+            </div>
+          </div>
+        )
       ) : (
-        <div id="result_unsupply_container" className="bg_color_main">
-          <div className="font_color_white flex_box fs_14">
-            현재 근무{unit === "day" ? "일" : "월"}수 :
-            <span className="unsupply_result_value font_color_white">
-              {Math.ceil(
-                result_data?.workingDays
-                  ? result_data?.workingDays
-                  : result_data?.workingMonths
-              )}
-            </span>
-            {unit === "day" ? "일" : "개월"}
-          </div>
-          <div className="font_color_white flex_box fs_14">
-            부족한 근무{unit === "day" ? "일" : "월"}수 :{" "}
-            <span className="unsupply_result_value font_color_white">
-              {Math.ceil(
-                result_data?.requireDays
-                  ? result_data?.requireDays
-                  : result_data?.requireMonths
-              )}
-            </span>
-            {unit === "day" ? "일" : "개월"}
-          </div>
+        <div id="result_uns_mesg_container">
+          {result_data.mesg.split(",").map((el: string) => {
+            return <div className="result_uns_mesg font_color_main">{el}</div>;
+          })}
         </div>
       )}
       {average_guide &&
@@ -241,17 +249,18 @@ const _UnSupplyResult = ({
             {average_guide}
           </div>
         ))}
-      {helps?.map((el: string, idx: number) => {
-        return (
-          <HelpLink
-            className={`result_help_link${idx + 1}`}
-            key={Date.now() + idx}
-            text={el}
-            link={helps_to ? helps_to[idx] : "/"}
-            direction="l"
-          />
-        );
-      })}
+      {!result_data.mesg &&
+        helps?.map((el: string, idx: number) => {
+          return (
+            <HelpLink
+              className={`result_help_link${idx + 1}`}
+              key={Date.now() + idx}
+              text={el}
+              link={helps_to ? helps_to[idx] : "/"}
+              direction="l"
+            />
+          );
+        })}
 
       <div id="result_guide_comment03" className="fs_12 flex_right">
         이전에 다녔던 직장이 있다면 <br />
@@ -431,7 +440,13 @@ export const ResultComp = ({
                     : ["저는 여러 건을 합치면 월 평균 기준이 되는데요?"]
                 }
                 helps_to={isShorts === "단기예술인" ? ["/help/6"] : ["/help/8"]}
-                average_guide={isShorts !== "단기예술인" ? "50만원" : ""}
+                average_guide={
+                  result_data.succ &&
+                  result_data.mesg &&
+                  isShorts !== "단기예술인"
+                    ? "50만원"
+                    : ""
+                }
               />
             ))}
           {(cal_type === 3 || cal_type === 5) &&

@@ -16,7 +16,7 @@ export const DetailConfirmPopup = (confirm_data: any) => {
     : "";
   const sumWorkDayFormatted = confirm_data?.sumWorkDay
     ? `${years ? years + "년 " : ""}${
-        remainingMonths ? `${remainingMonths}개월` : ""
+        remainingMonths > 0 ? `${remainingMonths}개월` : "0 개월"
       }`
     : "";
   return (
