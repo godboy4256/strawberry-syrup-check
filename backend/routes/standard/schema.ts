@@ -26,7 +26,7 @@ const standardBodyExamples = [
 
 const standardResponse = {
 	400: {
-		description: "신청일이 퇴직일부터 1년 초과 또는,\n\n입사일이 퇴사일보다 빠름",
+		description: "신청일이 퇴직일부터 1년 초과 또는,\n\n퇴사일이 입사일보다 빠름",
 		type: "object",
 		properties: {
 			succ: { type: "boolean" },

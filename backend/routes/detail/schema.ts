@@ -1,5 +1,5 @@
 import { Dayjs } from "dayjs";
-import { DefineParamInfo } from "../../share/validate";
+import { DefinedParamErrorMesg, DefineParamInfo } from "../../share/validate";
 
 export type TstandardInput = {
 	retired: boolean;
@@ -108,49 +108,317 @@ const standardBodyProp = {
 	retired: DefineParamInfo.retired,
 	workCate: DefineParamInfo.workCate,
 	retireReason: DefineParamInfo.retireReason,
-	age: { type: "number" },
+	age: DefineParamInfo.age,
 	disabled: DefineParamInfo.disabled,
 	enterDay: DefineParamInfo.enterDay,
 	retiredDay: DefineParamInfo.retiredDay,
 	weekDay: DefineParamInfo.weekDay, // 주의
 	dayWorkTime: DefineParamInfo.dayWorkTime,
 	salary: DefineParamInfo.salary,
-	limitDay: { type: "string" },
+	limitDay: DefineParamInfo.limitDay,
+	isMany: DefineParamInfo.isMany,
+};
+
+const standardResponse = {
+	400: {
+		description: "신청일이 퇴직일부터 1년 초과 또는,\n\n퇴사일이 입사일보다 빠름",
+		type: "object",
+		properties: {
+			succ: DefineParamInfo.succ,
+			errorCode: DefineParamInfo.errorCode,
+			mesg: DefineParamInfo.mesg,
+		},
+		examples: [
+			{
+				succ: false,
+				errorCode: 0,
+				mesg: DefinedParamErrorMesg.expire,
+			},
+			{
+				succ: false,
+				errorCode: 1,
+				mesg: DefinedParamErrorMesg.ealryRetire,
+			},
+		],
+	},
+	202: {
+		description: "수급 불인정",
+		type: "object",
+		properties: {
+			succ: DefineParamInfo.succ,
+			errorCode: DefineParamInfo.errorCode,
+			retired: DefineParamInfo.retired,
+			workingDays: DefineParamInfo.workingDays,
+			requireDays: DefineParamInfo.requireDays,
+			realDayPay: DefineParamInfo.realDayPay,
+			dayAvgPay: DefineParamInfo.dayAvgPay,
+			workDayForMulti: DefineParamInfo.workDayForMulti,
+		},
+		examples: [
+			{
+				succ: false,
+				errorCode: 2,
+				retired: true,
+				workingDays: 48,
+				requireDays: 132,
+				realDayPay: 61568,
+				dayAvgPay: 66667,
+				workDayForMulti: 48,
+			},
+		],
+	},
+	200: {
+		description: "수급 인정",
+		type: "object",
+		properties: {
+			succ: DefineParamInfo.succ,
+			retired: DefineParamInfo.retired,
+			amountCost: DefineParamInfo.amountCost,
+			dayAvgPay: DefineParamInfo.dayAvgPay,
+			realDayPay: DefineParamInfo.realDayPay,
+			receiveDay: DefineParamInfo.receiveDay,
+			realMonthPay: DefineParamInfo.realMonthPay,
+			severancePay: DefineParamInfo.severancePay,
+			workingDays: DefineParamInfo.workingDays,
+			workDayForMulti: DefineParamInfo.workDayForMulti,
+			needDay: DefineParamInfo.needDay, // 다음 단계 수급
+			availableDay: DefineParamInfo.availableDay, // 다음 단계 수급
+			nextAmountCost: DefineParamInfo.amountCost, // 다음 단계 수급
+			morePay: DefineParamInfo.morePay, // 다음 단계 수급
+		},
+		examples: [
+			{
+				succ: true,
+				retired: true,
+				amountCost: 14776320,
+				dayAvgPay: 66667,
+				realDayPay: 61568,
+				receiveDay: 240,
+				realMonthPay: 1847040,
+				severancePay: 20054895,
+				workingDays: 401,
+				workDayForMulti: 284,
+			},
+			{
+				succ: true,
+				retired: true,
+				amountCost: 9235200,
+				dayAvgPay: 66667,
+				realDayPay: 61568,
+				receiveDay: 150,
+				realMonthPay: 1847040,
+				severancePay: 4043856,
+				workingDays: 401,
+				needDay: 357,
+				availableDay: "2025-4-28",
+				nextAmountCost: 11082240,
+				morePay: 1847040,
+				workDayForMulti: 284,
+			},
+		],
+	},
 };
 
 const artBodyProp = {
 	retired: DefineParamInfo.retired,
 	workCate: DefineParamInfo.workCate,
-	jobCate: { type: "number", minimum: 0, maximum: 19 },
+	jobCate: DefineParamInfo.jobCate,
 	retireReason: DefineParamInfo.retireReason,
-	age: { type: "number" },
+	age: DefineParamInfo.age,
 	disabled: DefineParamInfo.disabled,
 	enterDay: DefineParamInfo.enterDay,
 	retiredDay: DefineParamInfo.retiredDay,
 	sumTwelveMonthSalary: DefineParamInfo.salary,
-	isSpecial: { type: "boolean" },
-	limitDay: { type: "string" },
-	isMany: { type: "boolean" },
+	isSpecial: DefineParamInfo.isSpecial,
+	limitDay: DefineParamInfo.limitDay,
+	isMany: DefineParamInfo.isMany,
+};
+
+const artResponse = {
+	400: {
+		description:
+			"신청일이 퇴직일부터 1년 초과 또는,\n\n퇴사일이 입사일보다 빠름\n\n예술인/특고로 3개월 이상 근무하지 않은 경우",
+		type: "object",
+		properties: {
+			succ: DefineParamInfo.succ,
+			errorCode: DefineParamInfo.errorCode,
+			mesg: DefineParamInfo.mesg,
+		},
+		examples: [
+			{
+				succ: false,
+				errorCode: 0,
+				mesg: DefinedParamErrorMesg.expire,
+			},
+			{
+				succ: false,
+				errorCode: 1,
+				mesg: DefinedParamErrorMesg.ealryRetire,
+			},
+			{
+				succ: false,
+				errorCode: 3,
+				mesg: DefinedParamErrorMesg.needArtorSpecialCareer,
+			},
+		],
+	},
+	202: {
+		description: "수급 불인정",
+		type: "object",
+		properties: {
+			succ: DefineParamInfo.succ,
+			errorCode: DefineParamInfo.errorCode,
+			retired: DefineParamInfo.retired,
+			workingDays: DefineParamInfo.workingDays,
+			requireMonths: DefineParamInfo.requireDays, // 키 변경 필요
+			realDayPay: DefineParamInfo.realDayPay,
+			dayAvgPay: DefineParamInfo.dayAvgPay,
+			workDayForMulti: DefineParamInfo.workDayForMulti,
+		},
+		examples: [
+			{
+				succ: false,
+				errorCode: 2,
+				retired: true,
+				dayAvgPay: 65754,
+				realDayPay: 39453,
+				workingDays: 253,
+				requireMonths: 17,
+				workDayForMulti: 3.3,
+			},
+		],
+	},
+	200: {
+		description: "수급 인정",
+		type: "object",
+		properties: {
+			succ: DefineParamInfo.succ,
+			retired: DefineParamInfo.retired,
+			amountCost: DefineParamInfo.amountCost,
+			dayAvgPay: DefineParamInfo.dayAvgPay,
+			realDayPay: DefineParamInfo.realDayPay,
+			receiveDay: DefineParamInfo.receiveDay,
+			realMonthPay: DefineParamInfo.realMonthPay,
+			workingDays: DefineParamInfo.workingDays,
+			workDayForMulti: DefineParamInfo.workDayForMulti,
+		},
+		examples: [
+			{
+				succ: true,
+				retired: true,
+				amountCost: 5917950,
+				dayAvgPay: 65754,
+				realDayPay: 39453,
+				receiveDay: 150,
+				realMonthPay: 1183590,
+				workingDays: 731,
+				workDayForMulti: 24,
+			},
+		],
+	},
 };
 
 const shortArtBodyProp = {
 	retired: DefineParamInfo.retired, // 퇴직여부
 	workCate: DefineParamInfo.workCate, // 근로형태
-	jobCate: { type: "number", minimum: 0, maximum: 18 },
+	jobCate: DefineParamInfo.jobCate,
 	retireReason: DefineParamInfo.retireReason, // 퇴직사유
-	age: { type: "number" },
+	age: DefineParamInfo.age,
 	disabled: DefineParamInfo.disabled, // 장애여부
 	lastWorkDay: DefineParamInfo.lastWorkDay, // 마지막 근무일
-	enrollDay: { type: "string" },
-	sumOneYearPay: { type: "number", minimum: 0 }, // 퇴직 전 12개월 급여 총액
-	sumTwoYearWorkDay: { type: "number", minimum: 0 },
-	sumWorkDay: { type: "number", minimum: 0 }, // 마지막 근무일
-	isSpecial: { type: "boolean" },
-	isSimple: { type: "boolean" },
-	isOverTen: { type: "boolean" },
-	hasWork: { type: "boolean" },
-	limitDay: { type: "string" },
-	isMany: { type: "boolean" },
+	enrollDay: DefineParamInfo.enrollDay,
+	sumOneYearPay: DefineParamInfo.sumOneYearPay, // 퇴직 전 12개월 급여 총액
+	sumTwoYearWorkDay: DefineParamInfo.sumTwoYearWorkDay,
+	sumWorkDay: DefineParamInfo.sumWorkDay, // 마지막 근무일
+	isSpecial: DefineParamInfo.isSpecial,
+	isSimple: DefineParamInfo.isSimple,
+	isOverTen: DefineParamInfo.isOverTen,
+	hasWork: DefineParamInfo.hasWork,
+	limitDay: DefineParamInfo.limitDay,
+	isMany: DefineParamInfo.isMany,
+};
+const shortArtResponse = {
+	400: {
+		description:
+			"신청일이 퇴직일부터 1년 초과 또는,\n\n단기 예술인으로 3개월 이상 근무하지 않은 경우\n\n최근 근로 정보 조건이 맞지 않는 겨우",
+		type: "object",
+		properties: {
+			succ: DefineParamInfo.succ,
+			errorCode: DefineParamInfo.errorCode,
+			mesg: DefineParamInfo.mesg,
+		},
+		examples: [
+			{
+				succ: false,
+				errorCode: 0,
+				mesg: DefinedParamErrorMesg.expire,
+			},
+			{
+				succ: false,
+				errorCode: 4,
+				mesg: DefinedParamErrorMesg.needShortArtCareer,
+			},
+			{
+				succ: false,
+				errorCode: 5,
+				mesg: DefinedParamErrorMesg.isOverTen + "," + DefinedParamErrorMesg.hasWork,
+			},
+		],
+	},
+	202: {
+		description: "수급 불인정",
+		type: "object",
+		properties: {
+			succ: DefineParamInfo.succ,
+			errorCode: DefineParamInfo.errorCode,
+			retired: DefineParamInfo.retired,
+			dayAvgPay: DefineParamInfo.dayAvgPay,
+			realDayPay: DefineParamInfo.realDayPay,
+			workingMonths: DefineParamInfo.workingMonths,
+			requireMonths: DefineParamInfo.requireMonths,
+			workDayForMulti: DefineParamInfo.workDayForMulti,
+		},
+		examples: [
+			{
+				succ: false,
+				errorCode: 2,
+				retired: true,
+				dayAvgPay: 52055,
+				realDayPay: 31233,
+				workingMonths: 6.8,
+				requireMonths: 2.2,
+				workDayForMulti: 6.8,
+			},
+		],
+	},
+	200: {
+		description: "수급 인정",
+		type: "object",
+		properties: {
+			succ: DefineParamInfo.succ,
+			retired: DefineParamInfo.retired,
+			amountCost: DefineParamInfo.amountCost,
+			dayAvgPay: DefineParamInfo.dayAvgPay,
+			realDayPay: DefineParamInfo.realDayPay,
+			receiveDay: DefineParamInfo.receiveDay,
+			realMonthPay: DefineParamInfo.realMonthPay,
+			workingMonths: DefineParamInfo.workingMonths,
+			workDayForMulti: DefineParamInfo.workDayForMulti,
+		},
+		examples: [
+			{
+				succ: true,
+				retired: true,
+				amountCost: 4684950,
+				dayAvgPay: 52055,
+				realDayPay: 31233,
+				receiveDay: 150,
+				realMonthPay: 936990,
+				workingMonths: 21.8,
+				workDayForMulti: 21.8,
+			},
+		],
+	},
 };
 
 const shortSepcialBodyProp = {
@@ -171,6 +439,89 @@ const shortSepcialBodyProp = {
 	hasWork: { type: "boolean" },
 	limitDay: { type: "string" },
 	isMany: { type: "boolean" },
+};
+const shortSpecialResponse = {
+	400: {
+		description:
+			"신청일이 퇴직일부터 1년 초과 또는,\n\n단기 특고로 3개월 이상 근무하지 않은 경우\n\n최근 근로 정보 조건이 맞지 않는 겨우",
+		type: "object",
+		properties: {
+			succ: DefineParamInfo.succ,
+			errorCode: DefineParamInfo.errorCode,
+			mesg: DefineParamInfo.mesg,
+		},
+		examples: [
+			{
+				succ: false,
+				errorCode: 0,
+				mesg: DefinedParamErrorMesg.expire,
+			},
+			{
+				succ: false,
+				errorCode: 4,
+				mesg: DefinedParamErrorMesg.needShortSpecialCareer,
+			},
+			{
+				succ: false,
+				errorCode: 5,
+				mesg: DefinedParamErrorMesg.isOverTen + "," + DefinedParamErrorMesg.hasWork,
+			},
+		],
+	},
+	202: {
+		description: "수급 불인정",
+		type: "object",
+		properties: {
+			succ: DefineParamInfo.succ,
+			errorCode: DefineParamInfo.errorCode,
+			retired: DefineParamInfo.retired,
+			dayAvgPay: DefineParamInfo.dayAvgPay,
+			realDayPay: DefineParamInfo.realDayPay,
+			workingMonths: DefineParamInfo.workingMonths,
+			requireMonths: DefineParamInfo.requireMonths,
+			workDayForMulti: DefineParamInfo.workDayForMulti,
+		},
+		examples: [
+			{
+				succ: false,
+				errorCode: 2,
+				retired: true,
+				dayAvgPay: 76713,
+				realDayPay: 46028,
+				workingMonths: 3,
+				requireMonths: 6,
+				workDayForMulti: 3,
+			},
+		],
+	},
+	200: {
+		description: "수급 인정",
+		type: "object",
+		properties: {
+			succ: DefineParamInfo.succ,
+			retired: DefineParamInfo.retired,
+			amountCost: DefineParamInfo.amountCost,
+			dayAvgPay: DefineParamInfo.dayAvgPay,
+			realDayPay: DefineParamInfo.realDayPay,
+			receiveDay: DefineParamInfo.receiveDay,
+			realMonthPay: DefineParamInfo.realMonthPay,
+			workingMonths: DefineParamInfo.workingMonths,
+			workDayForMulti: DefineParamInfo.workDayForMulti,
+		},
+		examples: [
+			{
+				succ: true,
+				retired: true,
+				amountCost: 6904200,
+				dayAvgPay: 76713,
+				realDayPay: 46028,
+				receiveDay: 150,
+				realMonthPay: 1380840,
+				workingMonths: 30,
+				workDayForMulti: 30,
+			},
+		],
+	},
 };
 
 const dayJobBodyProp = {
@@ -247,6 +598,7 @@ export const standardSchema = {
 			],
 			properties: standardBodyProp,
 		},
+		response: standardResponse,
 	},
 };
 
@@ -270,6 +622,7 @@ export const artSchema = {
 			],
 			properties: artBodyProp,
 		},
+		response: artResponse,
 	},
 };
 
@@ -282,6 +635,7 @@ export const shortArtSchema = {
 			required: ["age", "disabled", "lastWorkDay", "hasWork", "isSimple", "limitDay"],
 			properties: shortArtBodyProp,
 		},
+		response: shortArtResponse,
 	},
 };
 export const shortSpecialSchema = {
@@ -293,6 +647,7 @@ export const shortSpecialSchema = {
 			required: ["age", "disabled", "lastWorkDay", "hasWork", "isSimple", "limitDay"],
 			properties: shortSepcialBodyProp,
 		},
+		response: shortSpecialResponse,
 	},
 };
 
