@@ -168,7 +168,7 @@ export const DefineParamInfo = {
 		type: "array",
 		items: {
 			type: "number",
-			mnimum: 0,
+			minimum: 0,
 			maximum: 6,
 		},
 		maxItems: 7,
