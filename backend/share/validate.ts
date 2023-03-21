@@ -180,7 +180,7 @@ export const DefineParamInfo = {
 	},
 };
 
-export const DefinedParamErrorMesg: { [col_: string]: string } = {
+export const DefinedParamErrorMesg = {
 	birth: "생년월일을 입력해 주세요",
 	disabled: "장애여부를 선택해 주세요",
 	enterDay: "입사일 및 퇴사일을 입력해 주세요",
@@ -190,4 +190,6 @@ export const DefinedParamErrorMesg: { [col_: string]: string } = {
 	expire: "수급기간(퇴직 후 1년)이 경과하면 실업급여가 지급되지 않습니다.",
 	isOverTen: "신청일 이전 1달 간 근로일수가 10일 미만이어야 합니다.",
 	hasWork: "신청일 이전 14일간 연속근로내역이 없어야 합니다.",
+	needArtorSpecialCareer: "예술인/특고로 3개월 이상 근무해야합니다.",
+	needShortArtCareer: "단기 예술인으로 3개월 이상 근무해야합니다.",
 };

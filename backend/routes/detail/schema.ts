@@ -132,12 +132,12 @@ const standardResponse = {
 			{
 				succ: false,
 				errorCode: 0,
-				mesg: "실업급여는 퇴직한 다음날부터 12개월이 경과하면\t지급 받을 수 없습니다.",
+				mesg: DefinedParamErrorMesg.expire,
 			},
 			{
 				succ: false,
 				errorCode: 1,
-				mesg: "퇴사일이 입사일보다 빠릅니다.",
+				mesg: DefinedParamErrorMesg.ealryRetire,
 			},
 		],
 	},
@@ -248,17 +248,17 @@ const artResponse = {
 			{
 				succ: false,
 				errorCode: 0,
-				mesg: "실업급여는 퇴직한 다음날부터 12개월이 경과하면\t지급 받을 수 없습니다.",
+				mesg: DefinedParamErrorMesg.expire,
 			},
 			{
 				succ: false,
 				errorCode: 1,
-				mesg: "퇴사일이 입사일보다 빠릅니다.",
+				mesg: DefinedParamErrorMesg.ealryRetire,
 			},
 			{
 				succ: false,
 				errorCode: 3,
-				mesg: "예술인/특고로 3개월 이상 근무해야합니다.",
+				mesg: DefinedParamErrorMesg.needArtorSpecialCareer,
 			},
 		],
 	},
@@ -356,7 +356,7 @@ const shortArtResponse = {
 			{
 				succ: false,
 				errorCode: 4,
-				mesg: "단기 예술인으로 3개월 이상 근무해야합니다.",
+				mesg: DefinedParamErrorMesg.needShortArtCareer,
 			},
 			{
 				succ: false,

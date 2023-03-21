@@ -175,7 +175,7 @@ export default function detailRoute(fastify: FastifyInstance, options: any, done
 			if (employmentDate < 90)
 				return res
 					.code(400)
-					.send({ succ: false, errorCode: 3, mesg: "예술인/특고로 3개월 이상 근무해야합니다." });
+					.send({ succ: false, errorCode: 3, mesg: DefinedParamErrorMesg.needArtorSpecialCareer });
 
 			// 3. 급여 산정
 			const sumOneYearWorkDay = calSumOneYearWorkDay(mainData.retiredDay);
