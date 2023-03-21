@@ -76,15 +76,22 @@
  */
 
 export const DefineParamInfo = {
+	/**퇴사여부*/
 	retired: {
-		// 퇴사여부
 		type: "boolean",
 	},
+	/**만나이 */
+	age: {
+		type: "number",
+		minimum: 0,
+		maximum: 200,
+	},
+	/**퇴직금 */
 	severancePay: {
-		// 퇴직금
 		type: "number",
 		minimum: 0,
 	},
+	/**급여 */
 	salary: {
 		type: "array",
 		items: {
@@ -95,29 +102,17 @@ export const DefineParamInfo = {
 		minItems: 1,
 		maxItems: 3,
 	},
+	/**근로형태 */
 	workCate: {
-		// 근로형태
 		type: "number",
 		minimum: 0,
 		maximum: 8,
 	},
+	/**퇴직사유 */
 	retireReason: {
-		// 퇴직사유
 		type: "number",
 		minimum: 0,
 		maximum: 12,
-	},
-	subYear: {
-		// 총 고용보험 가입 기간 (년)(단기예술인 등)
-		type: "number",
-		minimum: 0,
-		maximum: 50,
-	},
-	subMonth: {
-		// 총 고용보험 가입 기간 (월)(단기예술인 등)
-		type: "number",
-		minimum: 0,
-		maximum: 11,
 	},
 	weekWorkTime: {
 		// 주 근무시간 (초단시간 등)
@@ -137,30 +132,48 @@ export const DefineParamInfo = {
 		minimum: 1,
 		maximum: 10,
 	},
+	/**입사일 */
 	enterDay: {
-		// 입사일
 		type: "string",
+		pattern: "^(d{4})-(0?[1-9]|1[012])-(0?[1-9]|[12][0-9]|3[01])$",
 	},
+	/**퇴사일 */
 	retiredDay: {
-		// 퇴사일
 		type: "string",
+		pattern: "^(d{4})-(0?[1-9]|1[012])-(0?[1-9]|[12][0-9]|3[01])$",
 	},
-	birth: {
-		// 생일
-		type: "string",
+	/**근로일수 */
+	workingDays: {
+		type: "number",
 	},
+	/**부족근로일수 */
+	requireDays: {
+		type: "number",
+	},
+	/**근로월수 */
+	workingMonths: {
+		type: "number",
+	},
+	/**부족근로월수 */
+	requireMonths: {
+		type: "number",
+	},
+
+	/**장애여부 */
 	disabled: {
-		// 장애여부
 		type: "boolean",
 	},
+	/**근무요일 */
 	weekDay: {
-		// 근무요일
 		type: "array",
 		items: {
 			type: "number",
+			mnimum: 0,
+			maximum: 6,
 		},
 		maxItems: 7,
 	},
+	/**일 소정근로시간 */
 	dayWorkTime: {
 		type: "number",
 		minimum: 4,
@@ -172,11 +185,112 @@ export const DefineParamInfo = {
 	lastWorkDay: {
 		type: "string",
 	},
-	workRecord: {
-		type: "array",
-		items: {
-			type: "object",
-		},
+	// workRecord: {
+	// 	type: "array",
+	// 	items: {
+	// 		type: "object",
+	// 	},
+	// },
+	/**실업급여 신청 근로의 퇴직일을 기준으로 계산한 피보험단위기간 계산 기한 */
+	limitDay: {
+		type: "string",
+		pattern: "^(d{4})-(0?[1-9]|1[012])-(0?[1-9]|[12][0-9]|3[01])$",
+	},
+	/**복수형 여부 */
+	isMany: {
+		type: "boolean",
+	},
+	/**수급 인정/불인정 여부 */
+	succ: {
+		type: "boolean",
+	},
+	errorCode: {
+		type: "number",
+		minimum: 0,
+		maximum: 11,
+	},
+	mesg: {
+		type: "string",
+	},
+	/**일 수령액 */
+	realDayPay: {
+		type: "number",
+		minimum: 0,
+	},
+	/**월 수령액 */
+	realMonthPay: {
+		type: "number",
+	},
+	/**기초일액 */
+	dayAvgPay: {
+		type: "number",
+		minimum: 0,
+	},
+	/**limitDay 기한 내에 피보험기간(복수형에서 사용)  */
+	workDayForMulti: {
+		type: "number",
+	},
+	/**실업급여 수령 총액 */
+	amountCost: {
+		type: "number",
+		minimum: 0,
+	},
+	/**소정급여일수 */
+	receiveDay: {
+		type: "number",
+		minimum: 120,
+		maximum: 270,
+	},
+	/**다음단계 수급을 위해서 필요한 근로일수 */
+	needDay: {
+		type: "number",
+	},
+	/**다음단계 수급 조건 예상 만족일 */
+	availableDay: {
+		type: "string",
+	},
+	/**다음단계 수급 시 현재 수령액과 비교하여 더 받는 금액 */
+	morePay: {
+		type: "number",
+	},
+	/**특고 직종 */
+	jobCate: {
+		type: "number",
+		minimum: 0,
+		maximum: 18,
+	},
+	/**특고 여부 */
+	isSpecial: {
+		type: "boolean",
+	},
+	/**실업급여 신청일 */
+	enrollDay: {
+		type: "string",
+		pattern: "^(d{4})-(0?[1-9]|1[012])-(0?[1-9]|[12][0-9]|3[01])$",
+	},
+	/**퇴직 전 12개월 급여 총액 */
+	sumOneYearPay: { type: "number", minimum: 0 },
+	/**퇴직 전 24개월 피보험단위기간*/
+	sumTwoYearWorkDay: {
+		type: "number",
+		minimum: 0,
+	},
+	/**피보험기간 */
+	sumWorkDay: {
+		type: "number",
+		minimum: 0,
+	},
+	/**결과만입력 여부 */
+	isSimple: {
+		type: "boolean",
+	},
+	/**신청일 이전 1달 간 근로일수 10일 미만 여부 */
+	isOverTen: {
+		type: "boolean",
+	},
+	/**신청일 이전 14일간 연속근로 여부 */
+	hasWork: {
+		type: "boolean",
 	},
 };
 
