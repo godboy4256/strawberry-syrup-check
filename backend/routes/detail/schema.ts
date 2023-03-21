@@ -1,5 +1,5 @@
 import { Dayjs } from "dayjs";
-import { DefineParamInfo } from "../../share/validate";
+import { DefinedParamErrorMesg, DefineParamInfo } from "../../share/validate";
 
 export type TstandardInput = {
 	retired: boolean;
@@ -337,6 +337,89 @@ const shortArtBodyProp = {
 	limitDay: { type: "string" },
 	isMany: { type: "boolean" },
 };
+const shortArtResponse = {
+	400: {
+		description:
+			"신청일이 퇴직일부터 1년 초과 또는,\n\n단기 예술인으로 3개월 이상 근무하지 않은 경우\n\n최근 근로 정보 조건이 맞지 않는 겨우",
+		type: "object",
+		properties: {
+			succ: { type: "boolean" },
+			errorCode: { type: "number" },
+			mesg: { type: "string" },
+		},
+		examples: [
+			{
+				succ: false,
+				errorCode: 0,
+				mesg: DefinedParamErrorMesg.expire,
+			},
+			{
+				succ: false,
+				errorCode: 4,
+				mesg: "단기 예술인으로 3개월 이상 근무해야합니다.",
+			},
+			{
+				succ: false,
+				errorCode: 5,
+				mesg: DefinedParamErrorMesg.isOverTen + "," + DefinedParamErrorMesg.hasWork,
+			},
+		],
+	},
+	202: {
+		description: "수급 불인정",
+		type: "object",
+		properties: {
+			succ: { type: "boolean" },
+			errorCode: { type: "number" },
+			retired: { type: "boolean" },
+			dayAvgPay: { type: "number" },
+			realDayPay: { type: "number" },
+			workingMonths: { type: "number" },
+			requireMonths: { type: "number" },
+			workDayForMulti: { type: "number" },
+		},
+		examples: [
+			{
+				succ: false,
+				errorCode: 2,
+				retired: true,
+				dayAvgPay: 52055,
+				realDayPay: 31233,
+				workingMonths: 6.8,
+				requireMonths: 2.2,
+				workDayForMulti: 6.8,
+			},
+		],
+	},
+	200: {
+		description: "수급 인정",
+		type: "object",
+		properties: {
+			succ: { type: "boolean" },
+			retired: { type: "boolean" },
+			amountCost: { type: "number" },
+			dayAvgPay: { type: "number" },
+			realDayPay: { type: "number" },
+			receiveDay: { type: "number" },
+			realMonthPay: { type: "number" },
+			workingMonths: { type: "number" },
+			workDayForMulti: { type: "number" },
+		},
+		examples: [
+			{
+				succ: true,
+				retired: true,
+				amountCost: 4684950,
+				dayAvgPay: 52055,
+				realDayPay: 31233,
+				receiveDay: 150,
+				realMonthPay: 936990,
+				workingMonths: 21.8,
+				workDayForMulti: 21.8,
+			},
+		],
+	},
+};
 
 const shortSepcialBodyProp = {
 	retired: DefineParamInfo.retired, // 퇴직여부
@@ -469,6 +552,7 @@ export const shortArtSchema = {
 			required: ["age", "disabled", "lastWorkDay", "hasWork", "isSimple", "limitDay"],
 			properties: shortArtBodyProp,
 		},
+		response: shortArtResponse,
 	},
 };
 export const shortSpecialSchema = {
