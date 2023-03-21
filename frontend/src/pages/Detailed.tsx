@@ -1,10 +1,4 @@
-import {
-  Dispatch,
-  ReactElement,
-  SetStateAction,
-  useEffect,
-  useState,
-} from "react";
+import { ReactElement, useEffect, useState } from "react";
 import CalIsRetiree from "../components/calculator/IsRetiree";
 import { DateInputNormal } from "../components/inputs/Date";
 import Header from "../components/layout/Header";
@@ -28,8 +22,11 @@ import { ClosePopup, CreatePopup } from "../components/common/popup";
 import Calendar from "../components/inputs/Calendar";
 import ResetButton from "../components/inputs/resetButton";
 import { useRecoilState, useRecoilValue } from "recoil";
-import { duplicationDateCheck } from "../assets/atom/multi";
-import { Get_Dates_InRange } from "../utils/date";
+import {
+  duplicationDateCheck,
+  duplicationWorkRecord,
+} from "../assets/atom/multi";
+import { Get_Dates_InRange, Get_Months_Between_Dates } from "../utils/date";
 import { disabledCheck } from "../assets/atom/checkbox";
 import {
   tabBelongArtIsShort,
@@ -66,7 +63,6 @@ const _Belong_Form_Tab = ({
         : tabBelongSpecialIsShort
       : tabBelongInput
   );
-  console.log("리렌ㅁ더");
   return (
     <>
       <>
@@ -270,13 +266,7 @@ const _DetailCalDayJob = ({ handler }: { handler: any }) => {
     </>
   );
 };
-const _DetailCalArt = ({
-  handler,
-  select_date,
-}: {
-  handler: any;
-  select_date: Dispatch<SetStateAction<any>> | undefined;
-}) => {
+const _DetailCalArt = ({ handler }: { handler: any }) => {
   useEffect(() => {
     handler.SetPageVal("input", "개별 입력");
     handler.SetPageVal(
@@ -489,8 +479,13 @@ export const DetailCalComp = ({
   handler: any;
   clickCallBack: CallableFunction;
 }) => {
+  const new_arr: any = [];
+  const new_arr2: any = [];
   const [check_select_date, setState] =
     useRecoilState<any>(duplicationDateCheck);
+  const [check_select_months, setState2] = useRecoilState<any>(
+    duplicationWorkRecord
+  );
   const disabled = useRecoilValue(disabledCheck);
   return (
     <div id={`${workCate !== 6 ? "detail_comp_container" : ""}`}>
@@ -525,12 +520,7 @@ export const DetailCalComp = ({
           <_DetailCalStandad handler={handler} />
         )}
         {(workCate === 2 || workCate === 3) && (
-          <_DetailCalArt
-            handler={handler}
-            select_date={
-              handler.GetPageVal("cal_state") === "multi" ? setState : undefined
-            }
-          />
+          <_DetailCalArt handler={handler} />
         )}
         {workCate === 4 && <_DetailCalDayJob handler={handler} />}
         {workCate === 5 && <_DetailCalVeryShort handler={handler} />}
@@ -544,14 +534,24 @@ export const DetailCalComp = ({
           type="bottom"
           click_func={() => {
             if (handler.GetPageVal("cal_state") === "multi") {
-              const addRange = Get_Dates_InRange(
-                handler.GetPageVal("enterDay"),
-                handler.GetPageVal("retiredDay")
-              );
-              const new_arr = [];
+              const addRange = handler.GetPageVal("date_check")
+                ? handler.GetPageVal("date_check")
+                : Get_Dates_InRange(
+                    handler.GetPageVal("enterDay"),
+                    handler.GetPageVal("retiredDay")
+                  );
+              const addRangeMonth = handler.GetPageVal("date_check_month")
+                ? handler.GetPageVal("date_check_month")
+                : Get_Months_Between_Dates(
+                    handler.GetPageVal("enterDay"),
+                    handler.GetPageVal("retiredDay")
+                  );
               new_arr.push(...check_select_date);
               new_arr.push(...addRange);
+              new_arr2.push(...check_select_months);
+              new_arr2.push(...addRangeMonth);
               setState(new_arr);
+              setState2(new_arr2);
             }
             clickCallBack();
           }}

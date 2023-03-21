@@ -130,6 +130,13 @@ const Calendar = ({
     if (params === "year") {
       setDays(Days_Option_Generater(Number(value), month));
       setYear(Number(value));
+      if (value === min_year) {
+        setMonth(Number(min_month));
+      } else if (value === max_year) {
+        setMonth(Number(max_month));
+      } else {
+        setMonth(1);
+      }
     } else {
       setDays(Days_Option_Generater(year, Number(value)));
       setMonth(Number(value));
@@ -227,11 +234,14 @@ const Calendar = ({
                   return (
                     <div
                       className={` ${
-                        (params === "retiredDay" || params === "enterDay") &&
-                        multi_dup_check &&
-                        multi_dup_check.includes(
-                          `${String(year)}-${String(month)}-${el}`
-                        )
+                        (new Date().getFullYear() === year &&
+                          new Date().getMonth() + 1 === month &&
+                          new Date().getDate() < Number(el)) ||
+                        ((params === "retiredDay" || params === "enterDay") &&
+                          multi_dup_check &&
+                          multi_dup_check.includes(
+                            `${String(year)}-${String(month)}-${el}`
+                          ))
                           ? "unset_dates"
                           : ""
                       } ${

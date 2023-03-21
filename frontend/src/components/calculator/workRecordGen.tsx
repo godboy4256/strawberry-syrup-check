@@ -1,5 +1,9 @@
 import {
+  Convert_To_Date_String,
+  Convert_To_Motths_String,
   GetDateArr,
+  Get_Dates_InRange,
+  Get_Months_Between_Dates,
   Month_Calculator,
   Year_Option_Generater,
 } from "../../utils/date";
@@ -16,8 +20,12 @@ import IMGPrev from "../../assets/image/new/i_date_prev.svg";
 import IMGNext from "../../assets/image/new/i_date_next.svg";
 import { ClosePopup, CreatePopup } from "../common/popup";
 import "../../styles/work_record_gen.css";
-import { useRecoilState } from "recoil";
+import { useRecoilState, useRecoilValue } from "recoil";
 import { workRecordState } from "../../assets/atom/workRecordGen";
+import {
+  duplicationDateCheck,
+  duplicationWorkRecord,
+} from "../../assets/atom/multi";
 
 type WorkRecordGenTypes = {
   label?: string;
@@ -26,6 +34,7 @@ type WorkRecordGenTypes = {
 };
 
 const _PopUpInvidual = ({
+  is_multi,
   onChangeFunc,
   lastWorkDay,
   year,
@@ -33,6 +42,9 @@ const _PopUpInvidual = ({
   type,
   workCate,
 }: any) => {
+  const check_date_list: any = is_multi
+    ? useRecoilValue(duplicationWorkRecord)
+    : undefined;
   let lastYear = GetDateArr(lastWorkDay)[0],
     locationPage = 0;
   const lastMonth = GetDateArr(lastWorkDay)[1],
@@ -140,6 +152,8 @@ const _PopUpInvidual = ({
                     >
                       <div
                         className={`indiviual_input_header ${
+                          (check_date_list &&
+                            check_date_list.includes(`${year}-${it}`)) ||
                           (workCate === 2 && 2020 === year && it < 12) ||
                           (lastYear === year && lastMonth < it)
                             ? "unset_header"
@@ -148,7 +162,9 @@ const _PopUpInvidual = ({
                       >
                         {it} 월
                       </div>
-                      {(lastYear === year && lastMonth < it) ||
+                      {(check_date_list &&
+                        check_date_list.includes(`${year}-${it}`)) ||
+                      (lastYear === year && lastMonth < it) ||
                       (workCate === 2 && 2020 === year && it < 12) ? (
                         <>
                           <div className="unset_box">unset</div>
@@ -280,7 +296,11 @@ const _onClickPopUpInvidual = (
   lastWorkDay: string,
   handler: any,
   setSelectYears: Dispatch<SetStateAction<number[]>>,
-  type: "dayJob" | "shorts"
+  type: "dayJob" | "shorts",
+  check_select_date: any,
+  check_select_months: any,
+  setState: any,
+  setState2: any
 ) => {
   const workRecordUnitsDays: any = {};
   const workRecordUnitsPays: any = {};
@@ -307,6 +327,7 @@ const _onClickPopUpInvidual = (
   CreatePopup(
     `${String(year)} 년`,
     <_PopUpInvidual
+      is_multi={handler.GetPageVal("cal_state") === "multi" ? true : false}
       onChangeFunc={onChageMonthsGen}
       lastWorkDay={lastWorkDay}
       year={year}
@@ -361,7 +382,11 @@ const _onClickPopUpInvidual = (
               lastWorkDay,
               handler,
               setSelectYears,
-              type
+              type,
+              check_select_date,
+              check_select_months,
+              setState,
+              setState2
             ),
           undefined,
           "확인"
@@ -398,13 +423,21 @@ const _onClickPopUpInvidual = (
               unit,
             ]
           : [...handler.GetPageVal("workRecord"), unit];
-
       handler.SetPageVal("workRecord", currentWorkRecord);
+      if (handler.GetPageVal("cal_state") === "multi") {
+        handler.SetPageVal(
+          "date_check",
+          Convert_To_Date_String(currentWorkRecord)
+        );
+        handler.SetPageVal(
+          "date_check_month",
+          Convert_To_Motths_String(currentWorkRecord)
+        );
+      }
       ClosePopup();
     }
   );
 };
-
 const WorkRecordGen = ({
   label = "개별 입력란",
   handler,
@@ -412,6 +445,11 @@ const WorkRecordGen = ({
 }: WorkRecordGenTypes) => {
   const current_year_list = Year_Option_Generater(10);
   const [selectYears, setSelectYears] = useRecoilState(workRecordState);
+  const [check_select_date, setState] =
+    useRecoilState<any>(duplicationDateCheck);
+  const [check_select_months, setState2] = useRecoilState<any>(
+    duplicationWorkRecord
+  );
   useEffect(() => {
     handler.SetPageVal("workRecord", []);
   }, []);
@@ -441,7 +479,11 @@ const WorkRecordGen = ({
                   handler.GetPageVal("lastWorkDay"),
                   handler,
                   setSelectYears,
-                  type
+                  type,
+                  check_select_date,
+                  check_select_months,
+                  setState,
+                  setState2
                 );
               }}
               key={String(Date.now()) + el}

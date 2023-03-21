@@ -437,7 +437,7 @@ export const DateInputNormal = ({
               undefined,
               "최근 근로일을 1일 이상 선택하세요.",
               "only_check",
-              () => {},
+              () => ClosePopup(),
               () => {},
               "확인"
             );

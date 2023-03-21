@@ -85,3 +85,54 @@ export const Get_Dates_InRange = (startDate: string, endDate: string) => {
 
   return dates;
 };
+
+export const Get_Months_Between_Dates = (
+  startDate: string,
+  endDate: string
+) => {
+  const startYear = new Date(startDate).getFullYear();
+  const endYear = new Date(endDate).getFullYear();
+  const startMonth = new Date(startDate).getMonth();
+  const endMonth = new Date(endDate).getMonth();
+  const months = [];
+  for (let year = startYear; year <= endYear; year++) {
+    const start = year === startYear ? startMonth : 0;
+    const end = year === endYear ? endMonth : 11;
+    for (let month = start; month <= end; month++) {
+      const monthString = `${year}-${month + 1}`;
+      months.push(monthString);
+    }
+  }
+  return months;
+};
+
+export const Convert_To_Date_String = (record: any) => {
+  const result = [];
+  for (let yearRecord of record) {
+    const year = yearRecord.year;
+    for (let i = 0; i < 12; i++) {
+      const month = i + 1;
+      const daysInMonth = new Date(year, month, 0).getDate();
+      for (let day = 1; day <= daysInMonth; day++) {
+        const dateStr = `${year}-${month}-${day}`;
+        const monthRecord = yearRecord.months.find(
+          (m: any) => m.month === month
+        );
+        if (monthRecord) {
+          result.push(dateStr);
+        }
+      }
+    }
+  }
+  return result;
+};
+
+export const Convert_To_Motths_String = (record: any) => {
+  const result = [];
+  for (let i = 0; i < record.length; i++) {
+    for (let j = 0; j < record[i].months.length; j++) {
+      result.push(`${record[i].year}-${record[i].months[j].month}`);
+    }
+  }
+  return result;
+};
