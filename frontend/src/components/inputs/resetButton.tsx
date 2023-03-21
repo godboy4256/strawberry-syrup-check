@@ -155,8 +155,11 @@ const ResetButton = ({
   };
 
   useEffect(() => {
-    setAgeState("");
-    setDisbled("비장애인");
+    if (handler.GetPageVal("cal_state") !== "multi") {
+      setAgeState("");
+      setDisbled("비장애인");
+    }
+    setLastWorkDayState("");
     setTabStateIsShortArt("예술인");
     setTabStateIsShortSpecial("특고");
     setTabStateInput("개별 입력");

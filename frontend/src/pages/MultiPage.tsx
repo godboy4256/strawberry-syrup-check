@@ -395,7 +395,7 @@ const _MultiCompanyList = () => {
             />
           );
         })}
-        <div className="fs_14">* 주의 : 근무기간 중복</div>
+        {/* <div className="fs_14">* 주의 : 근무기간 중복</div> */}
         <button
           id="company_add_btn"
           onClick={() => {
