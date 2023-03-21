@@ -396,22 +396,7 @@ export default function detailRoute(fastify: FastifyInstance, options: any, done
 		// 9. 소정급여일수 계산
 		const receiveDay = getReceiveDay(workingYear, mainData.age, mainData.disabled);
 
-		// 10. 다음단계 수급
-		const [requireWorkingYear, nextReceiveDay] = getNextReceiveDay(workingYear, mainData.age, mainData.disabled);
-
 		// 11. 결과 리턴
-		if (!nextReceiveDay)
-			return {
-				succ: true,
-				retired: mainData.retired,
-				amountCost: realDayPay * receiveDay,
-				dayAvgPay,
-				realDayPay,
-				receiveDay,
-				realMonthPay,
-				workingMonths: mainData.sumWorkDay,
-				workDayForMulti,
-			};
 		return {
 			succ: true,
 			retired: mainData.retired,
@@ -421,9 +406,6 @@ export default function detailRoute(fastify: FastifyInstance, options: any, done
 			receiveDay,
 			realMonthPay,
 			workingMonths: mainData.sumWorkDay,
-			needMonth: Math.floor((requireWorkingYear * 12 - mainData.sumWorkDay) * 10) / 10,
-			nextAmountCost: nextReceiveDay * realDayPay,
-			morePay: nextReceiveDay * realDayPay - realDayPay * receiveDay,
 			workDayForMulti,
 		};
 	});
