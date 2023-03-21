@@ -440,6 +440,89 @@ const shortSepcialBodyProp = {
 	limitDay: { type: "string" },
 	isMany: { type: "boolean" },
 };
+const shortSpecialResponse = {
+	400: {
+		description:
+			"신청일이 퇴직일부터 1년 초과 또는,\n\n단기 특고로 3개월 이상 근무하지 않은 경우\n\n최근 근로 정보 조건이 맞지 않는 겨우",
+		type: "object",
+		properties: {
+			succ: DefineParamInfo.succ,
+			errorCode: DefineParamInfo.errorCode,
+			mesg: DefineParamInfo.mesg,
+		},
+		examples: [
+			{
+				succ: false,
+				errorCode: 0,
+				mesg: DefinedParamErrorMesg.expire,
+			},
+			{
+				succ: false,
+				errorCode: 4,
+				mesg: DefinedParamErrorMesg.needShortSpecialCareer,
+			},
+			{
+				succ: false,
+				errorCode: 5,
+				mesg: DefinedParamErrorMesg.isOverTen + "," + DefinedParamErrorMesg.hasWork,
+			},
+		],
+	},
+	202: {
+		description: "수급 불인정",
+		type: "object",
+		properties: {
+			succ: DefineParamInfo.succ,
+			errorCode: DefineParamInfo.errorCode,
+			retired: DefineParamInfo.retired,
+			dayAvgPay: DefineParamInfo.dayAvgPay,
+			realDayPay: DefineParamInfo.realDayPay,
+			workingMonths: DefineParamInfo.workingMonths,
+			requireMonths: DefineParamInfo.requireMonths,
+			workDayForMulti: DefineParamInfo.workDayForMulti,
+		},
+		examples: [
+			{
+				succ: false,
+				errorCode: 2,
+				retired: true,
+				dayAvgPay: 76713,
+				realDayPay: 46028,
+				workingMonths: 3,
+				requireMonths: 6,
+				workDayForMulti: 3,
+			},
+		],
+	},
+	200: {
+		description: "수급 인정",
+		type: "object",
+		properties: {
+			succ: DefineParamInfo.succ,
+			retired: DefineParamInfo.retired,
+			amountCost: DefineParamInfo.amountCost,
+			dayAvgPay: DefineParamInfo.dayAvgPay,
+			realDayPay: DefineParamInfo.realDayPay,
+			receiveDay: DefineParamInfo.receiveDay,
+			realMonthPay: DefineParamInfo.realMonthPay,
+			workingMonths: DefineParamInfo.workingMonths,
+			workDayForMulti: DefineParamInfo.workDayForMulti,
+		},
+		examples: [
+			{
+				succ: true,
+				retired: true,
+				amountCost: 6904200,
+				dayAvgPay: 76713,
+				realDayPay: 46028,
+				receiveDay: 150,
+				realMonthPay: 1380840,
+				workingMonths: 30,
+				workDayForMulti: 30,
+			},
+		],
+	},
+};
 
 const dayJobBodyProp = {
 	retired: DefineParamInfo.retired, // 퇴직여부
@@ -564,6 +647,7 @@ export const shortSpecialSchema = {
 			required: ["age", "disabled", "lastWorkDay", "hasWork", "isSimple", "limitDay"],
 			properties: shortSepcialBodyProp,
 		},
+		response: shortSpecialResponse,
 	},
 };
 

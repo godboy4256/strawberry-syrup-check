@@ -306,4 +306,5 @@ export const DefinedParamErrorMesg = {
 	hasWork: "신청일 이전 14일간 연속근로내역이 없어야 합니다.",
 	needArtorSpecialCareer: "예술인/특고로 3개월 이상 근무해야합니다.",
 	needShortArtCareer: "단기 예술인으로 3개월 이상 근무해야합니다.",
+	needShortSpecialCareer: "단기 특고로 3개월 이상 근무해야합니다.",
 };
