@@ -207,20 +207,8 @@ export const calVeryShortWorkDay = (limitDay: dayjs.Dayjs, retiredDay: dayjs.Day
 	let workDay = (diffToRetired - diffToLimit - 1) * weekDay.length;
 
 	const diffRetiredAndLimit = retiredDay.diff(limitDay, "day");
-	console.log(diffRetiredAndLimit);
 	if (diffRetiredAndLimit <= 7) {
-		console.log("Hi");
-		// if (weekDay.length === 2) {
-		// 	console.log("hi02", retiredDay.day());
-		// 	if (retiredDay.day() >= weekDay[1]) return 2;
-		// 	console.log("hi03", retiredDay.day());
-		// 	if (retiredDay.day() >= weekDay[0]) return 1;
-		// 	console.log("hi04");
-		// 	return workDay;
-		// }
-		// if (retiredDay.day() >= weekDay[0]) return 1;
 		return weekDay.length - weekDay.findIndex(findLimitDayIndex) + (weekDay.findIndex(findRetiredDayIndex) + 1);
-		// return 0
 	}
 
 	if (limitDay.day() <= weekDay[0]) {

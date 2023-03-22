@@ -340,7 +340,7 @@ const shortArtBodyProp = {
 const shortArtResponse = {
 	400: {
 		description:
-			"신청일이 퇴직일부터 1년 초과 또는,\n\n단기 예술인으로 3개월 이상 근무하지 않은 경우\n\n최근 근로 정보 조건이 맞지 않는 겨우",
+			"신청일이 퇴직일부터 1년 초과 또는,\n\n단기 예술인으로 3개월 이상 근무하지 않은 경우\n\n최근 근로 정보 조건이 맞지 않는 경우",
 		type: "object",
 		properties: {
 			succ: DefineParamInfo.succ,
@@ -443,7 +443,7 @@ const shortSepcialBodyProp = {
 const shortSpecialResponse = {
 	400: {
 		description:
-			"신청일이 퇴직일부터 1년 초과 또는,\n\n단기 특고로 3개월 이상 근무하지 않은 경우\n\n최근 근로 정보 조건이 맞지 않는 겨우",
+			"신청일이 퇴직일부터 1년 초과 또는,\n\n단기 특고로 3개월 이상 근무하지 않은 경우\n\n최근 근로 정보 조건이 맞지 않는 경우",
 		type: "object",
 		properties: {
 			succ: DefineParamInfo.succ,
@@ -528,19 +528,111 @@ const dayJobBodyProp = {
 	retired: DefineParamInfo.retired, // 퇴직여부
 	workCate: DefineParamInfo.workCate, // 근로형태
 	retireReason: DefineParamInfo.retireReason, // 퇴직사유
-	age: { type: "number", minimum: 0 },
+	age: DefineParamInfo.age,
 	disabled: DefineParamInfo.disabled, // 장애여부
-	isSpecial: { type: "boolean" }, // 건설직 여부
 	lastWorkDay: DefineParamInfo.lastWorkDay, // 마지막 근무일
-	enrollDay: { type: "string" }, // 신청 예정일
+	enrollDay: DefineParamInfo.enrollDay, // 신청 예정일
 	dayWorkTime: DefineParamInfo.dayWorkTime, // 소정 근로시간
-	isSimple: { type: "boolean" },
-	dayAvgPay: { type: "number", minimum: 0 },
-	sumWorkDay: { type: "number", minimum: 0 },
-	isOverTen: { type: "boolean" },
-	hasWork: { type: "boolean" },
-	limitDay: { type: "string" },
-	isMany: { type: "boolean" },
+	dayAvgPay: DefineParamInfo.dayAvgPay,
+	sumWorkDay: DefineParamInfo.sumWorkDay,
+	hasWork: DefineParamInfo.hasWork,
+	limitDay: DefineParamInfo.limitDay,
+	isSpecial: DefineParamInfo.isSpecial, // 건설직 여부
+	isSimple: DefineParamInfo.isSimple,
+	isOverTen: DefineParamInfo.isOverTen,
+	isMany: DefineParamInfo.isMany,
+};
+const dayJobResponse = {
+	400: {
+		description: "신청일이 퇴직일부터 1년 초과 또는,\n\n최근 근로 정보 조건이 맞지 않는 경우",
+		type: "object",
+		properties: {
+			succ: DefineParamInfo.succ,
+			errorCode: DefineParamInfo.errorCode,
+			mesg: DefineParamInfo.mesg,
+		},
+		examples: [
+			{
+				succ: false,
+				errorCode: 0,
+				mesg: DefinedParamErrorMesg.expire,
+			},
+			{
+				succ: false,
+				errorCode: 5,
+				mesg: DefinedParamErrorMesg.isOverTen + "," + DefinedParamErrorMesg.hasWork,
+			},
+			{
+				succ: false,
+				errorCode: 11,
+				mesg: DefinedParamErrorMesg.isOverTen,
+			},
+		],
+	},
+	202: {
+		description: "수급 불인정",
+		type: "object",
+		properties: {
+			succ: DefineParamInfo.succ,
+			errorCode: DefineParamInfo.errorCode,
+			retired: DefineParamInfo.retired,
+			workingDay: DefineParamInfo.workingDays,
+			requireDays: DefineParamInfo.requireDays,
+			dayAvgPay: DefineParamInfo.dayAvgPay,
+			realDayPay: DefineParamInfo.realDayPay,
+			workDayForMulti: DefineParamInfo.workDayForMulti,
+		},
+		examples: [
+			{
+				succ: false,
+				errorCode: 2,
+				retired: true,
+				workingDays: 60,
+				requireDays: 120,
+				realDayPay: 66000,
+				dayAvgPay: 3572862,
+			},
+		],
+	},
+	200: {
+		description: "수급 인정",
+		type: "object",
+		properties: {
+			succ: DefineParamInfo.succ,
+			amountCost: DefineParamInfo.amountCost,
+			dayAvgPay: DefineParamInfo.dayAvgPay,
+			realDayPay: DefineParamInfo.realDayPay,
+			receiveDay: DefineParamInfo.receiveDay,
+			realMonthPay: DefineParamInfo.realMonthPay,
+			workingDays: DefineParamInfo.workingDays,
+			needDay: DefineParamInfo.needDay,
+			nextAmountCost: DefineParamInfo.amountCost,
+			morePay: DefineParamInfo.morePay,
+		},
+		examples: [
+			{
+				succ: true,
+				amountCost: 15840000,
+				dayAvgPay: 3572862,
+				realDayPay: 66000,
+				receiveDay: 240,
+				realMonthPay: 1980000,
+				workingDays: 5550,
+			},
+			{
+				succ: true,
+				amountCost: 7920000,
+				dayAvgPay: 3572862,
+				realDayPay: 66000,
+				receiveDay: 120,
+				realMonthPay: 1980000,
+				workingDays: 250,
+				needDay: 115,
+				nextAmountCost: 9900000,
+				morePay: 1980000,
+			},
+		],
+	},
 };
 
 const veryShortBodyProp = {
@@ -554,6 +646,105 @@ const veryShortBodyProp = {
 	salary: DefineParamInfo.salary,
 	limitDay: { type: "string" },
 	isMany: { type: "boolean" },
+};
+const veryShortResponse = {
+	400: {
+		description:
+			"신청일이 퇴직일부터 1년 초과\n\n퇴사일이 입사일보다 빠름\n\n주 근로일수 2일 초과\n\n주 근무시간 15시간 이상",
+		type: "object",
+		properties: {
+			succ: DefineParamInfo.succ,
+			errorCode: DefineParamInfo.errorCode,
+			mesg: DefineParamInfo.mesg,
+		},
+		examples: [
+			{
+				succ: false,
+				errorCode: 0,
+				mesg: DefinedParamErrorMesg.expire,
+			},
+			{
+				succ: false,
+				errorCode: 1,
+				mesg: DefinedParamErrorMesg.ealryRetire,
+			},
+			{
+				succ: false,
+				errorCode: 6,
+				mesg: DefinedParamErrorMesg.veryShortLimitWorkingDay,
+			},
+			{
+				succ: false,
+				errorCode: 7,
+				mesg: DefinedParamErrorMesg.veryShortLimitTime,
+			},
+		],
+	},
+	202: {
+		description: "수급 불인정",
+		type: "object",
+		properties: {
+			succ: DefineParamInfo.succ,
+			errorCode: DefineParamInfo.errorCode,
+			retired: DefineParamInfo.retired,
+			workingDays: DefineParamInfo.workingDays,
+			requireDays: DefineParamInfo.requireDays,
+			realDayPay: DefineParamInfo.realDayPay,
+			dayAvgPay: DefineParamInfo.dayAvgPay,
+			workDayForMulti: DefineParamInfo.workDayForMulti,
+		},
+		examples: [
+			{
+				succ: false,
+				errorCode: 2,
+				retired: true,
+				workingDays: 1,
+				requireDays: 179,
+				realDayPay: 30060,
+				dayAvgPay: 10667,
+				workDayForMulti: 1,
+			},
+		],
+	},
+	200: {
+		description: "수급 인정",
+		type: "object",
+		properties: {
+			succ: DefineParamInfo.succ,
+			amountCost: DefineParamInfo.amountCost,
+			realDayPay: DefineParamInfo.realDayPay,
+			receiveDay: DefineParamInfo.receiveDay,
+			realMonthPay: DefineParamInfo.realMonthPay,
+			workingDays: DefineParamInfo.workingDays,
+			needDay: DefineParamInfo.needDay,
+			nextAmountCost: DefineParamInfo.amountCost,
+			morePay: DefineParamInfo.morePay,
+			workDayForMulti: DefineParamInfo.workDayForMulti,
+		},
+		examples: [
+			{
+				succ: true,
+				amountCost: 5410800,
+				realDayPay: 30060,
+				receiveDay: 180,
+				realMonthPay: 901800,
+				workingDays: 1166,
+				workDayForMulti: 216,
+			},
+			{
+				succ: true,
+				amountCost: 5410800,
+				realDayPay: 30060,
+				receiveDay: 180,
+				realMonthPay: 901800,
+				workingDays: 1166,
+				needDay: 659,
+				nextAmountCost: 6312600,
+				morePay: 901800,
+				workDayForMulti: 216,
+			},
+		],
+	},
 };
 
 const employerBodyProp = {
@@ -576,6 +767,84 @@ const employerBodyExamples = [
 		isMany: false,
 	},
 ];
+const employerResponse = {
+	400: {
+		description: "신청일이 퇴직일부터 1년 초과",
+		type: "object",
+		properties: {
+			succ: DefineParamInfo.succ,
+			errorCode: DefineParamInfo.errorCode,
+			mesg: DefineParamInfo.mesg,
+		},
+		examples: [
+			{
+				succ: false,
+				errorCode: 0,
+				mesg: DefinedParamErrorMesg.expire,
+			},
+		],
+	},
+	202: {
+		description: "수급 불인정",
+		type: "object",
+		properties: {
+			succ: DefineParamInfo.succ,
+			errorCode: DefineParamInfo.errorCode,
+			workingDays: DefineParamInfo.workingDays,
+			requireDays: DefineParamInfo.requireDays,
+		},
+		examples: [
+			{
+				succ: false,
+				errorCode: 8,
+				workingDays: 359,
+				requireDays: 6,
+			},
+		],
+	},
+	200: {
+		description: "수급 인정",
+		type: "object",
+		properties: {
+			succ: DefineParamInfo.succ,
+			retired: DefineParamInfo.retired,
+			amountCost: DefineParamInfo.amountCost,
+			realDayPay: DefineParamInfo.realDayPay,
+			receiveDay: DefineParamInfo.receiveDay,
+			realMonthPay: DefineParamInfo.realMonthPay,
+			workingDays: DefineParamInfo.workingDays,
+			needDay: DefineParamInfo.needDay,
+			nextAmountCost: DefineParamInfo.amountCost,
+			morePay: DefineParamInfo.morePay,
+			workDayForMulti: DefineParamInfo.workDayForMulti,
+			examples: [
+				{
+					succ: true,
+					retired: true,
+					amountCost: 9745050,
+					realDayPay: 64967,
+					receiveDay: 150,
+					realMonthPay: 1949010,
+					workingDays: 1156,
+					workDayForMulti: 730,
+				},
+				{
+					succ: true,
+					retired: true,
+					amountCost: 9745050,
+					realDayPay: 64967,
+					receiveDay: 150,
+					realMonthPay: 1949010,
+					workingDays: 1156,
+					needDay: 669,
+					nextAmountCost: 11694060,
+					morePay: 1949010,
+					workDayForMulti: 730,
+				},
+			],
+		},
+	},
+};
 
 export const standardSchema = {
 	schema: {
@@ -670,6 +939,7 @@ export const dayJobSchema = {
 			],
 			properties: dayJobBodyProp,
 		},
+		response: dayJobResponse,
 	},
 };
 
@@ -692,6 +962,7 @@ export const veryShortSchema = {
 			],
 			properties: veryShortBodyProp,
 		},
+		response: veryShortResponse,
 	},
 };
 
@@ -705,5 +976,6 @@ export const employerSchema = {
 			properties: employerBodyProp,
 			examples: employerBodyExamples,
 		},
+		respose: employerResponse,
 	},
 };

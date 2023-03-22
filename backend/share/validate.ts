@@ -308,4 +308,8 @@ export const DefinedParamErrorMesg = {
 	needArtorSpecialCareer: "예술인/특고로 3개월 이상 근무해야합니다.",
 	needShortArtCareer: "단기 예술인으로 3개월 이상 근무해야합니다.",
 	needShortSpecialCareer: "단기 특고로 3개월 이상 근무해야합니다.",
+	veryShortLimitTime:
+		"초단시간 근로자의 주 근로시간은 14시간을 초과할 수 없습니다. 근로계약 조건을 다시 한번 확인해 보시기 바랍니다.",
+	veryShortLimitWorkingDay:
+		"초단시간 근로자의 주 근로일수는 2일을 초과할 수 없습니ㅏㄷ. 근로계약 조건을 다시 한번 확인해 보시기 바랍니다.",
 };
