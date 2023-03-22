@@ -647,6 +647,105 @@ const veryShortBodyProp = {
 	limitDay: { type: "string" },
 	isMany: { type: "boolean" },
 };
+const veryShortResponse = {
+	400: {
+		description:
+			"신청일이 퇴직일부터 1년 초과\n\n퇴사일이 입사일보다 빠름\n\n주 근로일수 2일 초과\n\n주 근무시간 15시간 이상",
+		type: "object",
+		properties: {
+			succ: DefineParamInfo.succ,
+			errorCode: DefineParamInfo.errorCode,
+			mesg: DefineParamInfo.mesg,
+		},
+		examples: [
+			{
+				succ: false,
+				errorCode: 0,
+				mesg: DefinedParamErrorMesg.expire,
+			},
+			{
+				succ: false,
+				errorCode: 1,
+				mesg: DefinedParamErrorMesg.ealryRetire,
+			},
+			{
+				succ: false,
+				errorCode: 6,
+				mesg: DefinedParamErrorMesg.veryShortLimitWorkingDay,
+			},
+			{
+				succ: false,
+				errorCode: 7,
+				mesg: DefinedParamErrorMesg.veryShortLimitTime,
+			},
+		],
+	},
+	202: {
+		description: "수급 불인정",
+		type: "object",
+		properties: {
+			succ: DefineParamInfo.succ,
+			errorCode: DefineParamInfo.errorCode,
+			retired: DefineParamInfo.retired,
+			workingDays: DefineParamInfo.workingDays,
+			requireDays: DefineParamInfo.requireDays,
+			realDayPay: DefineParamInfo.realDayPay,
+			dayAvgPay: DefineParamInfo.dayAvgPay,
+			workDayForMulti: DefineParamInfo.workDayForMulti,
+		},
+		examples: [
+			{
+				succ: false,
+				errorCode: 2,
+				retired: true,
+				workingDays: 1,
+				requireDays: 179,
+				realDayPay: 30060,
+				dayAvgPay: 10667,
+				workDayForMulti: 1,
+			},
+		],
+	},
+	200: {
+		description: "수급 인정",
+		type: "object",
+		properties: {
+			succ: DefineParamInfo.succ,
+			amountCost: DefineParamInfo.amountCost,
+			realDayPay: DefineParamInfo.realDayPay,
+			receiveDay: DefineParamInfo.receiveDay,
+			realMonthPay: DefineParamInfo.realMonthPay,
+			workingDays: DefineParamInfo.workingDays,
+			needDay: DefineParamInfo.needDay,
+			nextAmountCost: DefineParamInfo.amountCost,
+			morePay: DefineParamInfo.morePay,
+			workDayForMulti: DefineParamInfo.workDayForMulti,
+		},
+		examples: [
+			{
+				succ: true,
+				amountCost: 5410800,
+				realDayPay: 30060,
+				receiveDay: 180,
+				realMonthPay: 901800,
+				workingDays: 1166,
+				workDayForMulti: 216,
+			},
+			{
+				succ: true,
+				amountCost: 5410800,
+				realDayPay: 30060,
+				receiveDay: 180,
+				realMonthPay: 901800,
+				workingDays: 1166,
+				needDay: 659,
+				nextAmountCost: 6312600,
+				morePay: 901800,
+				workDayForMulti: 216,
+			},
+		],
+	},
+};
 
 const employerBodyProp = {
 	enterDay: DefineParamInfo.enterDay,
@@ -785,6 +884,7 @@ export const veryShortSchema = {
 			],
 			properties: veryShortBodyProp,
 		},
+		response: veryShortResponse,
 	},
 };
 

@@ -515,38 +515,37 @@ export default function detailRoute(fastify: FastifyInstance, options: any, done
 			retiredDay: dayjs(req.body.retiredDay),
 		};
 		const retiredDayArr = req.body.retiredDay.split("-").map(Number);
-		// console.log(mainData);
 
 		// 기본 조건 확인
 		const employmentDate = Math.floor(mainData.retiredDay.diff(mainData.enterDay, "day", true) + 1);
 		if (!mainData.isMany) {
 			const checkResult = checkBasicRequirements(mainData, employmentDate);
-			if (!checkResult.succ) return { checkResult };
+			if (!checkResult.succ) return res.code(400).send(checkResult);
 		} else {
-			if (employmentDate <= 0) return { succ: false, errorCode: 1, mesg: DefinedParamErrorMesg.ealryRetire };
+			if (employmentDate <= 0)
+				return res.code(400).send({ succ: false, errorCode: 1, mesg: DefinedParamErrorMesg.ealryRetire });
 		}
 
 		// 초단 시간 추가 조건 확인
 		if (mainData.weekDay.length > 2)
-			return { succ: false, errorCode: 6, mesg: "주 근로일수 2일을 초과할 수 없습니다." };
+			return res
+				.code(400)
+				.send({ succ: false, errorCode: 6, mesg: DefinedParamErrorMesg.veryShortLimitWorkingDay });
 		if (mainData.weekWorkTime >= 15)
-			return {
+			return res.code(400).send({
 				succ: false,
 				errorCode: 7,
-				mesg: "주 근무시간이 15시간이상이라면 초단시간으로 인정받을 수 없습니다.",
-			};
+				mesg: DefinedParamErrorMesg.veryShortLimitTime,
+			});
 
 		// 24개월 내에 피보험 단위 기간
-		// const limitDay = mainData.retiredDay.subtract(24, "month");
-		const limitDay = dayjs(req.body.limitDay);
+		const limitDay = dayjs(mainData.limitDay);
 		const permitWorkDay = mainData.enterDay.isSameOrAfter(limitDay)
 			? calVeryShortWorkDay(mainData.enterDay, mainData.retiredDay, mainData.weekDay)
 			: calVeryShortWorkDay(limitDay, mainData.retiredDay, mainData.weekDay);
-		console.log("2. ", limitDay.format("YYYY-MM-DD"), permitWorkDay);
 
 		// 전체 피보험 단위 기간
-		const workingDays = calVeryShortWorkDay(mainData.enterDay, mainData.retiredDay, req.body.weekDay);
-		console.log("workingDays:", workingDays);
+		const workingDays = calVeryShortWorkDay(mainData.enterDay, mainData.retiredDay, mainData.weekDay);
 
 		// 퇴사일 전 3개월 총일수
 		let sumLastThreeMonthDays = 0;
@@ -554,31 +553,25 @@ export default function detailRoute(fastify: FastifyInstance, options: any, done
 			const month = mainData.retiredDay.subtract(i, "month").month() + 1; // 이게 정상 작동한다면 calLeastPayInfo의 수정이 필요함
 			sumLastThreeMonthDays += new Date(retiredDayArr[0], month, 0).getDate();
 		}
-		// console.log("4. ", sumLastThreeMonthDays);
 
 		// 급여 산정
 		const tempDayWorkTime = Math.floor((mainData.weekWorkTime / mainData.weekDay.length) * 10) / 10;
 		const dayWorkTime = tempDayWorkTime <= 4 ? 4 : tempDayWorkTime >= 8 ? 8 : tempDayWorkTime;
-		console.log(mainData.salary, sumLastThreeMonthDays, dayWorkTime);
 		const { dayAvgPay, realDayPay, realMonthPay } = calVeryshortPay(
 			mainData.salary,
 			sumLastThreeMonthDays,
 			dayWorkTime
 		);
-		// console.log("5. ", realDayPay, realMonthPay);
 
 		//
-		// const limitDay = dayjs(req.body.limitDay);
 		const workDayForMulti = mainData.enterDay.isSameOrAfter(limitDay, "day")
 			? workingDays
-			: calVeryShortWorkDay(limitDay, mainData.retiredDay, req.body.weekDay);
-		// console.log("9. ", workDayForMulti);
+			: calVeryShortWorkDay(limitDay, mainData.retiredDay, mainData.weekDay);
 
 		// 수급 인정/ 불인정 판단
 		const isPermit = permitWorkDay >= 180 ? [true] : [false, permitWorkDay, 180 - permitWorkDay];
-		// console.log("6. ", isPermit);
 		if (!isPermit[0])
-			return {
+			return res.code(202).send({
 				succ: false,
 				errorCode: 2,
 				retired: mainData.retired,
@@ -587,14 +580,12 @@ export default function detailRoute(fastify: FastifyInstance, options: any, done
 				realDayPay,
 				dayAvgPay,
 				workDayForMulti,
-			};
+			});
 
 		// 소정급여일수 산정
 		const workingYears = Math.floor(workingDays / 365);
-		const receiveDay = getReceiveDay(workingYears, req.body.age, req.body.disabled);
-		const [requireWorkingYear, nextReceiveDay] = getNextReceiveDay(workingYears, req.body.age, req.body.disabled);
-		// console.log("7. ", workingYears, receiveDay);
-		// console.log("8. ", requireWorkingYear, nextReceiveDay);
+		const receiveDay = getReceiveDay(workingYears, mainData.age, mainData.disabled);
+		const [requireWorkingYear, nextReceiveDay] = getNextReceiveDay(workingYears, mainData.age, mainData.disabled);
 
 		if (nextReceiveDay === 0) {
 			return {
@@ -607,7 +598,6 @@ export default function detailRoute(fastify: FastifyInstance, options: any, done
 				workDayForMulti,
 			};
 		}
-
 		return {
 			succ: true,
 			amountCost: realDayPay * receiveDay,
