@@ -418,63 +418,78 @@ export default function detailRoute(fastify: FastifyInstance, options: any, done
 	});
 
 	fastify.post(detailPath.dayJob, dayJobSchema, (req: any, res) => {
-		const mainData: TdayJobInput = {
-			...req.body,
-			lastWorkDay: dayjs(req.body.lastWorkDay),
-		};
+		try {
+			const mainData: TdayJobInput = {
+				...req.body,
+				lastWorkDay: dayjs(req.body.lastWorkDay),
+			};
 
-		// 1. 신청일이 이직일로 부터 1년 초과 확인
-		if (!mainData.isMany) {
-			const now = mainData.isSimple ? dayjs(new Date()) : dayjs(mainData.enrollDay);
-			if (Math.floor(now.diff(mainData.lastWorkDay, "day", true)) > 365)
-				return res.code(400).send({ succ: false, errorCode: 0, mesg: DefinedParamErrorMesg.expire });
-		}
-		// 최근근로정보 조건 확인
-		if (mainData.isSpecial) {
-			if (mainData.isOverTen && mainData.hasWork)
-				return res.code(400).send({
+			// 1. 신청일이 이직일로 부터 1년 초과 확인
+			if (!mainData.isMany) {
+				const now = mainData.isSimple ? dayjs(new Date()) : dayjs(mainData.enrollDay);
+				if (Math.floor(now.diff(mainData.lastWorkDay, "day", true)) > 365)
+					return res.code(400).send({ succ: false, errorCode: 0, mesg: DefinedParamErrorMesg.expire });
+			}
+			// 최근근로정보 조건 확인
+			if (mainData.isSpecial) {
+				if (mainData.isOverTen && mainData.hasWork)
+					return res.code(400).send({
+						succ: false,
+						errorCode: 5,
+						mesg: DefinedParamErrorMesg.isOverTen + "," + DefinedParamErrorMesg.hasWork,
+					});
+			} else {
+				if (mainData.isOverTen)
+					return res.code(400).send({
+						succ: false,
+						errorCode: 11,
+						mesg: DefinedParamErrorMesg.isOverTen,
+					});
+			}
+
+			// // 3. 피보험단위기간 산정
+			const limitPermitDay = mainData.lastWorkDay
+				.subtract(18, "month")
+				.format("YYYY-MM-DD")
+				.split("-")
+				.map(Number);
+			const isPermit = dayJobCheckPermit(limitPermitDay, mainData.sumWorkDay, true);
+
+			// 4. 급여 산정
+			const { dayAvgPay, realDayPay, realMonthPay } =
+				mainData.lastWorkDay.get("year") === 2023
+					? calDayJobPay(mainData.dayAvgPay, mainData.dayWorkTime, true)
+					: calDayJobPay(mainData.dayAvgPay, mainData.dayWorkTime);
+
+			if (!isPermit[0])
+				return res.code(202).send({
 					succ: false,
-					errorCode: 5,
-					mesg: DefinedParamErrorMesg.isOverTen + "," + DefinedParamErrorMesg.hasWork,
+					errorCode: 2,
+					retired: mainData.retired,
+					workingDays: isPermit[1],
+					requireDays: isPermit[2],
+					realDayPay,
+					dayAvgPay,
 				});
-		} else {
-			if (mainData.isOverTen)
-				return res.code(400).send({
-					succ: false,
-					errorCode: 11,
-					mesg: DefinedParamErrorMesg.isOverTen,
-				});
-		}
 
-		// // 3. 피보험단위기간 산정
-		const limitPermitDay = mainData.lastWorkDay.subtract(18, "month").format("YYYY-MM-DD").split("-").map(Number);
-		const isPermit = dayJobCheckPermit(limitPermitDay, mainData.sumWorkDay, true);
+			// 5. 소정급여일수 산정
+			const joinYear = Math.floor(mainData.sumWorkDay / 365);
+			const receiveDay = getReceiveDay(joinYear, mainData.age, mainData.disabled);
 
-		// 4. 급여 산정
-		const { dayAvgPay, realDayPay, realMonthPay } =
-			mainData.lastWorkDay.get("year") === 2023
-				? calDayJobPay(mainData.dayAvgPay, mainData.dayWorkTime, true)
-				: calDayJobPay(mainData.dayAvgPay, mainData.dayWorkTime);
+			// 6 다음 단계 수급이 가능하다면 같이 전달
+			const [requireWorkingYear, nextReceiveDay] = getNextReceiveDay(joinYear, mainData.age, mainData.disabled);
 
-		if (!isPermit[0])
-			return res.code(202).send({
-				succ: false,
-				errorCode: 2,
-				retired: mainData.retired,
-				workingDays: isPermit[1],
-				requireDays: isPermit[2],
-				realDayPay,
-				dayAvgPay,
-			});
+			if (!nextReceiveDay)
+				return {
+					succ: true,
+					amountCost: realDayPay * receiveDay,
+					dayAvgPay,
+					realDayPay,
+					receiveDay,
+					realMonthPay,
+					workingDays: mainData.sumWorkDay,
+				};
 
-		// 5. 소정급여일수 산정
-		const joinYear = Math.floor(mainData.sumWorkDay / 365);
-		const receiveDay = getReceiveDay(joinYear, mainData.age, mainData.disabled);
-
-		// 6 다음 단계 수급이 가능하다면 같이 전달
-		const [requireWorkingYear, nextReceiveDay] = getNextReceiveDay(joinYear, mainData.age, mainData.disabled);
-
-		if (!nextReceiveDay)
 			return {
 				succ: true,
 				amountCost: realDayPay * receiveDay,
@@ -483,20 +498,14 @@ export default function detailRoute(fastify: FastifyInstance, options: any, done
 				receiveDay,
 				realMonthPay,
 				workingDays: mainData.sumWorkDay,
+				needDay: requireWorkingYear * 365 - mainData.sumWorkDay,
+				nextAmountCost: nextReceiveDay * realDayPay,
+				morePay: nextReceiveDay * realDayPay - receiveDay * realDayPay,
 			};
-
-		return {
-			succ: true,
-			amountCost: realDayPay * receiveDay,
-			dayAvgPay,
-			realDayPay,
-			receiveDay,
-			realMonthPay,
-			workingDays: mainData.sumWorkDay,
-			needDay: requireWorkingYear * 365 - mainData.sumWorkDay,
-			nextAmountCost: nextReceiveDay * realDayPay,
-			morePay: nextReceiveDay * realDayPay - receiveDay * realDayPay,
-		};
+		} catch (error) {
+			console.error(error);
+			return res.code(500).send();
+		}
 	});
 
 	fastify.post(detailPath.veryShort, veryShortSchema, (req: any, res) => {
