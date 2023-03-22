@@ -630,26 +630,23 @@ export default function detailRoute(fastify: FastifyInstance, options: any, done
 		if (!req.body.isMany) {
 			const now = dayjs();
 			if (Math.floor(now.diff(retiredDay, "day", true)) > 365)
-				return { succ: false, errorCode: 0, mesg: DefinedParamErrorMesg.expire };
+				return res.code(400).send({ succ: false, errorCode: 0, mesg: DefinedParamErrorMesg.expire });
 		}
 
 		// 1. 자영업자로서 최소 1년간 고용보험에 보험료를 납부해야함
 		const workingDays = Math.floor(retiredDay.diff(enterDay, "day", true)) + 1;
-		console.log("1. ", workingDays);
-		if (workingDays < 365) return { succ: false, errorCode: 8, workingDays, requireDays: 365 - workingDays };
+		if (workingDays < 365)
+			return res.code(202).send({ succ: false, errorCode: 8, workingDays, requireDays: 365 - workingDays });
 
 		// 2.  몇 년 몇 월에 가입했는 지 배열로 작성
 		const workList = makeEmployerJoinInfo(enterDay, retiredDay);
-		console.log(workList);
 
 		// 3. 피보험긴간이 3년 이상인 경우, 미만인 경우를 확인하기 위해서 3년전 년/월 계산
 		const limitYear = retiredDay.subtract(36, "month").year();
 		const limitMonth = retiredDay.subtract(36, "month").month() + 1;
-		console.log("3. ", limitYear, limitMonth);
 
 		// 4. 폐업일 이전 3년치의 급여와, 피보험단위기간 산정
 		const sumPay = calEmployerSumPay(workList, enterDay, retiredDay, limitYear, limitMonth, insuranceGrade);
-		console.log("4. ", sumPay);
 
 		// 5. 급여 산정(기초일액, 일수령액, 월수령액)
 		const dayAvgPay = Math.ceil(sumPay / workingDays); // 기초일액
@@ -659,19 +656,16 @@ export default function detailRoute(fastify: FastifyInstance, options: any, done
 			if (realDayPay > 66000) realDayPay = 66000;
 		}
 		const realMonthPay = realDayPay * 30;
-		console.log("5. ", realDayPay, realMonthPay);
 
 		// 6. 소정급여일수 산정
 		const workYear = Math.floor(workingDays / 365);
 		const receiveDay = getEmployerReceiveDay(workYear); // 소정 급여일수 테이블이 다르다
-		console.log("6. ", workYear, receiveDay);
 
 		// 7. 복수형에 사용되는 마지막 직장인 경우 workDawyForMulti 계산
 		const limitDay = dayjs(req.body.limitDay);
 		const workDayForMulti = enterDay.isSameOrAfter(limitDay, "day")
 			? workingDays
 			: Math.floor(retiredDay.diff(limitDay, "day", true));
-		console.log("7. ", workDayForMulti);
 
 		const [requireWorkingYear, nextReceiveDay] = getNextEmployerReceiveDay(workYear);
 

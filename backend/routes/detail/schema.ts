@@ -767,6 +767,84 @@ const employerBodyExamples = [
 		isMany: false,
 	},
 ];
+const employerResponse = {
+	400: {
+		description: "신청일이 퇴직일부터 1년 초과",
+		type: "object",
+		properties: {
+			succ: DefineParamInfo.succ,
+			errorCode: DefineParamInfo.errorCode,
+			mesg: DefineParamInfo.mesg,
+		},
+		examples: [
+			{
+				succ: false,
+				errorCode: 0,
+				mesg: DefinedParamErrorMesg.expire,
+			},
+		],
+	},
+	202: {
+		description: "수급 불인정",
+		type: "object",
+		properties: {
+			succ: DefineParamInfo.succ,
+			errorCode: DefineParamInfo.errorCode,
+			workingDays: DefineParamInfo.workingDays,
+			requireDays: DefineParamInfo.requireDays,
+		},
+		examples: [
+			{
+				succ: false,
+				errorCode: 8,
+				workingDays: 359,
+				requireDays: 6,
+			},
+		],
+	},
+	200: {
+		description: "수급 인정",
+		type: "object",
+		properties: {
+			succ: DefineParamInfo.succ,
+			retired: DefineParamInfo.retired,
+			amountCost: DefineParamInfo.amountCost,
+			realDayPay: DefineParamInfo.realDayPay,
+			receiveDay: DefineParamInfo.receiveDay,
+			realMonthPay: DefineParamInfo.realMonthPay,
+			workingDays: DefineParamInfo.workingDays,
+			needDay: DefineParamInfo.needDay,
+			nextAmountCost: DefineParamInfo.amountCost,
+			morePay: DefineParamInfo.morePay,
+			workDayForMulti: DefineParamInfo.workDayForMulti,
+			examples: [
+				{
+					succ: true,
+					retired: true,
+					amountCost: 9745050,
+					realDayPay: 64967,
+					receiveDay: 150,
+					realMonthPay: 1949010,
+					workingDays: 1156,
+					workDayForMulti: 730,
+				},
+				{
+					succ: true,
+					retired: true,
+					amountCost: 9745050,
+					realDayPay: 64967,
+					receiveDay: 150,
+					realMonthPay: 1949010,
+					workingDays: 1156,
+					needDay: 669,
+					nextAmountCost: 11694060,
+					morePay: 1949010,
+					workDayForMulti: 730,
+				},
+			],
+		},
+	},
+};
 
 export const standardSchema = {
 	schema: {
@@ -898,5 +976,6 @@ export const employerSchema = {
 			properties: employerBodyProp,
 			examples: employerBodyExamples,
 		},
+		respose: employerResponse,
 	},
 };
