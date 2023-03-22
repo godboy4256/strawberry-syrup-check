@@ -622,55 +622,66 @@ export default function detailRoute(fastify: FastifyInstance, options: any, done
 	});
 
 	fastify.post(detailPath.employer, employerSchema, (req: any, res) => {
-		const enterDay: dayjs.Dayjs = dayjs(req.body.enterDay);
-		const retiredDay: dayjs.Dayjs = dayjs(req.body.retiredDay);
-		const insuranceGrade = req.body.insuranceGrade;
+		try {
+			const enterDay: dayjs.Dayjs = dayjs(req.body.enterDay);
+			const retiredDay: dayjs.Dayjs = dayjs(req.body.retiredDay);
+			const insuranceGrade = req.body.insuranceGrade;
 
-		// 신청일이 이직일로 부터 1년 초과 확인
-		if (!req.body.isMany) {
-			const now = dayjs();
-			if (Math.floor(now.diff(retiredDay, "day", true)) > 365)
-				return res.code(400).send({ succ: false, errorCode: 0, mesg: DefinedParamErrorMesg.expire });
-		}
+			// 신청일이 이직일로 부터 1년 초과 확인
+			if (!req.body.isMany) {
+				const now = dayjs();
+				if (Math.floor(now.diff(retiredDay, "day", true)) > 365)
+					return res.code(400).send({ succ: false, errorCode: 0, mesg: DefinedParamErrorMesg.expire });
+			}
 
-		// 1. 자영업자로서 최소 1년간 고용보험에 보험료를 납부해야함
-		const workingDays = Math.floor(retiredDay.diff(enterDay, "day", true)) + 1;
-		if (workingDays < 365)
-			return res.code(202).send({ succ: false, errorCode: 8, workingDays, requireDays: 365 - workingDays });
+			// 1. 자영업자로서 최소 1년간 고용보험에 보험료를 납부해야함
+			const workingDays = Math.floor(retiredDay.diff(enterDay, "day", true)) + 1;
+			if (workingDays < 365)
+				return res.code(202).send({ succ: false, errorCode: 8, workingDays, requireDays: 365 - workingDays });
 
-		// 2.  몇 년 몇 월에 가입했는 지 배열로 작성
-		const workList = makeEmployerJoinInfo(enterDay, retiredDay);
+			// 2.  몇 년 몇 월에 가입했는 지 배열로 작성
+			const workList = makeEmployerJoinInfo(enterDay, retiredDay);
 
-		// 3. 피보험긴간이 3년 이상인 경우, 미만인 경우를 확인하기 위해서 3년전 년/월 계산
-		const limitYear = retiredDay.subtract(36, "month").year();
-		const limitMonth = retiredDay.subtract(36, "month").month() + 1;
+			// 3. 피보험긴간이 3년 이상인 경우, 미만인 경우를 확인하기 위해서 3년전 년/월 계산
+			const limitYear = retiredDay.subtract(36, "month").year();
+			const limitMonth = retiredDay.subtract(36, "month").month() + 1;
 
-		// 4. 폐업일 이전 3년치의 급여와, 피보험단위기간 산정
-		const sumPay = calEmployerSumPay(workList, enterDay, retiredDay, limitYear, limitMonth, insuranceGrade);
+			// 4. 폐업일 이전 3년치의 급여와, 피보험단위기간 산정
+			const sumPay = calEmployerSumPay(workList, enterDay, retiredDay, limitYear, limitMonth, insuranceGrade);
 
-		// 5. 급여 산정(기초일액, 일수령액, 월수령액)
-		const dayAvgPay = Math.ceil(sumPay / workingDays); // 기초일액
-		let realDayPay = Math.ceil(dayAvgPay * 0.6);
-		if (req.body.isMany) {
-			if (realDayPay < 60240) realDayPay = 60240;
-			if (realDayPay > 66000) realDayPay = 66000;
-		}
-		const realMonthPay = realDayPay * 30;
+			// 5. 급여 산정(기초일액, 일수령액, 월수령액)
+			const dayAvgPay = Math.ceil(sumPay / workingDays); // 기초일액
+			let realDayPay = Math.ceil(dayAvgPay * 0.6);
+			if (req.body.isMany) {
+				if (realDayPay < 60240) realDayPay = 60240;
+				if (realDayPay > 66000) realDayPay = 66000;
+			}
+			const realMonthPay = realDayPay * 30;
 
-		// 6. 소정급여일수 산정
-		const workYear = Math.floor(workingDays / 365);
-		const receiveDay = getEmployerReceiveDay(workYear); // 소정 급여일수 테이블이 다르다
+			// 6. 소정급여일수 산정
+			const workYear = Math.floor(workingDays / 365);
+			const receiveDay = getEmployerReceiveDay(workYear); // 소정 급여일수 테이블이 다르다
 
-		// 7. 복수형에 사용되는 마지막 직장인 경우 workDawyForMulti 계산
-		const limitDay = dayjs(req.body.limitDay);
-		const workDayForMulti = enterDay.isSameOrAfter(limitDay, "day")
-			? workingDays
-			: Math.floor(retiredDay.diff(limitDay, "day", true));
+			// 7. 복수형에 사용되는 마지막 직장인 경우 workDawyForMulti 계산
+			const limitDay = dayjs(req.body.limitDay);
+			const workDayForMulti = enterDay.isSameOrAfter(limitDay, "day")
+				? workingDays
+				: Math.floor(retiredDay.diff(limitDay, "day", true));
 
-		const [requireWorkingYear, nextReceiveDay] = getNextEmployerReceiveDay(workYear);
+			const [requireWorkingYear, nextReceiveDay] = getNextEmployerReceiveDay(workYear);
 
-		// 8. 결과 리턴, 퇴직금, 다음 단계 없음
-		if (nextReceiveDay === 0)
+			// 8. 결과 리턴, 퇴직금, 다음 단계 없음
+			if (nextReceiveDay === 0)
+				return {
+					succ: true,
+					retired: req.body.retired,
+					amountCost: realDayPay * receiveDay,
+					realDayPay,
+					receiveDay,
+					realMonthPay,
+					workingDays,
+					workDayForMulti,
+				};
 			return {
 				succ: true,
 				retired: req.body.retired,
@@ -679,21 +690,15 @@ export default function detailRoute(fastify: FastifyInstance, options: any, done
 				receiveDay,
 				realMonthPay,
 				workingDays,
+				needDay: requireWorkingYear * 365 - workingDays,
+				nextAmountCost: nextReceiveDay * realDayPay,
+				morePay: nextReceiveDay * realDayPay - receiveDay * realDayPay,
 				workDayForMulti,
 			};
-		return {
-			succ: true,
-			retired: req.body.retired,
-			amountCost: realDayPay * receiveDay,
-			realDayPay,
-			receiveDay,
-			realMonthPay,
-			workingDays,
-			needDay: requireWorkingYear * 365 - workingDays,
-			nextAmountCost: nextReceiveDay * realDayPay,
-			morePay: nextReceiveDay * realDayPay - receiveDay * realDayPay,
-			workDayForMulti,
-		};
+		} catch (error) {
+			console.error(error);
+			return res.code(500).send();
+		}
 	});
 
 	done();
