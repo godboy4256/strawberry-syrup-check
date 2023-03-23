@@ -550,6 +550,13 @@ export const DetailCalComp = ({
                     handler.GetPageVal("enterDay"),
                     handler.GetPageVal("retiredDay")
                   );
+              handler.SetPageVal(
+                `select_multi_${handler.GetPageVal("select_multi")}`,
+                {
+                  date_info: addRange,
+                  date_month_info: addRangeMonth,
+                }
+              );
               new_arr.push(...check_select_date);
               new_arr.push(...addRange);
               new_arr2.push(...check_select_months);

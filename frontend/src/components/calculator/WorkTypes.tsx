@@ -1,4 +1,9 @@
 import { MouseEventHandler, useEffect, useState } from "react";
+import { useRecoilState } from "recoil";
+import {
+  duplicationDateCheck,
+  duplicationWorkRecord,
+} from "../../assets/atom/multi";
 import {
   retire_reason_standard,
   work_cate,
@@ -74,6 +79,11 @@ const WorkTypes = ({ handler }: { handler: any }) => {
     "none"
   );
   const [workRypeInfo3, _] = useState<"select" | "next" | "none">("none");
+  const [check_select_date, setState3] =
+    useRecoilState<any>(duplicationDateCheck);
+  const [check_select_months, setState4] = useRecoilState<any>(
+    duplicationWorkRecord
+  );
   const popUpCallBack = (params: string, value: string | number) => {
     handler.SetPageVal(params, value);
     if (value === undefined) {
@@ -99,6 +109,42 @@ const WorkTypes = ({ handler }: { handler: any }) => {
         leftFunc={() => {
           handler.setCompState(1);
           handler.SetPageVal("retired", undefined);
+          if (
+            handler.GetPageVal("cal_state") === "multi" &&
+            handler.companys &&
+            handler.companys[handler.GetPageVal("select_multi")].content
+          ) {
+            const arr = [];
+            const arr2 = [];
+            arr.push(...check_select_date);
+            arr.push(
+              ...handler.GetPageVal(
+                `select_multi_${Number(handler.GetPageVal("select_multi"))}`
+              ).date_info
+            );
+            arr2.push(...check_select_months);
+            arr2.push(
+              ...handler.GetPageVal(
+                `select_multi_${Number(handler.GetPageVal("select_multi"))}`
+              ).date_month_info
+            );
+            console.log(
+              "ddd",
+              handler.GetPageVal(
+                `select_multi_${Number(handler.GetPageVal("select_multi"))}`
+              ).date_month_info
+            );
+            console.log(
+              "ddd",
+              handler.GetPageVal(
+                `select_multi_${Number(handler.GetPageVal("select_multi"))}`
+              ).date_info
+            );
+            setState3(arr);
+            setState4(arr2);
+            console.log(arr, arr2);
+            console.log(Number(handler.GetPageVal("select_multi")));
+          }
         }}
       />
       <div id="detail_container_comp1" className="full_height_layout_cal">
