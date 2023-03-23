@@ -22,8 +22,8 @@ export default function leastPayRoute(fastify: FastifyInstance, options: any, do
 			const leastMonthPay = isAddPay ? commonPay + addPay : commonPay;
 			return { leastMonthPay, dayPay };
 		} catch (err) {
-			fastify.log.error(err);
-			return err;
+			console.error(err);
+			return res.code(500).send();
 		}
 	});
 	done();
