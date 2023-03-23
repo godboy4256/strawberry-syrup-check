@@ -14,6 +14,23 @@ const leastPayBodyExamples = [
 	},
 ];
 
+const leastPayResponse = {
+	200: {
+		description: "최저 월급 계산 완료",
+		type: "object",
+		properties: {
+			leastMonthPay: { type: "number", minimum: 0 },
+			dayPay: { type: "number", minimum: 0 },
+		},
+		examples: [
+			{
+				leastMonthPay: 134680,
+				dayPay: 5772,
+			},
+		],
+	},
+};
+
 export const leastPaySchema = {
 	schema: {
 		tags: ["leastPay"],
@@ -24,6 +41,6 @@ export const leastPaySchema = {
 			properties: leastPayBodyProp,
 			examples: leastPayBodyExamples,
 		},
-		// response:
+		response: leastPayResponse,
 	},
 };

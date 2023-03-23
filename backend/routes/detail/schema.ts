@@ -117,6 +117,7 @@ const standardBodyProp = {
 	salary: DefineParamInfo.salary,
 	limitDay: DefineParamInfo.limitDay,
 	isMany: DefineParamInfo.isMany,
+	id: { type: "number", minimum: 0, maximum: 10 },
 };
 
 const standardResponse = {
@@ -232,6 +233,7 @@ const artBodyProp = {
 	isSpecial: DefineParamInfo.isSpecial,
 	limitDay: DefineParamInfo.limitDay,
 	isMany: DefineParamInfo.isMany,
+	id: { type: "number", minimum: 0, maximum: 10 },
 };
 
 const artResponse = {
@@ -336,6 +338,7 @@ const shortArtBodyProp = {
 	hasWork: DefineParamInfo.hasWork,
 	limitDay: DefineParamInfo.limitDay,
 	isMany: DefineParamInfo.isMany,
+	id: { type: "number", minimum: 0, maximum: 10 },
 };
 const shortArtResponse = {
 	400: {
@@ -439,6 +442,7 @@ const shortSepcialBodyProp = {
 	hasWork: { type: "boolean" },
 	limitDay: { type: "string" },
 	isMany: { type: "boolean" },
+	id: { type: "number", minimum: 0, maximum: 10 },
 };
 const shortSpecialResponse = {
 	400: {
@@ -541,6 +545,7 @@ const dayJobBodyProp = {
 	isSimple: DefineParamInfo.isSimple,
 	isOverTen: DefineParamInfo.isOverTen,
 	isMany: DefineParamInfo.isMany,
+	id: { type: "number", minimum: 0, maximum: 10 },
 };
 const dayJobResponse = {
 	400: {
@@ -576,7 +581,7 @@ const dayJobResponse = {
 			succ: DefineParamInfo.succ,
 			errorCode: DefineParamInfo.errorCode,
 			retired: DefineParamInfo.retired,
-			workingDay: DefineParamInfo.workingDays,
+			workingDays: DefineParamInfo.workingDays,
 			requireDays: DefineParamInfo.requireDays,
 			dayAvgPay: DefineParamInfo.dayAvgPay,
 			realDayPay: DefineParamInfo.realDayPay,
@@ -646,6 +651,7 @@ const veryShortBodyProp = {
 	salary: DefineParamInfo.salary,
 	limitDay: { type: "string" },
 	isMany: { type: "boolean" },
+	id: { type: "number", minimum: 0, maximum: 10 },
 };
 const veryShortResponse = {
 	400: {
@@ -755,6 +761,7 @@ const employerBodyProp = {
 	},
 	limitDay: { type: "string" },
 	isMany: { type: "boolean" }, // 복수형 여부
+	id: { type: "number", minimum: 0, maximum: 10 },
 };
 
 const employerBodyExamples = [
