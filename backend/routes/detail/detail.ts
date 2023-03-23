@@ -52,13 +52,9 @@ export default function detailRoute(fastify: FastifyInstance, options: any, done
 
 			// // 1. 기본 조건 확인
 			const employmentDate = Math.floor(mainData.retiredDay.diff(mainData.enterDay, "day", true) + 1);
-			if (!mainData.isMany) {
-				const checkResult = checkBasicRequirements(mainData, employmentDate);
-				if (!checkResult.succ) return res.code(400).send(checkResult);
-			} else {
-				if (employmentDate <= 0)
-					return res.code(400).send({ succ: false, errorCode: 1, mesg: DefinedParamErrorMesg.ealryRetire });
-			}
+
+			const checkResult = checkBasicRequirements(mainData, employmentDate, mainData.isMany);
+			if (!checkResult.succ) return res.code(400).send(checkResult);
 
 			// 2. 급여 산정
 			const { dayAvgPay, realDayPay, realMonthPay } =
@@ -164,14 +160,8 @@ export default function detailRoute(fastify: FastifyInstance, options: any, done
 
 			// 2. 기본 조건 확인 & 복수형이 아니면 추가 조건확인
 			const employmentDate = Math.floor(mainData.retiredDay.diff(mainData.enterDay, "day", true) + 1); // 예술인은 유/무급 휴일 개념이 없으며 가입기간 전체를 피보험 단위기간으로 취급한다.
-			if (!mainData.isMany) {
-				const checkResult = checkBasicRequirements(mainData, employmentDate);
-
-				if (!checkResult.succ) return res.code(400).send(checkResult);
-			} else {
-				if (employmentDate <= 0)
-					return res.code(400).send({ succ: false, errorCode: 1, mesg: DefinedParamErrorMesg.ealryRetire });
-			}
+			const checkResult = checkBasicRequirements(mainData, employmentDate, mainData.isMany);
+			if (!checkResult.succ) return res.code(400).send(checkResult);
 			if (employmentDate < 90)
 				return res
 					.code(400)
@@ -256,6 +246,14 @@ export default function detailRoute(fastify: FastifyInstance, options: any, done
 						.send({ succ: false, errorCode: 5, mesg: "단기 예술인으로 3개월 이상 근무해야합니다." });
 			}
 
+			// 5. 추가 근로 정보에서 단기 예술인/특고 추가 조건 확인
+			if (mainData.isOverTen && mainData.hasWork)
+				return res.code(400).send({
+					succ: false,
+					errorCode: 5,
+					mesg: DefinedParamErrorMesg.isOverTen + "," + DefinedParamErrorMesg.hasWork,
+				});
+
 			// 2. 급여(일수령액, 월수령액) 계산
 			const lastWorkDay = dayjs(mainData.lastWorkDay);
 			const sumOneYearWorkDay = calSumOneYearWorkDay(lastWorkDay);
@@ -279,14 +277,6 @@ export default function detailRoute(fastify: FastifyInstance, options: any, done
 			const isPermit = mainData.isSimple
 				? artShortCheckPermit(mainData.sumWorkDay, mainData.isSpecial)
 				: artShortCheckPermit(mainData.sumTwoYearWorkDay, mainData.isSpecial); // null 체크 필요
-
-			// 5. 추가 근로 정보에서 단기 예술인/특고 추가 조건 확인
-			if (mainData.isOverTen && mainData.hasWork)
-				return res.code(400).send({
-					succ: false,
-					errorCode: 5,
-					mesg: DefinedParamErrorMesg.isOverTen + "," + DefinedParamErrorMesg.hasWork,
-				});
 
 			// 6. 복수형에서 사용하기위한 workDayForMulti 계산
 			const limitDay = dayjs(mainData.limitDay);
@@ -344,6 +334,14 @@ export default function detailRoute(fastify: FastifyInstance, options: any, done
 						.send({ succ: false, errorCode: 4, mesg: DefinedParamErrorMesg.needShortSpecialCareer });
 			}
 
+			// 5. 추가 근로 정보에서 단기 특고 조건 확인
+			if (mainData.isOverTen && mainData.hasWork)
+				return res.code(400).send({
+					succ: false,
+					errorCode: 5,
+					mesg: DefinedParamErrorMesg.isOverTen + "," + DefinedParamErrorMesg.hasWork,
+				});
+
 			// 2. 급여 계산
 			const lastWorkDay = dayjs(mainData.lastWorkDay);
 			const sumOneYearWorkDay = calSumOneYearWorkDay(lastWorkDay);
@@ -364,14 +362,6 @@ export default function detailRoute(fastify: FastifyInstance, options: any, done
 			const isPermit = mainData.isSimple
 				? artShortCheckPermit(mainData.sumWorkDay, mainData.isSpecial)
 				: artShortCheckPermit(mainData.sumTwoYearWorkDay, mainData.isSpecial);
-
-			// 5. 추가 근로 정보에서 단기 특고 조건 확인
-			if (mainData.isOverTen && mainData.hasWork)
-				return res.code(400).send({
-					succ: false,
-					errorCode: 5,
-					mesg: DefinedParamErrorMesg.isOverTen + "," + DefinedParamErrorMesg.hasWork,
-				});
 
 			// 6. 복수형에서 사용하기 위한 workDayForMulti 계산
 			const limitDay = dayjs(mainData.limitDay);
@@ -519,13 +509,8 @@ export default function detailRoute(fastify: FastifyInstance, options: any, done
 
 			// 기본 조건 확인
 			const employmentDate = Math.floor(mainData.retiredDay.diff(mainData.enterDay, "day", true) + 1);
-			if (!mainData.isMany) {
-				const checkResult = checkBasicRequirements(mainData, employmentDate);
-				if (!checkResult.succ) return res.code(400).send(checkResult);
-			} else {
-				if (employmentDate <= 0)
-					return res.code(400).send({ succ: false, errorCode: 1, mesg: DefinedParamErrorMesg.ealryRetire });
-			}
+			const checkResult = checkBasicRequirements(mainData, employmentDate, mainData.isMany);
+			if (!checkResult.succ) return res.code(400).send(checkResult);
 
 			// 초단 시간 추가 조건 확인
 			if (mainData.weekDay.length > 2)
