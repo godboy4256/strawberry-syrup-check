@@ -8,16 +8,11 @@ export function getDateVal(reqEnterDay: string, reqRetiredDay: string | null = n
 		retiredDayArray: string[];
 		birthArray?: string[];
 	};
-
 	const enterDay = dayjs(reqEnterDay); // 입사일(고용보험 가입일)
-
 	const retiredDay = dayjs(reqRetiredDay); // 퇴사일(마지막 고용보험 가입일)
 	const retiredDayArray = reqRetiredDay.split("-");
-
 	const result: result = { enterDay, retiredDay, retiredDayArray };
-
 	if (birth) result.birthArray = birth.split("-");
-
 	return result;
 }
 

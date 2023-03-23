@@ -322,6 +322,8 @@ const Calendar = ({
                             ]
                           }`
                         );
+                        if (params === "enterDay") {
+                        }
                         handler &&
                           handler.SetPageVal(params, `${year}-${month}-${day}`);
                         ClosePopup();

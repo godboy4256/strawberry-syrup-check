@@ -21,7 +21,7 @@ import EMTDetailContractSupply from "../assets/image/emoticon/detail_contract_su
 import EMTDetailVeryShortsSupply from "../assets/image/emoticon/detail_veryshort_supply.svg";
 import { DetailCalComp } from "./Detailed";
 
-import { getAge } from "../utils/date";
+import { getAge, GetDateArr } from "../utils/date";
 import { sendToServer } from "../utils/sendToserver";
 import { ResultComp } from "../components/calculator/Result";
 import Loading from "../components/common/Loading";
@@ -33,6 +33,11 @@ import { CheckValiDation } from "../utils/validate";
 import "../styles/multi.css";
 import { MultiConfirmPopup } from "../components/calculator/confirmPopup";
 import Calendar from "../components/inputs/Calendar";
+import { useRecoilState } from "recoil";
+import {
+  duplicationDateCheck,
+  duplicationWorkRecord,
+} from "../assets/atom/multi";
 
 interface Company {
   id: number;
@@ -151,10 +156,12 @@ const _MultiMainDataSelect = () => {
                 mainData[0].workCate === 6
                   ? 18
                   : 24;
-              const limitDay = new Date(
-                targetDate.getFullYear(),
-                targetDate.getMonth() - limitNum,
-                targetDate.getDate()
+              const limitDay = GetDateArr(
+                new Date(
+                  targetDate.getFullYear(),
+                  targetDate.getMonth() - limitNum,
+                  targetDate.getDate()
+                )
               );
 
               const addDataResultArr: any[] = [];
@@ -174,7 +181,7 @@ const _MultiMainDataSelect = () => {
                 const url = DetailPathCal(addData[i].workCate);
                 const result = await sendToServer(url ? url : "", {
                   ...addData[i],
-                  limitDay,
+                  limitDay: `${limitDay[0]}-${limitDay[1]}-${limitDay[2]}`,
                   age: Number(
                     getAge(new Date(String(handler.GetPageVal("age_multi"))))
                       .age
@@ -185,12 +192,15 @@ const _MultiMainDataSelect = () => {
                       : false,
                 });
                 let permitDays = result.workDayForMulti;
-                if (handler.GetPageVal("dayJobPermitDay")) {
+                if (handler.GetPageVal("workCate") === 6) {
                   permitDays = handler.GetPageVal("dayJobPermitDay")
                     ? handler.GetPageVal("dayJobPermitDay")
                     : 0;
                 }
-                if (handler.GetPageVal("shortsPermitDay")) {
+                if (
+                  handler.GetPageVal("workCate") === 4 ||
+                  handler.GetPageVal("workCate") === 5
+                ) {
                   permitDays = handler.GetPageVal("shortsPermitDay")
                     ? handler.GetPageVal("shortsPermitDay")
                     : 0;
@@ -279,6 +289,12 @@ const _MultiCalListCard = ({
   company: Company;
   list_num: number;
 }) => {
+  console.log(company, 1212);
+  const [check_select_date, setState] =
+    useRecoilState<any>(duplicationDateCheck);
+  const [check_select_months, setState2] = useRecoilState<any>(
+    duplicationWorkRecord
+  );
   const onClickCompanyDelete = (e: MouseEvent<HTMLDivElement>) => {
     const targetId = e.currentTarget.id;
     CreatePopup(
@@ -316,8 +332,43 @@ const _MultiCalListCard = ({
               "select_multi",
               Number(e.currentTarget.id.split("_")[0])
             );
-            handler.GetPageVal("select_multi");
-            handler.setCompState && handler.setCompState(2);
+            if (company.content) {
+              CreatePopup(
+                undefined,
+                "해당 근무 정보를 모두 재 입력합니다.",
+                "confirm",
+                () => {
+                  const select_date_update = check_select_date.filter(
+                    (el: any) => {
+                      return !handler
+                        .GetPageVal(
+                          `select_multi_${Number(
+                            e.currentTarget.id.split("_")[0]
+                          )}`
+                        )
+                        .date_info.includes(el);
+                    }
+                  );
+                  const select_date__month_update = check_select_months.filter(
+                    (el: any) => {
+                      return !handler
+                        .GetPageVal(
+                          `select_multi_${Number(
+                            e.currentTarget.id.split("_")[0]
+                          )}`
+                        )
+                        .date_month_info.includes(el);
+                    }
+                  );
+                  setState(select_date_update);
+                  setState2(select_date__month_update);
+                  handler.setCompState && handler.setCompState(2);
+                },
+                () => ClosePopup()
+              );
+            } else {
+              handler.setCompState && handler.setCompState(2);
+            }
           }}
         >
           {company.content ? "수정 >" : "입력 >"}
@@ -395,7 +446,6 @@ const _MultiCompanyList = () => {
             />
           );
         })}
-        {/* <div className="fs_14">* 주의 : 근무기간 중복</div> */}
         <button
           id="company_add_btn"
           onClick={() => {
@@ -434,6 +484,11 @@ const MultiCalPage = () => {
   handler.setCompState = setCompState;
   handler.SetPageVal("cal_state", "multi");
   handler.SetPageVal("retired", true);
+  const [check_select_date, setState] =
+    useRecoilState<any>(duplicationDateCheck);
+  const [check_select_months, setState2] = useRecoilState<any>(
+    duplicationWorkRecord
+  );
   return (
     <>
       {compState === 5 ? (

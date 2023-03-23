@@ -178,32 +178,6 @@ class DetailedHandler extends InputHandler {
     return answer;
   };
   public Action_Cal_Result = () => {
-    const weekDay =
-      this._Data.weekDay &&
-      Object.values([...new Set(this._Data.weekDay)]).map((el) => {
-        if (el === "월") {
-          return 1;
-        }
-        if (el === "화") {
-          return 2;
-        }
-        if (el === "수") {
-          return 3;
-        }
-        if (el === "목") {
-          return 4;
-        }
-        if (el === "금") {
-          return 5;
-        }
-        if (el === "토") {
-          return 6;
-        }
-        if (el === "일") {
-          return 0;
-        }
-      });
-
     const limitDay = GetDateArr(
       new Date(
         new Date(
@@ -253,7 +227,7 @@ class DetailedHandler extends InputHandler {
                 ? this._Data.salary
                 : [this._Data.salary]
               : null,
-            weekDay,
+            weekDay: this._Data.weekDay,
             enterDay: this._Data.enterDay ? this._Data.enterDay : null,
             retiredDay: this._Data.retired
               ? this._Data.retiredDay
@@ -349,7 +323,7 @@ class DetailedHandler extends InputHandler {
         ? {
             enterDay: this._Data.enterDay,
             retiredDay: this._Data.retiredDay,
-            weekDay,
+            weekDay: this._Data.weekDay,
             salary: this._Data.salary
               ? Array.isArray(this._Data.salary)
                 ? this._Data.salary
